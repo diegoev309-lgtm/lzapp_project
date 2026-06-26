@@ -1,0 +1,195 @@
+
+/* ========= GENERALES ========= */
+body{
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+/* ========= barra de navegacion ========*/
+.navbar{
+    background: #f2f2f2 !important;
+    border: 3px solid #b8b8b8;
+}
+
+.navbar-brand{
+    display: flex;
+    align-items: center; /* Centra imagen y texto verticalmente */
+    gap: 10px;           /* Espacio entre imagen y texto */
+    color: #083b78 !important;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.navbar-brand img{
+    width: 60px;   /* Puedes cambiar el tamaño libremente */
+    height: 60px;
+    object-fit: contain;
+}
+
+.nav-link{
+    color: #083b78 !important;
+    font-weight: 700;
+    font-size: 20px;
+    text-shadow: 0 3px 5px rgba(0,0,0,.2);
+    margin: 0 25px;
+}
+
+.nav.justify-content-end .nav-link{
+    background: #083b78;
+    color: white !important;
+    padding: 8px 20px;
+    border-radius: 30px;
+    box-shadow: 0 3px 5px rgba(0,0,0,.3);
+}
+
+
+
+/* ========= CARRUSEL ========= */
+.imagen-carousel{
+    height: 600px;
+    object-fit: cover;
+}
+
+
+.texto-carousel{
+    top: 6%;
+    left: 10%;
+    right: auto;
+    bottom: auto;
+    color: white;
+}
+
+
+.texto-carousel h1{
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+
+.texto-carousel p{
+    font-size: 1.3rem;
+}
+
+/* ========= RESPONSIVE para el carrusel ========= */
+@media (max-width:768px){
+
+    .imagen-carousel{
+        height: 350px;
+    }
+
+
+    .texto-carousel{
+
+        top: 20%;
+        left: 5%;
+
+    }
+
+
+    .texto-carousel h1{
+
+        font-size: 2rem;
+
+    }
+
+
+    .texto-carousel p{
+
+        font-size: 1rem;
+
+    }
+
+}
+
+/* =========  los texto de las sesiones =========*/
+.texto-datos{
+    color: #083b78 !important;
+    font-weight: 700;
+}
+
+/* ========= FOOTER ========= */
+footer{
+    background-color: #f8f9fa;
+    padding-top: 40px;
+}
+
+/* Líneas divisorias solo en escritorio */
+@media (min-width:768px){
+
+    .border-md-end{
+        border-right: 1px solid #ccc;
+    }
+
+}
+
+/* ===== PIE DE PÁGINA ===== */
+footer{
+    background-color: #022C63;   /* Azul oscuro de la imagen */
+    color: white;
+    padding: 40px 0 15px;
+    border-top: 3px solid #b8b8b8; /* Morado superior */
+}
+
+/* Títulos */
+footer h4{
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+/* Texto */
+footer p{
+    font-size: .95rem;
+    margin-bottom: 10px;
+    color: #f0f0f0;
+}
+
+/* Líneas divisorias */
+.border-md-end{
+    border-right: 1px solid rgba(255,255,255,.25);
+}
+
+/* Redes sociales */
+footer a img{
+    transition: .3s;
+}
+
+footer a img:hover{
+    transform: scale(1.1);
+}
+
+/* Logo SENA */
+footer .col-md-4:last-child img{
+    margin-top: 15px;
+}
+
+/* Derechos reservados */
+footer .text-center.m-0{
+    margin-top: 30px !important;
+    padding-top: 20px !important;
+    border-top: 1px solid rgba(255,255,255,.15);
+    color: #d9d9d9;
+    font-size: .9rem;
+}
+
+/* Responsive */
+@media(max-width:992px){
+
+    .footer-col{
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,.3);
+        padding: 25px 0;
+    }
+
+    .sin-borde{
+        border-bottom: none;
+    }
+
+    .redes{
+        gap: 30px;
+    }
+
+    .logo-sena{
+        justify-content: center;
+    }
+}

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+
+    {% load static %}
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Fuente -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f9fa;
+        }
+
+        .nav-link {
+            color: #444;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            transition: .3s;
+        }
+
+        .nav-link:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: #192987;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+        }
+        
+        .btn-menu {
+            background-color: #192987;
+            color: white;
+            border-color: #192987;
+        }
+
+        .btn-menu:hover {
+            background-color: #14206b;
+            border-color: #14206b;
+            color: white;
+        }
+
+        .btn-menu:focus,
+        .btn-menu:active {
+            background-color: #14206b !important;
+            border-color: #14206b !important;
+            color: white !important;
+            box-shadow: 0 0 0 0.25rem rgba(25, 41, 135, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Botón menú para móviles -->
+        <div class="d-md-none p-2 shadow-sm">
+            <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <i class="bi bi-list"></i> Menu
+            </button>
+        </div>
+
+        <!-- Sidebar escritorio -->
+        <aside class="col-md-3 col-lg-2 d-none d-md-block bg-light vh-100 shadow p-1">
+
+            <h3 class="text-center mb-4">
+                <i class="bi bi-shop"></i> LzApp
+            </h3>
+
+            <div class="nav flex-column">
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Inicio' %}active{% endif %}"
+                   href="{% url 'Inicio' %}">
+                    <i class="bi bi-house-door-fill me-2"></i>
+                    Inicio
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Producto' %}active{% endif %}"
+                   href="{% url 'Producto' %}">
+                    <i class="bi bi-basket-fill me-2"></i>
+                    Productos
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Produccion' %}active{% endif %}"
+                   href="{% url 'Produccion' %}">
+                    <i class="bi bi-box-seam me-2"></i>
+                    Producción
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Ventas' %}active{% endif %}"
+                   href="{% url 'Ventas' %}">
+                    <i class="bi bi-cash-stack me-2"></i>
+                    Ventas
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Pedidos' %}active{% endif %}"
+                   href="{% url 'Pedidos' %}">
+                    <i class="bi bi-truck me-2"></i>
+                    Pedidos
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Usuarios' %}active{% endif %}"
+                   href="{% url 'Usuarios' %}">
+                    <i class="bi bi-people-fill me-2"></i>
+                    Usuarios
+                </a>
+
+                <a class="nav-link {% if request.resolver_match.url_name == 'Notificaciones' %}active{% endif %}"
+                   href="{% url 'Notificaciones' %}">
+                    <i class="bi bi-bell-fill me-2"></i>
+                    Notificaciones
+                </a>
+
+            </div>
+
+        </aside>
+
+        <!-- Sidebar móvil -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+
+            <div class="offcanvas-header">
+                <h5><i class="bi bi-shop"></i> LzApp</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="offcanvas">
+                </button>
+            </div>
+
+            <div class="offcanvas-body">
+
+                <div class="nav flex-column">
+
+                    <a class="nav-link" href="{% url 'Inicio' %}">
+                        <i class="bi bi-house-door-fill me-2"></i>
+                        Inicio
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Producto' %}">
+                        <i class="bi bi-basket-fill me-2"></i>
+                        Productos
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Produccion' %}">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Producción
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Ventas' %}">
+                        <i class="bi bi-cash-stack me-2"></i>
+                        Ventas
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Pedidos' %}">
+                        <i class="bi bi-truck me-2"></i>
+                        Pedidos
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Usuarios' %}">
+                        <i class="bi bi-people-fill me-2"></i>
+                        Usuarios
+                    </a>
+
+                    <a class="nav-link" href="{% url 'Notificaciones' %}">
+                        <i class="bi bi-bell-fill me-2"></i>
+                        Notificaciones
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Contenido -->
+        <main class="col-md-9 col-lg-10 p-4">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

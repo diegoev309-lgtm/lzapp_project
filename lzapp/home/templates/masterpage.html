@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LzApp{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+</head>
+<body>
+
+    <!-- barra de navegacion -->
+    <header>
+        <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo">
+                    LzApp
+                </a>
+
+                <ul class="nav justify-content-center">
+                    <li class="nav-item"><a class="nav-link" href="#">Quienes somos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contactos</a></li>
+                </ul>
+
+                {% block navbar_actions %}{% endblock %}
+            </div>
+        </nav>
+    </header>
+
+    {% block content %}
+    <main class="mt-5 pt-4">
+
+        <!-- carrusel de imagenes -->
+        <section>
+            <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" data-bs-interval="5000">
+                        <img src="{% static 'home/media/queso1.png' %}" class="d-block w-100 imagen-carousel">
+                        <div class="carousel-caption text-start texto-carousel">
+                            <h1>Queso Artesanal</h1>
+                            <p>El auténtico sabor venezolano.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item" data-bs-interval="5000">
+                        <img src="{% static 'home/media/queso2.png' %}" class="d-block w-100 imagen-carousel">
+                        <div class="carousel-caption text-start texto-carousel">
+                            <!-- <h5>Second slide label</h5>
+                            <p>Some representative placeholder content for the second slide.</p> -->
+                        </div>
+                    </div>
+                    <div class="carousel-item" data-bs-interval="5000">
+                        <img src="{% static 'home/media/queso3.png' %}" class="d-block w-100 imagen-carousel">
+                        <div class="carousel-caption text-start texto-carousel">
+                            <!-- <h5>Third slide label</h5>
+                            <p>Some representative placeholder content for the third slide.</p> -->
+                        </div>
+                    </div>
+                </div>
+                <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button> -->
+            </div>
+        </section>
+
+
+        <section class="container py-5 text-center">
+            <h1 class="texto-datos">Nuestros productos</h1>
+            <p class="lead">Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos de la cocina de la abuela.</p>
+        </section>
+
+        <section class="container py-5 text-center">
+            <h1 class="texto-datos">Quienes somos</h1>
+            <p class="lead">En Lácteos Zulianos, llevamos la tradición del queso venezolano a Medellín. Somos una microempresa familiar con un solo objetivo: garantizar el sabor auténtico, la calidad y la nostalgia de nuestra tierra en cada hogar.</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4 border-md-end">
+                    <h4>Servicio al cliente</h4>
+                    <p>Lineas exclusivas</p>
+                    <p>321-545-0519 / 311-456-987</p>
+                    <p>Medellin@zulianos.com.co</p>
+                </div>
+                <div class="col-md-4 mb-4 border-md-end">
+                    <h4>Síguenos en nuestras redes corporativas</h4>
+                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+                        <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="50" alt="WhatsApp"></a>
+                        <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="50" alt="Instagram"></a>
+                        <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="50" alt="Facebook"></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4>Términos y condiciones</h4>
+                    <p>Ubicación</p>
+                    <p>Protección de datos personales</p>
+                    <p>Aviso de privacidad</p>
+                    <img src="{% static 'home/media/sena.png' %}" alt="Logo" width="45" height="40" class="d-inline-block align-text-top">
+                </div>
+            </div>
+            <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a lacteos zulianos</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    {% endblock %}
+</body>
+</html>
