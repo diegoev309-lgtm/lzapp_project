@@ -6,12 +6,6 @@ def dview(resquet):
 def Inicio(request):
     return render(request, "Inicio.html")
 
-def Producto(request):
-    return render(request, "producto.html")
-
-def Produccion(request):
-    return render(request, "produccion.html")
-
 def Ventas(request):
     return render(request, "ventas.html")
 

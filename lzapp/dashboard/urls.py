@@ -1,13 +1,11 @@
-from django.urls import path
-from dashboard.views import dview,Inicio,Producto,Produccion,Ventas,Usuarios,Pedidos,Notificaciones
+from django.urls import path,include
+from . import views
 
 urlpatterns = [
-    path('dview',dview,name="dview"),
-    path('Inicio',Inicio,name="Inicio"),
-    path('Producto',Producto,name="Producto"),
-    path('Produccion',Produccion,name="Produccion"),
-    path('Ventas',Ventas,name="Ventas"),
-    path('Usuarios',Usuarios,name="Usuarios"),
-    path('Pedidos',Pedidos,name="Pedidos"),
-    path('Notificaciones',Notificaciones,name="Notificaciones"),
+    path('dview',views.dview,name="dview"),
+    path('Inicio',views.Inicio,name="Inicio"),
+    path('Ventas',views.Ventas,name="Ventas"),
+    path('Usuarios',views.Usuarios,name="Usuarios"),
+    path('Pedidos',views.Pedidos,name="Pedidos"),
+    path('Notificaciones',views.Notificaciones,name="Notificaciones"),
 ]

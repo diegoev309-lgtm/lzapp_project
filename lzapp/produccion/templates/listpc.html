@@ -1,0 +1,163 @@
+{% extends "masterpage_dashboard.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+    .contenedor-produccion{
+        padding: 30px;
+    }
+
+    .encabezado{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:30px;
+        flex-wrap:wrap;
+        gap:15px;
+    }
+
+    .titulo{
+        color:#192987;
+        font-weight:700;
+    }
+
+    .card-produccion{
+        background:white;
+        border-radius:20px;
+        box-shadow:0 8px 25px rgba(0,0,0,.08);
+        padding:25px;
+    }
+
+    .tabla-produccion thead{
+        background:#192987;
+        color:white;
+    }
+
+    .tabla-produccion thead th{
+        border:none;
+        padding:18px;
+    }
+
+    .tabla-produccion tbody td{
+        padding:15px;
+        vertical-align:middle;
+    }
+
+    .tabla-produccion tbody tr{
+        transition:.3s;
+    }
+
+    .tabla-produccion tbody tr:hover{
+        background:#f5f7ff;
+    }
+
+    .btn-nuevo{
+        background:#192987;
+        color:white;
+        border-radius:10px;
+        padding:10px 20px;
+    }
+
+    .btn-nuevo:hover{
+        background:#101d64;
+        color:white;
+    }
+
+    .badge-cantidad{
+        font-size:14px;
+        padding:8px 12px;
+    }
+</style>
+
+<div class="container contenedor-produccion">
+
+    <div class="encabezado">
+
+        <h1 class="titulo">
+            <i class="bi bi-box-seam"></i>
+            Historial de Producción
+        </h1>
+
+        <a href="{% url 'crear_produccion' %}"
+           class="btn btn-nuevo">
+
+            <i class="bi bi-plus-circle"></i>
+            Nueva Producción
+        </a>
+
+    </div>
+
+    <div class="card-produccion">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover tabla-produccion">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Cantidad Producida</th>
+                        <th>Fecha</th>
+                        <th>Observación</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for i in producciones %}
+                    <tr>
+
+                        <td>
+                            {{ i.id }}
+                        </td>
+
+                        <td>
+                            {{ i.producto.nombre }}
+                        </td>
+
+                        <td>
+                            <span class="badge bg-success badge-cantidad">
+                                + {{ i.cantidad_producida }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ i.fecha_produccion|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            {% if i.observacion %}
+                                {{ i.observacion }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Sin observaciones
+                                </span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            No hay producciones registradas.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

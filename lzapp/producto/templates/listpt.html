@@ -1,0 +1,219 @@
+{% extends "masterpage_dashboard.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+    .contenedor-productos{
+        padding: 30px;
+    }
+
+    .encabezado{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:30px;
+        flex-wrap:wrap;
+        gap:15px;
+    }
+
+    .titulo{
+        color:#192987;
+        font-weight:700;
+    }
+
+    .card-productos{
+        background:white;
+        border-radius:20px;
+        box-shadow:0 8px 25px rgba(0,0,0,.08);
+        padding:25px;
+    }
+
+    .tabla-productos thead{
+        background:#192987;
+        color:white;
+    }
+
+    .tabla-productos thead th{
+        border:none;
+        padding:18px;
+    }
+
+    .tabla-productos tbody td{
+        padding:15px;
+        vertical-align:middle;
+    }
+
+    .tabla-productos tbody tr{
+        transition:.3s;
+    }
+
+    .tabla-productos tbody tr:hover{
+        background:#f5f7ff;
+    }
+
+    .img-producto{
+        width:90px;
+        height:60px;
+        object-fit:cover;
+        border-radius:10px;
+    }
+
+    .btn-nuevo{
+        background:#192987;
+        color:white;
+        border-radius:10px;
+        padding:10px 20px;
+    }
+
+    .btn-nuevo:hover{
+        background:#101d64;
+        color:white;
+    }
+
+    .btn-editar{
+        background:#0d6efd;
+        color:white;
+        border-radius:8px;
+    }
+
+    .btn-eliminar{
+        background:#dc3545;
+        color:white;
+        border-radius:8px;
+    }
+
+    .btn-editar:hover,
+    .btn-eliminar:hover{
+        color:rgb(15, 8, 8);
+        transform:translateY(-2px);
+    }
+
+    .badge-stock{
+        font-size:14px;
+        padding:8px 12px;
+        margin-left:8px;
+    }
+</style>
+
+<div class="container contenedor-productos">
+
+    <div class="encabezado">
+        <h1 class="titulo">
+            <i class="bi bi-box-seam"></i>
+            Listado de Productos
+        </h1>
+
+        <a href="{% url 'crear_producto' %}" class="btn btn-nuevo">
+            <i class="bi bi-plus-circle"></i>
+            Nuevo Producto
+        </a>
+    </div>
+
+    <div class="card-productos">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover tabla-productos">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Disponible</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for i in productos %}
+                    <tr>
+
+                        <td>
+                            {{ i.id }}
+                        </td>
+
+                        <td>
+                            {% if i.imagen %}
+                                <img src="{{ i.imagen.url }}"
+                                     class="img-producto">
+                            {% else %}
+                                <img src="{% static 'img/no-image.png' %}"
+                                     class="img-producto">
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ i.nombre }}
+                        </td>
+
+                        <td>
+                            $ {{ i.precio }}
+                        </td>
+
+                        <td>
+                            {{ i.stock_actual }}
+
+                            {% if i.stock_actual <= i.stock_minimo %}
+                                <span class="badge bg-danger badge-stock">
+                                    Stock Bajo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-success badge-stock">
+                                    Stock Normal
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if i.activo %}
+                                <span class="badge bg-success">
+                                    Disponible
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    No disponible
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'editar_producto' i.id %}"
+                               class="btn btn-editar btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+
+                            <a href="{% url 'eliminar_producto' i.id %}"
+                               class="btn btn-eliminar btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            No hay productos registrados.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

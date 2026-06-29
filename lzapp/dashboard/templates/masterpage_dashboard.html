@@ -97,14 +97,14 @@
                     Inicio
                 </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Producto' %}active{% endif %}"
-                   href="{% url 'Producto' %}">
+                <a class="nav-link {% if request.resolver_match.url_name == 'listar_productos' %}active{% endif %}"
+                   href="{% url 'listar_productos' %}">
                     <i class="bi bi-basket-fill me-2"></i>
                     Productos
                 </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Produccion' %}active{% endif %}"
-                   href="{% url 'Produccion' %}">
+                <a class="nav-link {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
+                   href="{% url 'listar_producciones' %}">
                     <i class="bi bi-box-seam me-2"></i>
                     Producción
                 </a>
@@ -158,12 +158,12 @@
                         Inicio
                     </a>
 
-                    <a class="nav-link" href="{% url 'Producto' %}">
+                    <a class="nav-link" href="{% url 'listar_productos' %}">
                         <i class="bi bi-basket-fill me-2"></i>
                         Productos
                     </a>
 
-                    <a class="nav-link" href="{% url 'Produccion' %}">
+                    <a class="nav-link" href="{% url 'listar_producciones' %}">
                         <i class="bi bi-box-seam me-2"></i>
                         Producción
                     </a>
