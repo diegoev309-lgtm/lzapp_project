@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'accounts',
     'home',
     'dashboard',
+    'scruds',
 ]
 
 MIDDLEWARE = [
@@ -76,9 +77,9 @@ USE_TZ = True
 # ── Archivos estáticos ──────────────────────────────────────────────
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'home' / 'static',  # <-- ESTE ES EL CAMBIO
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'home' / 'static',  # <-- ESTE ES EL CAMBIO
+# ]
 
 # ── Archivos de media ───────────────────────────────────────────────
 MEDIA_URL = '/media/'
