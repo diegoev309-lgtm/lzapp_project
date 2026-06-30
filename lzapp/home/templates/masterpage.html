@@ -1,122 +1,689 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LzApp{% endblock %}</title>
+    <title>{% block title %}LzApp — Lácteos Zulianos{% endblock %}</title>
 
     {% load static %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
 </head>
 <body>
 
-    <!-- barra de navegacion -->
+    <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
     <header>
-        <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary">
+        <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
             <div class="container">
                 <a class="navbar-brand" href="#">
-                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo">
+                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
                     LzApp
                 </a>
 
-                <ul class="nav justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="#">Quienes somos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contactos</a></li>
-                </ul>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="bi bi-list text-white fs-2"></i>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="nav">
+                        <li class="nav-item"><a class="nav-link" href="#nosotros">Quiénes somos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
 
                 {% block navbar_actions %}{% endblock %}
             </div>
         </nav>
     </header>
 
-    {% block content %}
-    <main class="mt-5 pt-4">
 
-        <!-- carrusel de imagenes -->
-        <section>
-            <div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active" data-bs-interval="5000">
-                        <img src="{% static 'home/media/queso1.png' %}" class="d-block w-100 imagen-carousel">
-                        <div class="carousel-caption text-start texto-carousel">
-                            <h1>Queso Artesanal</h1>
-                            <p>El auténtico sabor venezolano.</p>
+    {% block content %}
+    <main>
+
+        <!-- ===== CARRUSEL HERO — slide 1 (video+3D) + 2 slides de imagen ===== -->
+        <section class="hero-carrusel" id="inicio">
+
+            <div class="carrusel-track" id="carruselTrack">
+
+                <!-- ---------- SLIDE 1: HERO ORIGINAL (video + escena 3D) ---------- -->
+                <div class="carrusel-slide">
+                    <div class="hero">
+
+                        <video class="hero-video" autoplay loop muted playsinline>
+                            <source src="{% static 'home/media/6804173-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
+                        </video>
+
+                        <div class="hero-video-overlay"></div>
+                        <div class="hero-topfade"></div>
+
+                        <span class="hero-orb orb-1" data-depth="0.5"></span>
+                        <span class="hero-orb orb-2" data-depth="0.9"></span>
+                        <span class="hero-orb orb-3" data-depth="0.35"></span>
+                        <span class="hero-orb orb-4" data-depth="0.7"></span>
+
+                        <div class="container hero-inner">
+                            <div class="row align-items-center g-5">
+
+                                <div class="col-lg-6">
+                                    <span class="hero-eyebrow"><span class="dot"></span> Tradición venezolana en Medellín</span>
+                                    <h1 class="hero-title">
+                                        <span class="linea"><span class="palabra" style="animation-delay:.1s">Queso</span></span>
+                                        <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">Artesanal</span></span>
+                                    </h1>
+                                    <p class="hero-sub">
+                                        El auténtico sabor de nuestra tierra, hecho con recetas familiares,
+                                        sin aditivos y con la frescura de siempre. Ahora más cerca de tu mesa.
+                                    </p>
+                                    <div class="hero-actions">
+                                        <a href="#productos" class="btn-dorado">
+                                            <i class="bi bi-bag-heart"></i> Ver productos
+                                        </a>
+                                        <a href="#contacto" class="btn-outline-blanco">
+                                            <i class="bi bi-whatsapp"></i> Contáctanos
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="hero-escena" id="heroEscena">
+                                        <span class="hero-anillo"></span>
+                                        <div class="pieza3d pieza-rueda" data-depth="0.18">
+                                            <img src="{% static 'home/media/logolacz.png' %}"
+                                                alt="Logo LzApp"
+                                                style="mix-blend-mode: normal; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); width: 260px;">
+                                        </div>
+                                        <div class="pieza3d pieza-cuna" data-depth="0.5">
+                                            <img src="{% static 'home/media/hero-wedge-3d.png' %}"
+                                                 alt="Cuña de queso fresco">
+                                        </div>
+                                        <div class="pieza3d pieza-bola" data-depth="0.7">
+                                            <img src="{% static 'home/media/481d0dc0e1da87c0016c82cd07e6820bd15a40f5 (1).png' %}"
+                                                 alt="Bola de queso fresco">
+                                        </div>
+                                        <div class="pieza3d pieza-extra" data-depth="0.4">
+                                            <img src="{% static 'home/media/9646ff920fb88ac261a97674057dd2133dba55c4 (1).png' %}"
+                                                 alt="Queso telita">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
-                    </div>
-                    <div class="carousel-item" data-bs-interval="5000">
-                        <img src="{% static 'home/media/queso2.png' %}" class="d-block w-100 imagen-carousel">
-                        <div class="carousel-caption text-start texto-carousel">
-                            <!-- <h5>Second slide label</h5>
-                            <p>Some representative placeholder content for the second slide.</p> -->
-                        </div>
-                    </div>
-                    <div class="carousel-item" data-bs-interval="5000">
-                        <img src="{% static 'home/media/queso3.png' %}" class="d-block w-100 imagen-carousel">
-                        <div class="carousel-caption text-start texto-carousel">
-                            <!-- <h5>Third slide label</h5>
-                            <p>Some representative placeholder content for the third slide.</p> -->
+
+                        <div class="hero-scroll">
+                            <span class="mouse"><span></span></span>
+                            Desliza
                         </div>
                     </div>
                 </div>
-                <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button> -->
+
+                <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos ---------- -->
+                <div class="carrusel-slide">
+                    <div class="slide-imagen">
+                        <img src="{% static 'home/media/Gemini_Generated_Image_vgurievgurievgur.png' %}" class="slide-imagen-fondo" alt="Variedad de quesos artesanales venezolanos">
+                        <div class="slide-imagen-overlay"></div>
+                        <div class="container slide-imagen-contenido">
+                            <span class="hero-eyebrow"><span class="dot"></span> Para todos los gustos</span>
+                            <h1 class="hero-title">
+                                <span class="linea"><span class="palabra" style="animation-delay:.1s">Variedad</span></span>
+                                <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">de Quesos</span></span>
+                            </h1>
+                            <p class="hero-sub">
+                                Desde el clásico queso blanco hasta el suave queso de mano y el delicado telita —
+                                tenemos la variedad que tu mesa necesita. Todos artesanales, frescos y sin aditivos.
+                            </p>
+                            <div class="hero-actions">
+                                <a href="#productos" class="btn-dorado">
+                                    <i class="bi bi-bag-heart"></i> Ver productos
+                                </a>
+                                <a href="#contacto" class="btn-outline-blanco">
+                                    <i class="bi bi-whatsapp"></i> Contáctanos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
+                <div class="carrusel-slide">
+                    <div class="slide-imagen">
+                        <img src="{% static 'home/media/Gemini_Generated_Image_sc7adrsc7adrsc7a.png' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
+                        <div class="slide-imagen-overlay"></div>
+                        <div class="container slide-imagen-contenido">
+                            <div class="row align-items-center g-4">
+
+                                <!-- Texto izquierda -->
+                                <div class="col-lg-6">
+                                    <span class="hero-eyebrow"><span class="dot"></span> Ahora llevamos hasta tu puerta</span>
+                                    <h1 class="hero-title">
+                                        <span class="linea"><span class="palabra" style="animation-delay:.1s">Pedidos</span></span>
+                                        <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">a Domicilio</span></span>
+                                    </h1>
+                                    <p class="hero-sub">
+                                        Haz tu pedido y sigue en tiempo real dónde está tu queso.
+                                        Sabor venezolano fresco, directo a tu hogar en Medellín —
+                                        rápido, seguro y sin salir de casa.
+                                    </p>
+                                    <div class="hero-actions">
+                                        <a href="https://wa.me/573215450519" class="btn-dorado">
+                                            <i class="bi bi-scooter"></i> Pedir ahora
+                                        </a>
+                                        <a href="#contacto" class="btn-outline-blanco">
+                                            <i class="bi bi-map"></i> Ver cobertura
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- GIF de tracking animado (SVG inline) -->
+                                <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                                    <div class="tracking-widget">
+                                        <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" class="tracking-svg">
+
+                                            <!-- Tarjeta fondo -->
+                                            <rect x="10" y="10" width="320" height="240" rx="20" ry="20"
+                                                fill="rgba(2,44,99,0.75)" stroke="rgba(201,168,76,0.5)" stroke-width="1.5"/>
+
+                                            <!-- Título tarjeta -->
+                                            <text x="170" y="42" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                font-size="13" font-weight="700" fill="#f0d98a" letter-spacing="1">
+                                                SEGUIMIENTO EN VIVO
+                                            </text>
+
+                                            <!-- Línea de ruta -->
+                                            <path d="M55,155 Q120,90 200,130 Q250,155 285,140"
+                                                fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="3"
+                                                stroke-dasharray="6 4"/>
+
+                                            <!-- Ruta activa animada -->
+                                            <path id="rutaActiva" d="M55,155 Q120,90 200,130 Q250,155 285,140"
+                                                fill="none" stroke="#c9a84c" stroke-width="3"
+                                                stroke-dasharray="300" stroke-dashoffset="300">
+                                                <animate attributeName="stroke-dashoffset"
+                                                    from="300" to="0" dur="3s"
+                                                    begin="0s;reinicio.end+0.8s"
+                                                    fill="freeze" id="trazado"/>
+                                            </path>
+
+                                            <!-- Punto origen (tienda) -->
+                                            <circle cx="55" cy="155" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
+                                            <text x="55" y="159" text-anchor="middle" font-size="9" fill="#f0d98a">🏪</text>
+                                            <text x="55" y="174" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                font-size="9" fill="rgba(255,255,255,0.7)">Tienda</text>
+
+                                            <!-- Punto destino (casa) -->
+                                            <circle cx="285" cy="140" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
+                                            <text x="285" y="144" text-anchor="middle" font-size="9" fill="#f0d98a">🏠</text>
+                                            <text x="285" y="158" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                font-size="9" fill="rgba(255,255,255,0.7)">Tu casa</text>
+
+                                            <!-- Scooter animado sobre la ruta -->
+                                            <g id="scooter">
+                                                <!-- Sombra del scooter -->
+                                                <ellipse cx="0" cy="6" rx="14" ry="4" fill="rgba(0,0,0,0.25)"/>
+                                                <!-- Cuerpo del scooter -->
+                                                <rect x="-13" y="-10" width="26" height="12" rx="5" fill="#c9a84c"/>
+                                                <!-- Ruedas -->
+                                                <circle cx="-10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
+                                                <circle cx="10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
+                                                <!-- Manillar -->
+                                                <rect x="8" y="-14" width="3" height="8" rx="1.5" fill="#f0d98a"/>
+                                                <!-- Cajita de queso -->
+                                                <rect x="-8" y="-18" width="14" height="10" rx="3" fill="#083b78" stroke="#c9a84c" stroke-width="1"/>
+                                                <text x="0" y="-10" text-anchor="middle" font-size="7" fill="#f0d98a">🧀</text>
+
+                                                <animateMotion dur="3s" begin="0.2s;reinicio.end+1s" fill="freeze" rotate="auto">
+                                                    <mpath href="#rutaActiva"/>
+                                                </animateMotion>
+                                            </g>
+
+                                            <!-- Pulso en el destino -->
+                                            <circle cx="285" cy="140" r="9" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0">
+                                                <animate attributeName="r" from="9" to="22" dur="1.5s"
+                                                    begin="trazado.end" repeatCount="indefinite"/>
+                                                <animate attributeName="opacity" from="0.7" to="0" dur="1.5s"
+                                                    begin="trazado.end" repeatCount="indefinite"/>
+                                            </circle>
+
+                                            <!-- Animación de reinicio oculta -->
+                                            <animate id="reinicio" attributeName="opacity" from="1" to="1"
+                                                begin="trazado.end+2s" dur="0.01s" fill="freeze"/>
+
+                                            <!-- Pasos de estado debajo -->
+                                            <g transform="translate(0,195)">
+                                                <!-- Paso 1: Confirmado -->
+                                                <circle cx="80" cy="12" r="8" fill="#c9a84c"/>
+                                                <text x="80" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">✓</text>
+                                                <text x="80" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                    font-size="8" fill="rgba(255,255,255,0.8)">Confirmado</text>
+
+                                                <!-- Línea -->
+                                                <line x1="92" y1="12" x2="148" y2="12" stroke="#c9a84c" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+                                                <!-- Paso 2: En camino -->
+                                                <circle cx="160" cy="12" r="8" fill="#c9a84c">
+                                                    <animate attributeName="fill" values="#c9a84c;#f0d98a;#c9a84c"
+                                                        dur="1.2s" repeatCount="indefinite"/>
+                                                </circle>
+                                                <text x="160" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">🛵</text>
+                                                <text x="160" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                    font-size="8" fill="rgba(255,255,255,0.8)">En camino</text>
+
+                                                <!-- Línea -->
+                                                <line x1="172" y1="12" x2="228" y2="12" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+                                                <!-- Paso 3: Entregado -->
+                                                <circle cx="240" cy="12" r="8" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+                                                <text x="240" y="16" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)">🏠</text>
+                                                <text x="240" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                                    font-size="8" fill="rgba(255,255,255,0.4)">Entregado</text>
+                                            </g>
+
+                                        </svg>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.carrusel-track -->
+
+            <!-- Flechas de navegación -->
+            <button class="carrusel-flecha prev" id="carruselPrev" aria-label="Diapositiva anterior">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="carrusel-flecha next" id="carruselNext" aria-label="Siguiente diapositiva">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+
+            <!-- Puntos indicadores -->
+            <div class="carrusel-puntos" id="carruselPuntos">
+                <button class="carrusel-punto activo" data-slide="0" aria-label="Ir a la diapositiva 1"></button>
+                <button class="carrusel-punto" data-slide="1" aria-label="Ir a la diapositiva 2"></button>
+                <button class="carrusel-punto" data-slide="2" aria-label="Ir a la diapositiva 3"></button>
+            </div>
+
+            <!-- Barra de progreso del autoplay -->
+            <div class="carrusel-progreso" id="carruselProgreso"></div>
+
+            <!-- Wave de transición hacia las estadísticas -->
+            <div class="hero-wave">
+                <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                    <path d="M0,40 C360,80 1080,0 1440,40 L1440,70 L0,70 Z" fill="#022C63"/>
+                </svg>
             </div>
         </section>
 
 
-        <section class="container py-5 text-center">
-            <h1 class="texto-datos">Nuestros productos</h1>
-            <p class="lead">Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos de la cocina de la abuela.</p>
+        <!-- ===== BANDA DE ESTADÍSTICAS ===== -->
+        <section class="seccion-stats">
+            <div class="container">
+                <div class="row justify-content-center align-items-center text-center g-0">
+                    <div class="col-6 col-md-3 reveal delay-1">
+                        <div class="stat-item">
+                            <span class="stat-numero">100%</span>
+                            <span class="stat-label">Artesanal</span>
+                        </div>
+                    </div>
+                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
+                    <div class="col-6 col-md-3 reveal delay-2">
+                        <div class="stat-item">
+                            <span class="stat-numero">0</span>
+                            <span class="stat-label">Aditivos</span>
+                        </div>
+                    </div>
+                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
+                    <div class="col-6 col-md-3 reveal delay-3">
+                        <div class="stat-item">
+                            <span class="stat-numero">+5</span>
+                            <span class="stat-label">Variedades</span>
+                        </div>
+                    </div>
+                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
+                    <div class="col-6 col-md-3 reveal delay-4">
+                        <div class="stat-item">
+                            <span class="stat-numero"><i class="bi bi-heart-fill"></i></span>
+                            <span class="stat-label">Hecho con amor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section class="container py-5 text-center">
-            <h1 class="texto-datos">Quienes somos</h1>
-            <p class="lead">En Lácteos Zulianos, llevamos la tradición del queso venezolano a Medellín. Somos una microempresa familiar con un solo objetivo: garantizar el sabor auténtico, la calidad y la nostalgia de nuestra tierra en cada hogar.</p>
+
+        <!-- Wave de transición hacia productos -->
+        <div class="wave-divider" style="background:#022C63;">
+            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
+            </svg>
+        </div>
+
+
+        <!-- ===== SECCIÓN PRODUCTOS ===== -->
+        <section class="seccion-productos" id="productos">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-lg-6 reveal-left">
+                        <span class="section-eyebrow">Lo que ofrecemos</span>
+                        <h2 class="section-titulo">Nuestros<br>productos</h2>
+                    </div>
+                    <div class="col-lg-6 d-flex align-items-end reveal-right">
+                        <p class="section-descripcion">
+                            Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad
+                            y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás
+                            aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos
+                            de la cocina de la abuela.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4 reveal delay-1">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso1.png' %}" class="producto-card-imagen" alt="Queso blanco">
+                            </div>
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Estrella</span>
+                                <h3 class="producto-nombre">Queso Blanco</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Fresco, suave y con la textura característica del queso venezolano. Ideal para acompañar arepa, tequeños y mucho más.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 reveal delay-2">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso2.png' %}" class="producto-card-imagen" alt="Queso de mano">
+                            </div>
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Favorito</span>
+                                <h3 class="producto-nombre">Queso de Mano</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Artesanal, delicado y con una consistencia que lo hace perfecto para derretir o disfrutar solo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 reveal delay-3">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso3.png' %}" class="producto-card-imagen" alt="Queso telita">
+                            </div>
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Especial</span>
+                                <h3 class="producto-nombre">Queso Telita</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Suave y cremoso, con esa fibra característica que lo distingue. Un clásico de la mesa venezolana.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
+
+
+        <!-- Wave de transición -->
+        <div class="wave-divider" style="background:#f7f8fc;">
+            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0,20 C480,70 960,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
+            </svg>
+        </div>
+
+
+        <!-- ===== SECCIÓN QUIÉNES SOMOS ===== -->
+        <section class="seccion-nosotros" id="nosotros">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-5 reveal-left">
+                        <div class="nosotros-imagen-wrapper">
+                            <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo">
+                        </div>
+                    </div>
+                    <div class="col-lg-7 reveal-right">
+                        <span class="section-eyebrow">Nuestra historia</span>
+                        <h2 class="section-titulo">Quiénes<br>somos</h2>
+                        <p class="section-descripcion mb-4">
+                            En Lácteos Zulianos, llevamos la tradición del queso venezolano a Medellín.
+                            Somos una microempresa familiar con un solo objetivo: garantizar el sabor auténtico,
+                            la calidad y la nostalgia de nuestra tierra en cada hogar.
+                        </p>
+
+                        <div class="nosotros-valor reveal delay-1">
+                            <div class="nosotros-valor-icono">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="nosotros-valor-texto">
+                                <strong>Calidad garantizada</strong>
+                                <p>Ingredientes frescos, proceso artesanal y sin conservantes artificiales.</p>
+                            </div>
+                        </div>
+
+                        <div class="nosotros-valor reveal delay-2">
+                            <div class="nosotros-valor-icono">
+                                <i class="bi bi-heart"></i>
+                            </div>
+                            <div class="nosotros-valor-texto">
+                                <strong>Tradición familiar</strong>
+                                <p>Recetas transmitidas de generación en generación, hechas con amor.</p>
+                            </div>
+                        </div>
+
+                        <div class="nosotros-valor reveal delay-3">
+                            <div class="nosotros-valor-icono">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <div class="nosotros-valor-texto">
+                                <strong>Medellín con sabor a Venezuela</strong>
+                                <p>Llevamos la nostalgia y el auténtico sabor zuliano a tu hogar en Colombia.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ===== BANDA CTA ===== -->
+        <section class="seccion-cta" id="contacto">
+            <div class="container text-center position-relative" style="z-index:1;">
+                <div class="reveal">
+                    <h2 class="cta-titulo">¿Listo para probar el<br><span>sabor auténtico?</span></h2>
+                    <p class="cta-subtitulo mb-4">Contáctanos y lleva Lácteos Zulianos a tu mesa.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="https://wa.me/573215450519" class="btn-dorado">
+                            <i class="bi bi-whatsapp"></i> Escríbenos por WhatsApp
+                        </a>
+                        <a href="mailto:Medellin@zulianos.com.co" class="btn-outline-blanco">
+                            <i class="bi bi-envelope"></i> Enviar correo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-4 border-md-end">
+                        <h4>Servicio al cliente</h4>
+                        <p>Líneas exclusivas</p>
+                        <p>321-545-0519 / 311-456-987</p>
+                        <p>Medellin@zulianos.com.co</p>
+                    </div>
+                    <div class="col-md-4 mb-4 border-md-end">
+                        <h4>Síguenos en redes</h4>
+                        <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
+                            <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="48" alt="WhatsApp"></a>
+                            <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="48" alt="Instagram"></a>
+                            <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="48" alt="Facebook"></a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h4>Términos y condiciones</h4>
+                        <p>Ubicación</p>
+                        <p>Protección de datos personales</p>
+                        <p>Aviso de privacidad</p>
+                        <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" width="45" height="40" class="d-inline-block align-text-top">
+                    </div>
+                </div>
+                <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+            </div>
+        </footer>
 
     </main>
-
-    <footer>
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-md-4 mb-4 border-md-end">
-                    <h4>Servicio al cliente</h4>
-                    <p>Lineas exclusivas</p>
-                    <p>321-545-0519 / 311-456-987</p>
-                    <p>Medellin@zulianos.com.co</p>
-                </div>
-                <div class="col-md-4 mb-4 border-md-end">
-                    <h4>Síguenos en nuestras redes corporativas</h4>
-                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
-                        <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="50" alt="WhatsApp"></a>
-                        <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="50" alt="Instagram"></a>
-                        <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="50" alt="Facebook"></a>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h4>Términos y condiciones</h4>
-                    <p>Ubicación</p>
-                    <p>Protección de datos personales</p>
-                    <p>Aviso de privacidad</p>
-                    <img src="{% static 'home/media/sena.png' %}" alt="Logo" width="45" height="40" class="d-inline-block align-text-top">
-                </div>
-            </div>
-            <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a lacteos zulianos</p>
-        </div>
-    </footer>
+    {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    {% endblock %}
+
+    <script>
+        /* ---- Navbar scroll effect ---- */
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        /* ---- Parallax 3D con el mouse en el hero ---- */
+        (function () {
+            const hero = document.querySelector('#inicio .hero');
+            if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const capas = hero.querySelectorAll('[data-depth]');
+            let raf = null;
+            let targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+            hero.addEventListener('mousemove', (e) => {
+                const r = hero.getBoundingClientRect();
+                targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+                targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
+
+            hero.addEventListener('mouseleave', () => {
+                targetX = 0; targetY = 0;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
+
+            function animar() {
+                curX += (targetX - curX) * 0.08;
+                curY += (targetY - curY) * 0.08;
+
+                capas.forEach((el) => {
+                    const d = parseFloat(el.dataset.depth) || 0.3;
+                    const x = -curX * d * 32;
+                    const y = -curY * d * 32;
+                    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+                });
+
+                if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+                    raf = requestAnimationFrame(animar);
+                } else {
+                    raf = null;
+                }
+            }
+        })();
+
+        /* ---- Carrusel del hero ---- */
+        (function () {
+            const track = document.getElementById('carruselTrack');
+            const prevBtn = document.getElementById('carruselPrev');
+            const nextBtn = document.getElementById('carruselNext');
+            const puntos = document.querySelectorAll('.carrusel-punto');
+            const progreso = document.getElementById('carruselProgreso');
+            if (!track) return;
+
+            const slides = track.querySelectorAll('.carrusel-slide');
+            const total = slides.length;
+            let actual = 0;
+            const DURACION_AUTOPLAY = 6000;
+            let autoplayTimer = null;
+            let progresoTimeout = null;
+
+            function irA(indice) {
+                actual = (indice + total) % total;
+                track.style.transform = `translateX(-${actual * 100}%)`;
+                puntos.forEach((p, i) => p.classList.toggle('activo', i === actual));
+                reiniciarAutoplay();
+            }
+
+            function siguiente() { irA(actual + 1); }
+            function anterior() { irA(actual - 1); }
+
+            function reiniciarProgreso() {
+                if (!progreso) return;
+                progreso.classList.remove('animando');
+                progreso.style.width = '0%';
+                clearTimeout(progresoTimeout);
+                progresoTimeout = setTimeout(() => {
+                    progreso.classList.add('animando');
+                }, 30);
+            }
+
+            function reiniciarAutoplay() {
+                clearInterval(autoplayTimer);
+                reiniciarProgreso();
+                autoplayTimer = setInterval(siguiente, DURACION_AUTOPLAY);
+            }
+
+            nextBtn && nextBtn.addEventListener('click', siguiente);
+            prevBtn && prevBtn.addEventListener('click', anterior);
+
+            puntos.forEach((p) => {
+                p.addEventListener('click', () => irA(parseInt(p.dataset.slide, 10)));
+            });
+
+            let touchStartX = 0;
+            track.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            track.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const diff = touchEndX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                    diff < 0 ? siguiente() : anterior();
+                }
+            }, { passive: true });
+
+            const heroCarrusel = document.querySelector('.hero-carrusel');
+            if (heroCarrusel) {
+                heroCarrusel.addEventListener('mouseenter', () => {
+                    clearInterval(autoplayTimer);
+                    progreso && progreso.classList.remove('animando');
+                });
+                heroCarrusel.addEventListener('mouseleave', () => {
+                    reiniciarAutoplay();
+                });
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                irA(0);
+            } else {
+                reiniciarAutoplay();
+            }
+        })();
+
+        /* ---- Scroll reveal con Intersection Observer ---- */
+        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealEls.forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>
