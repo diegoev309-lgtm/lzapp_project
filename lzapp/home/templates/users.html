@@ -1,4 +1,4 @@
-{% extends "main.html" %}
+{% extends "masterpage.html" %}
 
 {% block title %}Usurios - LzApp{% endblock %}
 
@@ -7,7 +7,7 @@
 {% block navbar_actions %}
 <ul class="nav justify-content-end">
     <li class="nav-item">
-        <a class="nav-link" href="{% static accounts/ %}">Inicio sesion</a>
+        <a class="nav-link" href="{% url 'acsounts' %}">Inicio sesion</a>
     </li>
 </ul>
 {% endblock %}

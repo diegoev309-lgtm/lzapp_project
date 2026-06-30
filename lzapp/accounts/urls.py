@@ -1,8 +1,8 @@
 from django.urls import path
-from accounts.views import Lview, Rview, Review
+from . import views
 
 urlpatterns = [
-    path('Lview',Lview,name="Lview"),
-    path('Rview',Rview,name="Rview"),
-    path('Review',Review,name="Review"),
+    path('Lview',views.Lview,name="Lview"),
+    path('Rview',views.Rview,name="Rview"),
+    path('Review',views.Review,name="Review"),
 ]
