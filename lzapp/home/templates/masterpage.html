@@ -8,6 +8,7 @@
 
     {% load static %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
@@ -359,14 +360,12 @@
             </div>
         </section>
 
-
         <!-- Wave de transición hacia productos -->
         <div class="wave-divider" style="background:#022C63;">
             <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
             </svg>
         </div>
-
 
         <!-- ===== SECCIÓN PRODUCTOS ===== -->
         <section class="seccion-productos" id="productos">
@@ -385,50 +384,147 @@
                         </p>
                     </div>
                 </div>
-
-                <div class="row g-4">
-                    <div class="col-md-6 col-lg-4 reveal delay-1">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso1.png' %}" class="producto-card-imagen" alt="Queso blanco">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Estrella</span>
-                                <h3 class="producto-nombre">Queso Blanco</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Fresco, suave y con la textura característica del queso venezolano. Ideal para acompañar arepa, tequeños y mucho más.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4 reveal delay-2">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso2.png' %}" class="producto-card-imagen" alt="Queso de mano">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Favorito</span>
-                                <h3 class="producto-nombre">Queso de Mano</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Artesanal, delicado y con una consistencia que lo hace perfecto para derretir o disfrutar solo.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4 reveal delay-3">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso3.png' %}" class="producto-card-imagen" alt="Queso telita">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Especial</span>
-                                <h3 class="producto-nombre">Queso Telita</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Suave y cremoso, con esa fibra característica que lo distingue. Un clásico de la mesa venezolana.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
+
+
+        <!-- Wave de transición -->
+        <div class="wave-divider" style="background:#f7f8fc;">
+            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path d="M0,20 C480,70 960,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
+            </svg>
+        </div>
+
+
+        <!-- ===== SECCIÓN PRODUCTOS ===== -->
+        <section class="seccion-productos" id="productos">
+
+            <div class="container py-5">
+            
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                
+                    <h2>
+                        Productos disponibles
+                    </h2>
+
+                    <span class="badge bg-primary fs-6">
+                        {{ productos|length }} Productos
+                    </span>
+                
+                </div>
+            
+            
+                <div class="row g-4">
+                
+                    {% for i in productos %}
+                
+                    <div class="col-lg-3 col-md-6">
+                    
+                        <div class="card producto-card h-100">
+                        
+                            <!-- Favorito -->
+                            <button class="favorito">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        
+                            <!-- Imagen -->
+                        
+                            {% if i.imagen %}
+                            <img src="{{ i.imagen.url }}" class="card-img-top imagen-producto">
+                            {% else %}
+                            <img src="{% static 'img/no-image.png' %}" class="card-img-top imagen-producto">
+                            {% endif %}
+                        
+                            <div class="card-body">
+                            
+                                {% if i.stock_actual <= i.stock_minimo %}
+                                <span class="badge bg-danger mb-2">
+                                    Stock Bajo
+                                </span>
+                                {% else %}
+                                <span class="badge bg-success mb-2">
+                                    Disponible
+                                </span>
+                                {% endif %}
+                            
+                                <h5 class="titulo-producto">
+                                    {{ i.nombre }}
+                                </h5>
+                            
+                                <div class="estrellas">
+                                
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                
+                                </div>
+                            
+                                <p class="precio">
+                                
+                                    $ {{ i.precio }}
+                                
+                                </p>
+                            
+                                <small class="text-muted">
+
+                                    Stock: {{ i.stock_actual }}
+                                
+                                </small>
+                            
+                            </div>
+                        
+                            <div class="card-footer bg-white border-0">
+                            
+                                <div class="d-grid gap-2">
+                                
+                                    <a href="users.html"
+                                       class="btn btn-carrito">
+                                
+                                        <i class="bi bi-cart-plus"></i>
+                                
+                                        Añadir al carrito
+                                
+                                    </a>
+                                
+                                    <a href="users.html"
+                                       class="btn btn-outline-dark">
+                                
+                                        <i class="bi bi-eye"></i>
+                                
+                                        Ver detalles
+                                
+                                    </a>
+                                
+                                </div>
+                            
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                
+                    {% empty %}
+                
+                    <div class="col-12">
+                    
+                        <div class="alert alert-info text-center">
+                        
+                            No existen productos disponibles.
+                        
+                        </div>
+                    
+                    </div>
+                
+                    {% endfor %}
+                
+                </div>
+            
+            </div>
+
+        </section>
+        
 
 
         <!-- Wave de transición -->

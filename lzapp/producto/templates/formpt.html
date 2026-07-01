@@ -1,152 +1,351 @@
 {% extends "masterpage_dashboard.html" %}
-
 {% load static %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body{
+    background:#f4f7fc;
+    font-family:'Segoe UI',sans-serif;
+}
 
-    <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">    
-    <style>
-        body{
-            background: #f4f7fc;
-            font-family: 'Segoe UI', sans-serif;
-        }
+/*==========================
+        FONDO MODAL
+==========================*/
 
-        /* Tarjeta del formulario */
-        .card-formulario{
-            background: white;
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0px 8px 25px rgba(0,0,0,0.08);
-            animation: aparecer .5s ease;
-        }
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    z-index:9999;
+}
 
-        /* Título */
-        .titulo-formulario{
-            text-align: center;
-            color: #192987;
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
+/*==========================
+      CONTENEDOR MODAL
+==========================*/
 
-        /* Campos del formulario */
-        .card-formulario p{
-            margin-bottom: 20px;
-        }
+.modal-formulario{
+    width:100%;
+    max-width:1100px;
+    max-height:90vh;
+    overflow-y:auto;
+    border-radius:20px;
+    animation:aparecer .35s ease;
+}
 
-        .card-formulario label{
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
+/*==========================
+        ENCABEZADO
+==========================*/
 
-        /* Inputs generados por Django */
-        .card-formulario input,
-        .card-formulario select,
-        .card-formulario textarea{
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #dcdcdc;
-            border-radius: 10px;
-            outline: none;
-            transition: .3s;
-        }
+.header-form{
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    padding:25px 35px;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
 
-        .card-formulario input:focus,
-        .card-formulario select:focus,
-        .card-formulario textarea:focus{
-            border-color: #192987;
-            box-shadow: 0 0 8px rgba(25,41,135,0.2);
-        }
+.header-form h2{
+    margin:0;
+    font-size:30px;
+    font-weight:700;
+}
 
-        /* Botón Guardar */
-        .btn-guardar{
-            background: #192987;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 10px;
-            border: none;
-            transition: .3s;
-        }
+.header-form p{
+    margin-top:8px;
+    margin-bottom:0;
+    opacity:.9;
+}
 
-        .btn-guardar:hover{
-            background: #101d64;
-            color: white;
-            transform: translateY(-2px);
-        }
+/*==========================
+        TARJETA
+==========================*/
 
-        /* Botón Volver */
-        .btn-volver{
-            background: #6c757d;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 10px;
-            text-decoration: none;
-            transition: .3s;
-        }
+.card-form{
+    background:white;
+    padding:35px;
+    border-radius:0 0 20px 20px;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
 
-        .btn-volver:hover{
-            background: #5a6268;
-            color: white;
-            transform: translateY(-2px);
-        }
+/*==========================
+      GRID FORMULARIO
+==========================*/
 
-        /* Animación */
-        @keyframes aparecer{
-            from{
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to{
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="container mt-5">
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px;
+}
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+.form-grid p{
+    margin:0;
+    display:flex;
+    flex-direction:column;
+}
 
-            <div class="card-formulario">
+/*==========================
+        LABELS
+==========================*/
 
-                <h2 class="titulo-formulario">
-                    📦 Formulario de Productos
-                </h2>
+label{
+    font-weight:600;
+    color:#192987;
+    margin-bottom:8px;
+}
 
-                <form action="" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
+/*==========================
+         INPUTS
+==========================*/
 
-                    <div class="mb-3">
-                        {{ form.as_p }}
-                    </div>
+input,
+select,
+textarea{
+    width:100%;
+    height:46px;
+    border:1px solid #d8d8d8;
+    border-radius:10px;
+    padding:10px 15px;
+    transition:.3s;
+    font-size:15px;
+    background:#fff;
+}
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'listar_productos' %}"
-                           class="btn btn-volver">
-                            <i class="bi bi-arrow-left"></i>
-                            Volver
-                        </a>
+textarea{
+    height:46px;
+    min-height:46px;
+    max-height:46px;
+    resize:none;
+}
 
-                        <button type="submit"
-                                class="btn btn-guardar">
-                            <i class="bi bi-check-circle"></i>
-                            Guardar
-                        </button>
-                    </div>
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#3556ff;
+    box-shadow:0 0 10px rgba(53,86,255,.20);
+}
 
-                </form>
+/*==========================
+      INPUT FILE
+==========================*/
 
-            </div>
+input[type=file]{
+    padding:8px;
+    height:auto;
+}
+
+/*==========================
+        CHECKBOX
+==========================*/
+
+input[type=checkbox]{
+    width:20px;
+    height:20px;
+    margin-top:12px;
+    box-shadow:none;
+}
+
+/*==========================
+        BOTONES
+==========================*/
+
+.botones{
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+    margin-top:35px;
+}
+
+.btn-volver{
+    background:#6c757d;
+    color:white;
+    padding:10px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.btn-volver:hover{
+    background:#555d65;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.btn-guardar{
+    background:#192987;
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.btn-guardar:hover{
+    background:#101d64;
+    color:white;
+    transform:translateY(-2px);
+}
+
+/*==========================
+        ERRORES
+==========================*/
+
+.errorlist{
+    list-style:none;
+    margin:5px 0 0;
+    padding:0;
+    color:#dc3545;
+    font-size:14px;
+}
+
+.helptext{
+    font-size:13px;
+    color:#777;
+    margin-top:5px;
+}
+
+/*==========================
+      SCROLL MODERNO
+==========================*/
+
+.modal-formulario::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-formulario::-webkit-scrollbar-thumb{
+    background:#3556ff;
+    border-radius:20px;
+}
+
+/*==========================
+       ANIMACIÓN
+==========================*/
+
+@keyframes aparecer{
+
+    from{
+        opacity:0;
+        transform:translateY(-30px) scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
+
+/*==========================
+       RESPONSIVE
+==========================*/
+
+@media(max-width:992px){
+
+    .modal-formulario{
+        max-width:95%;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .header-form{
+        text-align:center;
+    }
+
+    .header-form h2{
+        font-size:25px;
+    }
+
+}
+
+@media(max-width:576px){
+
+    .overlay{
+        padding:10px;
+    }
+
+    .card-form{
+        padding:20px;
+    }
+
+    .header-form{
+        padding:20px;
+    }
+
+    .botones{
+        flex-direction:column;
+    }
+
+    .botones a,
+    .botones button{
+        width:100%;
+    }
+
+}
+
+</style>
+
+<div class="overlay">
+
+    <div class="modal-formulario">
+
+        <div class="header-form">
+
+            <h2>
+                <i class="bi bi-box-seam-fill"></i>
+                Gestión de Productos
+            </h2>
+
+            <p>
+                Completa la información del producto.
+            </p>
 
         </div>
-    </div>
-</body>
 
+        <div class="card-form">
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    {{ form.as_p }}
+
+                </div>
+
+                <div class="botones">
+
+                    <a href="{% url 'listar_productos' %}"
+                       class="btn btn-volver">
+
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-guardar">
+
+                        <i class="bi bi-check-circle-fill"></i>
+                        Guardar Producto
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 {% endblock %}

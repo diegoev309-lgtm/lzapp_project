@@ -1102,3 +1102,171 @@ footer .text-center.m-0 {
         border-bottom: none;
     }
 }
+
+/* Banner */
+
+.banner{
+
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+
+    color:white;
+
+    padding:60px;
+
+    border-radius:25px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+
+}
+
+.banner h1{
+
+    font-weight:bold;
+
+    font-size:42px;
+
+}
+
+.banner p{
+
+    font-size:18px;
+
+    opacity:.9;
+
+}
+
+/* Tarjetas */
+
+.producto-card{
+
+    border:none;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    position:relative;
+
+}
+
+.producto-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.18);
+
+}
+
+.imagen-producto{
+
+    height:250px;
+
+    object-fit:cover;
+
+    transition:.4s;
+
+}
+
+.producto-card:hover .imagen-producto{
+
+    transform:scale(1.08);
+
+}
+
+.titulo-producto{
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    margin-top:10px;
+
+}
+
+.precio{
+
+    color:#4f46e5;
+
+    font-size:28px;
+
+    font-weight:bold;
+
+}
+
+.estrellas{
+
+    color:#ffc107;
+
+    margin:10px 0;
+
+}
+
+/* Botón carrito */
+
+.btn-carrito{
+
+    background:#4f46e5;
+
+    color:white;
+
+    border-radius:12px;
+
+    transition:.3s;
+
+}
+
+.btn-carrito:hover{
+
+    background:#372eb6;
+
+    color:white;
+
+}
+
+/* Corazón */
+
+.favorito{
+
+    position:absolute;
+
+    top:15px;
+
+    right:15px;
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:white;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+    z-index:20;
+
+    transition:.3s;
+
+}
+
+.favorito:hover{
+
+    background:#ff4d6d;
+
+    color:white;
+
+}
+
+/* Footer tarjeta */
+
+.card-footer{
+
+    padding:20px;
+
+}

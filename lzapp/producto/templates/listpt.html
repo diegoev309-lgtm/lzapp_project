@@ -5,110 +5,242 @@
 {% block content %}
 
 <style>
-    .contenedor-productos{
-        padding: 30px;
-    }
 
-    .encabezado{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:30px;
-        flex-wrap:wrap;
-        gap:15px;
-    }
+body{
+    background:#f4f7fc;
+}
 
-    .titulo{
-        color:#192987;
-        font-weight:700;
-    }
+.contenedor-productos{
+    padding:40px 20px;
+}
 
-    .card-productos{
-        background:white;
-        border-radius:20px;
-        box-shadow:0 8px 25px rgba(0,0,0,.08);
-        padding:25px;
-    }
+/*==========================
+        ENCABEZADO
+===========================*/
 
-    .tabla-productos thead{
-        background:#192987;
-        color:white;
-    }
+.encabezado{
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    border-radius:20px;
+    padding:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+    margin-bottom:30px;
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
+}
 
-    .tabla-productos thead th{
-        border:none;
-        padding:18px;
-    }
+.titulo{
+    margin:0;
+    font-size:35px;
+    font-weight:bold;
+}
 
-    .tabla-productos tbody td{
-        padding:15px;
-        vertical-align:middle;
-    }
+.subtitulo{
+    margin-top:8px;
+    opacity:.9;
+}
 
-    .tabla-productos tbody tr{
-        transition:.3s;
-    }
+.btn-nuevo{
+    background:white;
+    color:#192987;
+    border:none;
+    padding:12px 22px;
+    border-radius:12px;
+    font-weight:bold;
+    transition:.3s;
+}
 
-    .tabla-productos tbody tr:hover{
-        background:#f5f7ff;
-    }
+.btn-nuevo:hover{
+    background:#eef2ff;
+    color:#192987;
+    transform:translateY(-3px);
+}
 
-    .img-producto{
-        width:90px;
-        height:60px;
-        object-fit:cover;
-        border-radius:10px;
-    }
+/*==========================
+        TARJETA
+===========================*/
 
-    .btn-nuevo{
-        background:#192987;
-        color:white;
-        border-radius:10px;
-        padding:10px 20px;
-    }
+.card-productos{
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
 
-    .btn-nuevo:hover{
-        background:#101d64;
-        color:white;
-    }
+/*==========================
+          TABLA
+===========================*/
 
-    .btn-editar{
-        background:#0d6efd;
-        color:white;
-        border-radius:8px;
-    }
+.table{
+    margin-bottom:0;
+}
 
-    .btn-eliminar{
-        background:#dc3545;
-        color:white;
-        border-radius:8px;
-    }
+.tabla-productos thead{
+    background:#192987;
+}
 
-    .btn-editar:hover,
-    .btn-eliminar:hover{
-        color:rgb(15, 8, 8);
-        transform:translateY(-2px);
-    }
+.tabla-productos thead th{
+    color:rgb(0, 0, 0);
+    border:none;
+    padding:18px;
+    text-align:center;
+    font-size:15px;
+}
 
-    .badge-stock{
-        font-size:14px;
-        padding:8px 12px;
-        margin-left:8px;
-    }
+.tabla-productos tbody td{
+    vertical-align:middle;
+    text-align:center;
+    padding:2px 3px;
+}
+
+.tabla-productos tbody tr{
+    transition:.3s;
+}
+
+.tabla-productos tbody tr:hover{
+    background:#eef4ff;
+}
+
+/*==========================
+        IMAGEN
+===========================*/
+
+.img-producto{
+    width:95px;
+    height:70px;
+    object-fit:cover;
+    border-radius:12px;
+    border:2px solid #e8e8e8;
+    transition:.3s;
+}
+
+.img-producto:hover{
+    transform:scale(1.1);
+}
+
+/*==========================
+         BOTONES
+===========================*/
+
+.btn-editar{
+    background:#0d6efd;
+    color:white;
+    border:none;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.btn-eliminar{
+    background:#dc3545;
+    color:white;
+    border:none;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.btn-editar:hover{
+
+    background:#0a58ca;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.btn-eliminar:hover{
+
+    background:#bb2d3b;
+    color:white;
+    transform:translateY(-2px);
+}
+
+/*==========================
+        BADGES
+===========================*/
+
+.badge-stock{
+
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:13px;
+    margin-left:8px;
+}
+
+.badge{
+
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:13px;
+}
+
+/*==========================
+        PRECIO
+===========================*/
+
+.precio{
+
+    color:#198754;
+    font-weight:bold;
+    font-size:18px;
+}
+
+/*==========================
+      ID PRODUCTO
+===========================*/
+
+.id-producto{
+
+    font-weight:bold;
+    color:#192987;
+}
+
+/*==========================
+      RESPONSIVE
+===========================*/
+
+@media(max-width:768px){
+
+.encabezado{
+
+    flex-direction:column;
+    text-align:center;
+}
+
+.titulo{
+
+    font-size:28px;
+}
+
+}
+
 </style>
 
-<div class="container contenedor-productos">
+<div class="container-fluid contenedor-productos">
 
     <div class="encabezado">
-        <h1 class="titulo">
-            <i class="bi bi-box-seam"></i>
-            Listado de Productos
-        </h1>
+
+        <div>
+
+            <h1 class="titulo">
+                <i class="bi bi-box-seam-fill"></i>
+                Gestión de Productos
+            </h1>
+
+            <p class="subtitulo">
+                Administra todos los productos registrados del sistema.
+            </p>
+
+        </div>
 
         <a href="{% url 'crear_producto' %}" class="btn btn-nuevo">
-            <i class="bi bi-plus-circle"></i>
+
+            <i class="bi bi-plus-circle-fill"></i>
+
             Nuevo Producto
+
         </a>
+
     </div>
 
     <div class="card-productos">
@@ -118,93 +250,132 @@
             <table class="table table-hover tabla-productos">
 
                 <thead>
+
                     <tr>
-                        <th>ID</th>
+
                         <th>Imagen</th>
+
                         <th>Nombre</th>
+
                         <th>Precio</th>
+
                         <th>Stock</th>
-                        <th>Disponible</th>
+
+                        <th>Estado</th>
+
                         <th>Acciones</th>
+
                     </tr>
+
                 </thead>
 
                 <tbody>
 
-                    {% for i in productos %}
+                {% for i in productos %}
+
                     <tr>
 
                         <td>
-                            {{ i.id }}
-                        </td>
 
-                        <td>
                             {% if i.imagen %}
-                                <img src="{{ i.imagen.url }}"
-                                     class="img-producto">
+
+                                <img src="{{ i.imagen.url }}" class="img-producto">
+
                             {% else %}
-                                <img src="{% static 'img/no-image.png' %}"
-                                     class="img-producto">
+
+                                <img src="{% static 'img/no-image.png' %}" class="img-producto">
+
                             {% endif %}
+
                         </td>
 
                         <td>
-                            {{ i.nombre }}
+
+                            <strong>{{ i.nombre }}</strong>
+
                         </td>
 
-                        <td>
+                        <td class="precio">
+
                             $ {{ i.precio }}
+
                         </td>
 
                         <td>
-                            {{ i.stock_actual }}
 
-                            {% if i.stock_actual <= i.stock_minimo %}
-                                <span class="badge bg-danger badge-stock">
-                                    Stock Bajo
-                                </span>
-                            {% else %}
-                                <span class="badge bg-success badge-stock">
-                                    Stock Normal
-                                </span>
-                            {% endif %}
+                            <strong>{{ i.stock_actual }}</strong>
+
                         </td>
 
                         <td>
-                            {% if i.activo %}
+
+                            {% if i.disponibilidad %}
+
                                 <span class="badge bg-success">
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
                                     Disponible
+
                                 </span>
+
                             {% else %}
+
                                 <span class="badge bg-secondary">
-                                    No disponible
+
+                                    <i class="bi bi-x-circle-fill"></i>
+
+                                    No Disponible
+
                                 </span>
+
                             {% endif %}
+
                         </td>
 
                         <td>
-                            <a href="{% url 'editar_producto' i.id %}"
-                               class="btn btn-editar btn-sm">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
 
-                            <a href="{% url 'eliminar_producto' i.id %}"
-                               class="btn btn-eliminar btn-sm">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
-                        </td>
+    <div class="acciones">
+
+        <a href="{% url 'editar_producto' i.id %}"
+           class="btn btn-editar">
+
+            <i class="bi bi-pencil-square"></i>
+
+        </a>
+
+        <a href="{% url 'eliminar_producto' i.id %}"
+           class="btn btn-eliminar">
+
+            <i class="bi bi-trash-fill"></i>
+
+        </a>
+
+    </div>
+
+</td>
 
                     </tr>
 
-                    {% empty %}
+                {% empty %}
 
                     <tr>
-                        <td colspan="7" class="text-center">
-                            No hay productos registrados.
+
+                        <td colspan="7" class="text-center py-5">
+
+                            <i class="bi bi-box display-4 text-secondary"></i>
+
+                            <h5 class="mt-3">
+
+                                No existen productos registrados.
+
+                            </h5>
+
                         </td>
+
                     </tr>
 
-                    {% endfor %}
+                {% endfor %}
 
                 </tbody>
 
