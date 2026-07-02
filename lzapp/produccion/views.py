@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator
 from produccion.models import Produccion
 from produccion.forms import ProduccionForm
 
 
 def listar_producciones(request):
-    producciones = Produccion.objects.select_related('producto').all()
-    return render(request, 'listpc.html',
-                  {'producciones': producciones})
+    lista_producciones = Produccion.objects.all().order_by("-id")
+    paginator = Paginator(lista_producciones, 6)
+    page = request.GET.get("page")
+    producciones = paginator.get_page(page)
+
+    return render(request, "listpc.html", {"producciones": producciones})
 
 
 def crear_produccion(request):

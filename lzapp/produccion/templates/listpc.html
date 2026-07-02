@@ -5,155 +5,284 @@
 {% block content %}
 
 <style>
-    .contenedor-produccion{
-        padding: 30px;
-    }
+
+body{
+    background:#f4f7fc;
+}
+
+/*==========================================================
+   BLOQUE UNIFICADO: encabezado + tabla + pie (paginación)
+   Mismo lenguaje visual que la vista de Productos.
+===========================================================*/
+
+.bloque-produccion{
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+/*==========================
+        ENCABEZADO
+===========================*/
+
+.encabezado{
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    padding:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.titulo{
+    margin:0;
+    font-size:35px;
+    font-weight:bold;
+    color:white;
+}
+
+.subtitulo{
+    margin-top:8px;
+    opacity:.9;
+}
+
+/* Botón "Nueva Producción": blanco/gris difuminado, texto azul oscuro,
+   igual que "Nuevo Producto" en la vista de Productos */
+.btn-nuevo{
+    background:linear-gradient(135deg,#ffffff,#d7dce4);
+    color:#192987;
+    border:1px solid rgba(255,255,255,.5);
+    padding:12px 22px;
+    border-radius:12px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.btn-nuevo:hover{
+    background:linear-gradient(135deg,#eef0f3,#c2c8d2);
+    color:#14206b;
+    transform:translateY(-3px);
+    box-shadow:0 10px 22px rgba(0,0,0,.2);
+}
+
+/*==========================
+          TABLA
+===========================*/
+
+.table{
+    margin-bottom:0;
+}
+
+.tabla-produccion thead{
+    background:#192987;
+}
+
+.tabla-produccion thead th{
+    color:#000000;
+    border:none;
+    padding:8px;
+    text-align:center;
+    font-size:14px;
+    white-space:nowrap;
+}
+
+.tabla-produccion tbody td{
+    vertical-align:middle;
+    text-align:center;
+    padding:5px 6px;
+    font-size:13px;
+}
+
+.tabla-produccion tbody tr{
+    transition:.3s;
+}
+
+.tabla-produccion tbody tr:hover{
+    background:#eef4ff;
+}
+
+.badge-cantidad{
+    font-size:11px;
+    padding:5px 9px;
+}
+
+/*==========================================================
+   PIE DEL BLOQUE: paginación
+===========================================================*/
+
+.pie-produccion{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    padding:14px 20px;
+    border-top:1px solid rgba(2,44,99,.08);
+    background:white;
+}
+
+.paginacion-inline{
+    margin:0;
+}
+
+.paginacion-inline .pagination{
+    margin:0;
+    flex-wrap:wrap;
+}
+
+.paginacion-inline .page-link{
+    color:#192987;
+    border-color:#dfe3ef;
+}
+
+.paginacion-inline .page-link:hover{
+    color:#192987;
+    background-color:#eef2ff;
+    border-color:#dfe3ef;
+}
+
+.paginacion-inline .page-item.active .page-link{
+    background-color:#192987;
+    border-color:#192987;
+    color:white;
+}
+
+/*==========================
+      RESPONSIVE
+===========================*/
+
+@media(max-width:768px){
 
     .encabezado{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        margin-bottom:30px;
-        flex-wrap:wrap;
-        gap:15px;
+        flex-direction:column;
+        text-align:center;
     }
 
     .titulo{
-        color:#192987;
-        font-weight:700;
+        font-size:28px;
     }
 
-    .card-produccion{
-        background:white;
-        border-radius:20px;
-        box-shadow:0 8px 25px rgba(0,0,0,.08);
-        padding:25px;
+    .pie-produccion{
+        justify-content:center;
     }
 
-    .tabla-produccion thead{
-        background:#192987;
-        color:white;
-    }
-
-    .tabla-produccion thead th{
-        border:none;
-        padding:18px;
-    }
-
+    .tabla-produccion thead th,
     .tabla-produccion tbody td{
-        padding:15px;
-        vertical-align:middle;
+        padding:4px 3px;
+        font-size:9px;
     }
+}
 
-    .tabla-produccion tbody tr{
-        transition:.3s;
-    }
-
-    .tabla-produccion tbody tr:hover{
-        background:#f5f7ff;
-    }
-
-    .btn-nuevo{
-        background:#192987;
-        color:white;
-        border-radius:10px;
-        padding:10px 20px;
-    }
-
-    .btn-nuevo:hover{
-        background:#101d64;
-        color:white;
-    }
-
-    .badge-cantidad{
-        font-size:14px;
-        padding:8px 12px;
-    }
 </style>
 
-<div class="container contenedor-produccion">
 
-    <div class="encabezado">
+<div class="container-fluid contenedor-produccion">
 
-        <h1 class="titulo">
-            <i class="bi bi-box-seam"></i>
-            Historial de Producción
-        </h1>
+    <div class="bloque-produccion">
 
-        <a href="{% url 'crear_produccion' %}"
-           class="btn btn-nuevo">
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">
+                    <i class="bi bi-box-seam-fill"></i>
+                    Historial de Producción
+                </h1>
+                <p class="subtitulo">
+                    Consulta todas las producciones registradas del sistema.
+                </p>
+            </div>
+            <a href="{% url 'crear_produccion' %}" class="btn btn-nuevo">
+                <i class="bi bi-plus-circle-fill"></i>
+                Nueva Producción
+            </a>
+        </div>
 
-            <i class="bi bi-plus-circle"></i>
-            Nueva Producción
-        </a>
-
-    </div>
-
-    <div class="card-produccion">
-
+        <!-- table-responsive queda como red de seguridad; las columnas menos
+             esenciales (ID, Fecha, Observación) se ocultan progresivamente
+             en pantallas chicas con clases nativas de Bootstrap. -->
         <div class="table-responsive">
-
-            <table class="table table-hover tabla-produccion">
-
+            <table class="table table-hover tabla-produccion align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th class="d-none d-md-table-cell">ID</th>
                         <th>Producto</th>
                         <th>Cantidad Producida</th>
-                        <th>Fecha</th>
-                        <th>Observación</th>
+                        <th class="d-none d-sm-table-cell">Fecha</th>
+                        <th class="d-none d-lg-table-cell">Observación</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
-                    {% for i in producciones %}
+                {% for i in producciones %}
                     <tr>
-
-                        <td>
+                        <td class="d-none d-md-table-cell">
                             {{ i.id }}
                         </td>
-
                         <td>
-                            {{ i.producto.nombre }}
+                            <strong>{{ i.producto.nombre }}</strong>
                         </td>
-
                         <td>
                             <span class="badge bg-success badge-cantidad">
                                 + {{ i.cantidad_producida }}
                             </span>
                         </td>
-
-                        <td>
+                        <td class="d-none d-sm-table-cell">
                             {{ i.fecha_produccion|date:"d/m/Y H:i" }}
                         </td>
-
-                        <td>
+                        <td class="d-none d-lg-table-cell">
                             {% if i.observacion %}
                                 {{ i.observacion }}
                             {% else %}
-                                <span class="text-muted">
-                                    Sin observaciones
-                                </span>
+                                <span class="text-muted">Sin observaciones</span>
                             {% endif %}
                         </td>
-
                     </tr>
-
-                    {% empty %}
-
+                {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">
-                            No hay producciones registradas.
+                        <td colspan="5" class="estado-vacio text-center py-5">
+                            <i class="bi bi-box display-4 text-secondary"></i>
+                            <h5 class="mt-3">No hay producciones registradas.</h5>
                         </td>
                     </tr>
-
-                    {% endfor %}
-
+                {% endfor %}
                 </tbody>
-
             </table>
+        </div>
 
+        <!-- ============ PIE: PAGINACIÓN ============ -->
+        <div class="pie-produccion">
+            <nav class="paginacion-inline" aria-label="Paginación de producciones">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if producciones.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ producciones.previous_page_number }}">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for pagina in producciones.paginator.page_range %}
+                        {% if pagina == producciones.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ pagina }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pagina }}">{{ pagina }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if producciones.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ producciones.next_page_number }}">&raquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ producciones.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
 
     </div>

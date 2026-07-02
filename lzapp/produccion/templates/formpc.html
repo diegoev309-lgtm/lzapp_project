@@ -1,118 +1,293 @@
 {% extends "masterpage_dashboard.html" %}
-
 {% load static %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <style>
-    body{
-        background: #f4f7fc;
-        font-family: 'Segoe UI', sans-serif;
+body{
+    background:#f4f7fc;
+    font-family:'Segoe UI',sans-serif;
+}
+
+/*==========================
+        FONDO MODAL
+==========================*/
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    z-index:9999;
+}
+
+/*==========================
+      CONTENEDOR MODAL
+==========================*/
+
+.modal-formulario{
+    width:100%;
+    max-width:700px;
+    max-height:90vh;
+    overflow-y:auto;
+    border-radius:20px;
+    animation:aparecer .35s ease;
+}
+
+/*==========================
+        ENCABEZADO
+==========================*/
+
+.header-form{
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    padding:25px 35px;
+    border-radius:20px 20px 0 0;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
+
+.header-form h2{
+    margin:0;
+    font-size:30px;
+    font-weight:700;
+}
+
+.header-form p{
+    margin-top:8px;
+    margin-bottom:0;
+    opacity:.9;
+}
+
+/*==========================
+        TARJETA
+==========================*/
+
+.card-form{
+    background:white;
+    padding:35px;
+    border-radius:0 0 20px 20px;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+/*==========================
+      GRID FORMULARIO
+==========================*/
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px;
+}
+
+.form-grid .campo{
+    margin:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.campo-ancho{
+    grid-column:1 / -1;
+}
+
+/*==========================
+        LABELS
+==========================*/
+
+label{
+    font-weight:600;
+    color:#192987;
+    margin-bottom:8px;
+}
+
+/*==========================
+         INPUTS
+==========================*/
+
+input,
+select,
+textarea{
+    width:100%;
+    height:46px;
+    border:1px solid #d8d8d8;
+    border-radius:10px;
+    padding:10px 15px;
+    transition:.3s;
+    font-size:15px;
+    background:#fff;
+}
+
+textarea{
+    height:90px;
+    min-height:90px;
+    resize:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#3556ff;
+    box-shadow:0 0 10px rgba(53,86,255,.20);
+}
+
+/*==========================
+        BOTONES
+==========================*/
+
+.botones{
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+    margin-top:35px;
+}
+
+.btn-volver{
+    background:#6c757d;
+    color:white;
+    padding:10px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.btn-volver:hover{
+    background:#555d65;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.btn-guardar{
+    background:#192987;
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.btn-guardar:hover{
+    background:#101d64;
+    color:white;
+    transform:translateY(-2px);
+}
+
+/*==========================
+        ERRORES
+==========================*/
+
+.errorlist{
+    list-style:none;
+    margin:5px 0 0;
+    padding:0;
+    color:#dc3545;
+    font-size:14px;
+}
+
+.helptext{
+    font-size:13px;
+    color:#777;
+    margin-top:5px;
+}
+
+/*==========================
+       ANIMACIÓN
+==========================*/
+
+@keyframes aparecer{
+
+    from{
+        opacity:0;
+        transform:translateY(-30px) scale(.95);
     }
 
-    .card-formulario{
-        background: white;
-        padding: 35px;
-        border-radius: 20px;
-        box-shadow: 0px 8px 25px rgba(0,0,0,0.08);
-        animation: aparecer .5s ease;
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
     }
 
-    .titulo-formulario{
-        text-align: center;
-        color: #192987;
-        font-weight: 700;
-        margin-bottom: 30px;
+}
+
+/*==========================
+       RESPONSIVE
+==========================*/
+
+@media(max-width:992px){
+
+    .modal-formulario{
+        max-width:95%;
     }
 
-    .card-formulario label{
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #444;
+    .form-grid{
+        grid-template-columns:1fr;
     }
 
-    .card-formulario input,
-    .card-formulario select,
-    .card-formulario textarea{
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        outline: none;
-        transition: .3s;
+    .header-form{
+        text-align:center;
     }
 
-    .card-formulario input:focus,
-    .card-formulario select:focus,
-    .card-formulario textarea:focus{
-        border-color: #192987;
-        box-shadow: 0 0 8px rgba(25,41,135,0.2);
+    .header-form h2{
+        font-size:25px;
     }
 
-    .btn-guardar{
-        background: #192987;
-        color: white;
-        padding: 10px 25px;
-        border-radius: 10px;
-        border: none;
-        transition: .3s;
+}
+
+@media(max-width:576px){
+
+    .overlay{
+        padding:10px;
     }
 
-    .btn-guardar:hover{
-        background: #101d64;
-        color: white;
-        transform: translateY(-2px);
+    .card-form{
+        padding:20px;
     }
 
-    .btn-volver{
-        background: #6c757d;
-        color: white;
-        padding: 10px 25px;
-        border-radius: 10px;
-        text-decoration: none;
-        transition: .3s;
+    .header-form{
+        padding:20px;
     }
 
-    .btn-volver:hover{
-        background: #5a6268;
-        color: white;
-        transform: translateY(-2px);
+    .botones{
+        flex-direction:column;
     }
 
-    .campo-error{
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
+    .botones a,
+    .botones button{
+        width:100%;
     }
 
-    @keyframes aparecer{
-        from{
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to{
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+}
+
 </style>
 
-<div class="container mt-5">
+<div class="overlay">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+    <div class="modal-formulario">
 
-            <div class="card-formulario">
+        <div class="header-form">
 
-                <h2 class="titulo-formulario">
-                    🧀 Registrar Producción
-                </h2>
+            <h2>
+                <i class="bi bi-box-seam-fill"></i>
+                Registrar Producción
+            </h2>
 
-                <form method="POST">
-                    {% csrf_token %}
+            <p>
+                Completa la información de la producción.
+            </p>
 
-                    <div class="mb-3">
+        </div>
+
+        <div class="card-form">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="campo">
                         <label for="{{ form.producto.id_for_label }}">
                             Producto
                         </label>
@@ -120,13 +295,13 @@
                         {{ form.producto }}
 
                         {% if form.producto.errors %}
-                            <div class="campo-error">
+                            <ul class="errorlist">
                                 {{ form.producto.errors }}
-                            </div>
+                            </ul>
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
+                    <div class="campo">
                         <label for="{{ form.cantidad_producida.id_for_label }}">
                             Cantidad producida
                         </label>
@@ -134,13 +309,13 @@
                         {{ form.cantidad_producida }}
 
                         {% if form.cantidad_producida.errors %}
-                            <div class="campo-error">
+                            <ul class="errorlist">
                                 {{ form.cantidad_producida.errors }}
-                            </div>
+                            </ul>
                         {% endif %}
                     </div>
 
-                    <div class="mb-3">
+                    <div class="campo campo-ancho">
                         <label for="{{ form.observacion.id_for_label }}">
                             Observación
                         </label>
@@ -148,33 +323,39 @@
                         {{ form.observacion }}
 
                         {% if form.observacion.errors %}
-                            <div class="campo-error">
+                            <ul class="errorlist">
                                 {{ form.observacion.errors }}
-                            </div>
+                            </ul>
                         {% endif %}
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'listar_producciones' %}"
-                           class="btn btn-volver">
-                            <i class="bi bi-arrow-left"></i>
-                            Volver
-                        </a>
+                </div>
 
-                        <button type="submit"
-                                class="btn btn-guardar">
-                            <i class="bi bi-check-circle"></i>
-                            Guardar
-                        </button>
-                    </div>
+                <div class="botones">
 
-                </form>
+                    <a href="{% url 'listar_producciones' %}"
+                       class="btn btn-volver">
 
-            </div>
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-guardar">
+
+                        <i class="bi bi-check-circle-fill"></i>
+                        Guardar Producción
+
+                    </button>
+
+                </div>
+
+            </form>
 
         </div>
+
     </div>
 
 </div>
-
 {% endblock %}
