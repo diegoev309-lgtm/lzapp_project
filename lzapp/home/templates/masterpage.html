@@ -416,49 +416,39 @@
                         
                             <!-- Imagen -->
                         
-                            {% if i.imagen %}
-                            <img src="{{ i.imagen.url }}" class="card-img-top imagen-producto">
-                            {% else %}
-                            <img src="{% static 'img/no-image.png' %}" class="card-img-top imagen-producto">
-                            {% endif %}
-                        
-                            <div class="card-body">
-                            
-                                {% if i.stock_actual <= i.stock_minimo %}
-                                <span class="badge bg-danger mb-2">
-                                    Stock Bajo
-                                </span>
+                            <div class="producto-imagen">
+                                {% if i.imagen %}
+                                    <img src="{{ i.imagen.url }}" class="imagen-producto">
                                 {% else %}
-                                <span class="badge bg-success mb-2">
+                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                {% endif %}
+                            </div>
+                        
+                            <div class="producto-info">
+                            
+                                <span class="estado-producto">
                                     Disponible
                                 </span>
-                                {% endif %}
                             
                                 <h5 class="titulo-producto">
                                     {{ i.nombre }}
                                 </h5>
                             
                                 <div class="estrellas">
-                                
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                
+                                    ★★★★★
                                 </div>
                             
-                                <p class="precio">
+                                <div class="producto-precio">
                                 
-                                    $ {{ i.precio }}
+                                    <span class="precio">
+                                        ${{ i.precio }}
+                                    </span>
                                 
-                                </p>
-                            
-                                <small class="text-muted">
-
-                                    Stock: {{ i.stock_actual }}
+                                    <span class="stock">
+                                        {{ i.stock_actual }} disponibles
+                                    </span>
                                 
-                                </small>
+                                </div>
                             
                             </div>
                         

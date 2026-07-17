@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<style>
+
+    body{
+
+    background:linear-gradient(rgba(6,35,87,.90),rgba(6,35,87,.90)),
+    url("../img/logo.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.contenedor{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    padding:30px;
+
+}
+
+.card-login{
+
+    width:950px;
+
+    background:rgba(255,255,255,.96);
+
+    display:flex;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
+
+    backdrop-filter:blur(8px);
+
+}
+
+.lado-izquierdo{
+
+    width:45%;
+
+    background:linear-gradient(180deg,#082f73,#0b4ea2);
+
+    color:white;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:45px;
+
+}
+
+.lado-izquierdo img{
+
+    width:130px;
+
+    margin-bottom:20px;
+
+}
+
+.lado-izquierdo h2{
+
+    font-size:38px;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+.lado-izquierdo p{
+
+    text-align:center;
+
+    line-height:30px;
+
+    color:#d9e8ff;
+
+}
+
+.lado-derecho{
+
+    width:55%;
+
+    padding:55px;
+
+}
+
+.lado-derecho h2{
+
+    text-align:center;
+
+    font-weight:bold;
+
+    color:#082f73;
+
+    margin-bottom:30px;
+
+}
+
+.form-control{
+
+    border-radius:12px;
+
+    padding:12px;
+
+    border:2px solid #dbe4f1;
+
+    transition:.3s;
+
+}
+
+.form-control:focus{
+
+    border-color:#ffc107;
+
+    box-shadow:0 0 0 .2rem rgba(255,193,7,.25);
+
+}
+
+.btn-login{
+    width:100%;
+    background:#082f73 !important;
+    color:white !important;
+    border-radius:50px;
+    padding:13px;
+}
+
+.btn-login:hover{
+
+    background:#ffcf33;
+
+    transform:translateY(-2px);
+
+}
+
+.separador{
+
+    margin:30px 0;
+
+    text-align:center;
+
+    position:relative;
+
+}
+
+.separador::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:50%;
+
+    width:100%;
+
+    height:1px;
+
+    background:#d7d7d7;
+
+}
+
+.separador span{
+
+    background:white;
+
+    position:relative;
+
+    padding:0 15px;
+
+    color:#666;
+
+}
+
+.btn-google{
+
+    width:100%;
+
+    background:white;
+
+    border:2px solid #082f73;
+
+    color:#082f73;
+
+    padding:12px;
+
+    border-radius:50px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.btn-google:hover{
+
+    background:#082f73;
+
+    color:white;
+
+}
+
+.btn-google img{
+
+    width:24px;
+
+    margin-right:10px;
+
+}
+
+.registro{
+
+    text-align:center;
+
+    margin-top:30px;
+
+    color:#555;
+
+}
+
+.registro a{
+
+    text-decoration:none;
+
+    color:#082f73;
+
+    font-weight:bold;
+
+}
+
+.registro a:hover{
+
+    color:#ffc107;
+
+}
+
+.alert{
+
+    border-radius:12px;
+
+}
+
+</style>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Iniciar Sesión</title>
+
+    {% load static %}
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <div class="card-login">
+
+        <div class="lado-izquierdo">
+
+            <img src="{% static 'img/logo.png' %}" alt="Logo">
+
+            <h2>LzApp</h2>
+
+            <p>
+                Bienvenido nuevamente.
+                Inicia sesión para acceder a todos los servicios.
+            </p>
+
+        </div>
+
+        <div class="lado-derecho">
+
+            <h2>Iniciar Sesión</h2>
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="alert alert-warning">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-3">
+
+                    <label>Correo</label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        class="form-control"
+                        placeholder="correo@gmail.com"
+                        required>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label>Contraseña</label>
+
+                    <input
+                        type="password"
+                        name="contraseña"
+                        class="form-control"
+                        placeholder="********"
+                        required>
+
+                </div>
+
+                <button class="btn btn-login">
+
+                    Iniciar Sesión
+
+                </button>
+
+            </form>
+
+            <div class="separador">
+
+                <span>ó</span>
+
+            </div>
+
+            <button class="btn-google">
+
+                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
+
+                Continuar con Google
+
+            </button>
+
+            <p class="registro">
+
+                ¿No tienes cuenta?
+
+                <a href="{% url 'registro' %}">
+
+                    Regístrate
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+body{
+
+    background:linear-gradient(rgba(6,33,80,.90), rgba(6,33,80,.90)),
+    url("../img/fondo.jpg") center/cover no-repeat;
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.contenedor{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    padding:30px;
+
+}
+
+.card-registro{
+
+    width:980px;
+
+    background:white;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    display:flex;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.30);
+
+}
+
+.lado-izquierdo{
+
+    width:40%;
+
+    background:linear-gradient(135deg,#062150,#0d3d8f);
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    padding:45px;
+
+}
+
+.lado-izquierdo img{
+
+    width:140px;
+
+    margin-bottom:20px;
+
+}
+
+.lado-izquierdo h2{
+
+    font-size:38px;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+.lado-izquierdo p{
+
+    margin-top:10px;
+
+    text-align:center;
+
+    line-height:30px;
+
+    color:#d8e5ff;
+
+}
+
+.lado-derecho{
+
+    width:60%;
+
+    padding:50px;
+
+}
+
+.lado-derecho h2{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+    font-weight:bold;
+
+    color:#062150;
+
+}
+
+.form-control{
+
+    border-radius:50px;
+
+    padding:13px 18px;
+
+    border:2px solid #d6d6d6;
+
+    transition:.3s;
+
+}
+
+.form-control:focus{
+
+    border-color:#FFC107;
+
+    box-shadow:0 0 10px rgba(255,193,7,.35);
+
+}
+
+.btn-registro{
+
+    width:100%;
+
+    background:#FFC107;
+
+    color:#062150;
+
+    border:none;
+
+    border-radius:50px;
+
+    padding:13px;
+
+    font-weight:bold;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.btn-registro:hover{
+
+    background:#e6ae00;
+
+    transform:translateY(-2px);
+
+}
+
+.login{
+
+    margin-top:30px;
+
+    text-align:center;
+
+    color:#555;
+
+}
+
+.login a{
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+    color:#062150;
+
+}
+
+.login a:hover{
+
+    color:#FFC107;
+
+}
+
+label{
+
+    font-weight:600;
+
+    color:#062150;
+
+    margin-bottom:6px;
+
+}

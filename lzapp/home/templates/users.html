@@ -1,13 +1,60 @@
 {% extends "masterpage.html" %}
 
-{% block title %}Usurios - LzApp{% endblock %}
+{% block title %}Usuarios - LzApp{% endblock %}
 
 {% load static %}
 
 {% block navbar_actions %}
-<ul class="nav justify-content-end">
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'accounts' %}">Inicio sesion</a>
+<style>
+
+    /* Botón Iniciar sesión */
+.btn-login{
+    background: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 30px;
+    padding: 8px 22px;
+    font-weight: 500;
+    transition: .3s;
+}
+
+.btn-login:hover{
+    background: #fff;
+    color: #0b3d91;
+    transform: translateY(-2px);
+}
+
+/* Botón Registrarse */
+.btn-register{
+    background: #ffc107;
+    color: #000;
+    border-radius: 30px;
+    padding: 8px 22px;
+    font-weight: 600;
+    border: none;
+    transition: .3s;
+}
+
+.btn-register:hover{
+    background: #ffca2c;
+    color: #000;
+    transform: translateY(-2px);
+}
+
+</style>
+<ul class="nav justify-content-end align-items-center">
+
+    <li class="nav-item me-2">
+        <a class="btn btn-login" href="{% url 'login' %}">
+            Iniciar sesión
+        </a>
     </li>
+
+    <li class="nav-item">
+        <a class="btn btn-register" href="{% url 'registro' %}">
+            Registrarse
+        </a>
+    </li>
+
 </ul>
 {% endblock %}

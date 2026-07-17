@@ -6,7 +6,13 @@ def main(request):
     return render(request, "masterpage.html", {"productos": productos})
 
 def user(request):
-    return render(request, "users.html")
+    productos = Producto.objects.filter(disponibilidad=True)
+    return render(request, "users.html", {"productos": productos})
 
 def client(request):
-    return render(request, "clients.html")
+    productos = Producto.objects.filter(disponibilidad=True)
+    return render(request, "clients.html", {"productos": productos})
+
+def carro(request):
+    productos = Producto.objects.filter(disponibilidad=True)
+    return render(request, "carrito_compras.html", {"productos": productos})

@@ -1,0 +1,442 @@
+{% load humanize %}
+<style>
+  :root {
+    --azul-profundo: #022C63;
+    --azul-principal: #083b78;
+    --azul-claro: #e8f0fb;
+    --dorado: #c9a84c;
+    --dorado-claro: #f0d98a;
+    --blanco: #ffffff;
+    --gris-texto: #666;
+    --gris-borde: #e9ecf3;
+  }
+
+  /* ============================================================
+     SIDEBAR — Carrito (fondo blanco, acentos azul/dorado)
+     ============================================================ */
+  .carrito-widget {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 340px;
+    background: var(--blanco);
+    color: var(--azul-profundo);
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: -8px 0 30px rgba(2, 44, 99, 0.12);
+    border-left: 1px solid var(--gris-borde);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+    overflow-y: auto;
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .carrito-widget::-webkit-scrollbar { width: 6px; }
+  .carrito-widget::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.4);
+    border-radius: 4px;
+  }
+
+  /* --- Header --- */
+  .carrito-widget__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  .carrito-widget__header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--azul-profundo);
+  }
+
+  .carrito-widget__header h3 i {
+    color: var(--dorado);
+    font-size: 1.15rem;
+  }
+
+  .carrito-widget__count {
+    background: var(--azul-profundo);
+    color: var(--blanco);
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+  }
+
+  .carrito-widget__cerrar {
+    display: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--gris-borde);
+    background: var(--blanco);
+    color: var(--azul-profundo);
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .carrito-widget__cerrar:hover {
+    background: var(--dorado);
+    color: var(--azul-profundo);
+  }
+
+  /* --- Lista de items --- */
+  .carrito-widget__lista {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .carrito-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--azul-claro);
+    border: 1px solid transparent;
+    transition: background 0.25s ease, border-color 0.2s ease;
+  }
+
+  .carrito-item:hover {
+    background: #ddeafd;
+    border-color: rgba(201, 168, 76, 0.35);
+  }
+
+  .carrito-item__info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .carrito-item__nombre {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--azul-profundo);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+
+  .carrito-item__cantidad {
+    font-size: 0.76rem;
+    color: var(--gris-texto);
+    margin-top: 2px;
+  }
+
+  .carrito-item__controles {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .btn-qty {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .btn-qty:hover {
+    transform: scale(1.12);
+    opacity: 0.9;
+  }
+
+  .btn-qty--sumar {
+    background: var(--dorado);
+    color: var(--azul-profundo);
+  }
+
+  .btn-qty--restar {
+    background: var(--blanco);
+    color: var(--azul-principal);
+    border: 1px solid var(--gris-borde);
+  }
+
+  /* --- Estado vacío --- */
+  .carrito-widget__vacio {
+    text-align: center;
+    padding: 50px 10px;
+    color: var(--gris-texto);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .carrito-widget__vacio i {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 10px;
+    color: var(--dorado);
+    opacity: 0.8;
+  }
+
+  /* --- Footer --- */
+  .carrito-widget__footer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gris-borde);
+  }
+
+  .carrito-widget__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1rem;
+    margin-bottom: 14px;
+    color: var(--azul-profundo);
+  }
+
+  .carrito-widget__total strong {
+    background: linear-gradient(120deg, var(--dorado) 0%, var(--dorado-claro) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.3rem;
+  }
+
+  .carrito-widget__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .carrito-widget__acciones .btn-dorado {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-vaciar {
+    background: transparent;
+    color: var(--gris-texto);
+    font-size: 0.82rem;
+    border: 1px solid var(--gris-borde);
+    border-radius: 50px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-vaciar:hover {
+    border-color: #e63950;
+    color: #e63950;
+  }
+
+  /* ============================================================
+     BOTÓN FLOTANTE — solo visible en móvil/tablet
+     ============================================================ */
+  .carrito-toggle {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--azul-profundo);
+    color: var(--blanco);
+    border: none;
+    box-shadow: 0 10px 30px rgba(2, 44, 99, 0.4);
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    z-index: 1040;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .carrito-toggle:hover {
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    transform: scale(1.08);
+  }
+
+  .carrito-toggle__count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    font-size: 0.68rem;
+    font-weight: 800;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--blanco);
+  }
+
+  /* --- Fondo oscuro detrás del panel en móvil --- */
+  .carrito-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 44, 99, 0.45);
+    z-index: 1045;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .carrito-overlay.activo {
+    display: block;
+    opacity: 1;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 991px) {
+    .carrito-widget {
+      width: 85%;
+      max-width: 340px;
+      transform: translateX(100%);
+      box-shadow: -10px 0 40px rgba(2, 44, 99, 0.3);
+    }
+
+    .carrito-widget.activo {
+      transform: translateX(0);
+    }
+
+    .carrito-widget__cerrar {
+      display: flex;
+    }
+
+    .carrito-toggle {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .carrito-widget {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+</style>
+
+<!-- Botón flotante (solo móvil/tablet) -->
+<button class="carrito-toggle" id="carritoToggle" type="button" aria-label="Abrir carrito">
+  <i class="bi bi-cart3"></i>
+  {% if request.session.carro %}
+    <span class="carrito-toggle__count">{{ request.session.carro|length }}</span>
+  {% endif %}
+</button>
+
+<!-- Fondo oscuro al abrir en móvil -->
+<div class="carrito-overlay" id="carritoOverlay"></div>
+
+<aside class="carrito-widget" id="carritoWidget">
+
+  <div class="carrito-widget__header">
+    <h3><i class="bi bi-cart3"></i> Carrito de compras</h3>
+    <div class="d-flex align-items-center gap-2">
+      <span class="carrito-widget__count">{{ request.session.carro|length }}</span>
+      <button class="carrito-widget__cerrar" id="carritoCerrar" type="button" aria-label="Cerrar carrito">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="carrito-widget__lista">
+    {% for i,j in request.session.carro.items %}
+      <div class="carrito-item">
+        <div class="carrito-item__info">
+          <span class="carrito-item__nombre">{{ j.nombre }}</span>
+          <span class="carrito-item__cantidad">Cantidad: {{ j.cantidad }}</span>
+        </div>
+        <div class="carrito-item__controles">
+          <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
+          <a href="{% url 'carro:agregar' i %}" class="btn-qty btn-qty--sumar">+</a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="carrito-widget__vacio">
+        <i class="bi bi-bag-x"></i>
+        Sin productos
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if request.session.carro %}
+  <div class="carrito-widget__footer">
+    <div class="carrito-widget__total">
+      <span>Total:</span>
+      <strong>$ {{ totalizar_carro|floatformat:0|intcomma }}</strong>
+    </div>
+    <div class="carrito-widget__acciones">
+      <a href="" class="btn-dorado" style="justify-content:center;">
+        Finalizar compra
+      </a>
+      <form action="{% url 'carro:limpiar' %}" method="post" onsubmit="return confirm('¿Vaciar el carrito?');">
+        {% csrf_token %}
+        <button type="submit" class="btn-vaciar">Vaciar carrito</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+</aside>
+
+<script>
+  (function () {
+    const widget = document.getElementById('carritoWidget');
+    const toggle = document.getElementById('carritoToggle');
+    const cerrar = document.getElementById('carritoCerrar');
+    const overlay = document.getElementById('carritoOverlay');
+
+    function abrirCarrito() {
+      widget.classList.add('activo');
+      overlay.classList.add('activo');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarCarrito() {
+      widget.classList.remove('activo');
+      overlay.classList.remove('activo');
+      document.body.style.overflow = '';
+    }
+
+    if (toggle) toggle.addEventListener('click', abrirCarrito);
+    if (cerrar) cerrar.addEventListener('click', cerrarCarrito);
+    if (overlay) overlay.addEventListener('click', cerrarCarrito);
+
+    // Si la pantalla se agranda y el panel quedó abierto en modo móvil, limpiar estado
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 991) {
+        overlay.classList.remove('activo');
+        document.body.style.overflow = '';
+      }
+    });
+  })();
+</script>
