@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'home/css/carrito_compras.css' %}">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+    {% load humanize %}
 </head>
 <body>
 
@@ -132,15 +134,15 @@
                         <!--SECCION DE QUESOS INTERACTIVOS-->
                         <div class="quesos-interactivos" data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}">
 
-                            <!-- Queso 1: el oscuro/tostado de la izquierda -->
+                            <!-- Queso 1: el oscuro/tostado de la izquierda (conectado a datos reales) -->
+                            {% with p=productos_oferta.0 %}
                             <a href="#productos" class="queso-punto"
-                                data-left="34.7" data-top="25.7" data-width="30.6" data-height="48.9"
-                                data-descuento="20"
-                                data-descripcion="Suave y cremoso, con esa fibra característica que lo distingue."
+                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
+                                {% if p.descuento_vigente %}data-descuento="{{ p.descuento_vigente.porcentaje }}"{% endif %}
+                                data-peso-stock="{{ p.ratio_stock|floatformat:2 }}"
+                                data-descripcion="{{ p.descripcion|default:'Suave y cremoso, con esa fibra característica que lo distingue.' }}"
                                 data-oferta-video="{% static 'home/media/brillos.mp4' %}"
                                 data-oferta-pos="center 30%"
-                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
-                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
                                 data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%">
                                 <span class="queso-punto-glow"></span>
                                 <span class="queso-punto-borde"></span>
@@ -152,20 +154,24 @@
                                         <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
                                         <div class="queso-oferta-centro">
                                             <div class="queso-oferta-foto">
-                                                <!-- TODO Django: reemplazar por <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"> -->
-                                                <i class="bi bi-image"></i>
+                                                {% if p.imagen %}
+                                                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+                                                {% else %}
+                                                    <i class="bi bi-image"></i>
+                                                {% endif %}
                                             </div>
                                             <div class="queso-ruleta-wrap">
                                                 <div class="queso-ruleta"></div>
                                                 <span class="ruleta-signo">%</span>
                                             </div>
-                                            <strong class="queso-oferta-nombre">Queso Telita</strong>
+                                            <strong class="queso-oferta-nombre">{{ p.nombre|default:"Queso Telita" }}</strong>
                                             <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
                                         </div>
                                     </div>
                                 </div>
                                 <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
                             </a>
+                            {% endwith %}
                             <!-- Queso 2: el del medio -->
                             <a href="#productos" class="queso-punto"
                                 data-left="55.8" data-top="15.8" data-width="23.2" data-height="55.6"
@@ -235,7 +241,6 @@
                         <div class="oferta-info-unica" id="ofertaInfoUnica">
                             <div class="oferta-info-grupo-foto">
                                 <div class="oferta-info-foto" id="ofertaInfoFoto">
-                                    <!-- TODO Django: reemplazar por <img src="{{ producto.imagen.url }}"> -->
                                     <i class="bi bi-image"></i>
                                 </div>
                                 <strong class="oferta-info-nombre" id="ofertaInfoNombre">¿Qué te tocará hoy?</strong>
@@ -554,7 +559,7 @@
         </div>
 
 
-        <!-- ===== SECCIÓN PRODUCTOS ===== -->
+        <!-- ===== SECCIÓN PRODUCTOS (con buscador en vivo + productos reales) ===== -->
         <section class="seccion-productos" id="productos">
             <div class="container">
                 <div class="row mb-5">
@@ -572,47 +577,91 @@
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-md-6 col-lg-4 reveal delay-1">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso1.png' %}" class="producto-card-imagen" alt="Queso blanco">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Estrella</span>
-                                <h3 class="producto-nombre">Queso Blanco</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Fresco, suave y con la textura característica del queso venezolano. Ideal para acompañar arepa, tequeños y mucho más.</p>
-                            </div>
+                <!-- Buscador de productos -->
+                <div class="buscador-wrapper"
+                     data-url-ajax="{% url 'buscar_ajax' %}"
+                     data-url-agregar-base="{% url 'carro:agregar' 1 %}"
+                     data-layout="vertical">
+                    <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
+                        <div class="buscador-input-wrapper">
+                            <i class="bi bi-search buscador-icono"></i>
+                            <input
+                                type="text"
+                                name="q"
+                                id="inputBuscador"
+                                class="buscador-input"
+                                placeholder="Buscar productos..."
+                                value="{{ query|default:'' }}"
+                                autocomplete="off"
+                            >
+                            {% if query %}
+                            <a href="?" class="buscador-limpiar" aria-label="Limpiar búsqueda">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            {% endif %}
                         </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4 reveal delay-2">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso2.png' %}" class="producto-card-imagen" alt="Queso de mano">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Favorito</span>
-                                <h3 class="producto-nombre">Queso de Mano</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Artesanal, delicado y con una consistencia que lo hace perfecto para derretir o disfrutar solo.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4 reveal delay-3">
-                        <div class="producto-card">
-                            <div class="producto-card-img-wrapper">
-                                <img src="{% static 'home/media/queso3.png' %}" class="producto-card-imagen" alt="Queso telita">
-                            </div>
-                            <div class="producto-card-body">
-                                <span class="producto-tag">Especial</span>
-                                <h3 class="producto-nombre">Queso Telita</h3>
-                                <div class="producto-linea"></div>
-                                <p class="producto-descripcion">Suave y cremoso, con esa fibra característica que lo distingue. Un clásico de la mesa venezolana.</p>
-                            </div>
-                        </div>
-                    </div>
+                        <button type="submit" class="buscador-btn">
+                            <i class="bi bi-search"></i> <span>Buscar</span>
+                        </button>
+                    </form>
                 </div>
+
+                <p class="buscador-resultado-info" id="infoResultados" {% if not query %}style="display:none;"{% endif %}>
+                    Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
+                </p>
+
+                <div class="row g-3" id="listaProductos">
+                    {% for i in productos %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card producto-card producto-card--vertical h-100">
+                            <div class="producto-img-wrapper">
+                                {% if i.stock_actual <= i.stock_minimo %}
+                                    <span class="badge-stock bajo">Stock bajo</span>
+                                {% else %}
+                                    <span class="badge-stock disponible">Disponible</span>
+                                {% endif %}
+                                {% if i.imagen %}
+                                    <img src="{{ i.imagen.url }}" class="imagen-producto">
+                                {% else %}
+                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                <h5 class="titulo-producto">{{ i.nombre }}</h5>
+                                <p class="producto-descripcion">
+                                    {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
+                                </p>
+                                <p class="precio">$ {{ i.precio }}</p>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
+                                    <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12" id="sinResultados">
+                        {% if query %}
+                        <div class="alert alert-info text-center buscador-sin-resultados">
+                            <i class="bi bi-search"></i>
+                            No encontramos productos para "<strong>{{ query }}</strong>".
+                            <a href="?">Ver todos los productos</a>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info text-center">No existen productos disponibles.</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
             </div>
         </section>
 
@@ -740,53 +789,53 @@
         });
 
         /* ---- Parallax 3D con el mouse en el hero ---- */
-(function () {
-    const hero = document.querySelector('#inicio .hero');
-    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        (function () {
+            const hero = document.querySelector('#inicio .hero');
+            if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // FIX: no activar el parallax de mouse en móvil/pantallas táctiles.
-    const esTactilOMovil = window.matchMedia('(max-width: 991px)').matches ||
-                            window.matchMedia('(pointer: coarse)').matches;
-    if (esTactilOMovil) return;
+            const esTactilOMovil = window.matchMedia('(max-width: 991px)').matches ||
+                                    window.matchMedia('(pointer: coarse)').matches;
+            if (esTactilOMovil) return;
 
-    const capas = hero.querySelectorAll('[data-depth]');
-    let raf = null;
-    let targetX = 0, targetY = 0, curX = 0, curY = 0;
+            const capas = hero.querySelectorAll('[data-depth]');
+            let raf = null;
+            let targetX = 0, targetY = 0, curX = 0, curY = 0;
 
-    hero.addEventListener('mousemove', (e) => {
-        const r = hero.getBoundingClientRect();
-        targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
-        targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
-        if (!raf) raf = requestAnimationFrame(animar);
-    });
+            hero.addEventListener('mousemove', (e) => {
+                const r = hero.getBoundingClientRect();
+                targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+                targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
 
-    hero.addEventListener('mouseleave', () => {
-        targetX = 0; targetY = 0;
-        if (!raf) raf = requestAnimationFrame(animar);
-    });
+            hero.addEventListener('mouseleave', () => {
+                targetX = 0; targetY = 0;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
 
-    function animar() {
-        curX += (targetX - curX) * 0.08;
-        curY += (targetY - curY) * 0.08;
+            function animar() {
+                curX += (targetX - curX) * 0.08;
+                curY += (targetY - curY) * 0.08;
 
-        capas.forEach((el) => {
-            const d = parseFloat(el.dataset.depth) || 0.3;
-            const x = -curX * d * 32;
-            const y = -curY * d * 32;
-            el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        });
+                capas.forEach((el) => {
+                    const d = parseFloat(el.dataset.depth) || 0.3;
+                    const x = -curX * d * 32;
+                    const y = -curY * d * 32;
+                    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+                });
 
-        if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
-            raf = requestAnimationFrame(animar);
-        } else {
-            raf = null;
-        }
-    }
-})();
+                if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+                    raf = requestAnimationFrame(animar);
+                } else {
+                    raf = null;
+                }
+            }
+        })();
+
         /* ---- Carrusel del hero ---- */
         (function () {
-            const DURACION_AUTOPLAY = 6000; // ms entre cada slide automático
-            const ESPERA_INACTIVIDAD = 6000; // ms sin interactuar antes de reanudar
+            const DURACION_AUTOPLAY = 6000;
+            const ESPERA_INACTIVIDAD = 6000;
             const track = document.getElementById('carruselTrack');
             const prevBtn = document.getElementById('carruselPrev');
             const nextBtn = document.getElementById('carruselNext');
@@ -831,9 +880,6 @@
                 autoplayTimer = setInterval(siguiente, DURACION_AUTOPLAY);
             }
 
-            // Alguien está interactuando con el slide (globo, quesos, botón
-            // de sorteo): pausa el autoplay indefinidamente y solo lo
-            // reanuda tras un rato sin más interacciones.
             function notificarInteraccion() {
                 bloqueoInteraccion = true;
                 clearInterval(autoplayTimer);
@@ -902,8 +948,7 @@
         revealEls.forEach(el => observer.observe(el));
     </script>
 
-    <!-- Script independiente: si algo falla arriba (navbar, parallax, carrusel),
-         este bloque sigue ejecutándose igual, porque está en su propio <script> -->
+    <!-- Script independiente: posicionamiento de los quesos interactivos -->
     <script>
         (function () {
             const wrap = document.querySelector('.quesos-interactivos');
@@ -914,9 +959,6 @@
             const bgUrl = wrap.dataset.bg;
             const ofertaFondoUrl = wrap.dataset.ofertaFondo;
             const puntosEls = wrap.querySelectorAll('.queso-punto');
-            // Precargamos la imagen de oferta para conocer su tamaño real
-            // (necesario para calcular cuánto hay que escalarla dentro de
-            // la caja conjunta de los 3 quesos)
             const imgOferta = new Image();
             let ofertaLista = false;
             if (ofertaFondoUrl) {
@@ -948,21 +990,21 @@
                 const flip = p.querySelector('.queso-punto-flip');
                 const reverso = p.querySelector('.queso-punto-reverso');
 
-ventana.style.backgroundImage = `url(${bgUrl})`;
+                ventana.style.backgroundImage = `url(${bgUrl})`;
 
-const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
-if (video && p.dataset.ofertaVideo) {
-    video.src = p.dataset.ofertaVideo;
-    if (p.dataset.ofertaPos) {
-        video.style.objectPosition = p.dataset.ofertaPos;
-    }
-}
-const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
-if (reverso) {
-    reverso.classList.toggle('con-descuento', tieneDescuento);
-    reverso.classList.toggle('sin-descuento', !tieneDescuento);
-}
-return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
+                const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
+                if (video && p.dataset.ofertaVideo) {
+                    video.src = p.dataset.ofertaVideo;
+                    if (p.dataset.ofertaPos) {
+                        video.style.objectPosition = p.dataset.ofertaPos;
+                    }
+                }
+                const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
+                if (reverso) {
+                    reverso.classList.toggle('con-descuento', tieneDescuento);
+                    reverso.classList.toggle('sin-descuento', !tieneDescuento);
+                }
+                return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             });
 
             function geometriaCover() {
@@ -1002,118 +1044,100 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 let uMinX = Infinity, uMaxX = -Infinity, uMinY = Infinity, uMaxY = -Infinity;
                 quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, puntosGlobal }, idx) => {
                     try {
-                    const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
-                    window.LZ_PERIMETROS[idx] = puntosPantalla;
+                        const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
+                        window.LZ_PERIMETROS[idx] = puntosPantalla;
 
-                    const clipStr = 'polygon(' +
-                    puntosPantalla.map(([x, y]) => `${x.toFixed(3)}% ${y.toFixed(3)}%`).join(', ') +
-                    ')';
+                        const clipStr = 'polygon(' +
+                            puntosPantalla.map(([x, y]) => `${x.toFixed(3)}% ${y.toFixed(3)}%`).join(', ') +
+                            ')';
 
-                    if (el) el.style.clipPath = clipStr;
-                    if (ventana) ventana.style.clipPath = clipStr;
-                    if (borde) borde.style.clipPath = clipStr;
-                    if (glow) glow.style.clipPath = clipStr;
-                    if (flip) flip.style.clipPath = clipStr;
+                        if (el) el.style.clipPath = clipStr;
+                        if (ventana) ventana.style.clipPath = clipStr;
+                        if (borde) borde.style.clipPath = clipStr;
+                        if (glow) glow.style.clipPath = clipStr;
+                        if (flip) flip.style.clipPath = clipStr;
 
-                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-                    puntosPantalla.forEach(([x, y]) => {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                    });
-                    if (minX < uMinX) uMinX = minX;
-                    if (maxX > uMaxX) uMaxX = maxX;
-                    if (minY < uMinY) uMinY = minY;
-                    if (maxY > uMaxY) uMaxY = maxY;
-                
+                        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                        puntosPantalla.forEach(([x, y]) => {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        });
+                        if (minX < uMinX) uMinX = minX;
+                        if (maxX > uMaxX) uMaxX = maxX;
+                        if (minY < uMinY) uMinY = minY;
+                        if (maxY > uMaxY) uMaxY = maxY;
 
-                    const centroX = (minX + maxX) / 2;
-                    const centroY = (minY + maxY) / 2;
+                        const centroX = (minX + maxX) / 2;
+                        const centroY = (minY + maxY) / 2;
 
-                    borde.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    el.dataset.centroX = centroX.toFixed(2);
-                    el.dataset.centroY = centroY.toFixed(2);
-                    const ofertaCentro = el.querySelector('.queso-oferta-centro');
-                    if (ofertaCentro) {
-                        const offX = parseFloat(el.dataset.ofertaOffsetX) || 0;
-                        const offY = parseFloat(el.dataset.ofertaOffsetY) || 6;
-                        ofertaCentro.style.left = `${centroX + offX}%`;
-                        ofertaCentro.style.top = `${centroY + offY}%`;
+                        borde.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        el.dataset.centroX = centroX.toFixed(2);
+                        el.dataset.centroY = centroY.toFixed(2);
+                        const ofertaCentro = el.querySelector('.queso-oferta-centro');
+                        if (ofertaCentro) {
+                            const offX = parseFloat(el.dataset.ofertaOffsetX) || 0;
+                            const offY = parseFloat(el.dataset.ofertaOffsetY) || 6;
+                            ofertaCentro.style.left = `${centroX + offX}%`;
+                            ofertaCentro.style.top = `${centroY + offY}%`;
+                        }
+
+                    } catch (err) {
+                        console.error('Error recortando un queso:', err);
                     }
+                });
 
-                } catch (err) {
-                    console.error('Error recortando un queso:', err);
+                const infoUnica = document.getElementById('ofertaInfoUnica');
+                if (infoUnica) {
+                    const izquierdaPct = 64;
+                    const arribaPct = 59;
+                    const anchoPct = 25;
+
+                    infoUnica.style.left = `${izquierdaPct}%`;
+                    infoUnica.style.top = `${arribaPct}%`;
+                    infoUnica.style.width = `${anchoPct}%`;
                 }
-            });
-            // ---- Reparte UNA sola imagen "OFERTA DEL DÍA" entre los 3 quesos ----
-            // En vez de hacer cover por queso (que solo mostraba un pedazo del
-            // texto), se calcula la caja que envuelve a los 3 juntos y se
-            // encaja la imagen completa ahí — así el texto queda repartido de
-            // forma continua, como una pantalla partida real.
-            
-           const infoUnica = document.getElementById('ofertaInfoUnica');
-            if (infoUnica) {
-                // ---- CONTROL MANUAL: ajusta estos 3 números a mano ----
-                const izquierdaPct = 64;
-                const arribaPct = 59;
-                const anchoPct = 25;
 
-                infoUnica.style.left = `${izquierdaPct}%`;
-                infoUnica.style.top = `${arribaPct}%`;
-                infoUnica.style.width = `${anchoPct}%`;
-            }
+                const ruletaSuelta = document.getElementById('ofertaRuletaSuelta');
+                if (ruletaSuelta) {
+                    const ruletaIzquierdaPct = 78;
+                    const ruletaArribaPct = 45;
 
-            const ruletaSuelta = document.getElementById('ofertaRuletaSuelta');
-            if (ruletaSuelta) {
-                // ---- CONTROL MANUAL de la ruleta, totalmente independiente ----
-                const ruletaIzquierdaPct = 78;
-                const ruletaArribaPct = 45;
+                    ruletaSuelta.style.left = `${ruletaIzquierdaPct}%`;
+                    ruletaSuelta.style.top = `${ruletaArribaPct}%`;
+                }
 
-                ruletaSuelta.style.left = `${ruletaIzquierdaPct}%`;
-                ruletaSuelta.style.top = `${ruletaArribaPct}%`;
-            }
+                if (isFinite(uMinX)) {
+                    quesos.forEach(({ video }) => {
+                        if (!video) return;
+                        video.style.left   = uMinX + '%';
+                        video.style.top    = uMinY + '%';
+                        video.style.width  = (uMaxX - uMinX) + '%';
+                        video.style.height = (uMaxY - uMinY) + '%';
+                    });
+                }
 
-            // ---- Posiciona el video "OFERTA DEL DÍA" como UNA sola pieza
-            // continua repartida entre los 3 quesos, igual que hacía la
-            // imagen: los 3 <video> comparten el mismo left/top/width/height
-            // (la caja que envuelve a los 3 quesos juntos) y cada uno se ve
-            // recortado solo por su propio clip-path.
-            if (isFinite(uMinX)) {
-                quesos.forEach(({ video }) => {
-                    if (!video) return;
-                    video.style.left   = uMinX + '%';
-                    video.style.top    = uMinY + '%';
-                    video.style.width  = (uMaxX - uMinX) + '%';
-                    video.style.height = (uMaxY - uMinY) + '%';
-                });
-            }
+                if (isFinite(uMinY)) {
+                    const centro = (uMinY + uMaxY) / 2;
+                    const bandaLibre = (uMaxY - uMinY) * 0.34;
+                    const bandaTop = centro - bandaLibre / 2;
+                    const bandaBottom = centro + bandaLibre / 2;
 
-            // ---- Delineado dorado SOLO arriba y abajo (libre en el centro,
-            // por donde pasa el texto "OFERTA DEL DÍA") ----
-            if (isFinite(uMinY)) {
-                const centro = (uMinY + uMaxY) / 2;
-                // % de la altura total de los 3 quesos que queda LIBRE en el
-                // centro (sin borde). Súbelo si quieres franja libre más
-                // ancha, bájalo si quieres que el borde se acerque más al texto.
-                const bandaLibre = (uMaxY - uMinY) * 0.34;
-                const bandaTop = centro - bandaLibre / 2;
-                const bandaBottom = centro + bandaLibre / 2;
+                    const maskCSS = `linear-gradient(to bottom,
+                        black 0%, black ${bandaTop.toFixed(2)}%,
+                        transparent ${(bandaTop + 4).toFixed(2)}%,
+                        transparent ${(bandaBottom - 4).toFixed(2)}%,
+                        black ${bandaBottom.toFixed(2)}%, black 100%)`;
 
-                const maskCSS = `linear-gradient(to bottom,
-                    black 0%, black ${bandaTop.toFixed(2)}%,
-                    transparent ${(bandaTop + 4).toFixed(2)}%,
-                    transparent ${(bandaBottom - 4).toFixed(2)}%,
-                    black ${bandaBottom.toFixed(2)}%, black 100%)`;
-
-                quesos.forEach(({ borde }) => {
-                    if (!borde) return;
-                    borde.style.maskImage = maskCSS;
-                    borde.style.webkitMaskImage = maskCSS;
-                });
-            }
+                    quesos.forEach(({ borde }) => {
+                        if (!borde) return;
+                        borde.style.maskImage = maskCSS;
+                        borde.style.webkitMaskImage = maskCSS;
+                    });
+                }
             }
             window.addEventListener('resize', actualizar);
             img.addEventListener('load', actualizar);
@@ -1229,7 +1253,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             }
             requestAnimationFrame(paso);
         }
-       function mostrarBotonSortear() {
+        function mostrarBotonSortear() {
             if (botonSortearWrap) botonSortearWrap.classList.add('visible');
         }
 
@@ -1240,8 +1264,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             ).join('');
         }
 
-        // Versión animada tipo tragamonedas: cada columna de dígitos gira
-        // por varios números al azar antes de frenar en el valor final.
         function generarCintaAnimada(digitoFinal) {
             const pasos = 12;
             let html = '';
@@ -1271,19 +1293,12 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             });
         }
 
-        /* ---------------------------------------------------------------
-           SORTEO "TIPO RULETA" — enciende el borde dorado de cada queso
-           uno por uno (usa el mismo clip-path real que ya tienen), va
-           saltando cada vez más lento hasta frenar en el ganador. Sin
-           SVG ni trazado: solo la clase .resaltado-sorteo sobre
-           .queso-punto-borde de cada queso.
-        --------------------------------------------------------------- */
-       function iniciarSorteo() {
+        function iniciarSorteo() {
             if (sorteoEnCurso || sorteoHecho) return;
             const candidatos = quesosArr.filter(q => q.dataset.descuento);
             if (!candidatos.length) return;
 
-            const ganadorEl = candidatos[Math.floor(Math.random() * candidatos.length)];
+            const ganadorEl = elegirGanadorPonderado(candidatos);
             sorteoEnCurso = true;
             botonSortear.disabled = true;
             botonSortearWrap.classList.remove('visible');
@@ -1291,10 +1306,19 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             const ruletaUnica = document.getElementById('ofertaInfoRuleta');
             const valor = parseInt(ganadorEl.dataset.descuento, 10);
 
-            // La tarjeta y el video se quedan tal cual, solo gira el número.
             mostrarNumeroConGiro(ruletaUnica, valor);
-
             setTimeout(() => mostrarFelicidades(ganadorEl, valor), 2600);
+        }
+
+        function elegirGanadorPonderado(candidatos) {
+            const pesos = candidatos.map(c => Math.max(parseFloat(c.dataset.pesoStock) || 1, 0.1));
+            const total = pesos.reduce((a, b) => a + b, 0);
+            let r = Math.random() * total;
+            for (let i = 0; i < candidatos.length; i++) {
+                r -= pesos[i];
+                if (r <= 0) return candidatos[i];
+            }
+            return candidatos[candidatos.length - 1];
         }
 
         function mostrarFelicidades(ganadorEl, valor) {
@@ -1361,33 +1385,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 ruedaWrap.classList.add('visible', 'aparicion-pop');
             });
         }
-        function volarBrilloHaciaBadge(cx, cy, valor) {
-            if (!ruedaWrap) return;
-            const slide = wrap.closest('.slide-imagen');
 
-            const spark = document.createElement('span');
-            spark.className = 'brillo-volador';
-            spark.style.left = cx + '%';
-            spark.style.top = cy + '%';
-            slide.appendChild(spark);
-
-            const destino = ruedaWrap.getBoundingClientRect();
-            const origenSlide = slide.getBoundingClientRect();
-            const dx = (destino.left + destino.width / 2) - (origenSlide.left + (cx / 100) * origenSlide.width);
-            const dy = (destino.top + destino.height / 2) - (origenSlide.top + (cy / 100) * origenSlide.height);
-
-            spark.style.setProperty('--dx', dx + 'px');
-            spark.style.setProperty('--dy', dy + 'px');
-
-            requestAnimationFrame(() => spark.classList.add('volando'));
-
-            spark.addEventListener('animationend', () => {
-                spark.remove();
-                const texto = ruedaWrap.querySelector('.rueda-descuento');
-                if (texto) texto.textContent = `${valor}% de descuento hoy`;
-                ruedaWrap.classList.add('visible', 'aparicion-pop');
-            });
-        }
         botonSortear && botonSortear.addEventListener('click', () => {
             window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
             iniciarSorteo();
@@ -1405,7 +1403,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 const angulo = (Math.PI * 2 * i) / cantidad + (Math.random() * 0.4 - 0.2);
                 const distancia = 40 + Math.random() * 50;
                 const fx = Math.cos(angulo) * distancia;
-                const fy = Math.sin(angulo) * distancia - 10; // ligero sesgo hacia arriba
+                const fy = Math.sin(angulo) * distancia - 10;
 
                 frag.style.setProperty('--fx', fx + 'px');
                 frag.style.setProperty('--fy', fy + 'px');
@@ -1480,9 +1478,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 bannerTimeout = setTimeout(() => banner.classList.remove('visible'), 4000);
             }
 
-            // Precarga los 3 videos de oferta ahora, para que cuando el
-            // usuario encienda los 3 quesos ya estén listos y no haya
-            // retraso al reproducirlos.
             quesosArr.forEach((q) => {
                 const video = obtenerVideo(q);
                 if (video && video.readyState < 2) {
@@ -1497,8 +1492,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             banner.classList.remove('visible');
 
             if (sorteoHecho) {
-                // La oferta ya se sorteó y sigue vigente (24h): los quesos
-                // y el aviso de la esquina se quedan tal cual, sin resetear.
                 boton.classList.remove('volando', 'reventado');
                 return;
             }
@@ -1568,7 +1561,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                     vistos.add(p);
                 } else {
                     vistos.delete(p);
-                    // Si se apaga uno, se oculta el video/reverso en los 3 a la vez
                     quesosArr.forEach((q) => {
                         q.classList.remove('volteado');
                         pausarVideoQueso(q);
@@ -1577,8 +1569,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                     botonSortearWrap && botonSortearWrap.classList.remove('visible');
                 }
 
-                // Solo cuando los 3 están encendidos a la vez, se revela el
-                // video en los 3 quesos AL MISMO TIEMPO, con transición.
                 if (vistos.size === quesosArr.length && !sorteoHecho) {
                     quesosArr.forEach((q) => q.classList.add('volteado'));
                     wrap.classList.add('todos-encendidos');
@@ -1594,6 +1584,166 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                     wrap.classList.remove('todos-encendidos');
                 }
             });
+        });
+    })();
+
+    /* ---- Buscador en vivo: filtra el grid de productos (horizontal o vertical) ---- */
+    (function () {
+        const wrapper = document.querySelector('.buscador-wrapper');
+        const input = document.getElementById('inputBuscador');
+        const lista = document.getElementById('listaProductos');
+        const infoResultados = document.getElementById('infoResultados');
+        const infoQuery = document.getElementById('infoQuery');
+        const infoCantidad = document.getElementById('infoCantidad');
+        const contador = document.getElementById('contadorProductos');
+        if (!wrapper || !input || !lista) return;
+
+        const URL_BUSCAR = wrapper.dataset.urlAjax;
+        const URL_AGREGAR_BASE = wrapper.dataset.urlAgregarBase;
+        const LAYOUT = wrapper.dataset.layout || 'horizontal';
+        let timer = null;
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function urlAgregar(id) {
+            return URL_AGREGAR_BASE.replace(/\/1\/?$/, `/${id}/`);
+        }
+
+        function badgeHtml(p) {
+            return p.stock_actual <= p.stock_minimo
+                ? `<span class="badge-stock bajo">Stock bajo</span>`
+                : `<span class="badge-stock disponible">Disponible</span>`;
+        }
+
+        function descripcionSegura(p) {
+            return p.descripcion && p.descripcion.trim()
+                ? escapeHtml(p.descripcion)
+                : 'Producto elaborado con los más altos estándares de calidad, fresco y natural.';
+        }
+
+        function tarjetaHorizontal(p) {
+            return `
+                <div class="col-12">
+                    <div class="card producto-card">
+                        <div class="producto-img-wrapper">
+                            ${badgeHtml(p)}
+                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
+                        </div>
+                        <div class="producto-info">
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                <div class="precio-fila">
+                                    <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
+                                    <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                                </div>
+                                <p class="producto-descripcion"><strong>Descripcion:</strong></p>
+                                <p class="producto-descripcion">${descripcionSegura(p)}</p>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <div class="footer-botones">
+                                    <a href="${urlAgregar(p.id)}" class="btn btn-carrito">
+                                        <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function tarjetaVertical(p) {
+            return `
+                <div class="col-lg-3 col-md-6">
+                    <div class="card producto-card producto-card--vertical h-100">
+                        <div class="producto-img-wrapper">
+                            ${badgeHtml(p)}
+                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
+                        </div>
+                        <div class="card-body">
+                            <div class="estrellas">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                            <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
+                            <p class="producto-descripcion">${descripcionSegura(p)}</p>
+                            <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                        </div>
+                        <div class="card-footer bg-white border-0">
+                            <a href="${urlAgregar(p.id)}" class="btn btn-carrito w-100">
+                                <i class="bi bi-cart-plus"></i> Añadir al carrito
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function tarjetaHtml(p) {
+            return LAYOUT === 'vertical' ? tarjetaVertical(p) : tarjetaHorizontal(p);
+        }
+
+        function renderLista(data) {
+            const productos = data.productos || [];
+            const query = data.query || '';
+
+            if (query) {
+                infoResultados.style.display = '';
+                infoQuery.textContent = query;
+                infoCantidad.textContent = productos.length;
+            } else {
+                infoResultados.style.display = 'none';
+            }
+
+            if (contador) {
+                contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
+            }
+
+            if (productos.length === 0) {
+                lista.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info text-center buscador-sin-resultados">
+                            <i class="bi bi-search"></i>
+                            No encontramos productos para "<strong>${escapeHtml(query)}</strong>".
+                            <a href="?">Ver todos los productos</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            lista.innerHTML = productos.map(tarjetaHtml).join('');
+        }
+
+        input.addEventListener('input', () => {
+            clearTimeout(timer);
+            const q = input.value.trim();
+
+            timer = setTimeout(() => {
+                fetch(`${URL_BUSCAR}?q=${encodeURIComponent(q)}`)
+                    .then(res => res.json())
+                    .then(renderLista)
+                    .catch(() => {
+                        lista.innerHTML = `
+                            <div class="col-12">
+                                <div class="alert alert-danger text-center">Ocurrió un error al buscar.</div>
+                            </div>
+                        `;
+                    });
+            }, 300);
         });
     })();
     </script>

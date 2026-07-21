@@ -232,7 +232,13 @@
                     <i class="bi bi-basket-fill me-2"></i>
                     Productos
                 </a>
-
+                
+                <a class="nav-link {% if request.resolver_match.url_name == 'listar_descuentos' %}active{% endif %}"
+                   href="{% url 'listar_descuentos' %}">
+                    <i class="bi bi-tags-fill me-2"></i>
+                    Descuentos
+                </a>
+                
                 <a class="nav-link {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
                    href="{% url 'listar_producciones' %}">
                     <i class="bi bi-box-seam me-2"></i>
@@ -294,6 +300,11 @@
                     <a class="nav-link" href="{% url 'listar_productos' %}">
                         <i class="bi bi-basket-fill me-2"></i>
                         Productos
+                    </a>
+
+                    <a class="nav-link" href="{% url 'listar_descuentos' %}">
+                        <i class="bi bi-tags-fill me-2"></i>
+                        Descuentos
                     </a>
 
                     <a class="nav-link" href="{% url 'listar_producciones' %}">

@@ -26,6 +26,7 @@ urlpatterns = [
     path('carro/', include("carrito.urls")),
     path('',include("dashboard.urls")),
     path('productos/',include("producto.urls")),
+    path('descuentos/',include("descuentos.urls")),
     path('producciones/',include("produccion.urls")),
 ]
 

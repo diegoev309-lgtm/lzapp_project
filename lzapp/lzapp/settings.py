@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'home',
     'dashboard',
     'producto',
+    'descuentos',
     'produccion',
 ]
 

@@ -25,6 +25,10 @@
 
 html {
     scroll-behavior: smooth;
+    /* FIX: evita que cualquier elemento que se pase por unos px de ancho
+       (p. ej. el carrito fijo) empuje el documento y genere scroll
+       horizontal — eso era lo que recortaba visualmente toda la página. */
+    overflow-x: hidden;
 }
 
 body {
@@ -761,6 +765,13 @@ HERO — escena 3D animada (slide 1 del carrusel)
     padding: 6rem 0;
     background: var(--gris-claro);
     position: relative;
+    /* FIX: sin esto, si algún elemento hijo se pasa de ancho por
+       cualquier motivo (badges, texto largo, etc.) puede generar
+       scroll horizontal en toda la página, igual que pasaba con el
+       carrito fijo. Esta sección es la más ancha del sitio, así que
+       es el lugar más seguro para cortar cualquier desborde lateral
+       sin afectar animaciones verticales (reveal, hover, etc.). */
+    overflow-x: hidden;
 }
 
 .section-eyebrow {
@@ -2436,4 +2447,103 @@ footer .text-center.m-0 {
 @keyframes popBadge {
     0%   { transform: scale(0.5); }
     100% { transform: scale(1); }
+}
+
+
+/* ============================================================
+   TARJETAS DE PRODUCTO — VERSIÓN VERTICAL (grid 4 columnas)
+   Se usa en home.html con .producto-card--vertical
+   ============================================================ */
+
+.producto-card--vertical {
+    flex-direction: column;
+    min-height: unset;
+    height: 100%;
+}
+
+.producto-card--vertical .producto-img-wrapper {
+    height: 160px;   /* antes 220px */
+    padding: 12px;   /* antes 20px */
+}
+
+.producto-card--vertical .estrellas {
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.producto-card--vertical .imagen-producto {
+    max-height: 100%;
+}
+
+.producto-card--vertical .card-body {
+    padding: 0.9rem 1.1rem 0.2rem; /* antes 1.2rem 1.3rem 0.4rem */
+}
+
+.producto-card--vertical .titulo-producto {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    min-height: unset;          /* antes 2.6em */
+    line-height: 1.3;
+}
+
+.producto-card--vertical .producto-descripcion {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;      /* antes 3 líneas */
+    line-clamp: 2;
+    min-height: calc(0.8rem * 1.5 * 2); /* ajustada a 2 líneas */
+    line-height: 1.5;
+    margin-bottom: 0.6rem;
+}
+
+.producto-card--vertical .precio {
+    font-size: 1.1rem;          /* antes 1.25rem */
+}
+
+.producto-card--vertical .card-footer {
+    padding: 0 1.1rem 1rem;     /* antes 1.3rem 1.3rem */
+}
+
+.producto-card--vertical .btn-carrito {
+    padding: 0.5rem 1rem;       /* si tu botón usa padding grande por defecto */
+    font-size: 0.9rem;
+}
+
+/* Responsive: en móvil 2 columnas en vez de 1 sola tarjeta gigante */
+@media (max-width: 576px) {
+    .producto-card--vertical .producto-img-wrapper {
+        height: 160px;
+        padding: 12px;
+    }
+    .producto-card--vertical .titulo-producto {
+        font-size: 0.95rem;
+    }
+    .producto-card--vertical .producto-descripcion {
+        font-size: 0.78rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        min-height: calc(0.78rem * 1.6 * 2);
+    }
+    .producto-card--vertical .precio {
+        font-size: 1.1rem;
+    }
+}
+
+/* FIX: antes había dos reglas de body contradictorias:
+   `body.con-carrito-fijo { margin-right: 340px; }` (arriba, sección
+   NAVBAR) reservaba espacio para el carrito fijo, pero esta regla al
+   final del archivo lo anulaba con !important, dejando el carrito
+   fijo de 340px MONTADO sobre el contenido en vez de tener su propio
+   espacio — eso generaba el desborde horizontal que recortaba visualmente
+   toda la sección de productos (la franja negra en las capturas).
+   Se elimina el override y se deja que `con-carrito-fijo` haga su
+   trabajo. En mobile el carrito fijo normalmente se oculta, así que
+   ahí sí quitamos el margen para no dejar un hueco vacío a la derecha. */
+@media (max-width: 991px) {
+    body.con-carrito-fijo {
+        margin-right: 0;
+    }
+}
+
+body {
+    margin-right: 0 !important;
 }

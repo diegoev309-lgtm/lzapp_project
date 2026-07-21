@@ -189,35 +189,412 @@
             .producto-descripcion { font-size: 0.82rem; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
             .btn-carrito { width: 100%; padding: 0.65rem 1rem; font-size: 0.85rem; }
         }
+
+        /* ============================================================
+           VERSIÓN COMPACTA — para la página del carrito, donde el
+           contenido dispone de menos ancho (340px los ocupa el widget)
+           ============================================================ */
+
+        /* Contenedor: limita el ancho real usado en vez de dejar que
+           Bootstrap intente centrar un container de 1140/1320px en un
+           espacio menor */
+        .seccion-productos .container {
+            max-width: 100%;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        /* --- Encabezado de la sección: título y descripción más chicos --- */
+        .seccion-productos {
+            padding: 2.5rem 0 3rem;
+        }
+
+        .seccion-productos .section-titulo {
+            font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .seccion-productos .section-eyebrow {
+            font-size: 0.68rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .seccion-productos .section-descripcion {
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .seccion-productos .row.mb-5 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* --- Buscador más compacto --- */
+        .buscador-wrapper {
+            max-width: 480px;
+            margin-bottom: 1.2rem;
+        }
+
+        .buscador-input {
+            padding: 0.7rem 2.2rem 0.7rem 2.8rem;
+            font-size: 0.85rem;
+        }
+
+        .buscador-icono {
+            left: 18px;
+            font-size: 0.9rem;
+        }
+
+        .buscador-btn {
+            padding: 0 1.4rem;
+            font-size: 0.82rem;
+        }
+
+        .seccion-productos .container.py-5 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        .seccion-productos h2 {
+            font-size: 1.3rem;
+        }
+
+        #contadorProductos {
+            font-size: 0.78rem !important;
+        }
+
+        /* --- Tarjetas de producto: más compactas --- */
+        .producto-card {
+            min-height: 140px;
+            border-radius: 16px;
+        }
+
+        .producto-img-wrapper {
+            width: 150px;
+            padding: 10px;
+        }
+
+        .imagen-producto {
+            max-height: 130px;
+        }
+
+        .badge-stock {
+            top: 8px;
+            left: 8px;
+            font-size: 0.6rem;
+            padding: 0.22rem 0.6rem;
+        }
+
+        .card-body {
+            padding: 0.85rem 1rem 0.3rem;
+        }
+
+        .estrellas {
+            font-size: 0.72rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .titulo-producto {
+            font-size: 0.95rem;
+        }
+
+        .precio {
+            font-size: 1.05rem;
+        }
+
+        .producto-descripcion {
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            padding: 0.4rem 1rem 0.85rem;
+        }
+
+        .btn-carrito {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* En pantallas medianas, un poco más de aire ya que hay menos
+           presión de espacio */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            .producto-img-wrapper { width: 130px; }
+            .imagen-producto { max-height: 110px; }
+        }
+
+        /* ============================================================
+           BUSCADOR DE PRODUCTOS — rediseño
+           ============================================================ */
+        .buscador-wrapper {
+            position: relative;
+            margin-bottom: 1.75rem;
+            max-width: 620px;
+        }
+        
+        .buscador-productos {
+            display: flex;
+            align-items: stretch;
+            background: var(--blanco);
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(2, 44, 99, 0.08);
+            border: 1.5px solid transparent;
+            background-image: linear-gradient(var(--blanco), var(--blanco)),
+                               linear-gradient(120deg, rgba(8, 59, 120, 0.15), rgba(201, 168, 76, 0.35));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+        
+        .buscador-productos:focus-within {
+            box-shadow: 0 10px 30px rgba(2, 44, 99, 0.16), 0 0 0 4px rgba(201, 168, 76, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .buscador-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+        
+        .buscador-icono {
+            position: absolute;
+            left: 22px;
+            color: var(--dorado);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: transform var(--transition), color var(--transition);
+        }
+        
+        .buscador-productos:focus-within .buscador-icono {
+            color: var(--azul-principal);
+            transform: scale(1.1);
+        }
+        
+        .buscador-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 0.95rem 2.6rem 0.95rem 3.2rem;
+            color: var(--azul-profundo);
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .buscador-input:focus {
+            outline: none;
+        }
+        
+        .buscador-input::placeholder {
+            color: var(--gris-texto);
+            font-weight: 400;
+            opacity: 0.65;
+        }
+        
+        .buscador-limpiar {
+            position: absolute;
+            right: 12px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--gris-claro);
+            color: var(--gris-texto);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: background var(--transition), color var(--transition), transform var(--transition);
+        }
+        
+        .buscador-limpiar:hover {
+            background: #e63950;
+            color: var(--blanco);
+            transform: rotate(90deg);
+        }
+        
+        .buscador-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(120deg, var(--azul-principal), var(--azul-profundo));
+            color: var(--blanco);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0 2rem;
+            border: none;
+            white-space: nowrap;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--transition);
+        }
+        
+        .buscador-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, var(--dorado), var(--dorado-claro));
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+        
+        .buscador-btn span,
+        .buscador-btn i {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .buscador-btn:hover {
+            color: var(--azul-profundo);
+        }
+        
+        .buscador-btn:hover::before {
+            opacity: 1;
+        }
+        /* ============================================================
+           AJUSTE DE LAYOUT — deja espacio para el carrito fijo
+           ============================================================ */
+        body {
+            margin-right: 340px !important;   /* !important para ganarle a home.css */
+            transition: margin-right 0.3s ease;
+        }
+
+        /* El navbar es fixed-top: no hereda el margin del body,
+           así que hay que recortarlo manualmente */
+        #mainNav.navbar.fixed-top {
+            right: 340px;
+            left: 0;
+            transition: right 0.3s ease;
+        }
+
+        @media (max-width: 991px) {
+            body {
+                margin-right: 0 !important;
+            }
+            #mainNav.navbar.fixed-top {
+                right: 0;
+            }
+        }
+
+        /* ============================================================
+           NAVBAR — en esta página no hay hero, así que se queda
+           siempre azul (nunca transparente), gane o no la clase
+           .scrolled que agrega el JS al hacer scroll
+           ============================================================ */
+        #mainNav.navbar {
+            background: rgba(2, 44, 99, 0.97) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 8px 30px rgba(2, 44, 99, 0.25);
+            padding: 0.7rem 0;
+        }
+        
+        /* Widget del carrito: que la navbar respete su ancho también
+           cuando el carrito cambia de tamaño en breakpoints intermedios */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            body {
+                margin-right: 300px !important;
+            }
+            #mainNav.navbar.fixed-top {
+                right: 300px;
+            }
+        }
+    
     </style>
 </head>
 <body>
-
     {% include 'carrito/widget.html' %}
+
+    <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
+    <header>
+        <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
+                    LzApp
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="bi bi-list text-white fs-2"></i>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="nav">
+                        <li class="nav-item"><a class="nav-link" href="#nosotros">Quiénes somos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <ul class="nav justify-content-end align-items-center gap-2">
+                
+                    <!-- Perfil -->
+                    <li class="nav-item dropdown">
+                    
+                        <a class="nav-link dropdown-toggle p-1"
+                           href="#"
+                           id="perfilDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                    
+                            <i class="bi bi-person-circle fs-4"></i>
+                    
+                        </a>
+                    
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                        
+                            <li>
+                                <span class="dropdown-item-text fw-bold">
+                                    👋 Hola,
+                                    {{ request.session.nombre }}
+                                </span>
+                            </li>
+                        
+                            <li><hr class="dropdown-divider"></li>
+                        
+                            <li>
+                                <a class="dropdown-item text-danger"
+                                   href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    Cerrar sesión
+                                </a>
+                            </li>
+                        
+                        </ul>
+                    
+                    </li>
+                
+                    <!-- Carrito -->
+                    <li class="nav-item">
+                        <a class="nav-link p-1" href="{% url 'carro' %}" title="Carrito de compras">
+                            <i class="bi bi-basket fs-4"></i>
+                        </a>
+                    </li>
+                
+                </ul>
+
+                {% block navbar_actions %}{% endblock %}
+            </div>
+        </nav>
+    </header>
 
     <!-- ===== SECCIÓN PRODUCTOS ===== -->
     <section class="seccion-productos" id="productos">
-        <div class="container">
-            <div class="row mb-5">
-                <div class="col-lg-6 reveal-left">
-                    <span class="section-eyebrow">Lo que ofrecemos</span>
-                    <h2 class="section-titulo">Nuestros<br>productos</h2>
-                </div>
-                <div class="col-lg-6 d-flex align-items-end reveal-right">
-                    <p class="section-descripcion">
-                        Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad
-                        y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás
-                        aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos
-                        de la cocina de la abuela.
-                    </p>
-                </div>
-            </div>
-        </div>
 
         <div class="container py-5">
 
             <!-- Buscador de productos -->
-            <div class="buscador-wrapper" data-url-ajax="{% url 'buscar_ajax' %}">
+            <div class="buscador-wrapper"
+                 data-url-ajax="{% url 'buscar_ajax' %}"
+                 data-url-agregar-base="{% url 'carro:agregar' 1 %}"
+                 data-layout="horizontal">
                 <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
                     <div class="buscador-input-wrapper">
                         <i class="bi bi-search buscador-icono"></i>
@@ -240,23 +617,9 @@
                         <i class="bi bi-search"></i> Buscar
                     </button>
                 </form>
-            
-                <!-- Resultados en vivo (tabla con imagen, nombre, precio) -->
-                <div class="buscador-resultados" id="buscadorResultados"></div>
             </div>
 
-            {% if query %}
-            <p class="buscador-resultado-info">
-                Resultados para "<strong>{{ query }}</strong>" — {{ productos|length }} producto{{ productos|length|pluralize }} encontrado{{ productos|length|pluralize }}
-            </p>
-            {% endif %}
-
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h2>Productos disponibles</h2>
-                <span class="badge bg-primary fs-6">{{ productos|length }} Productos</span>
-            </div>
-
-            <div class="row g-4">
+            <div class="row g-4" id="listaProductos">
                 {% for i in productos %}
                 <div class="col-12">
                     <div class="card producto-card">
@@ -301,7 +664,7 @@
                     </div>
                 </div>
                 {% empty %}
-                <div class="col-12">
+                <div class="col-12" id="sinResultados">
                     {% if query %}
                     <div class="alert alert-info text-center buscador-sin-resultados">
                         <i class="bi bi-search"></i>
@@ -317,6 +680,36 @@
 
         </div>
     </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4 border-md-end">
+                    <h4>Servicio al cliente</h4>
+                    <p>Líneas exclusivas</p>
+                    <p>321-545-0519 / 311-456-987</p>
+                    <p>Medellin@zulianos.com.co</p>
+                </div>
+                <div class="col-md-4 mb-4 border-md-end">
+                    <h4>Síguenos en redes</h4>
+                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
+                        <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="48" alt="WhatsApp"></a>
+                        <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="48" alt="Instagram"></a>
+                        <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="48" alt="Facebook"></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4>Términos y condiciones</h4>
+                    <p>Ubicación</p>
+                    <p>Protección de datos personales</p>
+                    <p>Aviso de privacidad</p>
+                    <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" width="45" height="40" class="d-inline-block align-text-top">
+                </div>
+            </div>
+            <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'home/js/home.js' %}"></script>
@@ -334,7 +727,129 @@
                 btn.closest('.producto-card').classList.toggle('abierta');
             });
         });
-    </script>
 
+        /* ---- Buscador en vivo: filtra directamente el grid de productos ---- */
+        (function () {
+            const wrapper = document.querySelector('.buscador-wrapper');
+            const input = document.getElementById('inputBuscador');
+            const lista = document.getElementById('listaProductos');
+            const infoResultados = document.getElementById('infoResultados');
+            const infoQuery = document.getElementById('infoQuery');
+            const infoCantidad = document.getElementById('infoCantidad');
+            const contador = document.getElementById('contadorProductos');
+            if (!wrapper || !input || !lista) return;
+        
+            const URL_BUSCAR = wrapper.dataset.urlAjax;
+            const URL_AGREGAR_BASE = wrapper.dataset.urlAgregarBase; // ej: /carro/agregar/1/
+            let timer = null;
+        
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+        
+            function urlAgregar(id) {
+                // Reemplaza el ID de ejemplo (el último segmento numérico) por el ID real
+                return URL_AGREGAR_BASE.replace(/\/1\/?$/, `/${id}/`);
+            }
+        
+            function tarjetaHtml(p) {
+                const stockBajo = p.stock_actual <= p.stock_minimo;
+                const badge = stockBajo
+                    ? `<span class="badge-stock bajo">Stock bajo</span>`
+                    : `<span class="badge-stock disponible">Disponible</span>`;
+            
+                const descripcion = p.descripcion && p.descripcion.trim()
+                    ? escapeHtml(p.descripcion)
+                    : 'Producto elaborado con los más altos estándares de calidad, fresco y natural.';
+            
+                return `
+                    <div class="col-12">
+                        <div class="card producto-card">
+                            <div class="producto-img-wrapper">
+                                ${badge}
+                                <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
+                            </div>
+                            <div class="producto-info">
+                                <div class="card-body">
+                                    <div class="estrellas">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                    </div>
+                                    <div class="precio-fila">
+                                        <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
+                                        <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                                    </div>
+                                    <p class="producto-descripcion"><strong>Descripcion:</strong></p>
+                                    <p class="producto-descripcion">${descripcion}</p>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="footer-botones">
+                                        <a href="${urlAgregar(p.id)}" class="btn btn-carrito">
+                                            <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        
+            function renderLista(data) {
+                const productos = data.productos || [];
+                const query = data.query || '';
+            
+                if (query) {
+                    infoResultados.style.display = '';
+                    infoQuery.textContent = query;
+                    infoCantidad.textContent = productos.length;
+                } else {
+                    infoResultados.style.display = 'none';
+                }
+            
+                if (contador) {
+                    contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
+                }
+            
+                if (productos.length === 0) {
+                    lista.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info text-center buscador-sin-resultados">
+                                <i class="bi bi-search"></i>
+                                No encontramos productos para "<strong>${escapeHtml(query)}</strong>".
+                                <a href="?">Ver todos los productos</a>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+            
+                lista.innerHTML = productos.map(tarjetaHtml).join('');
+            }
+        
+            input.addEventListener('input', () => {
+                clearTimeout(timer);
+                const q = input.value.trim();
+            
+                timer = setTimeout(() => {
+                    fetch(`${URL_BUSCAR}?q=${encodeURIComponent(q)}`)
+                        .then(res => res.json())
+                        .then(renderLista)
+                        .catch(() => {
+                            lista.innerHTML = `
+                                <div class="col-12">
+                                    <div class="alert alert-danger text-center">Ocurrió un error al buscar.</div>
+                                </div>
+                            `;
+                        });
+                }, 300);
+            });
+        })();
+    </script>
 </body>
 </html>

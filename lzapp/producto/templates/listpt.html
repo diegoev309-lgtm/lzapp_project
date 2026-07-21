@@ -678,7 +678,14 @@ body{
                 Nuevo Producto
             </a>
         </div>
-
+        <!-- Buscador -->
+        <form method="get" class="d-flex mb-3 gap-2" style="max-width:340px;">
+            <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query }}">
+            <button class="btn" style="background:var(--degradado-marca); color:white;">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+        
         <!-- ============ VISTA TABLA ============
              table-responsive queda como red de seguridad (scroll horizontal
              SOLO si algún dato es anormalmente largo), pero las columnas

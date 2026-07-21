@@ -1,0 +1,92 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+body{ background:#f4f7fc; font-family:'Segoe UI',sans-serif; }
+
+.overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    display:flex; justify-content:center; align-items:center;
+    padding:20px; z-index:9999;
+}
+
+.modal-eliminar{
+    width:100%; max-width:500px; background:#fff; border-radius:20px;
+    overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.25);
+    animation:aparecer .35s ease;
+}
+
+.header-modal{
+    background:linear-gradient(135deg,#dc3545,#ff5d6c);
+    color:white; padding:25px; text-align:center;
+}
+.header-modal i{ font-size:60px; margin-bottom:15px; }
+.header-modal h2{ margin:0; font-size:28px; font-weight:bold; }
+
+.body-modal{ padding:30px; text-align:center; }
+.body-modal p{ color:#666; margin-bottom:15px; font-size:18px; }
+
+.nombre-producto{
+    background:#fff5f5; border:2px solid #ffd3d3; color:#dc3545;
+    font-size:20px; font-weight:bold; padding:15px; border-radius:12px; margin-bottom:30px;
+}
+
+.footer-modal{ display:flex; justify-content:center; gap:15px; }
+
+.btn-cancelar{
+    background:#6c757d; color:white; padding:10px 22px; border-radius:10px;
+    text-decoration:none; transition:.3s;
+}
+.btn-cancelar:hover{ background:#565e64; color:white; transform:translateY(-2px); }
+
+.btn-eliminar{
+    background:#dc3545; color:white; border:none; padding:10px 22px;
+    border-radius:10px; transition:.3s;
+}
+.btn-eliminar:hover{ background:#bb2d3b; color:white; transform:translateY(-2px); }
+
+@keyframes aparecer{
+    from{ opacity:0; transform:scale(.9) translateY(-20px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+}
+
+@media(max-width:576px){
+    .modal-eliminar{ max-width:95%; }
+    .header-modal h2{ font-size:22px; }
+    .footer-modal{ flex-direction:column; }
+    .btn-cancelar, .btn-eliminar{ width:100%; }
+}
+</style>
+
+<div class="overlay">
+    <div class="modal-eliminar">
+
+        <div class="header-modal">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <h2>Eliminar Regla</h2>
+        </div>
+
+        <div class="body-modal">
+            <p>¿Está seguro de eliminar la siguiente regla automática?</p>
+
+            <div class="nombre-producto">
+                {{ regla.nombre }} — {{ regla.descuento_porcentaje }}%
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="footer-modal">
+                    <a href="{% url 'listar_descuentos' %}" class="btn btn-cancelar">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-eliminar">
+                        <i class="bi bi-trash-fill"></i> Eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
