@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from producto.models import Producto
+from dashboard.models import Producto
 from producto.forms import ProductoForm
 from django.contrib import messages
 from django.db.models import F

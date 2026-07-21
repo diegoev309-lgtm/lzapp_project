@@ -216,71 +216,103 @@
 
         <div class="container py-5">
 
+            <!-- Buscador de productos -->
+            <div class="buscador-wrapper" data-url-ajax="{% url 'buscar_ajax' %}">
+                <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
+                    <div class="buscador-input-wrapper">
+                        <i class="bi bi-search buscador-icono"></i>
+                        <input
+                            type="text"
+                            name="q"
+                            id="inputBuscador"
+                            class="buscador-input"
+                            placeholder="Buscar productos..."
+                            value="{{ query|default:'' }}"
+                            autocomplete="off"
+                        >
+                        {% if query %}
+                        <a href="?" class="buscador-limpiar" aria-label="Limpiar búsqueda">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="buscador-btn">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </form>
+            
+                <!-- Resultados en vivo (tabla con imagen, nombre, precio) -->
+                <div class="buscador-resultados" id="buscadorResultados"></div>
+            </div>
+
+            {% if query %}
+            <p class="buscador-resultado-info">
+                Resultados para "<strong>{{ query }}</strong>" — {{ productos|length }} producto{{ productos|length|pluralize }} encontrado{{ productos|length|pluralize }}
+            </p>
+            {% endif %}
+
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 <h2>Productos disponibles</h2>
-                <span class="badge bg-primary fs-6">
-                    {{ productos|length }} Productos
-                </span>
+                <span class="badge bg-primary fs-6">{{ productos|length }} Productos</span>
             </div>
 
             <div class="row g-4">
-              {% for i in productos %}
-              <div class="col-12">
-                <div class="card producto-card">
-                
-                  <!-- Imagen (izquierda) -->
-                  <div class="producto-img-wrapper">
-                    {% if i.stock_actual <= i.stock_minimo %}
-                      <span class="badge-stock bajo">Stock bajo</span>
-                    {% else %}
-                      <span class="badge-stock disponible">Disponible</span>
-                    {% endif %}
-                
-                    {% if i.imagen %}
-                      <img src="{{ i.imagen.url }}" class="imagen-producto">
-                    {% else %}
-                      <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                    {% endif %}
-                  </div>
-              
-                  <!-- Contenido (derecha) -->
-                  <div class="producto-info">
-                    
-                    <div class="card-body">
-                      <div class="estrellas">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
-                      </div>
-                      <div class="precio-fila">
-                        <h5 class="titulo-producto">{{ i.nombre }}</h5>
-                        <p class="precio">$ {{ i.precio }}</p>
-                      </div>
-                      
-                      <p class="producto-descripcion"><strong>Descripcion:</strong></p>
-                      <p class="producto-descripcion">
-                        {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
-                      </p>
+                {% for i in productos %}
+                <div class="col-12">
+                    <div class="card producto-card">
+                        <div class="producto-img-wrapper">
+                            {% if i.stock_actual <= i.stock_minimo %}
+                                <span class="badge-stock bajo">Stock bajo</span>
+                            {% else %}
+                                <span class="badge-stock disponible">Disponible</span>
+                            {% endif %}
+                            {% if i.imagen %}
+                                <img src="{{ i.imagen.url }}" class="imagen-producto">
+                            {% else %}
+                                <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                            {% endif %}
+                        </div>
+                        <div class="producto-info">
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                <div class="precio-fila">
+                                    <h5 class="titulo-producto">{{ i.nombre }}</h5>
+                                    <p class="precio">$ {{ i.precio }}</p>
+                                </div>
+                                <p class="producto-descripcion"><strong>Descripcion:</strong></p>
+                                <p class="producto-descripcion">
+                                    {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <div class="footer-botones">
+                                    <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito">
+                                        <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                
-                    <div class="card-footer bg-white border-0">
-                      <div class="footer-botones">
-                        <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito">
-                          <i class="bi bi-cart-plus"></i> Añadir al carrito
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-              
                 </div>
-              </div>
-              {% empty %}
-              <div class="col-12">
-                <div class="alert alert-info text-center">No existen productos disponibles.</div>
-              </div>
-              {% endfor %}
+                {% empty %}
+                <div class="col-12">
+                    {% if query %}
+                    <div class="alert alert-info text-center buscador-sin-resultados">
+                        <i class="bi bi-search"></i>
+                        No encontramos productos para "<strong>{{ query }}</strong>".
+                        <a href="?">Ver todos los productos</a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center">No existen productos disponibles.</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
 
         </div>

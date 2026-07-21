@@ -1,5 +1,5 @@
 from django import forms
-from .models import Produccion
+from dashboard.models import Produccion
 
 class ProduccionForm(forms.ModelForm):
     class Meta:

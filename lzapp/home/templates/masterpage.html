@@ -8,11 +8,9 @@
 
     {% load static %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
-    
 </head>
 <body>
 
@@ -54,7 +52,7 @@
             <div class="carrusel-track" id="carruselTrack">
 
                 <!-- ---------- SLIDE 1: HERO ORIGINAL (video + escena 3D) ---------- -->
-                <div class="carrusel-slide">
+                <div class="carrusel-slide activo">
                     <div class="hero">
 
                         <video class="hero-video" autoplay loop muted playsinline>
@@ -125,11 +123,197 @@
                     </div>
                 </div>
 
-                <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos ---------- -->
+                <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos (con quesos interactivos) ---------- -->
                 <div class="carrusel-slide">
                     <div class="slide-imagen">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_vgurievgurievgur.png' %}" class="slide-imagen-fondo" alt="Variedad de quesos artesanales venezolanos">
-                        <div class="slide-imagen-overlay"></div>
+                        <img src="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
+                        <img src="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
+                        <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
+                        <!--SECCION DE QUESOS INTERACTIVOS-->
+                        <div class="quesos-interactivos" data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}">
+
+                            <!-- Queso 1: el oscuro/tostado de la izquierda -->
+                            <a href="#productos" class="queso-punto"
+                                data-left="34.7" data-top="25.7" data-width="30.6" data-height="48.9"
+                                data-descuento="20"
+                                data-descripcion="Suave y cremoso, con esa fibra característica que lo distingue."
+                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                                data-oferta-pos="center 30%"
+                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
+                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
+                                data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%">
+                                <span class="queso-punto-glow"></span>
+                                <span class="queso-punto-borde"></span>
+                                <div class="queso-punto-flip">
+                                    <div class="queso-punto-cara queso-punto-frente">
+                                        <span class="queso-punto-ventana"></span>
+                                    </div>
+                                    <div class="queso-punto-cara queso-punto-reverso">
+                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <div class="queso-oferta-centro">
+                                            <div class="queso-oferta-foto">
+                                                <!-- TODO Django: reemplazar por <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"> -->
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                            <div class="queso-ruleta-wrap">
+                                                <div class="queso-ruleta"></div>
+                                                <span class="ruleta-signo">%</span>
+                                            </div>
+                                            <strong class="queso-oferta-nombre">Queso Telita</strong>
+                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                            </a>
+                            <!-- Queso 2: el del medio -->
+                            <a href="#productos" class="queso-punto"
+                                data-left="55.8" data-top="15.8" data-width="23.2" data-height="55.6"
+                                data-descuento="50"
+                                data-descripcion="Fresco, suave y con la textura característica del queso venezolano."
+                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                                data-oferta-pos="center 30%"
+                                data-clip="5.1% 45.8%, 6.6% 43.2%, 6.6% 42.0%, 8.1% 40.5%, 11.2% 36.7%, 12.2% 34.8%, 8.1% 33.0%, 3.6% 31.4%, 1.5% 29.9%, 0.5% 26.1%, 0.0% 22.0%, 1.0% 18.9%, 3.0% 15.9%, 7.1% 9.8%, 12.2% 4.9%, 15.7% 1.9%, 18.8% 0.8%, 23.4% 0.0%, 25.9% 4.2%, 28.9% 10.6%, 31.0% 16.7%, 34.5% 25.0%, 36.0% 29.9%, 41.1% 32.2%, 46.7% 34.8%, 51.8% 37.5%, 55.8% 39.8%, 63.5% 44.3%, 71.1% 50.0%, 74.6% 53.0%, 80.2% 60.6%, 87.3% 72.7%, 90.4% 77.3%, 93.9% 87.1%, 96.4% 92.8%, 99.0% 92.4%, 100.0% 94.3%, 95.4% 99.6%, 77.2% 100.0%, 41.1% 99.6%, 35.5% 95.8%, 34.0% 90.9%, 31.5% 80.7%">
+                                <span class="queso-punto-glow"></span>
+                                <span class="queso-punto-borde"></span>
+                                <div class="queso-punto-flip">
+                                    <div class="queso-punto-cara queso-punto-frente">
+                                        <span class="queso-punto-ventana"></span>
+                                    </div>
+                                    <div class="queso-punto-cara queso-punto-reverso">
+                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <div class="queso-oferta-centro">
+                                            <div class="queso-oferta-foto">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                            <div class="queso-ruleta-wrap">
+                                                <div class="queso-ruleta"></div>
+                                                <span class="ruleta-signo">%</span>
+                                            </div>
+                                            <strong class="queso-oferta-nombre">Queso Blanco</strong>
+                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                            </a>
+                            <!-- Queso 3: el de la derecha -->
+                            <a href="#productos" class="queso-punto"
+                                data-left="70.2" data-top="16.2" data-width="21.6" data-height="52.7"
+                                data-descuento="60"
+                                data-descripcion="Artesanal, delicado y perfecto para derretir o disfrutar solo."
+                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                                data-oferta-pos="center 30%"
+                                data-clip="3.3% 47.2%, 4.3% 44.4%, 9.2% 38.4%, 11.4% 34.4%, 5.4% 31.6%, 1.1% 30.0%, 0.5% 26.8%, 0.0% 24.8%, 0.0% 19.6%, 1.6% 16.4%, 3.8% 12.8%, 7.1% 9.2%, 9.8% 6.0%, 13.6% 3.6%, 16.8% 0.8%, 23.9% 0.0%, 26.1% 3.2%, 28.3% 8.4%, 37.0% 29.6%, 48.9% 35.2%, 57.1% 39.6%, 69.6% 48.4%, 77.2% 54.8%, 83.2% 58.8%, 98.4% 66.8%, 98.4% 68.8%, 91.8% 77.6%, 92.4% 82.4%, 96.2% 91.6%, 98.9% 91.2%, 100.0% 92.4%, 98.4% 96.4%, 95.1% 100.0%, 80.4% 98.8%, 40.8% 98.4%, 35.9% 95.6%, 30.4% 81.6%, 22.8% 67.6%, 15.2% 57.2%">
+                                <span class="queso-punto-glow"></span>
+                                <span class="queso-punto-borde"></span>
+                                <div class="queso-punto-flip">
+                                    <div class="queso-punto-cara queso-punto-frente">
+                                        <span class="queso-punto-ventana"></span>
+                                    </div>
+                                    <div class="queso-punto-cara queso-punto-reverso">
+                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <div class="queso-oferta-centro">
+                                            <div class="queso-oferta-foto">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                            <div class="queso-ruleta-wrap">
+                                                <div class="queso-ruleta"></div>
+                                                <span class="ruleta-signo">%</span>
+                                            </div>
+                                            <strong class="queso-oferta-nombre">Queso de Mano</strong>
+                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                            </a>
+
+                        </div>
+
+                        <!-- Ficha única de "Oferta del día", compartida por los 3 quesos -->
+                        <div class="oferta-info-unica" id="ofertaInfoUnica">
+                            <div class="oferta-info-grupo-foto">
+                                <div class="oferta-info-foto" id="ofertaInfoFoto">
+                                    <!-- TODO Django: reemplazar por <img src="{{ producto.imagen.url }}"> -->
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <strong class="oferta-info-nombre" id="ofertaInfoNombre">¿Qué te tocará hoy?</strong>
+                            </div>
+                            <p class="oferta-info-descripcion" id="ofertaInfoDescripcion"></p>
+
+                            <!-- Tarjeta de descuento tipo cupón, oculta hasta el sorteo -->
+                            <div class="oferta-descuento-tarjeta" id="ofertaDescuentoTarjeta">
+                                <span class="oferta-descuento-label">Descuento especial</span>
+                                <div class="oferta-descuento-numero-wrap">
+                                    <div class="queso-ruleta" id="ofertaInfoRuleta"></div>
+                                    <span class="oferta-descuento-signo">%</span>
+                                </div>
+                                <span class="oferta-descuento-dto">DTO.</span>
+                                <div class="oferta-descuento-liston">En tu próxima compra</div>
+                            </div>
+                        </div>
+
+                        <div class="oferta-globo-wrap" id="ofertaGloboWrap">
+                            <div class="globo-fragmentos" id="globoFragmentos"></div>
+                            <div class="globo-indicador" id="globoIndicador">
+                            <i class="bi bi-hand-index-thumb"></i>
+                            Presiona para ver nuevas ofertas
+                        </div>
+                        <button type="button" class="globo-ofertas" id="botonOfertas" aria-label="Ver ofertas">
+                            <span class="globo-cuerpo">
+                                <i class="bi bi-tag-fill"></i>
+                                <span class="globo-numero">%</span>
+                            </span>
+                            <span class="globo-brillo"></span>
+                            <span class="globo-nudo"></span>
+                            <span class="globo-hilo"></span>
+                            </button>
+                        </div>
+
+                        <div class="oferta-banner" id="ofertaBanner">
+                            Enciende los 3 quesos para revelar la oferta de hoy
+                        </div>
+                        <div class="boton-sortear-wrap" id="botonSortearWrap">
+                            <button type="button" class="boton-sortear" id="botonSortear">
+                                <i class="bi bi-dice-5-fill"></i> ¡Sortear la oferta del día!
+                            </button>
+                        </div>
+                        <div class="confetti-contenedor" id="confettiContenedor"></div>
+                        <div class="oferta-reveal-overlay" id="ofertaRevealOverlay">
+                            <div class="oferta-reveal-tarjeta">
+                                <strong class="oferta-reveal-titulo">¡Felicidades!</strong>
+                                <span class="oferta-reveal-subtitulo" id="ofertaRevealSubtitulo">Tienes 50% de descuento</span>
+                            </div>
+                        </div>
+                        <div class="oferta-rueda-wrap" id="ofertaRuedaWrap">
+                            <div class="oferta-rueda-icono">
+                                <svg viewBox="0 0 220 220" class="rueda-svg" xmlns="http://www.w3.org/2000/svg">
+                                    <g class="rueda-llamas">
+                                        <path class="llama llama-1" d="M120,150 C108,118 132,95 120,62 C148,80 165,58 158,30 C192,58 202,102 178,132 C166,148 142,158 120,150 Z" fill="#c9301f"/>
+                                        <path class="llama llama-2" d="M130,138 C120,112 138,93 130,68 C150,82 162,64 157,44 C180,64 186,96 170,118 C160,132 144,140 130,138 Z" fill="#ff6a3d"/>
+                                        <path class="llama llama-3" d="M138,126 C132,106 143,92 137,74 C151,84 158,71 155,55 C170,68 174,92 163,108 C156,118 146,126 138,126 Z" fill="#ffb03d"/>
+                                    </g>
+                                    <circle cx="78" cy="142" r="54" fill="#0a0a0a"/>
+                                    <circle cx="78" cy="142" r="41" fill="#ffffff"/>
+                                    <circle cx="78" cy="142" r="35" fill="none" stroke="#e2402d" stroke-width="4"/>
+                                    <g stroke="#e2402d" stroke-width="5" stroke-linecap="round">
+                                        <line x1="78" y1="142" x2="78" y2="109"/>
+                                        <line x1="78" y1="142" x2="107" y2="125"/>
+                                        <line x1="78" y1="142" x2="107" y2="159"/>
+                                        <line x1="78" y1="142" x2="78" y2="175"/>
+                                        <line x1="78" y1="142" x2="49" y2="159"/>
+                                        <line x1="78" y1="142" x2="49" y2="125"/>
+                                    </g>
+                                    <circle cx="78" cy="142" r="8" fill="#e2402d"/>
+                                </svg>
+                            </div>
+                            <div class="oferta-rueda-texto">
+                                <strong class="rueda-descuento">50% de descuento hoy</strong>
+                                <span class="rueda-aviso">Ya tienes el descuento de hoy, espera hasta mañana</span>
+                            </div>
+                        </div>
+
                         <div class="container slide-imagen-contenido">
                             <span class="hero-eyebrow"><span class="dot"></span> Para todos los gustos</span>
                             <h1 class="hero-title">
@@ -151,6 +335,7 @@
                         </div>
                     </div>
                 </div>
+                <!--FINAL QUESOS INTERACTIVOS-->
 
                 <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
                 <div class="carrusel-slide">
@@ -360,12 +545,14 @@
             </div>
         </section>
 
+
         <!-- Wave de transición hacia productos -->
         <div class="wave-divider" style="background:#022C63;">
             <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
             </svg>
         </div>
+
 
         <!-- ===== SECCIÓN PRODUCTOS ===== -->
         <section class="seccion-productos" id="productos">
@@ -384,129 +571,59 @@
                         </p>
                     </div>
                 </div>
-            </div>
 
-            <div class="container py-5">
-            
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                
-                    <h2>
-                        Productos disponibles
-                    </h2>
-
-                    <span class="badge bg-primary fs-6">
-                        {{ productos|length }} Productos
-                    </span>
-                
-                </div>
-            
-            
                 <div class="row g-4">
-                
-                    {% for i in productos %}
-                
-                    <div class="col-lg-3 col-md-6">
-                    
-                        <div class="card producto-card h-100">
-                        
-                            <!-- Favorito -->
-                            <button class="favorito">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                        
-                            <!-- Imagen -->
-                        
-                            <div class="producto-imagen">
-                                {% if i.imagen %}
-                                    <img src="{{ i.imagen.url }}" class="imagen-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                                {% endif %}
+                    <div class="col-md-6 col-lg-4 reveal delay-1">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso1.png' %}" class="producto-card-imagen" alt="Queso blanco">
                             </div>
-                        
-                            <div class="producto-info">
-                            
-                                <span class="estado-producto">
-                                    Disponible
-                                </span>
-                            
-                                <h5 class="titulo-producto">
-                                    {{ i.nombre }}
-                                </h5>
-                            
-                                <div class="estrellas">
-                                    ★★★★★
-                                </div>
-                            
-                                <div class="producto-precio">
-                                
-                                    <span class="precio">
-                                        ${{ i.precio }}
-                                    </span>
-                                
-                                    <span class="stock">
-                                        {{ i.stock_actual }} disponibles
-                                    </span>
-                                
-                                </div>
-                            
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Estrella</span>
+                                <h3 class="producto-nombre">Queso Blanco</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Fresco, suave y con la textura característica del queso venezolano. Ideal para acompañar arepa, tequeños y mucho más.</p>
                             </div>
-                        
-                            <div class="card-footer bg-white border-0">
-                            
-                                <div class="d-grid gap-2">
-                                
-                                    <a href="users.html"
-                                       class="btn btn-carrito">
-                                
-                                        <i class="bi bi-cart-plus"></i>
-                                
-                                        Añadir al carrito
-                                
-                                    </a>
-                                
-                                    <a href="users.html"
-                                       class="btn btn-outline-dark">
-                                
-                                        <i class="bi bi-eye"></i>
-                                
-                                        Ver detalles
-                                
-                                    </a>
-                                
-                                </div>
-                            
-                            </div>
-                        
                         </div>
-                    
                     </div>
-                
-                    {% empty %}
-                
-                    <div class="col-12">
-                    
-                        <div class="alert alert-info text-center">
-                        
-                            No existen productos disponibles.
-                        
+                    <div class="col-md-6 col-lg-4 reveal delay-2">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso2.png' %}" class="producto-card-imagen" alt="Queso de mano">
+                            </div>
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Favorito</span>
+                                <h3 class="producto-nombre">Queso de Mano</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Artesanal, delicado y con una consistencia que lo hace perfecto para derretir o disfrutar solo.</p>
+                            </div>
                         </div>
-                    
                     </div>
-                
-                    {% endfor %}
-                
+                    <div class="col-md-6 col-lg-4 reveal delay-3">
+                        <div class="producto-card">
+                            <div class="producto-card-img-wrapper">
+                                <img src="{% static 'home/media/queso3.png' %}" class="producto-card-imagen" alt="Queso telita">
+                            </div>
+                            <div class="producto-card-body">
+                                <span class="producto-tag">Especial</span>
+                                <h3 class="producto-nombre">Queso Telita</h3>
+                                <div class="producto-linea"></div>
+                                <p class="producto-descripcion">Suave y cremoso, con esa fibra característica que lo distingue. Un clásico de la mesa venezolana.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            
             </div>
         </section>
-        
+
+
         <!-- Wave de transición -->
         <div class="wave-divider" style="background:#f7f8fc;">
             <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M0,20 C480,70 960,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
             </svg>
         </div>
+
 
         <!-- ===== SECCIÓN QUIÉNES SOMOS ===== -->
         <section class="seccion-nosotros" id="nosotros">
@@ -614,7 +731,871 @@
     {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'home/js/home.js' %}"></script>
 
+    <script>
+        /* ---- Navbar scroll effect ---- */
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        /* ---- Parallax 3D con el mouse en el hero ---- */
+(function () {
+    const hero = document.querySelector('#inicio .hero');
+    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // FIX: no activar el parallax de mouse en móvil/pantallas táctiles.
+    const esTactilOMovil = window.matchMedia('(max-width: 991px)').matches ||
+                            window.matchMedia('(pointer: coarse)').matches;
+    if (esTactilOMovil) return;
+
+    const capas = hero.querySelectorAll('[data-depth]');
+    let raf = null;
+    let targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+    hero.addEventListener('mousemove', (e) => {
+        const r = hero.getBoundingClientRect();
+        targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        if (!raf) raf = requestAnimationFrame(animar);
+    });
+
+    hero.addEventListener('mouseleave', () => {
+        targetX = 0; targetY = 0;
+        if (!raf) raf = requestAnimationFrame(animar);
+    });
+
+    function animar() {
+        curX += (targetX - curX) * 0.08;
+        curY += (targetY - curY) * 0.08;
+
+        capas.forEach((el) => {
+            const d = parseFloat(el.dataset.depth) || 0.3;
+            const x = -curX * d * 32;
+            const y = -curY * d * 32;
+            el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        });
+
+        if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+            raf = requestAnimationFrame(animar);
+        } else {
+            raf = null;
+        }
+    }
+})();
+        /* ---- Carrusel del hero ---- */
+        (function () {
+            const DURACION_AUTOPLAY = 6000; // ms entre cada slide automático
+            const ESPERA_INACTIVIDAD = 6000; // ms sin interactuar antes de reanudar
+            const track = document.getElementById('carruselTrack');
+            const prevBtn = document.getElementById('carruselPrev');
+            const nextBtn = document.getElementById('carruselNext');
+            const puntos = document.querySelectorAll('.carrusel-punto');
+            const progreso = document.getElementById('carruselProgreso');
+            if (!track) return;
+
+            const slides = track.querySelectorAll('.carrusel-slide');
+            const total = slides.length;
+            let actual = 0;
+            let autoplayTimer = null;
+            let progresoTimeout = null;
+            let bloqueoInteraccion = false;
+            let inactividadTimer = null;
+
+            function irA(indice) {
+                bloqueoInteraccion = false;
+                clearTimeout(inactividadTimer);
+
+                actual = (indice + total) % total;
+                slides.forEach((s, i) => s.classList.toggle('activo', i === actual));
+                puntos.forEach((p, i) => p.classList.toggle('activo', i === actual));
+                reiniciarAutoplay();
+            }
+
+            function siguiente() { irA(actual + 1); }
+            function anterior() { irA(actual - 1); }
+
+            function reiniciarProgreso() {
+                if (!progreso) return;
+                progreso.classList.remove('animando');
+                progreso.style.width = '0%';
+                clearTimeout(progresoTimeout);
+                progresoTimeout = setTimeout(() => {
+                    progreso.classList.add('animando');
+                }, 30);
+            }
+
+            function reiniciarAutoplay() {
+                clearInterval(autoplayTimer);
+                reiniciarProgreso();
+                autoplayTimer = setInterval(siguiente, DURACION_AUTOPLAY);
+            }
+
+            // Alguien está interactuando con el slide (globo, quesos, botón
+            // de sorteo): pausa el autoplay indefinidamente y solo lo
+            // reanuda tras un rato sin más interacciones.
+            function notificarInteraccion() {
+                bloqueoInteraccion = true;
+                clearInterval(autoplayTimer);
+                progreso && progreso.classList.remove('animando');
+                clearTimeout(inactividadTimer);
+                inactividadTimer = setTimeout(() => {
+                    bloqueoInteraccion = false;
+                    reiniciarAutoplay();
+                }, ESPERA_INACTIVIDAD);
+            }
+            window.LZ_notificarInteraccion = notificarInteraccion;
+
+            nextBtn && nextBtn.addEventListener('click', siguiente);
+            prevBtn && prevBtn.addEventListener('click', anterior);
+
+            puntos.forEach((p) => {
+                p.addEventListener('click', () => irA(parseInt(p.dataset.slide, 10)));
+            });
+
+            let touchStartX = 0;
+            track.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            track.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const diff = touchEndX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                    diff < 0 ? siguiente() : anterior();
+                }
+            }, { passive: true });
+
+            const heroCarrusel = document.querySelector('.hero-carrusel');
+            if (heroCarrusel) {
+                heroCarrusel.addEventListener('mouseenter', () => {
+                    if (bloqueoInteraccion) return;
+                    clearInterval(autoplayTimer);
+                    progreso && progreso.classList.remove('animando');
+                });
+                heroCarrusel.addEventListener('mouseleave', () => {
+                    if (bloqueoInteraccion) return;
+                    reiniciarAutoplay();
+                });
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                irA(0);
+            } else {
+                slides.forEach((s, i) => s.classList.toggle('activo', i === 0));
+                puntos.forEach((p, i) => p.classList.toggle('activo', i === 0));
+                reiniciarAutoplay();
+            }
+        })();
+
+        /* ---- Scroll reveal con Intersection Observer ---- */
+        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealEls.forEach(el => observer.observe(el));
+    </script>
+
+    <!-- Script independiente: si algo falla arriba (navbar, parallax, carrusel),
+         este bloque sigue ejecutándose igual, porque está en su propio <script> -->
+    <script>
+        (function () {
+            const wrap = document.querySelector('.quesos-interactivos');
+            if (!wrap) return;
+
+            const slide = wrap.closest('.slide-imagen');
+            const img = slide.querySelector('.slide-imagen-fondo');
+            const bgUrl = wrap.dataset.bg;
+            const ofertaFondoUrl = wrap.dataset.ofertaFondo;
+            const puntosEls = wrap.querySelectorAll('.queso-punto');
+            // Precargamos la imagen de oferta para conocer su tamaño real
+            // (necesario para calcular cuánto hay que escalarla dentro de
+            // la caja conjunta de los 3 quesos)
+            const imgOferta = new Image();
+            let ofertaLista = false;
+            if (ofertaFondoUrl) {
+                imgOferta.onload = () => { ofertaLista = true; actualizar(); };
+                imgOferta.src = ofertaFondoUrl;
+            }
+            function parsearPuntos(str) {
+                return str.trim().split(',').map((par) => {
+                    const partes = par.trim().split(/\s+/);
+                    return [parseFloat(partes[0]), parseFloat(partes[1])];
+                });
+            }
+
+            const quesos = Array.from(puntosEls).map((p) => {
+                const left = parseFloat(p.dataset.left);
+                const top = parseFloat(p.dataset.top);
+                const width = parseFloat(p.dataset.width);
+                const height = parseFloat(p.dataset.height);
+                const clipLocal = parsearPuntos(p.dataset.clip);
+
+                const puntosGlobal = clipLocal.map(([cx, cy]) => [
+                    left + (cx / 100) * width,
+                    top + (cy / 100) * height
+                ]);
+
+                const glow = p.querySelector('.queso-punto-glow');
+                const ventana = p.querySelector('.queso-punto-ventana');
+                const borde = p.querySelector('.queso-punto-borde');
+                const flip = p.querySelector('.queso-punto-flip');
+                const reverso = p.querySelector('.queso-punto-reverso');
+
+ventana.style.backgroundImage = `url(${bgUrl})`;
+
+const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
+if (video && p.dataset.ofertaVideo) {
+    video.src = p.dataset.ofertaVideo;
+    if (p.dataset.ofertaPos) {
+        video.style.objectPosition = p.dataset.ofertaPos;
+    }
+}
+const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
+if (reverso) {
+    reverso.classList.toggle('con-descuento', tieneDescuento);
+    reverso.classList.toggle('sin-descuento', !tieneDescuento);
+}
+return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
+            });
+
+            function geometriaCover() {
+                const W = img.naturalWidth, H = img.naturalHeight;
+                const rect = slide.getBoundingClientRect();
+                const Cw = rect.width, Ch = rect.height;
+                if (!W || !H || Cw < 50 || Ch < 50) return null;
+
+                const scale = Math.max(Cw / W, Ch / H);
+                const offsetX = (Cw - W * scale) / 2;
+                const offsetY = (Ch - H * scale) / 2;
+
+                return { W, H, Cw, Ch, scale, offsetX, offsetY };
+            }
+
+            function puntoAContenedor(xPct, yPct, geo) {
+                const xImgPx = (xPct / 100) * geo.W;
+                const yImgPx = (yPct / 100) * geo.H;
+                const xScreenPx = geo.offsetX + xImgPx * geo.scale;
+                const yScreenPx = geo.offsetY + yImgPx * geo.scale;
+                return [(xScreenPx / geo.Cw) * 100, (yScreenPx / geo.Ch) * 100];
+            }
+
+            let intentos = 0;
+            function actualizar() {
+                const geo = geometriaCover();
+                if (!geo) {
+                    if (intentos < 20) {
+                        intentos++;
+                        requestAnimationFrame(actualizar);
+                    }
+                    return;
+                }
+                intentos = 0;
+                window.LZ_CONTENEDOR_SIZE = { w: geo.Cw, h: geo.Ch };
+                window.LZ_PERIMETROS = window.LZ_PERIMETROS || [];
+                let uMinX = Infinity, uMaxX = -Infinity, uMinY = Infinity, uMaxY = -Infinity;
+                quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, puntosGlobal }, idx) => {
+                    try {
+                    const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
+                    window.LZ_PERIMETROS[idx] = puntosPantalla;
+
+                    const clipStr = 'polygon(' +
+                    puntosPantalla.map(([x, y]) => `${x.toFixed(3)}% ${y.toFixed(3)}%`).join(', ') +
+                    ')';
+
+                    if (el) el.style.clipPath = clipStr;
+                    if (ventana) ventana.style.clipPath = clipStr;
+                    if (borde) borde.style.clipPath = clipStr;
+                    if (glow) glow.style.clipPath = clipStr;
+                    if (flip) flip.style.clipPath = clipStr;
+
+                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                    puntosPantalla.forEach(([x, y]) => {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    });
+                    if (minX < uMinX) uMinX = minX;
+                    if (maxX > uMaxX) uMaxX = maxX;
+                    if (minY < uMinY) uMinY = minY;
+                    if (maxY > uMaxY) uMaxY = maxY;
+                
+
+                    const centroX = (minX + maxX) / 2;
+                    const centroY = (minY + maxY) / 2;
+
+                    borde.style.transformOrigin = `${centroX}% ${centroY}%`;
+                    ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
+                    if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
+                    el.dataset.centroX = centroX.toFixed(2);
+                    el.dataset.centroY = centroY.toFixed(2);
+                    const ofertaCentro = el.querySelector('.queso-oferta-centro');
+                    if (ofertaCentro) {
+                        const offX = parseFloat(el.dataset.ofertaOffsetX) || 0;
+                        const offY = parseFloat(el.dataset.ofertaOffsetY) || 6;
+                        ofertaCentro.style.left = `${centroX + offX}%`;
+                        ofertaCentro.style.top = `${centroY + offY}%`;
+                    }
+
+                } catch (err) {
+                    console.error('Error recortando un queso:', err);
+                }
+            });
+            // ---- Reparte UNA sola imagen "OFERTA DEL DÍA" entre los 3 quesos ----
+            // En vez de hacer cover por queso (que solo mostraba un pedazo del
+            // texto), se calcula la caja que envuelve a los 3 juntos y se
+            // encaja la imagen completa ahí — así el texto queda repartido de
+            // forma continua, como una pantalla partida real.
+            
+           const infoUnica = document.getElementById('ofertaInfoUnica');
+            if (infoUnica) {
+                // ---- CONTROL MANUAL: ajusta estos 3 números a mano ----
+                const izquierdaPct = 64;
+                const arribaPct = 59;
+                const anchoPct = 25;
+
+                infoUnica.style.left = `${izquierdaPct}%`;
+                infoUnica.style.top = `${arribaPct}%`;
+                infoUnica.style.width = `${anchoPct}%`;
+            }
+
+            const ruletaSuelta = document.getElementById('ofertaRuletaSuelta');
+            if (ruletaSuelta) {
+                // ---- CONTROL MANUAL de la ruleta, totalmente independiente ----
+                const ruletaIzquierdaPct = 78;
+                const ruletaArribaPct = 45;
+
+                ruletaSuelta.style.left = `${ruletaIzquierdaPct}%`;
+                ruletaSuelta.style.top = `${ruletaArribaPct}%`;
+            }
+
+            // ---- Posiciona el video "OFERTA DEL DÍA" como UNA sola pieza
+            // continua repartida entre los 3 quesos, igual que hacía la
+            // imagen: los 3 <video> comparten el mismo left/top/width/height
+            // (la caja que envuelve a los 3 quesos juntos) y cada uno se ve
+            // recortado solo por su propio clip-path.
+            if (isFinite(uMinX)) {
+                quesos.forEach(({ video }) => {
+                    if (!video) return;
+                    video.style.left   = uMinX + '%';
+                    video.style.top    = uMinY + '%';
+                    video.style.width  = (uMaxX - uMinX) + '%';
+                    video.style.height = (uMaxY - uMinY) + '%';
+                });
+            }
+
+            // ---- Delineado dorado SOLO arriba y abajo (libre en el centro,
+            // por donde pasa el texto "OFERTA DEL DÍA") ----
+            if (isFinite(uMinY)) {
+                const centro = (uMinY + uMaxY) / 2;
+                // % de la altura total de los 3 quesos que queda LIBRE en el
+                // centro (sin borde). Súbelo si quieres franja libre más
+                // ancha, bájalo si quieres que el borde se acerque más al texto.
+                const bandaLibre = (uMaxY - uMinY) * 0.34;
+                const bandaTop = centro - bandaLibre / 2;
+                const bandaBottom = centro + bandaLibre / 2;
+
+                const maskCSS = `linear-gradient(to bottom,
+                    black 0%, black ${bandaTop.toFixed(2)}%,
+                    transparent ${(bandaTop + 4).toFixed(2)}%,
+                    transparent ${(bandaBottom - 4).toFixed(2)}%,
+                    black ${bandaBottom.toFixed(2)}%, black 100%)`;
+
+                quesos.forEach(({ borde }) => {
+                    if (!borde) return;
+                    borde.style.maskImage = maskCSS;
+                    borde.style.webkitMaskImage = maskCSS;
+                });
+            }
+            }
+            window.addEventListener('resize', actualizar);
+            img.addEventListener('load', actualizar);
+            actualizar();
+            if (window.ResizeObserver) {
+                new ResizeObserver(actualizar).observe(slide);
+            }
+        })();
+    </script>
+    <script>
+    (function () {
+        const wrap = document.querySelector('.quesos-interactivos');
+        const boton = document.getElementById('botonOfertas');
+        const banner = document.getElementById('ofertaBanner');
+        const confettiWrap = document.getElementById('confettiContenedor');
+        const indicador = document.getElementById('globoIndicador');
+        const ruedaWrap = document.getElementById('ofertaRuedaWrap');
+        const fragmentosWrap = document.getElementById('globoFragmentos');
+        if (!wrap || !boton) return;
+        const quesosArr = Array.from(wrap.querySelectorAll('.queso-punto'));
+        const botonSortearWrap = document.getElementById('botonSortearWrap');
+        const botonSortear = document.getElementById('botonSortear');
+
+        let vistos = new Set();
+        let sorteoHecho = false;
+        let sorteoEnCurso = false;
+        let sincronizando = false;
+
+        const CLAVE_OFERTA = 'lz_oferta_del_dia';
+
+        function leerOfertaGuardada() {
+            try {
+                const raw = localStorage.getItem(CLAVE_OFERTA);
+                if (!raw) return null;
+                const data = JSON.parse(raw);
+                if (!data || !data.timestamp || !data.valor) return null;
+                const segundosPasados = (Date.now() - data.timestamp) / 1000;
+                if (segundosPasados >= 1) {
+                    localStorage.removeItem(CLAVE_OFERTA);
+                    return null;
+                }
+                return data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function guardarOfertaDelDia(valor) {
+            try {
+                localStorage.setItem(CLAVE_OFERTA, JSON.stringify({ valor, timestamp: Date.now() }));
+            } catch (e) {}
+        }
+        const ofertaGuardada = leerOfertaGuardada();
+        if (ofertaGuardada) {
+            sorteoHecho = true;
+            quesosArr.forEach((q) => q.classList.add('encendido'));
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                if (texto) texto.textContent = `${ofertaGuardada.valor}% de descuento hoy`;
+                ruedaWrap.classList.add('visible');
+            }
+        }
+
+        function obtenerVideo(p) {
+            const reverso = p.querySelector('.queso-punto-reverso');
+            return reverso ? reverso.querySelector('.queso-oferta-video') : null;
+        }
+        function reproducirVideoQueso(p) {
+            const video = obtenerVideo(p);
+            if (video) {
+                video.currentTime = 0;
+                video.classList.add('reproduciendo');
+                video.play().catch(() => {});
+            }
+        }
+        function pausarVideoQueso(p) {
+            const video = obtenerVideo(p);
+            if (video) {
+                video.pause();
+                video.classList.remove('reproduciendo');
+            }
+        }
+        function reproducirTodosSincronizados() {
+            const videos = quesosArr.map(obtenerVideo).filter(Boolean);
+            if (!videos.length) return;
+
+            videos.forEach((v) => { v.currentTime = 0; });
+
+            Promise.all(videos.map((v) => v.play().catch(() => {})))
+                .then(() => {
+                    videos.forEach((v) => v.classList.add('reproduciendo'));
+                    iniciarLoopSincronizacion(videos);
+                });
+        }
+
+        function iniciarLoopSincronizacion(videos) {
+            if (sincronizando) return;
+            sincronizando = true;
+            const maestro = videos[0];
+
+            function paso() {
+                if (maestro.paused || maestro.ended) {
+                    sincronizando = false;
+                    return;
+                }
+                videos.forEach((v) => {
+                    if (v === maestro) return;
+                    if (Math.abs(v.currentTime - maestro.currentTime) > 0.08) {
+                        v.currentTime = maestro.currentTime;
+                    }
+                });
+                requestAnimationFrame(paso);
+            }
+            requestAnimationFrame(paso);
+        }
+       function mostrarBotonSortear() {
+            if (botonSortearWrap) botonSortearWrap.classList.add('visible');
+        }
+
+        function mostrarNumeroFijo(contenedor, valorFinal) {
+            const digitos = String(Math.max(0, Math.min(99, valorFinal))).padStart(2, '0').split('');
+            contenedor.innerHTML = digitos.map(d =>
+                `<span class="ruleta-digito"><span class="ruleta-cinta"><span>${d}</span></span></span>`
+            ).join('');
+        }
+
+        // Versión animada tipo tragamonedas: cada columna de dígitos gira
+        // por varios números al azar antes de frenar en el valor final.
+        function generarCintaAnimada(digitoFinal) {
+            const pasos = 12;
+            let html = '';
+            for (let i = 0; i < pasos; i++) {
+                html += `<span>${Math.floor(Math.random() * 10)}</span>`;
+            }
+            html += `<span>${digitoFinal}</span>`;
+            return html;
+        }
+
+        function mostrarNumeroConGiro(contenedor, valorFinal, alturaItem = 34) {
+            const digitos = String(Math.max(0, Math.min(99, valorFinal))).padStart(2, '0').split('');
+            contenedor.innerHTML = digitos.map((d) =>
+                `<span class="ruleta-digito"><span class="ruleta-cinta">${generarCintaAnimada(d)}</span></span>`
+            ).join('');
+
+            const cintas = contenedor.querySelectorAll('.ruleta-cinta');
+            cintas.forEach((cinta, idx) => {
+                const totalItems = cinta.children.length;
+                cinta.style.transition = 'none';
+                cinta.style.transform = 'translateY(0)';
+                void cinta.offsetHeight;
+                requestAnimationFrame(() => {
+                    cinta.style.transition = `transform ${1.1 + idx * 0.4}s cubic-bezier(0.15, 0.75, 0.25, 1)`;
+                    cinta.style.transform = `translateY(-${(totalItems - 1) * alturaItem}px)`;
+                });
+            });
+        }
+
+        /* ---------------------------------------------------------------
+           SORTEO "TIPO RULETA" — enciende el borde dorado de cada queso
+           uno por uno (usa el mismo clip-path real que ya tienen), va
+           saltando cada vez más lento hasta frenar en el ganador. Sin
+           SVG ni trazado: solo la clase .resaltado-sorteo sobre
+           .queso-punto-borde de cada queso.
+        --------------------------------------------------------------- */
+       function iniciarSorteo() {
+            if (sorteoEnCurso || sorteoHecho) return;
+            const candidatos = quesosArr.filter(q => q.dataset.descuento);
+            if (!candidatos.length) return;
+
+            const ganadorEl = candidatos[Math.floor(Math.random() * candidatos.length)];
+            sorteoEnCurso = true;
+            botonSortear.disabled = true;
+            botonSortearWrap.classList.remove('visible');
+
+            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+            const valor = parseInt(ganadorEl.dataset.descuento, 10);
+
+            // La tarjeta y el video se quedan tal cual, solo gira el número.
+            mostrarNumeroConGiro(ruletaUnica, valor);
+
+            setTimeout(() => mostrarFelicidades(ganadorEl, valor), 2600);
+        }
+
+        function mostrarFelicidades(ganadorEl, valor) {
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            const subtitulo = document.getElementById('ofertaRevealSubtitulo');
+            if (subtitulo) subtitulo.textContent = `Tienes ${valor}% de descuento`;
+            if (overlay) overlay.classList.add('visible');
+            lanzarConfetti(90);
+
+            setTimeout(() => cerrarReveal(ganadorEl, valor), 2800);
+        }
+
+        function cerrarReveal(ganadorEl, valor) {
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            if (overlay) overlay.classList.remove('visible');
+
+            sorteoEnCurso = false;
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho');
+            guardarOfertaDelDia(valor);
+
+            quesosArr.forEach((q) => {
+                q.classList.remove('volteado');
+                pausarVideoQueso(q);
+            });
+            wrap.classList.remove('todos-encendidos');
+
+            let sumX = 0, sumY = 0, n = 0;
+            quesosArr.forEach((q) => {
+                sumX += parseFloat(q.dataset.centroX) || 50;
+                sumY += parseFloat(q.dataset.centroY) || 50;
+                n++;
+            });
+            const cx = n ? sumX / n : 50;
+            const cy = n ? sumY / n : 50;
+
+            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valor), 500);
+        }
+
+        function volarBrilloHaciaBadge(cx, cy, valor) {
+            if (!ruedaWrap) return;
+            const slide = wrap.closest('.slide-imagen');
+
+            const spark = document.createElement('span');
+            spark.className = 'brillo-volador';
+            spark.style.left = cx + '%';
+            spark.style.top = cy + '%';
+            slide.appendChild(spark);
+
+            const destino = ruedaWrap.getBoundingClientRect();
+            const origenSlide = slide.getBoundingClientRect();
+            const dx = (destino.left + destino.width / 2) - (origenSlide.left + (cx / 100) * origenSlide.width);
+            const dy = (destino.top + destino.height / 2) - (origenSlide.top + (cy / 100) * origenSlide.height);
+
+            spark.style.setProperty('--dx', dx + 'px');
+            spark.style.setProperty('--dy', dy + 'px');
+
+            requestAnimationFrame(() => spark.classList.add('volando'));
+
+            spark.addEventListener('animationend', () => {
+                spark.remove();
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                if (texto) texto.textContent = `${valor}% de descuento hoy`;
+                ruedaWrap.classList.add('visible', 'aparicion-pop');
+            });
+        }
+        function volarBrilloHaciaBadge(cx, cy, valor) {
+            if (!ruedaWrap) return;
+            const slide = wrap.closest('.slide-imagen');
+
+            const spark = document.createElement('span');
+            spark.className = 'brillo-volador';
+            spark.style.left = cx + '%';
+            spark.style.top = cy + '%';
+            slide.appendChild(spark);
+
+            const destino = ruedaWrap.getBoundingClientRect();
+            const origenSlide = slide.getBoundingClientRect();
+            const dx = (destino.left + destino.width / 2) - (origenSlide.left + (cx / 100) * origenSlide.width);
+            const dy = (destino.top + destino.height / 2) - (origenSlide.top + (cy / 100) * origenSlide.height);
+
+            spark.style.setProperty('--dx', dx + 'px');
+            spark.style.setProperty('--dy', dy + 'px');
+
+            requestAnimationFrame(() => spark.classList.add('volando'));
+
+            spark.addEventListener('animationend', () => {
+                spark.remove();
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                if (texto) texto.textContent = `${valor}% de descuento hoy`;
+                ruedaWrap.classList.add('visible', 'aparicion-pop');
+            });
+        }
+        botonSortear && botonSortear.addEventListener('click', () => {
+            window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+            iniciarSorteo();
+        });
+
+        function reventarGlobo() {
+            if (!fragmentosWrap) return;
+            const formas = ['50% 50% 50% 10%', '50% 10% 50% 50%', '10% 50% 50% 50%', '50%'];
+            const cantidad = 14;
+
+            for (let i = 0; i < cantidad; i++) {
+                const frag = document.createElement('span');
+                frag.className = 'globo-fragmento';
+
+                const angulo = (Math.PI * 2 * i) / cantidad + (Math.random() * 0.4 - 0.2);
+                const distancia = 40 + Math.random() * 50;
+                const fx = Math.cos(angulo) * distancia;
+                const fy = Math.sin(angulo) * distancia - 10; // ligero sesgo hacia arriba
+
+                frag.style.setProperty('--fx', fx + 'px');
+                frag.style.setProperty('--fy', fy + 'px');
+                frag.style.setProperty('--frot', (Math.random() * 360 - 180) + 'deg');
+
+                const tam = 6 + Math.random() * 9;
+                frag.style.width = tam + 'px';
+                frag.style.height = tam + 'px';
+                frag.style.borderRadius = formas[Math.floor(Math.random() * formas.length)];
+                frag.style.animationDelay = (Math.random() * 0.05) + 's';
+
+                fragmentosWrap.appendChild(frag);
+                frag.addEventListener('animationend', () => frag.remove());
+            }
+        }
+
+        setTimeout(() => indicador && indicador.classList.add('visible'), 900);
+
+        const colores = ['#c9a84c', '#f0d98a', '#e2402d', '#ffffff', '#1a5fa8'];
+
+        function lanzarConfetti(cantidad = 70) {
+            for (let i = 0; i < cantidad; i++) {
+                const pieza = document.createElement('span');
+                pieza.className = 'confetti-pieza';
+                pieza.style.left = Math.random() * 100 + '%';
+                pieza.style.background = colores[Math.floor(Math.random() * colores.length)];
+                pieza.style.width = (6 + Math.random() * 6) + 'px';
+                pieza.style.height = (10 + Math.random() * 8) + 'px';
+                pieza.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+                pieza.style.animationDelay = (Math.random() * 0.4) + 's';
+                confettiWrap.appendChild(pieza);
+                pieza.addEventListener('animationend', () => pieza.remove());
+            }
+        }
+
+        function lanzarConfettiLocal(xPct, yPct, cantidad = 24) {
+            if (!confettiWrap) return;
+            for (let i = 0; i < cantidad; i++) {
+                const pieza = document.createElement('span');
+                pieza.className = 'confetti-pieza-local';
+                pieza.style.left = xPct + '%';
+                pieza.style.top = yPct + '%';
+                pieza.style.background = colores[Math.floor(Math.random() * colores.length)];
+                pieza.style.width = (10 + Math.random() * 8) + 'px';
+                pieza.style.height = (16 + Math.random() * 12) + 'px';
+
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = 50 + Math.random() * 80;
+                pieza.style.setProperty('--cx', (Math.cos(angulo) * distancia) + 'px');
+                pieza.style.setProperty('--cy', (Math.sin(angulo) * distancia - 30) + 'px');
+                pieza.style.setProperty('--crot', (Math.random() * 720 - 360) + 'deg');
+                pieza.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
+                pieza.style.animationDelay = (Math.random() * 0.08) + 's';
+
+                confettiWrap.appendChild(pieza);
+                pieza.addEventListener('animationend', () => pieza.remove());
+            }
+        }
+
+        let modoActivo = false;
+        let bannerTimeout = null;
+
+        function activar() {
+            modoActivo = true;
+            wrap.classList.add('modo-ofertas');
+            boton.classList.add('activo');
+            lanzarConfetti(70);
+
+            if (!sorteoHecho) {
+                banner.classList.add('visible');
+                clearTimeout(bannerTimeout);
+                bannerTimeout = setTimeout(() => banner.classList.remove('visible'), 4000);
+            }
+
+            // Precarga los 3 videos de oferta ahora, para que cuando el
+            // usuario encienda los 3 quesos ya estén listos y no haya
+            // retraso al reproducirlos.
+            quesosArr.forEach((q) => {
+                const video = obtenerVideo(q);
+                if (video && video.readyState < 2) {
+                    video.load();
+                }
+            });
+        }
+
+        function desactivar() {
+            modoActivo = false;
+            wrap.classList.remove('modo-ofertas');
+            banner.classList.remove('visible');
+
+            if (sorteoHecho) {
+                // La oferta ya se sorteó y sigue vigente (24h): los quesos
+                // y el aviso de la esquina se quedan tal cual, sin resetear.
+                boton.classList.remove('volando', 'reventado');
+                return;
+            }
+
+            wrap.classList.remove('sorteo-hecho');
+            ruedaWrap && ruedaWrap.classList.remove('visible');
+            wrap.querySelectorAll('.queso-punto.volteado')
+                .forEach((el) => {
+                    el.classList.remove('volteado');
+                    pausarVideoQueso(el);
+                    const v = obtenerVideo(el);
+                    if (v) { v.currentTime = 0; v.classList.remove('reproduciendo'); }
+                });
+            sincronizando = false;
+            wrap.querySelectorAll('.queso-punto-borde.resaltado-sorteo')
+                .forEach((el) => el.classList.remove('resaltado-sorteo'));
+
+            wrap.querySelectorAll('.queso-punto.encendido')
+                .forEach((el) => el.classList.remove('encendido'));
+            wrap.classList.remove('todos-encendidos');
+            const ruletaSueltaReset = document.getElementById('ofertaRuletaSuelta');
+            if (ruletaSueltaReset) ruletaSueltaReset.classList.remove('revelada');
+
+            vistos.clear();
+            sorteoEnCurso = false;
+            botonSortearWrap && botonSortearWrap.classList.remove('visible');
+            botonSortear && (botonSortear.disabled = false);
+
+            wrap.querySelectorAll('.es-ganador').forEach(el => el.classList.remove('es-ganador'));
+
+            boton.classList.remove('volando', 'reventado');
+            setTimeout(() => indicador && indicador.classList.add('visible'), 400);
+        }
+
+        boton.addEventListener('click', () => {
+            window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+            if (modoActivo) {
+                desactivar();
+                return;
+            }
+            if (boton.classList.contains('volando')) return;
+
+            indicador && indicador.classList.remove('visible');
+            boton.classList.add('volando');
+
+            setTimeout(() => {
+                boton.classList.add('reventado');
+                reventarGlobo();
+                activar();
+            }, 750);
+        });
+
+        wrap.querySelectorAll('.queso-punto').forEach((p) => {
+            p.addEventListener('click', (e) => {
+                window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+                if (!modoActivo || sorteoEnCurso || sorteoHecho) return;
+                e.preventDefault();
+
+                const encendiendo = !p.classList.contains('encendido');
+                p.classList.toggle('encendido');
+
+                const cx = parseFloat(p.dataset.centroX) || 50;
+                const cy = parseFloat(p.dataset.centroY) || 50;
+
+                if (encendiendo) {
+                    lanzarConfettiLocal(cx, cy);
+                    vistos.add(p);
+                } else {
+                    vistos.delete(p);
+                    // Si se apaga uno, se oculta el video/reverso en los 3 a la vez
+                    quesosArr.forEach((q) => {
+                        q.classList.remove('volteado');
+                        pausarVideoQueso(q);
+                    });
+                    wrap.classList.remove('todos-encendidos');
+                    botonSortearWrap && botonSortearWrap.classList.remove('visible');
+                }
+
+                // Solo cuando los 3 están encendidos a la vez, se revela el
+                // video en los 3 quesos AL MISMO TIEMPO, con transición.
+                if (vistos.size === quesosArr.length && !sorteoHecho) {
+                    quesosArr.forEach((q) => q.classList.add('volteado'));
+                    wrap.classList.add('todos-encendidos');
+                    reproducirTodosSincronizados();
+
+                    const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
+                    const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+                    if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
+                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, 50);
+
+                    mostrarBotonSortear();
+                } else {
+                    wrap.classList.remove('todos-encendidos');
+                }
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

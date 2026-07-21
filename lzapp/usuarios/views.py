@@ -12,8 +12,8 @@ def registro(request):
 
         form = RegistroForm(request.POST)
 
-        print(request.POST)          # <-- Agrega esto
-        print(form.errors)           # <-- Agrega esto
+        print(request.POST)          
+        print(form.errors)          
 
         if form.is_valid():
 

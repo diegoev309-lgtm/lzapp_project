@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .logic import Carro
-from producto.models import Producto
+from dashboard.models import Producto
 
 def agregar_producto(request,producto_id):
     carro=Carro(request)

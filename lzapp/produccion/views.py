@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from produccion.models import Produccion
+from dashboard.models import Produccion
 from produccion.forms import ProduccionForm
 
 
