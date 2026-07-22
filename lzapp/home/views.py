@@ -43,16 +43,16 @@ def carro(request):
     productos, query = buscar_productos_ajax(request)
     return render(request, "carrito_compras.html", {"productos": productos, "query": query})
 
-def home(request):
-    query = request.GET.get('q', '')
-    productos_qs = Producto.objects.filter(disponibilidad=True)
-    if query:
-        productos_qs = productos_qs.filter(nombre__icontains=query)
-    todos = list(Producto.objects.filter(disponibilidad=True).prefetch_related('descuentos'))
-
-    # Prioridad: 1º los que YA tienen descuento vigente (real, de tu sistema),
-    # 2º entre esos, el que tiene más stock sobrante primero.
-    todos_ordenados = sorted(todos,key=lambda p: (p.descuento_vigente is None, -p.ratio_stock))
-    productos_oferta = todos_ordenados[:3]
-
-    return render(request, 'masterpage.html', {'productos': productos_qs,'query': query,'productos_oferta': productos_oferta,})
+#def home(request):
+#    query = request.GET.get('q', '')
+#    productos_qs = Producto.objects.filter(disponibilidad=True)
+#    if query:
+#        productos_qs = productos_qs.filter(nombre__icontains=query)
+#    todos = list(Producto.objects.filter(disponibilidad=True).prefetch_related('descuentos'))
+#
+#    # Prioridad: 1º los que YA tienen descuento vigente (real, de tu sistema),
+#    # 2º entre esos, el que tiene más stock sobrante primero.
+#    todos_ordenados = sorted(todos,key=lambda p: (p.descuento_vigente is None, -p.ratio_stock))
+#    productos_oferta = todos_ordenados[:3]
+#
+#    return render(request, 'masterpage.html', {'productos': productos_qs,'query': query,'productos_oferta': productos_oferta,})

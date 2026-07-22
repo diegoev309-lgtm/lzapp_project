@@ -1,72 +1,45 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password, check_password
-
-from .models import Usuario
-from .forms import RegistroForm
-
+from .forms import RegistroForm, LoginForm
+from dashboard.models import Perfil
 
 def registro(request):
-
     if request.method == "POST":
-
         form = RegistroForm(request.POST)
-
-        print(request.POST)          
-        print(form.errors)          
-
         if form.is_valid():
-
-            usuario = form.save(commit=False)
-
-            usuario.contraseña = make_password(
-                form.cleaned_data["contraseña"]
-            )
-
-            usuario.save()
-
-            print("Usuario guardado correctamente")
-
-            return redirect("login")
-
+            usuario = form.save()
+            Perfil.objects.create(
+                usuario=usuario,
+                telefono=form.cleaned_data['telefono'])
+            messages.success(request, "Usuario registrado correctamente. Ya puedes iniciar sesión.")
+            return redirect('login')
+        else:
+            messages.error(request, "Revisa los datos del formulario.")
     else:
         form = RegistroForm()
+    return render(request, 'registro.html', {'form': form})
 
-    return render(request, "registro.html", {
-        "form": form
-    })
-
-def login(request):
-
+def iniciar_sesion(request):
     if request.method == "POST":
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            usuario = form.get_user()
+            login(request, usuario)
+            messages.success(request, f"Bienvenido, {usuario.username}.")
+            return redirect('client')
+        else:
+            messages.error(request, "Usuario o contraseña incorrectos.")
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
-        correo = request.POST["correo"]
-        contraseña = request.POST["contraseña"]
+def cerrar_sesion(request):
+    logout(request)
+    messages.info(request, "Has cerrado sesión correctamente.")
+    return redirect('login')
 
-        try:
-
-            usuario = Usuario.objects.get(correo=correo)
-
-            if check_password(contraseña, usuario.contraseña):
-
-                request.session["usuario_id"] = usuario.id
-                request.session["nombre"] = usuario.nombre
-
-                return redirect("client")
-
-            else:
-
-                messages.error(request, "Contraseña incorrecta.")
-
-        except Usuario.DoesNotExist:
-
-            messages.error(request, "El usuario no existe.")
-
-    return render(request, "login.html")
-
-
-def logout(request):
-
-    request.session.flush()
-
-    return redirect("user")
+@login_required
+def inicio(request):
+    return render(request, 'inicio.html')

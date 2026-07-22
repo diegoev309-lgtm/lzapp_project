@@ -1,393 +1,382 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar Sesión</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 
 <style>
 
-    body{
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-    background:linear-gradient(rgba(6,35,87,.90),rgba(6,35,87,.90)),
-    url("../img/logo.jpg");
 
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
+body{
 
-    height:100vh;
+    background:linear-gradient(135deg,#001F54,#0A3D91,#1565C0);
+
+    min-height:100vh;
 
     display:flex;
-
     justify-content:center;
-
     align-items:center;
 
     font-family:Arial, Helvetica, sans-serif;
 
 }
 
-.contenedor{
 
-    width:100%;
+.login-card{
 
-    display:flex;
+    width:430px;
 
-    justify-content:center;
+    background:#fff;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.35);
+
+}
+
+
+.login-header{
+
+    background:#001F54;
+
+    color:white;
+
+    text-align:center;
 
     padding:30px;
 
 }
 
-.card-login{
 
-    width:950px;
+.logo{
 
-    background:rgba(255,255,255,.96);
-
-    display:flex;
-
-    border-radius:25px;
-
-    overflow:hidden;
-
-    box-shadow:0 20px 45px rgba(0,0,0,.35);
-
-    backdrop-filter:blur(8px);
-
-}
-
-.lado-izquierdo{
-
-    width:45%;
-
-    background:linear-gradient(180deg,#082f73,#0b4ea2);
-
-    color:white;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    padding:45px;
-
-}
-
-.lado-izquierdo img{
-
-    width:130px;
-
-    margin-bottom:20px;
-
-}
-
-.lado-izquierdo h2{
-
-    font-size:38px;
-
-    font-weight:bold;
+    width:90px;
 
     margin-bottom:15px;
 
 }
 
-.lado-izquierdo p{
 
-    text-align:center;
+.login-body{
 
-    line-height:30px;
-
-    color:#d9e8ff;
+    padding:35px;
 
 }
 
-.lado-derecho{
 
-    width:55%;
-
-    padding:55px;
-
-}
-
-.lado-derecho h2{
-
-    text-align:center;
+.form-label{
 
     font-weight:bold;
 
-    color:#082f73;
-
-    margin-bottom:30px;
+    color:#001F54;
 
 }
+
 
 .form-control{
 
-    border-radius:12px;
+    height:48px;
 
-    padding:12px;
+    border-radius:10px;
 
-    border:2px solid #dbe4f1;
-
-    transition:.3s;
+    border:2px solid #dcdcdc;
 
 }
 
+
 .form-control:focus{
 
-    border-color:#ffc107;
+    border-color:#FFC107;
 
     box-shadow:0 0 0 .2rem rgba(255,193,7,.25);
 
 }
 
+
 .btn-login{
-    width:100%;
-    background:#082f73 !important;
-    color:white !important;
-    border-radius:50px;
-    padding:13px;
-}
-
-.btn-login:hover{
-
-    background:#ffcf33;
-
-    transform:translateY(-2px);
-
-}
-
-.separador{
-
-    margin:30px 0;
-
-    text-align:center;
-
-    position:relative;
-
-}
-
-.separador::before{
-
-    content:"";
-
-    position:absolute;
-
-    left:0;
-
-    top:50%;
 
     width:100%;
 
-    height:1px;
+    background:#FFC107;
 
-    background:#d7d7d7;
-
-}
-
-.separador span{
-
-    background:white;
-
-    position:relative;
-
-    padding:0 15px;
-
-    color:#666;
-
-}
-
-.btn-google{
-
-    width:100%;
-
-    background:white;
-
-    border:2px solid #082f73;
-
-    color:#082f73;
-
-    padding:12px;
-
-    border-radius:50px;
+    color:#001F54;
 
     font-weight:bold;
+
+    border:none;
+
+    border-radius:10px;
+
+    height:48px;
 
     transition:.3s;
 
 }
 
-.btn-google:hover{
 
-    background:#082f73;
+.btn-login:hover{
 
-    color:white;
+    background:#FFD54F;
 
-}
-
-.btn-google img{
-
-    width:24px;
-
-    margin-right:10px;
+    transform:scale(1.02);
 
 }
 
-.registro{
+
+.register{
 
     text-align:center;
 
-    margin-top:30px;
-
-    color:#555;
+    margin-top:20px;
 
 }
 
-.registro a{
+
+.register a{
 
     text-decoration:none;
 
-    color:#082f73;
+    color:#1565C0;
 
     font-weight:bold;
 
 }
 
-.registro a:hover{
 
-    color:#ffc107;
+/* OJO CONTRASEÑA */
+
+.password-container{
+
+    position:relative;
+
+}
+
+
+.password-container .form-control{
+
+    padding-right:50px;
 
 }
 
-.alert{
 
-    border-radius:12px;
+.btn-eye{
+
+    position:absolute;
+
+    right:12px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    color:#001F54;
 
 }
+
 
 </style>
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Iniciar Sesión</title>
-
-    {% load static %}
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
 
+
 <body>
 
-<div class="contenedor">
 
-    <div class="card-login">
+<div class="login-card">
 
-        <div class="lado-izquierdo">
 
-            <img src="{% static 'img/logo.png' %}" alt="Logo">
+<div class="login-header">
 
-            <h2>LzApp</h2>
 
-            <p>
-                Bienvenido nuevamente.
-                Inicia sesión para acceder a todos los servicios.
-            </p>
+<img src="{% static 'img/logo.png' %}" class="logo">
 
-        </div>
 
-        <div class="lado-derecho">
+<h2>Lácteos Zulianos</h2>
 
-            <h2>Iniciar Sesión</h2>
 
-            {% if messages %}
+<p>Bienvenido nuevamente</p>
 
-                {% for message in messages %}
-
-                    <div class="alert alert-warning">
-
-                        {{ message }}
-
-                    </div>
-
-                {% endfor %}
-
-            {% endif %}
-
-            <form method="POST">
-
-                {% csrf_token %}
-
-                <div class="mb-3">
-
-                    <label>Correo</label>
-
-                    <input
-                        type="email"
-                        name="correo"
-                        class="form-control"
-                        placeholder="correo@gmail.com"
-                        required>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label>Contraseña</label>
-
-                    <input
-                        type="password"
-                        name="contraseña"
-                        class="form-control"
-                        placeholder="********"
-                        required>
-
-                </div>
-
-                <button class="btn btn-login">
-
-                    Iniciar Sesión
-
-                </button>
-
-            </form>
-
-            <div class="separador">
-
-                <span>ó</span>
-
-            </div>
-
-            <button class="btn-google">
-
-                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
-
-                Continuar con Google
-
-            </button>
-
-            <p class="registro">
-
-                ¿No tienes cuenta?
-
-                <a href="{% url 'registro' %}">
-
-                    Regístrate
-
-                </a>
-
-            </p>
-
-        </div>
-
-    </div>
 
 </div>
+
+
+
+<div class="login-body">
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+<div class="mb-3">
+
+
+<label class="form-label">
+
+Usuario
+
+</label>
+
+
+{{ form.username }}
+
+
+</div>
+
+
+
+
+
+<div class="mb-4">
+
+
+<label class="form-label">
+
+Contraseña
+
+</label>
+
+
+
+<div class="password-container">
+
+
+{{ form.password }}
+
+
+
+<button type="button" class="btn-eye" onclick="mostrarPassword('id_password', this)">
+
+
+<i class="bi bi-eye-slash"></i>
+
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<button type="submit" class="btn btn-login">
+
+
+Iniciar Sesión
+
+
+</button>
+
+
+
+</form>
+
+
+
+
+<div class="register">
+
+
+¿No tienes una cuenta?
+
+
+<a href="{% url 'registro' %}">
+
+Regístrate aquí
+
+</a>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+function mostrarPassword(id, boton){
+
+
+    let campo = document.getElementById(id);
+
+    let icono = boton.querySelector("i");
+
+
+
+    if(campo.type === "password"){
+
+
+        campo.type = "text";
+
+
+        icono.classList.remove("bi-eye-slash");
+
+        icono.classList.add("bi-eye");
+
+
+    }else{
+
+
+        campo.type = "password";
+
+
+        icono.classList.remove("bi-eye");
+
+        icono.classList.add("bi-eye-slash");
+
+
+    }
+
+
+}
+
+
+</script>
+
+
 
 </body>
 

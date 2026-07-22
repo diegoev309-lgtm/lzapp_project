@@ -1,25 +1,16 @@
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
+    # Página principal
+    path('', views.inicio, name='inicio'),
 
-    path(
-        "registro/",
-        views.registro,
-        name="registro"
-    ),
+    # Registro
+    path('registro/', views.registro, name='registro'),
 
-    path(
-        "login/",
-        views.login,
-        name="login"
-    ),
+    # Inicio de sesión
+    path('login/', views.iniciar_sesion, name='login'),
 
-    path(
-        "logout/",
-        views.logout,
-        name="logout"
-    ),
-
+    # Cerrar sesión
+    path('logout/', views.cerrar_sesion, name='logout'),
 ]

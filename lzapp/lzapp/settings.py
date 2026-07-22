@@ -59,7 +59,7 @@ WSGI_APPLICATION = 'lzapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_lacteos_zulianos',
+        'NAME': 'db_lacteos_z',
         'USER': 'root',
         'PASSWORD': 'www309edt',
         'HOST': 'localhost',
