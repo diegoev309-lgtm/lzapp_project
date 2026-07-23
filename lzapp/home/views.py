@@ -27,8 +27,7 @@ def buscar_productos_ajax(request):
     return JsonResponse({"productos": resultados, "query": query})
 
 def main(request):
-    productos = Producto.objects.filter(disponibilidad=True)
-    query = request.GET.get("q", "")
+    productos, query = buscar_productos_ajax(request)
     return render(request,"masterpage.html",{"productos":productos,"query":query})
 
 def user(request):
