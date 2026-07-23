@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegistroForm, LoginForm
 from dashboard.models import Perfil
+from .tasks import enviar_email_bienvenida_async  # <-- NUEVO import
 
 def registro(request):
     if request.method == "POST":
@@ -13,6 +14,9 @@ def registro(request):
             Perfil.objects.create(
                 usuario=usuario,
                 telefono=form.cleaned_data['telefono'])
+
+            enviar_email_bienvenida_async(usuario.id)  # <-- NUEVA línea: dispara el hilo en segundo plano
+
             messages.success(request, "Usuario registrado correctamente. Ya puedes iniciar sesión.")
             return redirect('login')
         else:
