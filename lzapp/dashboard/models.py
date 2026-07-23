@@ -25,7 +25,6 @@ class Producto(models.Model):
     disponibilidad = models.BooleanField(default=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    fecha_ultimo_movimiento_stock = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'producto'
@@ -78,11 +77,8 @@ class ReglaDescuentoAutomatico(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.descuento_porcentaje}%)"
+
     
-from django.db import models
-from django.utils import timezone
-
-
 
 class Descuento(models.Model):
     ORIGEN = (('manual', 'Manual'),('automatico', 'Automático'),)

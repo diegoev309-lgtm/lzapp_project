@@ -50,7 +50,6 @@ class ReglaDescuentoAutomaticoForm(forms.ModelForm):
             "nombre",
             "prioridad",
             "tipo_condicion",
-            "dias_sin_movimiento",
             "stock_multiplicador_min",
             "dias_antes_vencimiento",
             "descuento_porcentaje",
@@ -60,7 +59,6 @@ class ReglaDescuentoAutomaticoForm(forms.ModelForm):
             "nombre": "Nombre de la regla",
             "prioridad": "Prioridad",
             "tipo_condicion": "Tipo de evaluación",
-            "dias_sin_movimiento": "Días sin movimiento",
             "stock_multiplicador_min": "Multiplicador mínimo de stock",
             "dias_antes_vencimiento": "Días antes del vencimiento",
             "descuento_porcentaje": "Porcentaje de descuento",
@@ -71,8 +69,6 @@ class ReglaDescuentoAutomaticoForm(forms.ModelForm):
                 "Las reglas con mayor prioridad se ejecutan primero.",
             "tipo_condicion":
                 "AND = todas las condiciones. OR = cualquiera de ellas.",
-            "dias_sin_movimiento":
-                "Déjalo vacío si esta condición no aplica.",
             "stock_multiplicador_min":
                 "Ejemplo: 2 significa que el stock actual debe ser al menos el doble del stock mínimo.",
             "dias_antes_vencimiento":
@@ -95,12 +91,6 @@ class ReglaDescuentoAutomaticoForm(forms.ModelForm):
 
             "tipo_condicion": forms.Select(attrs={
                 "class": "form-select"
-            }),
-
-            "dias_sin_movimiento": forms.NumberInput(attrs={
-                "class": "form-control",
-                "min": 0,
-                "placeholder": "Opcional"
             }),
 
             "stock_multiplicador_min": forms.NumberInput(attrs={
