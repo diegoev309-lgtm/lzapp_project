@@ -61,7 +61,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_lacteos_z',
         'USER': 'root',
-        'PASSWORD': 'www309edt',
+        'PASSWORD': 'Rojas123fj',
         'HOST': 'localhost',
         'PORT': '3306',
     }
