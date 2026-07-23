@@ -1501,6 +1501,29 @@ footer .text-center.m-0 {
        aro dorado y nunca lo tapa, sin importar cuánto dure el hover. */
     filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.4));
 }
+/* Contorno dorado permanente que sigue EXACTAMENTE el perímetro
+   del recorte (mismo data-clip), en vez de rellenar la silueta.
+   Al ser un <polygon> con fill:none, solo se ve la línea del borde
+   —justo lo que se ve en la referencia— sin tapar la foto de fondo. */
+.queso-punto-contorno {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: visible;
+}
+.queso-punto-contorno-linea {
+    stroke: var(--dorado-claro);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px rgba(240, 217, 138, 0.95))
+            drop-shadow(0 0 14px rgba(201, 168, 76, 0.65));
+    opacity: 0.92;
+    transition: opacity 0.4s ease;
+}
 
 .quesos-interactivos.modo-ofertas .queso-punto.encendido .queso-punto-borde {
     opacity: 1;
@@ -1826,7 +1849,7 @@ footer .text-center.m-0 {
 .confetti-contenedor {
     position: absolute;
     inset: 0;
-    z-index: 7;
+    z-index: 10;
     overflow: hidden;
     pointer-events: none;
 }
@@ -2065,7 +2088,7 @@ footer .text-center.m-0 {
 .boton-sortear-wrap {
     position: absolute;
     left: 50%;
-    bottom: 70px;
+    bottom: 24px;
     transform: translateX(-50%) translateY(16px) scale(0.9);
     z-index: 6;
     opacity: 0;
@@ -2152,34 +2175,12 @@ footer .text-center.m-0 {
 .oferta-info-unica {
     position: absolute;
     transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    display: block;
     z-index: 3;
     text-align: center;
-    /* El ancho lo asigna JS dinámicamente (basado en el ancho real de los
-       3 quesos); aquí solo dejamos un mínimo/máximo de seguridad. */
-    min-width: 300px;
-    max-width: 95%;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease, transform 0.5s ease;
-
-    /* Tarjeta contenedora: mismo azul de la tarjeta "Seguimiento en vivo" del slide 3 */
-    background: rgba(2, 44, 99, 0.75);
-    border: 2px solid rgba(240, 217, 138, 0.9);
-    border-radius: 20px;
-    padding: 14px 24px 40px 24px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow:
-        0 12px 32px rgba(0, 0, 0, 0.45),
-        0 0 18px rgba(240, 217, 138, 0.55),
-        0 0 40px rgba(201, 168, 76, 0.35),
-        inset 0 0 20px rgba(240, 217, 138, 0.08);
-    animation: brilloTarjetaOferta 2.6s ease-in-out infinite;
 }
 .quesos-interactivos.todos-encendidos + .oferta-info-unica {
     opacity: 1;
@@ -2292,15 +2293,24 @@ footer .text-center.m-0 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    background: rgba(2, 44, 99, 0.55);
-    border: 1px solid rgba(240, 217, 138, 0.45);
-    border-radius: 12px;
-    padding: 10px 20px 20px;
-    flex-shrink: 0;
+    gap: clamp(2px, 0.4vw, 4px);
+    width: min(80%, 320px);
     opacity: 0;
     transform: scale(0.9);
     transition: opacity 0.4s ease, transform 0.4s ease;
+
+    background: rgba(3, 30, 68, 0.94);
+    border: 3px solid var(--dorado);
+    border-radius: 16px;
+    padding: clamp(12px, 2.2vw, 22px) clamp(16px, 4vw, 40px) clamp(28px, 6vw, 48px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.55),
+        0 0 24px rgba(240, 217, 138, 0.5),
+        0 0 50px rgba(201, 168, 76, 0.3),
+        inset 0 0 24px rgba(240, 217, 138, 0.06);
+    animation: brilloTarjetaOferta 2.6s ease-in-out infinite;
 }
 
 .oferta-descuento-tarjeta.visible {
@@ -2309,49 +2319,73 @@ footer .text-center.m-0 {
 }
 
 .oferta-descuento-label {
-    font-size: 0.62rem;
+    font-size: clamp(0.62rem, 1.4vw, 0.85rem);
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.9);
     white-space: nowrap;
 }
 
 .oferta-descuento-numero-wrap {
     display: flex;
     align-items: flex-end;
-    gap: 3px;
-    margin-top: 2px;
+    gap: clamp(4px, 0.8vw, 8px);
+    margin-top: clamp(2px, 0.5vw, 4px);
 }
 
 .oferta-descuento-signo {
-    font-size: 1.1rem;
+    font-size: clamp(1.2rem, 2.8vw, 2rem);
     font-weight: 800;
     color: var(--dorado-claro);
-    margin-bottom: 5px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    margin-bottom: clamp(8px, 1.6vw, 14px);
 }
 
 .oferta-descuento-dto {
-    font-size: 0.62rem;
+    font-size: clamp(0.6rem, 1.2vw, 0.78rem);
     font-weight: 700;
-    letter-spacing: 0.06em;
-    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: clamp(2px, 0.5vw, 4px);
 }
 
 .oferta-descuento-liston {
     position: absolute;
-    bottom: -11px;
+    bottom: clamp(-14px, -2.6vw, -22px);
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
     color: var(--azul-profundo);
-    font-size: 0.6rem;
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
     font-weight: 800;
-    letter-spacing: 0.02em;
-    padding: 4px 14px;
-    border-radius: 4px;
+    letter-spacing: 0.03em;
+    padding: clamp(4px, 0.8vw, 6px) clamp(12px, 2.6vw, 20px);
+    border-radius: 6px;
     white-space: nowrap;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Números grandes SIN cajita, solo dentro de esta tarjeta.
+   No toca .ruleta-digito global (la ruleta chica de cada
+   queso individual conserva su cajita normal). */
+.oferta-descuento-numero-wrap .ruleta-digito {
+    width: clamp(26px, 5vw, 48px) !important;
+    height: clamp(38px, 8vw, 70px) !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    text-align: center !important;
+}
+.oferta-descuento-numero-wrap .ruleta-cinta span {
+    height: clamp(38px, 8vw, 70px) !important;
+    line-height: clamp(38px, 8vw, 70px) !important;
+    font-size: clamp(1.8rem, 5vw, 3.2rem) !important;
+    font-weight: 800 !important;
+    color: var(--dorado-claro) !important;
+    text-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+    padding: 0 2px;
 }
 
 /* Destello dorado cuando el video se apaga, justo antes de revelar el número */
@@ -2419,6 +2453,66 @@ footer .text-center.m-0 {
     color: #fff;
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);
     font-weight: 600;
+    margin-bottom: 1.6rem;
+}
+
+/* Queso flotando arriba de la tarjeta de felicidades */
+.oferta-reveal-queso-wrap {
+    position: relative;
+    width: 150px;
+    margin: 0 auto 1.2rem;
+}
+.oferta-reveal-queso {
+    width: 100%;
+    display: block;
+    filter: drop-shadow(0 20px 34px rgba(0, 0, 0, 0.5));
+    animation: flotarRueda 4.5s ease-in-out infinite;
+}
+.oferta-reveal-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: linear-gradient(135deg, #ff5c4d, #e2402d);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 50px;
+    box-shadow: 0 8px 18px rgba(226, 64, 45, 0.55), 0 0 0 3px rgba(255,255,255,0.15);
+    animation: pulsarBotonSortear 1.6s ease-in-out infinite;
+}
+
+.oferta-reveal-precios {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.oferta-reveal-precio-anterior {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: line-through;
+    text-decoration-color: rgba(226, 64, 45, 0.85);
+    text-decoration-thickness: 2px;
+}
+.oferta-reveal-precio-nuevo {
+    color: var(--dorado-claro);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+.oferta-reveal-credencial {
+    background: linear-gradient(135deg, #ff5c4d, #e2402d);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 50px;
+    box-shadow: 0 6px 16px rgba(226, 64, 45, 0.5);
 }
 /* ---------- Brillito volador hacia el aviso fijo de la esquina ---------- */
 .brillo-volador {
