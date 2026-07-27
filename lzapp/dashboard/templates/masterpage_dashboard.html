@@ -222,7 +222,7 @@
             <div class="nav flex-column nav-lateral">
 
                 <a class="nav-link {% if request.resolver_match.url_name == 'Inicio' %}active{% endif %}"
-                   href="{% url 'Inicio' %}">
+                   href="{% url 'Inicio_dash'  %}">
                     <i class="bi bi-house-door-fill me-2"></i>
                     Inicio
                 </a>
@@ -233,8 +233,8 @@
                     Productos
                 </a>
                 
-                <a class="nav-link {% if request.resolver_match.url_name == 'listar_descuentos' %}active{% endif %}"
-                   href="{% url 'listar_descuentos' %}">
+                <a class="nav-link {% if request.resolver_match.url_name == 'panel_descuentos' %}active{% endif %}"
+                   href="{% url 'panel_descuentos' %}">
                     <i class="bi bi-tags-fill me-2"></i>
                     Descuentos
                 </a>
@@ -292,7 +292,7 @@
 
                 <div class="nav flex-column nav-lateral">
 
-                    <a class="nav-link" href="{% url 'Inicio' %}">
+                    <a class="nav-link" href="{% url 'Inicio_dash' %}">
                         <i class="bi bi-house-door-fill me-2"></i>
                         Inicio
                     </a>
@@ -302,7 +302,7 @@
                         Productos
                     </a>
 
-                    <a class="nav-link" href="{% url 'listar_descuentos' %}">
+                    <a class="nav-link" href="{% url 'panel_descuentos' %}">
                         <i class="bi bi-tags-fill me-2"></i>
                         Descuentos
                     </a>

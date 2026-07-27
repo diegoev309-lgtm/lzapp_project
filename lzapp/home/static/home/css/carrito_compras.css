@@ -1,4 +1,4 @@
-        /* ============================================================
+/* ============================================================
            AJUSTE DE LAYOUT — deja espacio para el carrito fijo
            ============================================================ */
         body {
@@ -176,6 +176,138 @@
         }
 
         /* ============================================================
+           VERSIÓN COMPACTA — para la página del carrito, donde el
+           contenido dispone de menos ancho (340px los ocupa el widget)
+           ============================================================ */
+
+        /* Contenedor: limita el ancho real usado en vez de dejar que
+           Bootstrap intente centrar un container de 1140/1320px en un
+           espacio menor */
+        .seccion-productos .container {
+            max-width: 100%;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        /* --- Encabezado de la sección: título y descripción más chicos --- */
+        .seccion-productos {
+            padding: 2.5rem 0 3rem;
+        }
+
+        .seccion-productos .section-titulo {
+            font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .seccion-productos .section-eyebrow {
+            font-size: 0.68rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .seccion-productos .section-descripcion {
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .seccion-productos .row.mb-5 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* --- Buscador más compacto --- */
+        .buscador-wrapper {
+            max-width: 480px;
+            margin-bottom: 1.2rem;
+        }
+
+        .buscador-input {
+            padding: 0.7rem 2.2rem 0.7rem 2.8rem;
+            font-size: 0.85rem;
+        }
+
+        .buscador-icono {
+            left: 18px;
+            font-size: 0.9rem;
+        }
+
+        .buscador-btn {
+            padding: 0 1.4rem;
+            font-size: 0.82rem;
+        }
+
+        .seccion-productos .container.py-5 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        .seccion-productos h2 {
+            font-size: 1.3rem;
+        }
+
+        #contadorProductos {
+            font-size: 0.78rem !important;
+        }
+
+        /* --- Tarjetas de producto: más compactas --- */
+        .producto-card {
+            min-height: 140px;
+            border-radius: 16px;
+        }
+
+        .producto-img-wrapper {
+            width: 150px;
+            padding: 10px;
+        }
+
+        .imagen-producto {
+            max-height: 130px;
+        }
+
+        .badge-stock {
+            top: 8px;
+            left: 8px;
+            font-size: 0.6rem;
+            padding: 0.22rem 0.6rem;
+        }
+
+        .card-body {
+            padding: 0.85rem 1rem 0.3rem;
+        }
+
+        .estrellas {
+            font-size: 0.72rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .titulo-producto {
+            font-size: 0.95rem;
+        }
+
+        .precio {
+            font-size: 1.05rem;
+        }
+
+        .producto-descripcion {
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            padding: 0.4rem 1rem 0.85rem;
+        }
+
+        .btn-carrito {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* En pantallas medianas, un poco más de aire ya que hay menos
+           presión de espacio */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            .producto-img-wrapper { width: 130px; }
+            .imagen-producto { max-height: 110px; }
+        }
+
+        /* ============================================================
            BUSCADOR DE PRODUCTOS — rediseño
            ============================================================ */
         .buscador-wrapper {
@@ -307,4 +439,123 @@
         
         .buscador-btn:hover::before {
             opacity: 1;
+        }
+        /* ============================================================
+           AJUSTE DE LAYOUT — deja espacio para el carrito fijo
+           ============================================================ */
+        body {
+            margin-right: 340px !important;   /* !important para ganarle a home.css */
+            transition: margin-right 0.3s ease;
+        }
+
+        /* El navbar es fixed-top: no hereda el margin del body,
+           así que hay que recortarlo manualmente */
+        #mainNav.navbar.fixed-top {
+            right: 340px;
+            left: 0;
+            transition: right 0.3s ease;
+        }
+
+        @media (max-width: 991px) {
+            body {
+                margin-right: 0 !important;
+            }
+            #mainNav.navbar.fixed-top {
+                right: 0;
+            }
+        }
+
+        /* ============================================================
+           NAVBAR — en esta página no hay hero, así que se queda
+           siempre azul (nunca transparente), gane o no la clase
+           .scrolled que agrega el JS al hacer scroll
+           ============================================================ */
+        #mainNav.navbar {
+            background: rgba(2, 44, 99, 0.97) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 8px 30px rgba(2, 44, 99, 0.25);
+            padding: 0.7rem 0;
+        }
+        
+        /* Widget del carrito: que la navbar respete su ancho también
+           cuando el carrito cambia de tamaño en breakpoints intermedios */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            body {
+                margin-right: 300px !important;
+            }
+            #mainNav.navbar.fixed-top {
+                right: 300px;
+            }
+        }
+        
+
+        /* ============================================================
+           RESPONSIVE ADICIONAL — carrito_compras.html
+           ============================================================ */
+
+        /* --- Íconos de la derecha del navbar (perfil + carrito):
+           en mobile conviven con el botón hamburguesa; sin esto quedan
+           muy pegados o se montan sobre el toggler en pantallas angostas --- */
+        @media (max-width: 991px) {
+            #mainNav .container {
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+            #mainNav ul.justify-content-end {
+                gap: 4px !important;
+                margin-left: auto;
+            }
+            #mainNav ul.justify-content-end .nav-link {
+                padding: 0.25rem !important;
+            }
+            #mainNav .navbar-brand {
+                font-size: 1.3rem;
+            }
+            #mainNav .navbar-brand img {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* --- Contenedor de la sección de productos: menos padding lateral
+           en pantallas chicas, para no robarle ancho útil a las tarjetas --- */
+        @media (max-width: 576px) {
+            .seccion-productos .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .seccion-productos {
+                padding: 1.5rem 0 2rem;
+            }
+        }
+
+        /* --- Buscador: en pantallas muy angostas se apila (input arriba,
+           botón "Buscar" abajo) en vez de comprimirse hasta ilegible --- */
+        @media (max-width: 480px) {
+            .buscador-productos {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+            .buscador-input {
+                padding: 0.85rem 1.2rem;
+            }
+            .buscador-icono {
+                left: 16px;
+            }
+            .buscador-btn {
+                padding: 0.7rem 1rem;
+                justify-content: center;
+                border-radius: 0 0 18px 18px;
+            }
+        }
+
+        /* --- Dropdown de perfil: en mobile puede salirse de pantalla por
+           la derecha si el body ya tiene overflow ajustado por el carrito --- */
+        @media (max-width: 480px) {
+            .dropdown-menu-end {
+                right: 0;
+                left: auto;
+                min-width: 180px;
+            }
         }

@@ -1,20 +1,30 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db.models import F, Q
+from django.shortcuts import get_object_or_404, redirect, render
+
 from dashboard.models import Producto
 from producto.forms import ProductoForm
-from django.contrib import messages
-from django.db.models import F
-
 
 
 def listar_productos(request):
+    query = request.GET.get('q', '').strip()
+
     lista_producto = Producto.objects.all().order_by("-id")
+    if query:
+        lista_producto = lista_producto.filter(nombre__icontains=query)
+
     productos_bajo_stock = Producto.objects.filter(stock_actual__lt=F('stock_minimo'))
-    paginator = Paginator(lista_producto, 6)
+
+    paginator = Paginator(lista_producto, 5)
     page = request.GET.get("page")
     productos = paginator.get_page(page)
 
-    return render(request, "listpt.html", {"productos": productos,"productos_bajo_stock": productos_bajo_stock,})
+    return render(request, "listpt.html", {
+        "productos": productos,
+        "productos_bajo_stock": productos_bajo_stock,
+        "query": query,
+    })
 
 
 def crear_producto(request):

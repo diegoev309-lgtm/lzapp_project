@@ -49,8 +49,6 @@ body{
     opacity:.9;
 }
 
-/* Botón "Nuevo producto": blanco/gris difuminado, con texto
-   azul oscuro para mantener contraste y coherencia con la marca */
 .btn-nuevo{
     background:linear-gradient(135deg,#ffffff,#d7dce4);
     color:#192987;
@@ -66,6 +64,87 @@ body{
     color:#14206b;
     transform:translateY(-3px);
     box-shadow:0 10px 22px rgba(0,0,0,.2);
+}
+
+/*==========================
+        BUSCADOR
+===========================*/
+
+.barra-busqueda-wrapper{
+    padding:22px 30px 6px;
+}
+
+.barra-busqueda{
+    display:flex;
+    gap:10px;
+    max-width:420px;
+}
+
+.campo-busqueda{
+    position:relative;
+    flex:1;
+}
+
+.campo-busqueda i{
+    position:absolute;
+    top:50%;
+    left:16px;
+    transform:translateY(-50%);
+    color:#9aa3b4;
+    font-size:15px;
+    pointer-events:none;
+}
+
+.input-busqueda{
+    width:100%;
+    border:1px solid rgba(2,44,99,.12);
+    border-radius:12px;
+    padding:11px 16px 11px 42px;
+    font-size:14px;
+    color:#192987;
+    background:#f7f9fd;
+    transition:.25s;
+}
+
+.input-busqueda:focus{
+    outline:none;
+    border-color:#3556ff;
+    background:white;
+    box-shadow:0 0 0 4px rgba(53,86,255,.12);
+}
+
+.input-busqueda::placeholder{
+    color:#9aa3b4;
+}
+
+.btn-buscar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:46px;
+    height:46px;
+    flex-shrink:0;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    font-size:16px;
+    transition:.3s;
+}
+
+.btn-buscar:hover{
+    color:white;
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(25,41,135,.3);
+}
+
+@media(max-width:768px){
+    .barra-busqueda-wrapper{
+        padding:18px 16px 4px;
+    }
+    .barra-busqueda{
+        max-width:100%;
+    }
 }
 
 /*==========================
@@ -118,13 +197,6 @@ body{
     box-shadow:0 5px 14px rgba(25,41,135,.35);
 }
 
-/*
-  IMPORTANTE: esta clase se llamaba antes ".d-none" y chocaba con la
-  utilidad nativa de Bootstrap (.d-none / .d-md-block), lo que ocultaba
-  el sidebar de la masterpage en pantallas de escritorio.
-  Ahora se llama ".vista-oculta" y SOLO la usa el JS de este archivo
-  para alternar Tabla/Tarjetas.
-*/
 .vista-oculta{
     display:none !important;
 }
@@ -165,10 +237,6 @@ body{
     background:#eef4ff;
 }
 
-/*==========================
-        IMAGEN (tabla)
-===========================*/
-
 .img-producto{
     width:52px;
     height:38px;
@@ -181,10 +249,6 @@ body{
 .img-producto:hover{
     transform:scale(1.1);
 }
-
-/*==========================
-         BOTONES ACCIÓN
-===========================*/
 
 .btn-editar{
     background:#0d6efd;
@@ -222,10 +286,6 @@ body{
     font-size:12px;
 }
 
-/*==========================
-        BADGES
-===========================*/
-
 .badge-stock, .badge{
     padding:6px 12px;
     border-radius:30px;
@@ -236,20 +296,12 @@ body{
     margin-left:8px;
 }
 
-/*==========================
-        PRECIO
-===========================*/
-
 .precio{
     color:#198754;
     font-weight:bold;
     font-size:12px;
     white-space:nowrap;
 }
-
-/*==========================
-      ID PRODUCTO
-===========================*/
 
 .id-producto{
     font-weight:bold;
@@ -377,7 +429,6 @@ body{
     font-size:9px;
 }
 
-/* Estado vacío (compartido tabla / tarjetas) */
 .estado-vacio{
     text-align:center;
     padding:60px 20px;
@@ -678,181 +729,199 @@ body{
                 Nuevo Producto
             </a>
         </div>
-        <!-- Buscador -->
-        <form method="get" class="d-flex mb-3 gap-2" style="max-width:340px;">
-            <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query }}">
-            <button class="btn" style="background:var(--degradado-marca); color:white;">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
-        
-        <!-- ============ VISTA TABLA ============
-             table-responsive queda como red de seguridad (scroll horizontal
-             SOLO si algún dato es anormalmente largo), pero las columnas
-             menos importantes (Imagen y Stock) se ocultan en pantallas
-             chicas con clases nativas de Bootstrap. -->
-        <div id="vistaTabla" class="table-responsive">
-            <table class="table table-hover tabla-productos align-middle">
-                <thead>
-                    <tr>
-                        <th class="d-none d-sm-table-cell">Imagen</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th class="d-none d-md-table-cell">Stock</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for i in productos %}
-                    <tr>
-                        <td class="d-none d-sm-table-cell">
-                            {% if i.imagen %}
-                                <img src="{{ i.imagen.url }}" class="img-producto">
-                            {% else %}
-                                <img src="{% static 'img/no-image.png' %}" class="img-producto">
-                            {% endif %}
-                        </td>
-                        <td>
-                            <strong>{{ i.nombre }}</strong>
-                        </td>
-                        <td class="precio">
-                            $ {{ i.precio }}
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                            <strong>{{ i.stock_actual }}</strong>
-                        </td>
-                        <td>
-                            {% if i.disponibilidad %}
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    <span class="d-none d-lg-inline">Disponible</span>
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary">
-                                    <i class="bi bi-x-circle-fill"></i>
-                                    <span class="d-none d-lg-inline">No Disponible</span>
-                                </span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="acciones">
-                                <a href="{% url 'editar_producto' i.id %}" class="btn btn-editar btn-sm">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a href="{% url 'eliminar_producto' i.id %}" class="btn btn-eliminar btn-sm">
-                                    <i class="bi bi-trash-fill"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="estado-vacio">
-                            <i class="bi bi-box display-4 text-secondary"></i>
-                            <h5 class="mt-3">No existen productos registrados.</h5>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+
+        <!-- Buscador: en vivo, sin recargar la página -->
+        <div class="barra-busqueda-wrapper">
+            <form method="get" class="barra-busqueda" id="formBuscarProducto">
+                <div class="campo-busqueda">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="q" id="inputBuscarProducto" class="input-busqueda" placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
+                </div>
+                <button type="submit" class="btn-buscar" aria-label="Buscar">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
         </div>
 
-        <!-- ============ VISTA TARJETAS ============ -->
-        <div id="vistaTarjetas" class="grid-productos vista-oculta">
-            {% for i in productos %}
-                <div class="producto-card">
-                    <div class="producto-card-img-wrapper">
-                        {% if i.imagen %}
-                            <img src="{{ i.imagen.url }}" class="producto-card-imagen">
-                        {% else %}
-                            <img src="{% static 'img/no-image.png' %}" class="producto-card-imagen">
-                        {% endif %}
-                        <div class="producto-card-estado">
-                            {% if i.disponibilidad %}
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle-fill"></i> Disp.
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary">
-                                    <i class="bi bi-x-circle-fill"></i> No disp.
-                                </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="producto-card-body">
-                        <h3 class="producto-card-nombre">{{ i.nombre }}</h3>
-                        <div class="producto-card-linea"></div>
-                        <div class="producto-card-precio-fila">
-                            <span class="producto-card-precio">$ {{ i.precio }}</span>
-                            <span class="producto-card-stock">
-                                <i class="bi bi-boxes"></i> {{ i.stock_actual }}
-                            </span>
-                        </div>
-                        <div class="producto-card-acciones">
-                            <a href="{% url 'editar_producto' i.id %}" class="btn btn-editar">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-                            <a href="{% url 'eliminar_producto' i.id %}" class="btn btn-eliminar">
-                                <i class="bi bi-trash-fill"></i> Eliminar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <div class="estado-vacio">
-                    <i class="bi bi-box display-4 text-secondary"></i>
-                    <h5 class="mt-3">No existen productos registrados.</h5>
-                </div>
-            {% endfor %}
-        </div>
+        <div id="contenedorListaProductos">
 
-        <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
-        <div class="pie-productos">
-
-            <div class="barra-vista">
-                <span>Vista:</span>
-                <div class="selector-vista" role="group" aria-label="Selector de vista">
-                    <button type="button" class="btn-vista activo" id="btnVistaTabla" onclick="cambiarVista('tabla')">
-                        <i class="bi bi-table"></i> Tabla
-                    </button>
-                    <button type="button" class="btn-vista" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
-                        <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
-                    </button>
-                </div>
+            <!-- ============ VISTA TABLA ============ -->
+            <div id="vistaTabla" class="table-responsive">
+                <table class="table table-hover tabla-productos align-middle">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-sm-table-cell">Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th class="d-none d-md-table-cell">Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in productos %}
+                        <tr>
+                            <td class="d-none d-sm-table-cell">
+                                {% if i.imagen %}
+                                    <img src="{{ i.imagen.url }}" class="img-producto">
+                                {% else %}
+                                    <img src="{% static 'img/no-image.png' %}" class="img-producto">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ i.nombre }}</strong>
+                            </td>
+                            <td class="precio">
+                                $ {{ i.precio }}
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <strong>{{ i.stock_actual }}</strong>
+                            </td>
+                            <td>
+                                {% if i.disponibilidad %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        <span class="d-none d-lg-inline">Disponible</span>
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                        <span class="d-none d-lg-inline">No Disponible</span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="acciones">
+                                    <a href="{% url 'editar_producto' i.id %}" class="btn btn-editar btn-sm">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="{% url 'eliminar_producto' i.id %}" class="btn btn-eliminar btn-sm">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="estado-vacio">
+                                <i class="bi bi-box display-4 text-secondary"></i>
+                                <h5 class="mt-3">
+                                    {% if query %}
+                                        No encontramos productos para "<strong>{{ query }}</strong>".
+                                    {% else %}
+                                        No existen productos registrados.
+                                    {% endif %}
+                                </h5>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <nav class="paginacion-inline" aria-label="Paginación de productos">
-                <ul class="pagination pagination-sm mb-0">
-                    {% if productos.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1">Primera</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ productos.previous_page_number }}">&laquo;</a>
-                        </li>
-                    {% endif %}
-                    {% for pagina in productos.paginator.page_range %}
-                        {% if pagina == productos.number %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ pagina }}</span>
-                            </li>
-                        {% else %}
+            <!-- ============ VISTA TARJETAS ============ -->
+            <div id="vistaTarjetas" class="grid-productos vista-oculta">
+                {% for i in productos %}
+                    <div class="producto-card">
+                        <div class="producto-card-img-wrapper">
+                            {% if i.imagen %}
+                                <img src="{{ i.imagen.url }}" class="producto-card-imagen">
+                            {% else %}
+                                <img src="{% static 'img/no-image.png' %}" class="producto-card-imagen">
+                            {% endif %}
+                            <div class="producto-card-estado">
+                                {% if i.disponibilidad %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Disp.
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle-fill"></i> No disp.
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="producto-card-body">
+                            <h3 class="producto-card-nombre">{{ i.nombre }}</h3>
+                            <div class="producto-card-linea"></div>
+                            <div class="producto-card-precio-fila">
+                                <span class="producto-card-precio">$ {{ i.precio }}</span>
+                                <span class="producto-card-stock">
+                                    <i class="bi bi-boxes"></i> {{ i.stock_actual }}
+                                </span>
+                            </div>
+                            <div class="producto-card-acciones">
+                                <a href="{% url 'editar_producto' i.id %}" class="btn btn-editar">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{% url 'eliminar_producto' i.id %}" class="btn btn-eliminar">
+                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="estado-vacio">
+                        <i class="bi bi-box display-4 text-secondary"></i>
+                        <h5 class="mt-3">
+                            {% if query %}
+                                No encontramos productos para "<strong>{{ query }}</strong>".
+                            {% else %}
+                                No existen productos registrados.
+                            {% endif %}
+                        </h5>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
+            <div class="pie-productos">
+
+                <div class="barra-vista">
+                    <span>Vista:</span>
+                    <div class="selector-vista" role="group" aria-label="Selector de vista">
+                        <button type="button" class="btn-vista activo" id="btnVistaTabla" onclick="cambiarVista('tabla')">
+                            <i class="bi bi-table"></i> Tabla
+                        </button>
+                        <button type="button" class="btn-vista" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
+                        </button>
+                    </div>
+                </div>
+
+                <nav class="paginacion-inline" aria-label="Paginación de productos">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if productos.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ pagina }}">{{ pagina }}</a>
+                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo;</a>
                             </li>
                         {% endif %}
-                    {% endfor %}
-                    {% if productos.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ productos.next_page_number }}">&raquo;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ productos.paginator.num_pages }}">Última</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
+                        {% for pagina in productos.paginator.page_range %}
+                            {% if pagina == productos.number %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ pagina }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ pagina }}{% if query %}&q={{ query }}{% endif %}">{{ pagina }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if productos.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+            </div>
 
         </div>
 
@@ -869,6 +938,8 @@ body{
         const btnTabla = document.getElementById('btnVistaTabla');
         const btnTarjetas = document.getElementById('btnVistaTarjetas');
 
+        if(!vistaTabla || !vistaTarjetas || !btnTabla || !btnTarjetas) return;
+
         if(vista === 'tarjetas'){
             vistaTabla.classList.add('vista-oculta');
             vistaTarjetas.classList.remove('vista-oculta');
@@ -884,11 +955,15 @@ body{
         localStorage.setItem('vistaProductos', vista);
     }
 
-    document.addEventListener('DOMContentLoaded', function(){
+    function aplicarVistaGuardada(){
         const vistaGuardada = localStorage.getItem('vistaProductos');
         if(vistaGuardada === 'tarjetas'){
             cambiarVista('tarjetas');
         }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        aplicarVistaGuardada();
 
         const notifStock = document.getElementById('notifStock');
         if(notifStock && sessionStorage.getItem('notifStockCerrada') === '1'){
@@ -903,6 +978,72 @@ body{
         }
         sessionStorage.setItem('notifStockCerrada', '1');
     }
+
+    /* ---- Búsqueda en vivo: pide la página completa por fetch() y se
+       queda solo con el contenido de #contenedorListaProductos ---- */
+    (function () {
+        const form = document.getElementById('formBuscarProducto');
+        const input = document.getElementById('inputBuscarProducto');
+        const contenedor = document.getElementById('contenedorListaProductos');
+        if (!form || !input || !contenedor) return;
+
+        let timer = null;
+
+        function extraerContenedor(htmlTexto) {
+            const doc = new DOMParser().parseFromString(htmlTexto, 'text/html');
+            return doc.getElementById('contenedorListaProductos');
+        }
+
+        function actualizarDesdeUrl(url) {
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then((res) => res.text())
+                .then((htmlTexto) => {
+                    const nuevoContenedor = extraerContenedor(htmlTexto);
+                    if (nuevoContenedor) {
+                        contenedor.innerHTML = nuevoContenedor.innerHTML;
+                    }
+                    aplicarVistaGuardada();
+                    window.history.replaceState({}, '', url);
+                })
+                .catch(() => {
+                    contenedor.innerHTML = `
+                        <div class="estado-vacio">
+                            <i class="bi bi-exclamation-triangle display-6 text-danger"></i>
+                            <h5 class="mt-3">Ocurrió un error al buscar. Intenta de nuevo.</h5>
+                        </div>`;
+                });
+        }
+
+        function buscar(query) {
+            const url = query
+                ? `${window.location.pathname}?q=${encodeURIComponent(query)}`
+                : window.location.pathname;
+            actualizarDesdeUrl(url);
+        }
+
+        input.addEventListener('input', () => {
+            clearTimeout(timer);
+            const q = input.value.trim();
+            timer = setTimeout(() => buscar(q), 300);
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearTimeout(timer);
+            buscar(input.value.trim());
+        });
+
+        // La paginación (Primera, «, números, », Última) también pasa
+        // por el mismo camino de fetch(), sin recargar la página.
+        contenedor.addEventListener('click', (e) => {
+            const link = e.target.closest('.paginacion-inline a.page-link');
+            if (!link) return;
+            e.preventDefault();
+            const url = new URL(link.href);
+            actualizarDesdeUrl(`${url.pathname}${url.search}`);
+            window.scrollTo({ top: contenedor.offsetTop - 20, behavior: 'smooth' });
+        });
+    })();
 
 </script>
 

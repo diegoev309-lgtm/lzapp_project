@@ -2,11 +2,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('descuentos/', views.listar_descuentos, name='listar_descuentos'),
-    path('descuentos/<int:producto_id>/aplicar/', views.aplicar_descuento, name='aplicar_descuento'),
-    path('descuentos/<int:descuento_id>/quitar/', views.quitar_descuento, name='quitar_descuento'),
-    path('descuentos/reglas/<int:regla_id>/toggle/', views.toggle_regla_descuento, name='toggle_regla_descuento'),
-    path('descuentos/reglas/nueva/', views.crear_regla_descuento, name='crear_regla_descuento'),
-    path('descuentos/reglas/<int:regla_id>/editar/', views.editar_regla_descuento, name='editar_regla_descuento'),
-    path('descuentos/reglas/<int:regla_id>/eliminar/', views.eliminar_regla_descuento, name='eliminar_regla_descuento'),
+    path('', views.panel_descuentos, name='panel_descuentos'),
+    path('campana/nueva/', views.crear_campana_descuento, name='crear_campana_descuento'),
+    path('campana/<int:pk>/editar/', views.editar_campana_descuento, name='editar_campana_descuento'),
+    path('campana/<int:pk>/eliminar/', views.eliminar_campana_descuento, name='eliminar_campana_descuento'),
+    path('campana/<int:pk>/toggle/', views.toggle_campana_descuento, name='toggle_campana_descuento'),
+    path('producto/<int:pk>/previsualizar/', views.previsualizar_producto, name='previsualizar_producto'),
+    path('premio/marcar-mostrado/', views.marcar_premio_mostrado, name='marcar_premio_mostrado'),
 ]

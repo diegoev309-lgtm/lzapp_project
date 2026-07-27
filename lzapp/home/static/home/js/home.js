@@ -5,53 +5,53 @@
         });
 
         /* ---- Parallax 3D con el mouse en el hero ---- */
-(function () {
-    const hero = document.querySelector('#inicio .hero');
-    if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        (function () {
+            const hero = document.querySelector('#inicio .hero');
+            if (!hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // FIX: no activar el parallax de mouse en móvil/pantallas táctiles.
-    const esTactilOMovil = window.matchMedia('(max-width: 991px)').matches ||
-                            window.matchMedia('(pointer: coarse)').matches;
-    if (esTactilOMovil) return;
+            const esTactilOMovil = window.matchMedia('(max-width: 991px)').matches ||
+                                    window.matchMedia('(pointer: coarse)').matches;
+            if (esTactilOMovil) return;
 
-    const capas = hero.querySelectorAll('[data-depth]');
-    let raf = null;
-    let targetX = 0, targetY = 0, curX = 0, curY = 0;
+            const capas = hero.querySelectorAll('[data-depth]');
+            let raf = null;
+            let targetX = 0, targetY = 0, curX = 0, curY = 0;
 
-    hero.addEventListener('mousemove', (e) => {
-        const r = hero.getBoundingClientRect();
-        targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
-        targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
-        if (!raf) raf = requestAnimationFrame(animar);
-    });
+            hero.addEventListener('mousemove', (e) => {
+                const r = hero.getBoundingClientRect();
+                targetX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+                targetY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
 
-    hero.addEventListener('mouseleave', () => {
-        targetX = 0; targetY = 0;
-        if (!raf) raf = requestAnimationFrame(animar);
-    });
+            hero.addEventListener('mouseleave', () => {
+                targetX = 0; targetY = 0;
+                if (!raf) raf = requestAnimationFrame(animar);
+            });
 
-    function animar() {
-        curX += (targetX - curX) * 0.08;
-        curY += (targetY - curY) * 0.08;
+            function animar() {
+                curX += (targetX - curX) * 0.08;
+                curY += (targetY - curY) * 0.08;
 
-        capas.forEach((el) => {
-            const d = parseFloat(el.dataset.depth) || 0.3;
-            const x = -curX * d * 32;
-            const y = -curY * d * 32;
-            el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        });
+                capas.forEach((el) => {
+                    const d = parseFloat(el.dataset.depth) || 0.3;
+                    const x = -curX * d * 32;
+                    const y = -curY * d * 32;
+                    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+                });
 
-        if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
-            raf = requestAnimationFrame(animar);
-        } else {
-            raf = null;
-        }
-    }
-})();
+                if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
+                    raf = requestAnimationFrame(animar);
+                } else {
+                    raf = null;
+                }
+            }
+        })();
+
         /* ---- Carrusel del hero ---- */
         (function () {
-            const DURACION_AUTOPLAY = 6000; // ms entre cada slide automático
-            const ESPERA_INACTIVIDAD = 6000; // ms sin interactuar antes de reanudar
+            const DURACION_AUTOPLAY = 6000;
+            const ESPERA_INACTIVIDAD = 6000;
             const track = document.getElementById('carruselTrack');
             const prevBtn = document.getElementById('carruselPrev');
             const nextBtn = document.getElementById('carruselNext');
@@ -72,7 +72,22 @@
                 clearTimeout(inactividadTimer);
 
                 actual = (indice + total) % total;
-                slides.forEach((s, i) => s.classList.toggle('activo', i === actual));
+                slides.forEach((s, i) => {
+                    const esActivo = i === actual;
+                    s.classList.toggle('activo', esActivo);
+
+                    // Pausa los videos de los slides que no se están viendo,
+                    // y reanuda el del slide activo. Esto evita que el
+                    // navegador siga decodificando video en segundo plano
+                    // sin necesidad (causa principal del lag).
+                    s.querySelectorAll('video').forEach((v) => {
+                        if (esActivo) {
+                            v.play().catch(() => {});
+                        } else {
+                            v.pause();
+                        }
+                    });
+                });
                 puntos.forEach((p, i) => p.classList.toggle('activo', i === actual));
                 reiniciarAutoplay();
             }
@@ -96,9 +111,6 @@
                 autoplayTimer = setInterval(siguiente, DURACION_AUTOPLAY);
             }
 
-            // Alguien está interactuando con el slide (globo, quesos, botón
-            // de sorteo): pausa el autoplay indefinidamente y solo lo
-            // reanuda tras un rato sin más interacciones.
             function notificarInteraccion() {
                 bloqueoInteraccion = true;
                 clearInterval(autoplayTimer);
@@ -147,10 +159,30 @@
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 irA(0);
             } else {
-                slides.forEach((s, i) => s.classList.toggle('activo', i === 0));
+                slides.forEach((s, i) => {
+                    const esActivo = i === 0;
+                    s.classList.toggle('activo', esActivo);
+                    s.querySelectorAll('video').forEach((v) => {
+                        if (esActivo) v.play().catch(() => {});
+                        else v.pause();
+                    });
+                });
                 puntos.forEach((p, i) => p.classList.toggle('activo', i === 0));
                 reiniciarAutoplay();
             }
+            /* ---- Pausar todos los videos cuando la pestaña no está visible ---- */
+        document.addEventListener('visibilitychange', () => {
+            const videos = document.querySelectorAll('video');
+            if (document.hidden) {
+                videos.forEach((v) => v.pause());
+            } else {
+                // Solo reanuda los que pertenecen al slide activo del carrusel
+                const slideActivo = document.querySelector('.carrusel-slide.activo');
+                if (slideActivo) {
+                    slideActivo.querySelectorAll('video').forEach((v) => v.play().catch(() => {}));
+                }
+            }
+        });
         })();
 
         /* ---- Scroll reveal con Intersection Observer ---- */
@@ -176,9 +208,6 @@
             const bgUrl = wrap.dataset.bg;
             const ofertaFondoUrl = wrap.dataset.ofertaFondo;
             const puntosEls = wrap.querySelectorAll('.queso-punto');
-            // Precargamos la imagen de oferta para conocer su tamaño real
-            // (necesario para calcular cuánto hay que escalarla dentro de
-            // la caja conjunta de los 3 quesos)
             const imgOferta = new Image();
             let ofertaLista = false;
             if (ofertaFondoUrl) {
@@ -209,22 +238,24 @@
                 const borde = p.querySelector('.queso-punto-borde');
                 const flip = p.querySelector('.queso-punto-flip');
                 const reverso = p.querySelector('.queso-punto-reverso');
+                const contornoSvg = p.querySelector('.queso-punto-contorno');
+                const contornoPoligono = p.querySelector('.queso-punto-contorno-linea');
 
-ventana.style.backgroundImage = `url(${bgUrl})`;
+                ventana.style.backgroundImage = `url(${bgUrl})`;
 
-const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
-if (video && p.dataset.ofertaVideo) {
-    video.src = p.dataset.ofertaVideo;
-    if (p.dataset.ofertaPos) {
-        video.style.objectPosition = p.dataset.ofertaPos;
-    }
-}
-const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
-if (reverso) {
-    reverso.classList.toggle('con-descuento', tieneDescuento);
-    reverso.classList.toggle('sin-descuento', !tieneDescuento);
-}
-return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
+                const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
+                if (video && p.dataset.ofertaVideo) {
+                    video.src = p.dataset.ofertaVideo;
+                    if (p.dataset.ofertaPos) {
+                        video.style.objectPosition = p.dataset.ofertaPos;
+                    }
+                }
+                const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
+                if (reverso) {
+                    reverso.classList.toggle('con-descuento', tieneDescuento);
+                    reverso.classList.toggle('sin-descuento', !tieneDescuento);
+                }
+                return { el: p, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobal };
             });
 
             function geometriaCover() {
@@ -262,115 +293,113 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 window.LZ_CONTENEDOR_SIZE = { w: geo.Cw, h: geo.Ch };
                 window.LZ_PERIMETROS = window.LZ_PERIMETROS || [];
                 let uMinX = Infinity, uMaxX = -Infinity, uMinY = Infinity, uMaxY = -Infinity;
-                quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, puntosGlobal }, idx) => {
+                quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobal }, idx) => {
                     try {
-                    const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
-                    window.LZ_PERIMETROS[idx] = puntosPantalla;
+                        const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
+                        window.LZ_PERIMETROS[idx] = puntosPantalla;
 
-                    const clipStr = 'polygon(' +
-                    puntosPantalla.map(([x, y]) => `${x.toFixed(3)}% ${y.toFixed(3)}%`).join(', ') +
-                    ')';
+                        const clipStr = 'polygon(' +
+                            puntosPantalla.map(([x, y]) => `${x.toFixed(3)}% ${y.toFixed(3)}%`).join(', ') +
+                            ')';
 
-                    if (el) el.style.clipPath = clipStr;
-                    if (ventana) ventana.style.clipPath = clipStr;
-                    if (borde) borde.style.clipPath = clipStr;
-                    if (glow) glow.style.clipPath = clipStr;
-                    if (flip) flip.style.clipPath = clipStr;
+                        if (el) el.style.clipPath = clipStr;
+                        if (ventana) ventana.style.clipPath = clipStr;
+                        if (borde) borde.style.clipPath = clipStr;
+                        if (glow) glow.style.clipPath = clipStr;
+                        if (flip) flip.style.clipPath = clipStr;
 
-                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-                    puntosPantalla.forEach(([x, y]) => {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                    });
-                    if (minX < uMinX) uMinX = minX;
-                    if (maxX > uMaxX) uMaxX = maxX;
-                    if (minY < uMinY) uMinY = minY;
-                    if (maxY > uMaxY) uMaxY = maxY;
-                
+                        // Contorno dorado real (stroke), usando los MISMOS
+                        // puntos del recorte pero en px del contenedor, para
+                        // que el <svg> no se deforme con el viewBox.
+                        if (contornoSvg && contornoPoligono) {
+                            contornoSvg.setAttribute('viewBox', `0 0 ${geo.Cw} ${geo.Ch}`);
+                            const puntosPx = puntosPantalla
+                                .map(([xPct, yPct]) => `${(xPct / 100 * geo.Cw).toFixed(2)},${(yPct / 100 * geo.Ch).toFixed(2)}`)
+                                .join(' ');
+                            contornoPoligono.setAttribute('points', puntosPx);
+                        }
 
-                    const centroX = (minX + maxX) / 2;
-                    const centroY = (minY + maxY) / 2;
+                        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                        puntosPantalla.forEach(([x, y]) => {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        });
+                        if (minX < uMinX) uMinX = minX;
+                        if (maxX > uMaxX) uMaxX = maxX;
+                        if (minY < uMinY) uMinY = minY;
+                        if (maxY > uMaxY) uMaxY = maxY;
 
-                    borde.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
-                    el.dataset.centroX = centroX.toFixed(2);
-                    el.dataset.centroY = centroY.toFixed(2);
-                    const ofertaCentro = el.querySelector('.queso-oferta-centro');
-                    if (ofertaCentro) {
-                        const offX = parseFloat(el.dataset.ofertaOffsetX) || 0;
-                        const offY = parseFloat(el.dataset.ofertaOffsetY) || 6;
-                        ofertaCentro.style.left = `${centroX + offX}%`;
-                        ofertaCentro.style.top = `${centroY + offY}%`;
+                        const centroX = (minX + maxX) / 2;
+                        const centroY = (minY + maxY) / 2;
+
+                        borde.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        el.dataset.centroX = centroX.toFixed(2);
+                        el.dataset.centroY = centroY.toFixed(2);
+                        const ofertaCentro = el.querySelector('.queso-oferta-centro');
+                        if (ofertaCentro) {
+                            const offX = parseFloat(el.dataset.ofertaOffsetX) || 0;
+                            const offY = parseFloat(el.dataset.ofertaOffsetY) || 6;
+                            ofertaCentro.style.left = `${centroX + offX}%`;
+                            ofertaCentro.style.top = `${centroY + offY}%`;
+                        }
+
+                    } catch (err) {
+                        console.error('Error recortando un queso:', err);
                     }
+                });
 
-                } catch (err) {
-                    console.error('Error recortando un queso:', err);
+                const infoUnica = document.getElementById('ofertaInfoUnica');
+                if (infoUnica) {
+                    const izquierdaPct = 64;
+                    const arribaPct = 68;
+                    const anchoPct = 20;
+
+                    infoUnica.style.left = `${izquierdaPct}%`;
+                    infoUnica.style.top = `${arribaPct}%`;
+                    infoUnica.style.width = `${anchoPct}%`;
                 }
-            });
-            
-           const infoUnica = document.getElementById('ofertaInfoUnica');
-            if (infoUnica) {
-                // ---- CONTROL MANUAL: ajusta estos 3 números a mano ----
-                const izquierdaPct = 64;
-                const arribaPct = 59;
-                const anchoPct = 25;
 
-                infoUnica.style.left = `${izquierdaPct}%`;
-                infoUnica.style.top = `${arribaPct}%`;
-                infoUnica.style.width = `${anchoPct}%`;
-            }
+                const ruletaSuelta = document.getElementById('ofertaRuletaSuelta');
+                if (ruletaSuelta) {
+                    const ruletaIzquierdaPct = 78;
+                    const ruletaArribaPct = 45;
 
-            const ruletaSuelta = document.getElementById('ofertaRuletaSuelta');
-            if (ruletaSuelta) {
-                // ---- CONTROL MANUAL de la ruleta, totalmente independiente ----
-                const ruletaIzquierdaPct = 78;
-                const ruletaArribaPct = 45;
+                    ruletaSuelta.style.left = `${ruletaIzquierdaPct}%`;
+                    ruletaSuelta.style.top = `${ruletaArribaPct}%`;
+                }
 
-                ruletaSuelta.style.left = `${ruletaIzquierdaPct}%`;
-                ruletaSuelta.style.top = `${ruletaArribaPct}%`;
-            }
+                if (isFinite(uMinX)) {
+                    quesos.forEach(({ video }) => {
+                        if (!video) return;
+                        video.style.left   = uMinX + '%';
+                        video.style.top    = uMinY + '%';
+                        video.style.width  = (uMaxX - uMinX) + '%';
+                        video.style.height = (uMaxY - uMinY) + '%';
+                    });
+                }
 
-            // ---- Posiciona el video "OFERTA DEL DÍA" como UNA sola pieza
-            // continua repartida entre los 3 quesos, igual que hacía la
-            // imagen: los 3 <video> comparten el mismo left/top/width/height
-            // (la caja que envuelve a los 3 quesos juntos) y cada uno se ve
-            // recortado solo por su propio clip-path.
-            if (isFinite(uMinX)) {
-                quesos.forEach(({ video }) => {
-                    if (!video) return;
-                    video.style.left   = uMinX + '%';
-                    video.style.top    = uMinY + '%';
-                    video.style.width  = (uMaxX - uMinX) + '%';
-                    video.style.height = (uMaxY - uMinY) + '%';
-                });
-            }
+                if (isFinite(uMinY)) {
+                    const centro = (uMinY + uMaxY) / 2;
+                    const bandaLibre = (uMaxY - uMinY) * 0.34;
+                    const bandaTop = centro - bandaLibre / 2;
+                    const bandaBottom = centro + bandaLibre / 2;
 
-            // ---- Delineado dorado SOLO arriba y abajo (libre en el centro,
-            // por donde pasa el texto "OFERTA DEL DÍA") ----
-            if (isFinite(uMinY)) {
-                const centro = (uMinY + uMaxY) / 2;
-                // % de la altura total de los 3 quesos que queda LIBRE en el
-                // centro (sin borde). Súbelo si quieres franja libre más
-                // ancha, bájalo si quieres que el borde se acerque más al texto.
-                const bandaLibre = (uMaxY - uMinY) * 0.34;
-                const bandaTop = centro - bandaLibre / 2;
-                const bandaBottom = centro + bandaLibre / 2;
+                    const maskCSS = `linear-gradient(to bottom,
+                        black 0%, black ${bandaTop.toFixed(2)}%,
+                        transparent ${(bandaTop + 4).toFixed(2)}%,
+                        transparent ${(bandaBottom - 4).toFixed(2)}%,
+                        black ${bandaBottom.toFixed(2)}%, black 100%)`;
 
-                const maskCSS = `linear-gradient(to bottom,
-                    black 0%, black ${bandaTop.toFixed(2)}%,
-                    transparent ${(bandaTop + 4).toFixed(2)}%,
-                    transparent ${(bandaBottom - 4).toFixed(2)}%,
-                    black ${bandaBottom.toFixed(2)}%, black 100%)`;
-
-                quesos.forEach(({ borde }) => {
-                    if (!borde) return;
-                    borde.style.maskImage = maskCSS;
-                    borde.style.webkitMaskImage = maskCSS;
-                });
-            }
+                    quesos.forEach(({ borde }) => {
+                        if (!borde) return;
+                        borde.style.maskImage = maskCSS;
+                        borde.style.webkitMaskImage = maskCSS;
+                    });
+                }
             }
             window.addEventListener('resize', actualizar);
             img.addEventListener('load', actualizar);
@@ -379,7 +408,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 new ResizeObserver(actualizar).observe(slide);
             }
         })();
-
 
     (function () {
         const wrap = document.querySelector('.quesos-interactivos');
@@ -393,6 +421,45 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
         const quesosArr = Array.from(wrap.querySelectorAll('.queso-punto'));
         const botonSortearWrap = document.getElementById('botonSortearWrap');
         const botonSortear = document.getElementById('botonSortear');
+
+        // --- Datos reales del premio, inyectados desde el backend (ver punto A) ---
+
+        const tienePremio = wrap.dataset.tienePremio === 'true';
+        const premioProducto = wrap.dataset.premioProducto || '';
+        const premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
+        const premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
+        const premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
+        const premioCodigo = wrap.dataset.premioCodigo || '';
+        const premioImagen = wrap.dataset.premioImagen || '';
+        const urlMarcarMostrado = wrap.dataset.urlMarcarMostrado || '';
+
+        function getCookie(nombre) {
+            let valor = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach((cookie) => {
+                    cookie = cookie.trim();
+                    if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                        valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                    }
+                });
+            }
+            return valor;
+        }
+
+        function marcarPremioMostrado() {
+            if (!urlMarcarMostrado || !premioCodigo) return;
+            fetch(urlMarcarMostrado, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'codigo=' + encodeURIComponent(premioCodigo),
+            }).catch(() => {
+                // silencioso: si falla, en el peor caso el premio sigue "no mostrado"
+                // en la base de datos, pero el cliente ya vio la animación.
+            });
+        }
 
         let vistos = new Set();
         let sorteoHecho = false;
@@ -486,7 +553,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             }
             requestAnimationFrame(paso);
         }
-       function mostrarBotonSortear() {
+        function mostrarBotonSortear() {
             if (botonSortearWrap) botonSortearWrap.classList.add('visible');
         }
 
@@ -497,8 +564,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             ).join('');
         }
 
-        // Versión animada tipo tragamonedas: cada columna de dígitos gira
-        // por varios números al azar antes de frenar en el valor final.
         function generarCintaAnimada(digitoFinal) {
             const pasos = 12;
             let html = '';
@@ -509,7 +574,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             return html;
         }
 
-        function mostrarNumeroConGiro(contenedor, valorFinal, alturaItem = 34) {
+        function mostrarNumeroConGiro(contenedor, valorFinal) {
             const digitos = String(Math.max(0, Math.min(99, valorFinal))).padStart(2, '0').split('');
             contenedor.innerHTML = digitos.map((d) =>
                 `<span class="ruleta-digito"><span class="ruleta-cinta">${generarCintaAnimada(d)}</span></span>`
@@ -518,6 +583,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             const cintas = contenedor.querySelectorAll('.ruleta-cinta');
             cintas.forEach((cinta, idx) => {
                 const totalItems = cinta.children.length;
+                const alturaItem = cinta.children[0].getBoundingClientRect().height || 34;
                 cinta.style.transition = 'none';
                 cinta.style.transform = 'translateY(0)';
                 void cinta.offsetHeight;
@@ -527,70 +593,59 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 });
             });
         }
+        function formatearPrecio(valor) {
+            return '$' + Math.round(valor).toLocaleString('es-CO');
+        }
 
-        /* ---------------------------------------------------------------
-           SORTEO "TIPO RULETA" — enciende el borde dorado de cada queso
-           uno por uno (usa el mismo clip-path real que ya tienen), va
-           saltando cada vez más lento hasta frenar en el ganador. Sin
-           SVG ni trazado: solo la clase .resaltado-sorteo sobre
-           .queso-punto-borde de cada queso.
-        --------------------------------------------------------------- */
         function iniciarSorteo() {
             if (sorteoEnCurso || sorteoHecho) return;
-            const candidatos = quesosArr.filter(q => q.dataset.descuento);
-            if (!candidatos.length) return;
         
-            const ganadorEl = elegirGanadorPonderado(candidatos); // <-- cambio aquí
             sorteoEnCurso = true;
             botonSortear.disabled = true;
             botonSortearWrap.classList.remove('visible');
         
             const ruletaUnica = document.getElementById('ofertaInfoRuleta');
-            const valor = parseInt(ganadorEl.dataset.descuento, 10);
+            // El % ya no se inventa aquí: viene decidido por el backend (DescuentoAsignado).
+            mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
+            setTimeout(() => mostrarFelicidades(), 2600);
+        }
         
-            mostrarNumeroConGiro(ruletaUnica, valor);
-            setTimeout(() => mostrarFelicidades(ganadorEl, valor), 2600);
-        }
-
-        function elegirGanadorPonderado(candidatos) {
-            // Cada queso pesa según su ratio de stock (más stock sobrante = más
-            // probabilidad de "ganar" el sorteo). Mínimo 0.1 para que ninguno
-            // quede en 0% de probabilidad, aunque tenga stock justo.
-            const pesos = candidatos.map(c => Math.max(parseFloat(c.dataset.pesoStock) || 1, 0.1));
-            const total = pesos.reduce((a, b) => a + b, 0);
-            let r = Math.random() * total;
-            for (let i = 0; i < candidatos.length; i++) {
-                r -= pesos[i];
-                if (r <= 0) return candidatos[i];
-            }
-            return candidatos[candidatos.length - 1];
-        }
-
-        function mostrarFelicidades(ganadorEl, valor) {
+        function mostrarFelicidades() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             const subtitulo = document.getElementById('ofertaRevealSubtitulo');
-            if (subtitulo) subtitulo.textContent = `Tienes ${valor}% de descuento`;
+            const badge = document.getElementById('ofertaRevealBadge');
+            const precioAnterior = document.getElementById('ofertaRevealPrecioAnterior');
+            const precioNuevo = document.getElementById('ofertaRevealPrecioNuevo');
+            const imagenReveal = document.getElementById('ofertaRevealImagen');
+
+            if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
+            if (badge) badge.textContent = `-${premioPorcentaje}%`;
+            if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
+            if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
+            if (imagenReveal && premioImagen) imagenReveal.src = premioImagen;
+
             if (overlay) overlay.classList.add('visible');
             lanzarConfetti(90);
 
-            setTimeout(() => cerrarReveal(ganadorEl, valor), 2800);
+            setTimeout(() => cerrarReveal(), 2800);
         }
-
-        function cerrarReveal(ganadorEl, valor) {
+        
+        function cerrarReveal() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             if (overlay) overlay.classList.remove('visible');
-
+        
             sorteoEnCurso = false;
             sorteoHecho = true;
             wrap.classList.add('sorteo-hecho');
-            guardarOfertaDelDia(valor);
-
+            guardarOfertaDelDia(premioPorcentaje);
+            marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
+        
             quesosArr.forEach((q) => {
                 q.classList.remove('volteado');
                 pausarVideoQueso(q);
             });
             wrap.classList.remove('todos-encendidos');
-
+        
             let sumX = 0, sumY = 0, n = 0;
             quesosArr.forEach((q) => {
                 sumX += parseFloat(q.dataset.centroX) || 50;
@@ -599,8 +654,8 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             });
             const cx = n ? sumX / n : 50;
             const cy = n ? sumY / n : 50;
-
-            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valor), 500);
+        
+            setTimeout(() => volarBrilloHaciaBadge(cx, cy, premioPorcentaje), 500);
         }
 
         function volarBrilloHaciaBadge(cx, cy, valor) {
@@ -630,33 +685,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 ruedaWrap.classList.add('visible', 'aparicion-pop');
             });
         }
-        function volarBrilloHaciaBadge(cx, cy, valor) {
-            if (!ruedaWrap) return;
-            const slide = wrap.closest('.slide-imagen');
 
-            const spark = document.createElement('span');
-            spark.className = 'brillo-volador';
-            spark.style.left = cx + '%';
-            spark.style.top = cy + '%';
-            slide.appendChild(spark);
-
-            const destino = ruedaWrap.getBoundingClientRect();
-            const origenSlide = slide.getBoundingClientRect();
-            const dx = (destino.left + destino.width / 2) - (origenSlide.left + (cx / 100) * origenSlide.width);
-            const dy = (destino.top + destino.height / 2) - (origenSlide.top + (cy / 100) * origenSlide.height);
-
-            spark.style.setProperty('--dx', dx + 'px');
-            spark.style.setProperty('--dy', dy + 'px');
-
-            requestAnimationFrame(() => spark.classList.add('volando'));
-
-            spark.addEventListener('animationend', () => {
-                spark.remove();
-                const texto = ruedaWrap.querySelector('.rueda-descuento');
-                if (texto) texto.textContent = `${valor}% de descuento hoy`;
-                ruedaWrap.classList.add('visible', 'aparicion-pop');
-            });
-        }
         botonSortear && botonSortear.addEventListener('click', () => {
             window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
             iniciarSorteo();
@@ -674,7 +703,7 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 const angulo = (Math.PI * 2 * i) / cantidad + (Math.random() * 0.4 - 0.2);
                 const distancia = 40 + Math.random() * 50;
                 const fx = Math.cos(angulo) * distancia;
-                const fy = Math.sin(angulo) * distancia - 10; // ligero sesgo hacia arriba
+                const fy = Math.sin(angulo) * distancia - 10;
 
                 frag.style.setProperty('--fx', fx + 'px');
                 frag.style.setProperty('--fy', fy + 'px');
@@ -749,9 +778,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                 bannerTimeout = setTimeout(() => banner.classList.remove('visible'), 4000);
             }
 
-            // Precarga los 3 videos de oferta ahora, para que cuando el
-            // usuario encienda los 3 quesos ya estén listos y no haya
-            // retraso al reproducirlos.
             quesosArr.forEach((q) => {
                 const video = obtenerVideo(q);
                 if (video && video.readyState < 2) {
@@ -766,8 +792,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
             banner.classList.remove('visible');
 
             if (sorteoHecho) {
-                // La oferta ya se sorteó y sigue vigente (24h): los quesos
-                // y el aviso de la esquina se quedan tal cual, sin resetear.
                 boton.classList.remove('volando', 'reventado');
                 return;
             }
@@ -837,7 +861,6 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                     vistos.add(p);
                 } else {
                     vistos.delete(p);
-                    // Si se apaga uno, se oculta el video/reverso en los 3 a la vez
                     quesosArr.forEach((q) => {
                         q.classList.remove('volteado');
                         pausarVideoQueso(q);
@@ -846,17 +869,15 @@ return { el: p, ventana, borde, glow, flip, video, reverso, puntosGlobal };
                     botonSortearWrap && botonSortearWrap.classList.remove('visible');
                 }
 
-                // Solo cuando los 3 están encendidos a la vez, se revela el
-                // video en los 3 quesos AL MISMO TIEMPO, con transición.
                 if (vistos.size === quesosArr.length && !sorteoHecho) {
                     quesosArr.forEach((q) => q.classList.add('volteado'));
                     wrap.classList.add('todos-encendidos');
                     reproducirTodosSincronizados();
-
+                
                     const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
                     const ruletaUnica = document.getElementById('ofertaInfoRuleta');
                     if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
-                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, 50);
+                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, premioPorcentaje);
 
                     mostrarBotonSortear();
                 } else {

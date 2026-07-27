@@ -2,123 +2,429 @@
 {% load static %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <style>
-body{ background:#f4f7fc; font-family:'Segoe UI',sans-serif; }
+
+/*==========================
+        FONDO MODAL
+==========================*/
 
 .overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.45);
-    display:flex; justify-content:center; align-items:center;
-    padding:25px; z-index:9999;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    z-index:9999;
 }
 
+/*==========================
+      CONTENEDOR MODAL
+==========================*/
+
 .modal-formulario{
-    width:100%; max-width:520px; max-height:95vh; overflow-y:auto;
-    border-radius:20px; animation:aparecer .35s ease;
+    width:100%;
+    max-width:760px;
+    max-height:95vh;
+    overflow-y:auto;
+    border-radius:20px;
+    animation:aparecer .35s ease;
 }
+
+/*==========================
+        ENCABEZADO
+==========================*/
 
 .header-form{
     background:linear-gradient(135deg,#192987,#3556ff);
-    color:white; padding:14px 30px; border-radius:20px 20px 0 0;
+    color:white;
+    padding:14px 30px;
+    border-radius:20px 20px 0 0;
     box-shadow:0 8px 20px rgba(0,0,0,.15);
 }
-.header-form h2{ margin:0; font-size:22px; font-weight:700; }
-.header-form p{ margin-top:3px; margin-bottom:0; font-size:13px; opacity:.9; }
+
+.header-form h2{
+    margin:0;
+    font-size:22px;
+    font-weight:700;
+}
+
+.header-form p{
+    margin-top:3px;
+    margin-bottom:0;
+    font-size:13px;
+    opacity:.9;
+}
+
+/*==========================
+        TARJETA
+==========================*/
 
 .card-form{
-    background:white; padding:20px 30px; border-radius:0 0 20px 20px;
+    background:white;
+    padding:20px 30px;
+    border-radius:0 0 20px 20px;
     box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
-label{ font-weight:600; color:#192987; margin-bottom:4px; font-size:14px; }
+/*==========================
+        CAMPOS
+==========================*/
 
-input, select, textarea{
-    width:100%; height:36px; border:1px solid #d8d8d8; border-radius:8px;
-    padding:6px 12px; transition:.3s; font-size:13px; background:#fff;
+.grupo-campo{
+    margin-bottom:18px;
 }
-input:focus{ outline:none; border-color:#3556ff; box-shadow:0 0 10px rgba(53,86,255,.20); }
+
+.grupo-campo label{
+    font-weight:600;
+    font-size:14px;
+    color:#192987;
+    margin-bottom:4px;
+    display:block;
+}
+
+.texto-ayuda{
+    font-size:13px;
+    color:#777;
+    margin-top:5px;
+}
+
+.fila-doble{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px 22px;
+}
+
+/*==========================
+         INPUTS
+==========================*/
+
+input,
+select,
+textarea{
+    width:100%;
+    height:36px;
+    border:1px solid #d8d8d8;
+    border-radius:8px;
+    padding:6px 12px;
+    transition:.3s;
+    font-size:13px;
+    background:#fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#3556ff;
+    box-shadow:0 0 10px rgba(53,86,255,.20);
+}
+
+/*==========================
+      LISTA DE PRODUCTOS
+==========================*/
+
+.lista-productos-checkbox{
+    max-height:200px;
+    overflow-y:auto;
+    border:1px solid #d8d8d8;
+    border-radius:8px;
+    padding:10px 14px;
+}
+
+.lista-productos-checkbox label{
+    font-weight:400;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+    color:#333;
+    font-size:14px;
+}
+
+input[type=checkbox]{
+    width:18px;
+    height:18px;
+    margin-top:4px;
+    box-shadow:none;
+}
+
+.form-check-input:checked{
+    background-color:#3556ff;
+    border-color:#3556ff;
+}
+
+/*==========================
+        BOTONES
+==========================*/
 
 .botones{
-    display:flex; justify-content:flex-end; gap:12px; margin-top:18px;
-    background:#f4f7fc; border:1px solid rgba(2,44,99,.08);
-    border-radius:12px; padding:10px 16px;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:18px;
+    background:#f4f7fc;
+    border:1px solid rgba(2,44,99,.08);
+    border-radius:12px;
+    padding:10px 16px;
 }
 
 .btn-volver{
-    background:#6c757d; color:white; padding:8px 18px; font-size:14px;
-    border-radius:8px; text-decoration:none; transition:.3s;
+    background:#6c757d;
+    color:white;
+    padding:8px 18px;
+    font-size:14px;
+    border-radius:8px;
+    text-decoration:none;
+    transition:.3s;
+    border:none;
 }
-.btn-volver:hover{ background:#555d65; color:white; transform:translateY(-2px); }
+
+.btn-volver:hover{
+    background:#555d65;
+    color:white;
+    transform:translateY(-2px);
+}
 
 .btn-guardar{
-    background:#192987; color:white; border:none; padding:8px 18px;
-    font-size:14px; border-radius:8px; transition:.3s;
+    background:#192987;
+    color:white;
+    border:none;
+    padding:8px 18px;
+    font-size:14px;
+    border-radius:8px;
+    transition:.3s;
 }
-.btn-guardar:hover{ background:#101d64; color:white; transform:translateY(-2px); }
 
-.errorlist{ list-style:none; margin:5px 0 0; padding:0; color:#dc3545; font-size:14px; }
-.helptext{ font-size:13px; color:#777; margin-top:5px; }
-
-.info-producto{
-    display:flex; align-items:center; gap:12px;
-    background:#eef2ff; border:1px solid rgba(25,41,135,.1);
-    border-radius:12px; padding:10px 14px; margin-bottom:16px;
+.btn-guardar:hover{
+    background:#101d64;
+    color:white;
+    transform:translateY(-2px);
 }
-.info-producto img{ width:44px; height:44px; object-fit:cover; border-radius:8px; }
-.info-producto strong{ color:#192987; }
-.info-producto span{ font-size:12px; color:#5b6472; }
+
+/*==========================
+        ERRORES
+==========================*/
+
+.errorlist{
+    list-style:none;
+    padding:0;
+    margin:5px 0 0;
+    color:#dc3545;
+    font-size:14px;
+}
+
+/*==========================
+      SCROLL MODERNO
+==========================*/
+
+.modal-formulario::-webkit-scrollbar{
+    width:8px;
+}
+
+.modal-formulario::-webkit-scrollbar-thumb{
+    background:#3556ff;
+    border-radius:20px;
+}
+
+/*==========================
+       ANIMACIÓN
+==========================*/
 
 @keyframes aparecer{
-    from{ opacity:0; transform:translateY(-30px) scale(.95); }
-    to{ opacity:1; transform:translateY(0) scale(1); }
+
+    from{
+        opacity:0;
+        transform:translateY(-30px) scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
+
+/*==========================
+       RESPONSIVE
+==========================*/
+
+@media(max-width:992px){
+
+    .modal-formulario{
+        max-width:95%;
+    }
+
+    .fila-doble{
+        grid-template-columns:1fr;
+    }
+
+    .header-form{
+        text-align:center;
+    }
+
+    .header-form h2{
+        font-size:25px;
+    }
+
 }
 
 @media(max-width:576px){
-    .overlay{ padding:10px; }
-    .card-form{ padding:20px; }
-    .header-form{ padding:20px; }
-    .botones{ flex-direction:column; }
-    .botones a, .botones button{ width:100%; }
+
+    .overlay{
+        padding:10px;
+    }
+
+    .card-form{
+        padding:20px;
+    }
+
+    .header-form{
+        padding:20px;
+    }
+
+    .botones{
+        flex-direction:column;
+    }
+
+    .botones a,
+    .botones button{
+        width:100%;
+        text-align:center;
+    }
+
 }
+
 </style>
 
+{% if messages %}
+    <div class="overlay" style="position:fixed; z-index:10000; background:transparent; align-items:flex-start; pointer-events:none;">
+        <div style="max-width:760px; width:100%; margin-top:20px; pointer-events:auto;">
+            {% for m in messages %}
+                <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
 <div class="overlay">
+
     <div class="modal-formulario">
 
         <div class="header-form">
-            <h2><i class="bi bi-tag-fill"></i> Aplicar Descuento</h2>
-            <p>Define el porcentaje y la vigencia de la oferta.</p>
+            <h2>
+                <i class="bi bi-tags-fill"></i>
+                {% if modo == 'crear' %}Nueva Campaña de Descuento{% else %}Editar Campaña{% endif %}
+            </h2>
+            <p>Define a quién y cómo se le ofrecerá el descuento tipo lotería.</p>
         </div>
 
         <div class="card-form">
 
-            <div class="info-producto">
-                {% if producto.imagen %}
-                    <img src="{{ producto.imagen.url }}">
-                {% else %}
-                    <img src="{% static 'img/no-image.png' %}">
-                {% endif %}
-                <div>
-                    <strong>{{ producto.nombre }}</strong><br>
-                    <span>$ {{ producto.precio }} · Stock {{ producto.stock_actual }}</span>
-                </div>
-            </div>
-
-            <form method="POST">
+            <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                <div class="grupo-campo">
+                    <label for="{{ form.nombre.id_for_label }}">Nombre de la campaña</label>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </div>
+
+                <div class="grupo-campo">
+                    <label>Quesos/productos incluidos</label>
+                    <div class="lista-productos-checkbox">
+                        {{ form.productos }}
+                    </div>
+                    {{ form.productos.errors }}
+                    <p class="texto-ayuda">Cada producto seleccionado tendrá su propio sorteo de clientes.</p>
+                </div>
+
+                <div class="fila-doble">
+                    <div class="grupo-campo">
+                        <label for="{{ form.porcentaje_descuento.id_for_label }}">Porcentaje de descuento (%)</label>
+                        {{ form.porcentaje_descuento }}
+                        {{ form.porcentaje_descuento.errors }}
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="{{ form.frecuencia.id_for_label }}">Frecuencia</label>
+                        {{ form.frecuencia }}
+                        {{ form.frecuencia.errors }}
+                    </div>
+                </div>
+
+                <div class="fila-doble">
+                    <div class="grupo-campo">
+                        <label for="{{ form.dias_sin_compra.id_for_label }}">Días sin comprar el producto</label>
+                        {{ form.dias_sin_compra }}
+                        {{ form.dias_sin_compra.errors }}
+                        <p class="texto-ayuda">El cliente califica si no ha comprado este producto en estos días.</p>
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="{{ form.dias_validez_premio.id_for_label }}">Días de validez del premio</label>
+                        {{ form.dias_validez_premio }}
+                        {{ form.dias_validez_premio.errors }}
+                    </div>
+                </div>
+
+                <div class="fila-doble">
+                    <div class="grupo-campo">
+                        <label for="{{ form.cantidad_clientes.id_for_label }}">Tope de clientes (número)</label>
+                        {{ form.cantidad_clientes }}
+                        {{ form.cantidad_clientes.errors }}
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="{{ form.porcentaje_maximo_clientes.id_for_label }}">Tope de clientes (% de la base)</label>
+                        {{ form.porcentaje_maximo_clientes }}
+                        {{ form.porcentaje_maximo_clientes.errors }}
+                        <p class="texto-ayuda">Se usa el menor entre este % y el número de arriba.</p>
+                    </div>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="{{ form.stock_reservado_no_ofertable.id_for_label }}">Stock reservado (no ofertable)</label>
+                    {{ form.stock_reservado_no_ofertable }}
+                    {{ form.stock_reservado_no_ofertable.errors }}
+                    <p class="texto-ayuda">Unidades extra que nunca se comprometen en la oferta, además del stock mínimo del producto.</p>
+                </div>
+
+                <div class="fila-doble">
+                    <div class="grupo-campo">
+                        <label for="{{ form.fecha_inicio.id_for_label }}">Fecha de inicio</label>
+                        {{ form.fecha_inicio }}
+                        {{ form.fecha_inicio.errors }}
+                    </div>
+                    <div class="grupo-campo">
+                        <label for="{{ form.fecha_fin.id_for_label }}">Fecha de fin (opcional)</label>
+                        {{ form.fecha_fin }}
+                        {{ form.fecha_fin.errors }}
+                    </div>
+                </div>
+
+                <div class="grupo-campo form-check form-switch">
+                    {{ form.activo }}
+                    <label class="form-check-label" for="{{ form.activo.id_for_label }}">Campaña activa</label>
+                </div>
 
                 <div class="botones">
-                    <a href="{% url 'listar_descuentos' %}" class="btn btn-volver">
-                        <i class="bi bi-arrow-left"></i> Volver
+                    <a href="{% url 'panel_descuentos' %}" class="btn btn-volver">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
                     </a>
                     <button type="submit" class="btn btn-guardar">
-                        <i class="bi bi-check-circle-fill"></i> Aplicar Descuento
+                        <i class="bi bi-check-circle-fill"></i>
+                        {% if modo == 'crear' %}Crear campaña{% else %}Guardar cambios{% endif %}
                     </button>
                 </div>
+
             </form>
 
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}

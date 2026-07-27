@@ -1,0 +1,7 @@
+{% block content %}
+<div class="container mt-5 text-center" style="max-width: 450px;">
+    <h2 class="mb-4 text-danger">Enlace inválido o expirado</h2>
+    <p>El enlace de recuperación de contraseña ya no es válido. Esto puede deberse a que ya fue usado o a que expiró.</p>
+    <a href="{% url 'solicitar_reset_password' %}" class="btn btn-primary">Solicitar un nuevo enlace</a>
+</div>
+{% endblock %}

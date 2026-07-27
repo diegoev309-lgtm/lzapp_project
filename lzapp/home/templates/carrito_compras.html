@@ -503,17 +503,126 @@
                 right: 300px;
             }
         }
-    
+        
+
+        /* ============================================================
+           RESPONSIVE ADICIONAL — carrito_compras.html
+           ============================================================ */
+
+        /* --- Íconos de la derecha del navbar (perfil + carrito):
+           en mobile conviven con el botón hamburguesa; sin esto quedan
+           muy pegados o se montan sobre el toggler en pantallas angostas --- */
+        @media (max-width: 991px) {
+            #mainNav .container {
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+            #mainNav ul.justify-content-end {
+                gap: 4px !important;
+                margin-left: auto;
+            }
+            #mainNav ul.justify-content-end .nav-link {
+                padding: 0.25rem !important;
+            }
+            #mainNav .navbar-brand {
+                font-size: 1.3rem;
+            }
+            #mainNav .navbar-brand img {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* --- Contenedor de la sección de productos: menos padding lateral
+           en pantallas chicas, para no robarle ancho útil a las tarjetas --- */
+        @media (max-width: 576px) {
+            .seccion-productos .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .seccion-productos {
+                padding: 1.5rem 0 2rem;
+            }
+        }
+
+        /* --- Buscador: en pantallas muy angostas se apila (input arriba,
+           botón "Buscar" abajo) en vez de comprimirse hasta ilegible --- */
+        @media (max-width: 480px) {
+            .buscador-productos {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+            .buscador-input {
+                padding: 0.85rem 1.2rem;
+            }
+            .buscador-icono {
+                left: 16px;
+            }
+            .buscador-btn {
+                padding: 0.7rem 1rem;
+                justify-content: center;
+                border-radius: 0 0 18px 18px;
+            }
+        }
+
+        /* --- Dropdown de perfil: en mobile puede salirse de pantalla por
+           la derecha si el body ya tiene overflow ajustado por el carrito --- */
+        @media (max-width: 480px) {
+            .dropdown-menu-end {
+                right: 0;
+                left: auto;
+                min-width: 180px;
+            }
+        }
+
+        /* ============================================================
+           FIX 1 — El navbar es fixed-top y no ocupa espacio en el flujo:
+           sin este padding-top, el contenido queda tapado debajo de él.
+           ============================================================ */
+        .seccion-productos {
+            padding-top: 100px;
+        }
+
+        @media (max-width: 991px) {
+            .seccion-productos {
+                padding-top: 90px;
+            }
+        }
+
+        /* ============================================================
+           FIX 2 — Footer pegado abajo (sticky footer) cuando hay poco
+           contenido, sin importar cuántos productos se estén mostrando.
+           El body se convierte en columna flex; la sección de productos
+           crece para llenar el espacio sobrante y empuja el footer al
+           fondo real de la pantalla.
+           ============================================================ */
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .seccion-productos {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
     </style>
 </head>
-<body>
+<body class="pagina-carrito">
     {% include 'carrito/widget.html' %}
 
     <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
     <header>
         <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{% url 'client' %}">
                     <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
                     LzApp
                 </a>
@@ -526,9 +635,9 @@
 
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul class="nav">
-                        <li class="nav-item"><a class="nav-link" href="#nosotros">Quiénes somos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#nosotros">Quiénes somos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#productos">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#contacto">Contacto</a></li>
                     </ul>
                 </div>
 
@@ -800,21 +909,23 @@
                 `;
             }
         
-            function renderLista(data) {
-                const productos = data.productos || [];
-                const query = data.query || '';
-            
+        function renderLista(data) {
+            const productos = data.productos || [];
+            const query = data.query || '';
+        
+            if (infoResultados) {
                 if (query) {
                     infoResultados.style.display = '';
-                    infoQuery.textContent = query;
-                    infoCantidad.textContent = productos.length;
+                    if (infoQuery) infoQuery.textContent = query;
+                    if (infoCantidad) infoCantidad.textContent = productos.length;
                 } else {
                     infoResultados.style.display = 'none';
                 }
-            
-                if (contador) {
-                    contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
-                }
+            }
+        
+            if (contador) {
+                contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
+            }
             
                 if (productos.length === 0) {
                     lista.innerHTML = `

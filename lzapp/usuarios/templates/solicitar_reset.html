@@ -1,0 +1,27 @@
+
+
+{% block content %}
+<div class="container mt-5" style="max-width: 450px;">
+    <h2 class="mb-4">Recuperar contraseña</h2>
+    <p class="text-muted">Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Enviar enlace de recuperación</button>
+    </form>
+
+    <p class="mt-3 text-center">
+        <a href="{% url 'login' %}">Volver al inicio de sesión</a>
+    </p>
+</div>
+{% endblock %}

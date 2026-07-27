@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'home/css/carrito_compras.css' %}">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
     {% load humanize %}
 </head>
@@ -132,7 +131,17 @@
                         <img src="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
                         <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
                         <!--SECCION DE QUESOS INTERACTIVOS-->
-                        <div class="quesos-interactivos" data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}">
+                        <div class="quesos-interactivos"
+                            data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
+                            data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
+                            data-tiene-premio="{% if premio_activo %}true{% else %}false{% endif %}"
+                            data-premio-producto="{{ premio_activo.producto.nombre|default:'' }}"
+                            data-premio-porcentaje="{{ premio_activo.campana.porcentaje_descuento|default:'0' }}"
+                            data-premio-precio-original="{{ premio_activo.precio_original|default:'0' }}"
+                            data-premio-precio-descuento="{{ premio_activo.precio_con_descuento|default:'0' }}"
+                            data-premio-codigo="{{ premio_activo.codigo|default:'' }}"
+                            data-url-marcar-mostrado="{% url 'marcar_premio_mostrado' %}"
+                            data-premio-imagen="{% if premio_activo.producto.imagen %}{{ premio_activo.producto.imagen.url }}{% endif %}">
 
                             <!-- Queso 1: el oscuro/tostado de la izquierda (conectado a datos reales) -->
                             {% with p=productos_oferta.0 %}
@@ -260,7 +269,7 @@
                             </div>
                         </div>
 
-                        <div class="oferta-globo-wrap" id="ofertaGloboWrap">
+                        <div class="oferta-globo-wrap" id="ofertaGloboWrap" {% if not premio_activo %}style="display:none;"{% endif %}>
                             <div class="globo-fragmentos" id="globoFragmentos"></div>
                             <div class="globo-indicador" id="globoIndicador">
                             <i class="bi bi-hand-index-thumb"></i>
@@ -290,7 +299,7 @@
                             <div class="oferta-reveal-tarjeta">
                                 <div class="oferta-reveal-queso-wrap">
                                     <img src="{% static 'home/media/fb36d63f777712b60e871eaefa443eb2bf3b3515 (1).png' %}"
-                                        alt="Queso en oferta" class="oferta-reveal-queso">
+                                        alt="Queso en oferta" class="oferta-reveal-queso" id="ofertaRevealImagen">
                                     <span class="oferta-reveal-badge" id="ofertaRevealBadge">-50%</span>
                                 </div>
                                 <strong class="oferta-reveal-titulo">¡Felicidades!</strong>
@@ -622,6 +631,39 @@
                 </p>
 
                 <div class="row g-3" id="listaProductos">
+                    {% if premio_activo %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                            <span class="premio-cinta-mini">TU PREMIO</span>
+                            <div class="producto-img-wrapper">
+                                <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
+                                {% if premio_activo.producto.imagen %}
+                                    <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
+                                {% else %}
+                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-stars"></i> Premio de la lotería
+                                </div>
+                                <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
+                                <p class="producto-descripcion">
+                                    Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
+                                </p>
+                                <p class="precio">
+                                    $ {{ premio_activo.precio_con_descuento }}
+                                    <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
+                                    <i class="bi bi-gift-fill"></i> Reclamar premio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     {% for i in productos %}
                     <div class="col-lg-3 col-md-6">
                         <div class="card producto-card producto-card--vertical h-100">
@@ -1220,6 +1262,45 @@
         const botonSortearWrap = document.getElementById('botonSortearWrap');
         const botonSortear = document.getElementById('botonSortear');
 
+        // --- Datos reales del premio, inyectados desde el backend (ver punto A) ---
+
+        const tienePremio = wrap.dataset.tienePremio === 'true';
+        const premioProducto = wrap.dataset.premioProducto || '';
+        const premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
+        const premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
+        const premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
+        const premioCodigo = wrap.dataset.premioCodigo || '';
+        const premioImagen = wrap.dataset.premioImagen || '';
+        const urlMarcarMostrado = wrap.dataset.urlMarcarMostrado || '';
+
+        function getCookie(nombre) {
+            let valor = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach((cookie) => {
+                    cookie = cookie.trim();
+                    if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                        valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                    }
+                });
+            }
+            return valor;
+        }
+
+        function marcarPremioMostrado() {
+            if (!urlMarcarMostrado || !premioCodigo) return;
+            fetch(urlMarcarMostrado, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'codigo=' + encodeURIComponent(premioCodigo),
+            }).catch(() => {
+                // silencioso: si falla, en el peor caso el premio sigue "no mostrado"
+                // en la base de datos, pero el cliente ya vio la animación.
+            });
+        }
+
         let vistos = new Set();
         let sorteoHecho = false;
         let sorteoEnCurso = false;
@@ -1352,77 +1433,59 @@
                 });
             });
         }
-
-        function iniciarSorteo() {
-            if (sorteoEnCurso || sorteoHecho) return;
-            const candidatos = quesosArr.filter(q => q.dataset.descuento);
-            if (!candidatos.length) return;
-
-            const ganadorEl = elegirGanadorPonderado(candidatos);
-            sorteoEnCurso = true;
-            botonSortear.disabled = true;
-            botonSortearWrap.classList.remove('visible');
-
-            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
-            const valor = parseInt(ganadorEl.dataset.descuento, 10);
-
-            mostrarNumeroConGiro(ruletaUnica, valor);
-            setTimeout(() => mostrarFelicidades(ganadorEl, valor), 2600);
-        }
-
-        function elegirGanadorPonderado(candidatos) {
-            const pesos = candidatos.map(c => Math.max(parseFloat(c.dataset.pesoStock) || 1, 0.1));
-            const total = pesos.reduce((a, b) => a + b, 0);
-            let r = Math.random() * total;
-            for (let i = 0; i < candidatos.length; i++) {
-                r -= pesos[i];
-                if (r <= 0) return candidatos[i];
-            }
-            return candidatos[candidatos.length - 1];
-        }
-
-        // Precio base de referencia para calcular el "antes/después".
-        const PRECIO_BASE_OFERTA = 12000;
-
         function formatearPrecio(valor) {
             return '$' + Math.round(valor).toLocaleString('es-CO');
         }
 
-        function mostrarFelicidades(ganadorEl, valor) {
+        function iniciarSorteo() {
+            if (sorteoEnCurso || sorteoHecho) return;
+        
+            sorteoEnCurso = true;
+            botonSortear.disabled = true;
+            botonSortearWrap.classList.remove('visible');
+        
+            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+            // El % ya no se inventa aquí: viene decidido por el backend (DescuentoAsignado).
+            mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
+            setTimeout(() => mostrarFelicidades(), 2600);
+        }
+        
+        function mostrarFelicidades() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             const subtitulo = document.getElementById('ofertaRevealSubtitulo');
             const badge = document.getElementById('ofertaRevealBadge');
             const precioAnterior = document.getElementById('ofertaRevealPrecioAnterior');
             const precioNuevo = document.getElementById('ofertaRevealPrecioNuevo');
+            const imagenReveal = document.getElementById('ofertaRevealImagen');
 
-            if (subtitulo) subtitulo.textContent = `Tienes ${valor}% de descuento`;
-            if (badge) badge.textContent = `-${valor}%`;
-
-            const precioFinal = PRECIO_BASE_OFERTA * (1 - valor / 100);
-            if (precioAnterior) precioAnterior.textContent = formatearPrecio(PRECIO_BASE_OFERTA);
-            if (precioNuevo) precioNuevo.textContent = formatearPrecio(precioFinal);
+            if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
+            if (badge) badge.textContent = `-${premioPorcentaje}%`;
+            if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
+            if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
+            if (imagenReveal && premioImagen) imagenReveal.src = premioImagen;
 
             if (overlay) overlay.classList.add('visible');
             lanzarConfetti(90);
 
-            setTimeout(() => cerrarReveal(ganadorEl, valor), 2800);
+            setTimeout(() => cerrarReveal(), 2800);
         }
-
-        function cerrarReveal(ganadorEl, valor) {
+        
+        function cerrarReveal() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             if (overlay) overlay.classList.remove('visible');
-
+        
             sorteoEnCurso = false;
             sorteoHecho = true;
             wrap.classList.add('sorteo-hecho');
-            guardarOfertaDelDia(valor);
-
+            guardarOfertaDelDia(premioPorcentaje);
+            marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
+        
             quesosArr.forEach((q) => {
                 q.classList.remove('volteado');
                 pausarVideoQueso(q);
             });
             wrap.classList.remove('todos-encendidos');
-
+        
             let sumX = 0, sumY = 0, n = 0;
             quesosArr.forEach((q) => {
                 sumX += parseFloat(q.dataset.centroX) || 50;
@@ -1431,8 +1494,8 @@
             });
             const cx = n ? sumX / n : 50;
             const cy = n ? sumY / n : 50;
-
-            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valor), 500);
+        
+            setTimeout(() => volarBrilloHaciaBadge(cx, cy, premioPorcentaje), 500);
         }
 
         function volarBrilloHaciaBadge(cx, cy, valor) {
@@ -1650,11 +1713,11 @@
                     quesosArr.forEach((q) => q.classList.add('volteado'));
                     wrap.classList.add('todos-encendidos');
                     reproducirTodosSincronizados();
-
+                
                     const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
                     const ruletaUnica = document.getElementById('ofertaInfoRuleta');
                     if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
-                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, 50);
+                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, premioPorcentaje);
 
                     mostrarBotonSortear();
                 } else {

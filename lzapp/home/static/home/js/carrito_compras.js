@@ -1,4 +1,4 @@
-        document.querySelectorAll('.favorito').forEach(btn => {
+document.querySelectorAll('.favorito').forEach(btn => {
             btn.addEventListener('click', () => {
                 btn.classList.toggle('activo');
                 const icono = btn.querySelector('i');
@@ -84,21 +84,23 @@
                 `;
             }
         
-            function renderLista(data) {
-                const productos = data.productos || [];
-                const query = data.query || '';
-            
+        function renderLista(data) {
+            const productos = data.productos || [];
+            const query = data.query || '';
+        
+            if (infoResultados) {
                 if (query) {
                     infoResultados.style.display = '';
-                    infoQuery.textContent = query;
-                    infoCantidad.textContent = productos.length;
+                    if (infoQuery) infoQuery.textContent = query;
+                    if (infoCantidad) infoCantidad.textContent = productos.length;
                 } else {
                     infoResultados.style.display = 'none';
                 }
-            
-                if (contador) {
-                    contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
-                }
+            }
+        
+            if (contador) {
+                contador.textContent = `${productos.length} Producto${productos.length === 1 ? '' : 's'}`;
+            }
             
                 if (productos.length === 0) {
                     lista.innerHTML = `

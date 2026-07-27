@@ -814,56 +814,227 @@ HERO — escena 3D animada (slide 1 del carrusel)
     box-shadow: 0 24px 60px rgba(2, 44, 99, 0.15);
 }
 
-.producto-card-img-wrapper { overflow: hidden; }
-
-.producto-card-imagen {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-}
-
-.producto-card:hover .producto-card-imagen { transform: scale(1.06); }
-
-.producto-card-body { padding: 1.5rem; }
-
-.producto-tag {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    background: var(--azul-claro);
-    color: var(--azul-principal);
-    padding: 0.25rem 0.8rem;
-    border-radius: 50px;
-    margin-bottom: 0.75rem;
-}
-
-.producto-nombre {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--azul-profundo);
-    margin-bottom: 0.5rem;
-}
-
 .producto-descripcion {
     font-size: 0.9rem;
     color: var(--gris-texto);
     line-height: 1.65;
 }
 
-.producto-linea {
-    width: 40px;
-    height: 3px;
-    background: var(--dorado);
-    border-radius: 2px;
-    margin: 1rem 0;
-    transition: width var(--transition);
-}
-
 .producto-card:hover .producto-linea { width: 80px; }
 
+/* ============================================================
+   TARJETA DE PRODUCTO — piezas compartidas por HOME y CARRITO.
+   El layout general (vertical en el home, horizontal en el
+   carrito) lo define cada página en su propia sección más abajo.
+   ============================================================ */
+
+.producto-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: var(--gris-claro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.imagen-producto {
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 14px;
+}
+
+.badge-stock {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 5;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    background: var(--blanco);
+    box-shadow: 0 4px 10px rgba(2, 44, 99, 0.12);
+}
+
+.badge-stock.disponible { color: var(--azul-principal); }
+.badge-stock.bajo { color: #c0392b; }
+
+.estrellas {
+    color: var(--dorado);
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+}
+
+.titulo-producto {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.precio {
+    color: #111;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.card-footer {
+    padding: 0.8rem 1.5rem 1.3rem;
+}
+
+.btn-carrito {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--azul-principal);
+    color: var(--blanco);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.8rem;
+    border-radius: 50px;
+    border: none;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-carrito:hover {
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.35);
+}
+
+/* ============================================================
+   BUSCADOR DE PRODUCTOS — compartido por HOME y CARRITO
+   ============================================================ */
+.buscador-wrapper {
+    position: relative;
+    margin-bottom: 1.75rem;
+    max-width: 620px;
+}
+
+.buscador-productos {
+    display: flex;
+    align-items: stretch;
+    background: var(--blanco);
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.08);
+    border: 1.5px solid transparent;
+    background-image: linear-gradient(var(--blanco), var(--blanco)),
+                       linear-gradient(120deg, rgba(8, 59, 120, 0.15), rgba(201, 168, 76, 0.35));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.buscador-productos:focus-within {
+    box-shadow: 0 10px 30px rgba(2, 44, 99, 0.16), 0 0 0 4px rgba(201, 168, 76, 0.15);
+    transform: translateY(-1px);
+}
+
+.buscador-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.buscador-icono {
+    position: absolute;
+    left: 22px;
+    color: var(--dorado);
+    font-size: 1rem;
+    pointer-events: none;
+    transition: transform var(--transition), color var(--transition);
+}
+
+.buscador-productos:focus-within .buscador-icono {
+    color: var(--azul-principal);
+    transform: scale(1.1);
+}
+
+.buscador-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0.95rem 2.6rem 0.95rem 3.2rem;
+    color: var(--azul-profundo);
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.buscador-input:focus { outline: none; }
+
+.buscador-input::placeholder {
+    color: var(--gris-texto);
+    font-weight: 400;
+    opacity: 0.65;
+}
+
+.buscador-limpiar {
+    position: absolute;
+    right: 12px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--gris-claro);
+    color: var(--gris-texto);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+
+.buscador-limpiar:hover {
+    background: #e63950;
+    color: var(--blanco);
+    transform: rotate(90deg);
+}
+
+.buscador-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(120deg, var(--azul-principal), var(--azul-profundo));
+    color: var(--blanco);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 2rem;
+    border: none;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition);
+}
+
+.buscador-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, var(--dorado), var(--dorado-claro));
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.buscador-btn span, .buscador-btn i {
+    position: relative;
+    z-index: 1;
+}
+
+.buscador-btn:hover { color: var(--azul-profundo); }
+.buscador-btn:hover::before { opacity: 1; }
 
 /* ============================================================
    SECCIÓN QUIÉNES SOMOS
@@ -2632,12 +2803,207 @@ footer .text-center.m-0 {
    Se elimina el override y se deja que `con-carrito-fijo` haga su
    trabajo. En mobile el carrito fijo normalmente se oculta, así que
    ahí sí quitamos el margen para no dejar un hueco vacío a la derecha. */
-@media (max-width: 991px) {
-    body.con-carrito-fijo {
-        margin-right: 0;
-    }
+
+
+/* --- Tarjeta destacada del premio en el grid de productos --- */
+.producto-card--premio {
+    position: relative;
+    overflow: visible;
+    border: 2px solid var(--dorado);
+    box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25);
+    animation: premioCardBrillo 2.6s ease-in-out infinite;
 }
 
-body {
-    margin-right: 0 !important;
+@keyframes premioCardBrillo {
+    0%, 100% { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25); }
+    50%      { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.12), 0 0 22px rgba(240, 217, 138, 0.55), 0 0 0 3px rgba(201, 168, 76, 0.55); }
+}
+
+.premio-cinta-mini {
+    position: absolute;
+    top: 14px;
+    right: -30px;
+    background: var(--dorado);
+    color: #1a1a1a;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 3px 34px;
+    transform: rotate(35deg);
+    z-index: 5;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.badge-stock.premio {
+    background: var(--dorado);
+    color: #1a1a1a;
+}
+
+.precio-tachado {
+    text-decoration: line-through;
+    color: #8a8a8a;
+    font-size: 0.75em;
+    font-weight: 500;
+    margin-left: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .producto-card--premio { animation: none; }
+}
+
+/* ============================================================
+   PÁGINA CARRITO — solo las diferencias respecto a la tarjeta
+   base: layout horizontal en vez de vertical, y todo un poco
+   más compacto porque el carrito fijo le resta ancho a la página.
+   ============================================================ */
+
+.pagina-carrito .producto-card {
+    border: none;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    min-height: 140px;
+}
+
+.pagina-carrito .producto-img-wrapper {
+    width: 150px;
+    padding: 10px;
+}
+
+.pagina-carrito .imagen-producto {
+    max-height: 130px;
+}
+
+.pagina-carrito .badge-stock {
+    top: 8px;
+    left: 8px;
+    font-size: 0.6rem;
+    padding: 0.22rem 0.6rem;
+}
+
+.pagina-carrito .card-body {
+    padding: 0.85rem 1rem 0.3rem;
+}
+
+.pagina-carrito .estrellas {
+    font-size: 0.72rem;
+    margin-bottom: 0.35rem;
+}
+
+.pagina-carrito .titulo-producto {
+    font-size: 0.95rem;
+}
+
+.pagina-carrito .precio {
+    font-size: 1.05rem;
+}
+
+.pagina-carrito .producto-descripcion {
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+
+.pagina-carrito .card-footer {
+    padding: 0.4rem 1rem 0.85rem;
+}
+
+.pagina-carrito .btn-carrito {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+    .pagina-carrito .producto-img-wrapper { width: 130px; }
+    .pagina-carrito .imagen-producto { max-height: 110px; }
+}
+
+@media (max-width: 576px) {
+    .pagina-carrito .producto-card { min-height: 160px; }
+    .pagina-carrito .producto-img-wrapper { width: 130px; padding: 10px; }
+    .pagina-carrito .imagen-producto { max-height: 140px; }
+    .pagina-carrito .card-body { padding: 1rem 1rem 0.3rem; }
+    .pagina-carrito .card-footer { padding: 0.5rem 1rem 1rem; }
+    .pagina-carrito .titulo-producto { font-size: 0.95rem; }
+    .pagina-carrito .precio { font-size: 1.1rem; }
+    .pagina-carrito .btn-carrito { width: 100%; padding: 0.65rem 1rem; font-size: 0.85rem; }
+}
+
+.pagina-carrito .seccion-productos {
+    padding: 2.5rem 0 3rem;
+}
+
+.pagina-carrito .seccion-productos .container {
+    max-width: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.pagina-carrito .seccion-productos .container.py-5 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+}
+
+.pagina-carrito .seccion-productos .section-titulo {
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    margin-bottom: 0.5rem;
+}
+
+.pagina-carrito .seccion-productos .section-eyebrow {
+    font-size: 0.68rem;
+    margin-bottom: 0.3rem;
+}
+
+.pagina-carrito .seccion-productos .section-descripcion {
+    font-size: 0.85rem;
+    line-height: 1.55;
+}
+
+.pagina-carrito .seccion-productos .row.mb-5 {
+    margin-bottom: 1.5rem !important;
+}
+
+.pagina-carrito .seccion-productos h2 {
+    font-size: 1.3rem;
+}
+
+.pagina-carrito #contadorProductos {
+    font-size: 0.78rem !important;
+}
+
+.pagina-carrito .buscador-wrapper {
+    max-width: 480px;
+    margin-bottom: 1.2rem;
+}
+
+.pagina-carrito .buscador-input {
+    padding: 0.7rem 2.2rem 0.7rem 2.8rem;
+    font-size: 0.85rem;
+}
+
+.pagina-carrito .buscador-icono {
+    left: 18px;
+    font-size: 0.9rem;
+}
+
+.pagina-carrito .buscador-btn {
+    padding: 0 1.4rem;
+    font-size: 0.82rem;
+}
+
+@media (max-width: 480px) {
+    .pagina-carrito .buscador-productos {
+        flex-direction: column;
+        border-radius: 20px;
+    }
+    .pagina-carrito .buscador-input {
+        padding: 0.85rem 1.2rem;
+    }
+    .pagina-carrito .buscador-icono {
+        left: 16px;
+    }
+    .pagina-carrito .buscador-btn {
+        padding: 0.7rem 1rem;
+        justify-content: center;
+        border-radius: 0 0 18px 18px;
+    }
 }

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 import re
+
 from dashboard.models import Perfil
 
 
@@ -58,37 +59,41 @@ class RegistroForm(UserCreationForm):
             'password2'
         ]
 
-    import re
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Ya existe una cuenta registrada con este correo electrónico.")
+        return email
 
-    def clean_username(self):
-        username = self.cleaned_data.get("username")
+def clean_username(self):
+    username = self.cleaned_data.get("username")
 
-        if len(username) < 6:
-            raise forms.ValidationError(
-                "El nombre de usuario debe tener al menos 6 caracteres."
-            )
+    if len(username) < 6:
+        raise forms.ValidationError(
+            "El nombre de usuario debe tener al menos 6 caracteres."
+        )
 
-        if len(username) > 20:
-            raise forms.ValidationError(
-                "El nombre de usuario no puede tener más de 20 caracteres."
-            )
+    if len(username) > 20:
+        raise forms.ValidationError(
+            "El nombre de usuario no puede tener más de 20 caracteres."
+        )
 
-        if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', username):
-            raise forms.ValidationError(
-                "Debe comenzar con una letra y solo puede contener letras, números y guiones bajos (_)."
-            )
+    if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', username):
+        raise forms.ValidationError(
+            "Debe comenzar con una letra y solo puede contener letras, números y guiones bajos (_)."
+        )
 
-        if not any(c.isdigit() for c in username):
-            raise forms.ValidationError(
-                "El nombre de usuario debe contener al menos un número."
-            )
+    if not any(c.isdigit() for c in username):
+        raise forms.ValidationError(
+            "El nombre de usuario debe contener al menos un número."
+        )
 
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError(
-                "Este nombre de usuario ya está registrado."
-            )
+    if User.objects.filter(username=username).exists():
+        raise forms.ValidationError(
+            "Este nombre de usuario ya está registrado."
+        )
 
-        return username
+    return username
 
     def clean_email(self):
         email = self.cleaned_data.get("email")

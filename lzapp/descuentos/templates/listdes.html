@@ -9,12 +9,20 @@ body{
     background:#f4f7fc;
 }
 
+/*==========================================================
+   BLOQUE UNIFICADO: encabezado + tabla/tarjetas + pie
+===========================================================*/
+
 .bloque-productos{
     background:white;
     border-radius:20px;
     overflow:hidden;
     box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
+
+/*==========================
+        ENCABEZADO
+===========================*/
 
 .encabezado{
     background:linear-gradient(135deg,#192987,#3556ff);
@@ -27,8 +35,16 @@ body{
     gap:20px;
 }
 
-.titulo{ margin:0; font-size:35px; font-weight:bold; }
-.subtitulo{ margin-top:8px; opacity:.9; }
+.titulo{
+    margin:0;
+    font-size:35px;
+    font-weight:bold;
+}
+
+.subtitulo{
+    margin-top:8px;
+    opacity:.9;
+}
 
 .btn-nuevo{
     background:linear-gradient(135deg,#ffffff,#d7dce4);
@@ -51,17 +67,111 @@ body{
     box-shadow:0 10px 22px rgba(0,0,0,.2);
 }
 
-.barra-vista{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.barra-vista span{ font-size:13px; color:#000000; font-weight:600; margin-right:4px; }
+/*==========================
+        BUSCADOR
+===========================*/
 
-/* Selector "Ver: Productos / Reglas" — antes se perdía sobre el fondo gris */
+.barra-busqueda-wrapper{
+    padding:22px 30px 6px;
+}
+
+.barra-busqueda{
+    display:flex;
+    gap:10px;
+    max-width:420px;
+}
+
+.campo-busqueda{
+    position:relative;
+    flex:1;
+}
+
+.campo-busqueda i{
+    position:absolute;
+    top:50%;
+    left:16px;
+    transform:translateY(-50%);
+    color:#9aa3b4;
+    font-size:15px;
+    pointer-events:none;
+}
+
+.input-busqueda{
+    width:100%;
+    border:1px solid rgba(2,44,99,.12);
+    border-radius:12px;
+    padding:11px 16px 11px 42px;
+    font-size:14px;
+    color:#192987;
+    background:#f7f9fd;
+    transition:.25s;
+}
+
+.input-busqueda:focus{
+    outline:none;
+    border-color:#3556ff;
+    background:white;
+    box-shadow:0 0 0 4px rgba(53,86,255,.12);
+}
+
+.input-busqueda::placeholder{
+    color:#9aa3b4;
+}
+
+.btn-buscar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:46px;
+    height:46px;
+    flex-shrink:0;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#192987,#3556ff);
+    color:white;
+    font-size:16px;
+    transition:.3s;
+}
+
+.btn-buscar:hover{
+    color:white;
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(25,41,135,.3);
+}
+
+@media(max-width:768px){
+    .barra-busqueda-wrapper{
+        padding:18px 16px 4px;
+    }
+    .barra-busqueda{
+        max-width:100%;
+    }
+}
+
+/*==========================
+      SELECTOR DE VISTA
+===========================*/
+
+.barra-vista{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.barra-vista span{
+    font-size:13px;
+    color:#5b6472;
+    font-weight:600;
+    margin-right:4px;
+}
+
 .selector-vista{
     display:inline-flex;
-    background:white;
+    background:#f4f7fc;
     border-radius:12px;
     padding:4px;
-    border:1px solid rgba(2,44,99,.08);
-    box-shadow:0 4px 14px rgba(2,44,99,.08);
+    border:1px solid rgba(2,44,99,.06);
 }
 
 .btn-vista{
@@ -88,73 +198,104 @@ body{
     box-shadow:0 5px 14px rgba(25,41,135,.35);
 }
 
-/* Buscador — antes el input y el botón se veían planos/grises */
-.buscador-descuentos{
-    background:white;
-    border-radius:12px;
-    padding:6px;
-    border:1px solid rgba(2,44,99,.08);
-    box-shadow:0 4px 14px rgba(2,44,99,.08);
-    display:flex;
-    gap:6px;
-    max-width:340px;
+.vista-oculta{
+    display:none !important;
 }
 
-.buscador-descuentos input{
+/*==========================
+          TABLA
+===========================*/
+
+.table{
+    margin-bottom:0;
+}
+
+.tabla-productos thead{
+    background:#192987;
+}
+
+.tabla-productos thead th{
+    color:#fff;
     border:none;
-    background:transparent;
-    height:32px;
+    padding:8px;
+    text-align:center;
+    font-size:14px;
+    white-space:nowrap;
 }
 
-.buscador-descuentos input:focus{
-    box-shadow:none;
-    outline:none;
+.tabla-productos tbody td{
+    vertical-align:middle;
+    text-align:center;
+    padding:5px 6px;
+    font-size:13px;
 }
 
-.buscador-descuentos button{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    border:none;
-    border-radius:8px;
-    padding:0 16px;
+.tabla-productos tbody tr{
     transition:.3s;
 }
 
-.buscador-descuentos button:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 16px rgba(25,41,135,.3);
+.tabla-productos tbody tr:hover{
+    background:#eef4ff;
 }
-
-.vista-oculta{ display:none !important; }
-
-.table{ margin-bottom:0; }
-
-.tabla-productos thead{ background:#192987; }
-.tabla-productos thead th{
-    color:#000; border:none; padding:8px; text-align:center;
-    font-size:14px; white-space:nowrap;
-}
-.tabla-productos tbody td{
-    vertical-align:middle; text-align:center; padding:5px 6px; font-size:13px;
-}
-.tabla-productos tbody tr{ transition:.3s; }
-.tabla-productos tbody tr:hover{ background:#eef4ff; }
 
 .img-producto{
-    width:52px; height:38px; object-fit:cover; border-radius:8px;
-    border:2px solid #e8e8e8; transition:.3s;
+    width:52px;
+    height:38px;
+    object-fit:cover;
+    border-radius:8px;
+    border:2px solid #e8e8e8;
+    transition:.3s;
 }
-.img-producto:hover{ transform:scale(1.1); }
 
-.btn-editar{ background:#0d6efd; color:white; border:none; border-radius:10px; transition:.3s; }
-.btn-eliminar{ background:#dc3545; color:white; border:none; border-radius:10px; transition:.3s; }
-.btn-editar:hover{ background:#0a58ca; color:white; transform:translateY(-2px); }
-.btn-eliminar:hover{ background:#bb2d3b; color:white; transform:translateY(-2px); }
+.img-producto:hover{
+    transform:scale(1.1);
+}
 
-.acciones{ display:flex; gap:4px; justify-content:center; flex-wrap:wrap; font-size:12px; }
+.btn-editar{
+    background:#0d6efd;
+    color:white;
+    border:none;
+    border-radius:10px;
+    transition:.3s;
+}
 
-.badge-stock, .badge{ padding:6px 12px; border-radius:30px; font-size:12px; }
-.badge-stock{ margin-left:8px; }
+.btn-eliminar{
+    background:#dc3545;
+    color:white;
+    border:none;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.btn-editar:hover{
+    background:#0a58ca;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.btn-eliminar:hover{
+    background:#bb2d3b;
+    color:white;
+    transform:translateY(-2px);
+}
+
+.acciones{
+    display:flex;
+    gap:4px;
+    justify-content:center;
+    flex-wrap:wrap;
+    font-size:12px;
+}
+
+.badge-stock, .badge{
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+}
+
+.badge-stock{
+    margin-left:8px;
+}
 
 .badge-oferta{
     background:#2de25a;
@@ -176,56 +317,192 @@ body{
     font-size:12px;
 }
 
-.precio{ color:#198754; font-weight:bold; font-size:12px; white-space:nowrap; }
+.precio{
+    color:#198754;
+    font-weight:bold;
+    font-size:12px;
+    white-space:nowrap;
+}
 
-.estado-vacio{ text-align:center; padding:60px 20px; }
+/*==========================================================
+   VISTA DE TARJETAS ANIMADAS (campañas de descuento)
+===========================================================*/
 
-/* ===== Tarjetas de reglas automáticas ===== */
-.grid-reglas{
+.grid-productos{
     padding:15px;
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));
     gap:14px;
 }
 
-.regla-card{
+.producto-card{
     background:white;
     border:1px solid rgba(2,44,99,.08);
     border-radius:14px;
-    padding:16px;
+    overflow:hidden;
     box-shadow:0 6px 16px rgba(2,44,99,.08);
-    transition:transform .3s, box-shadow .3s;
-}
-.regla-card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 14px 30px rgba(2,44,99,.15);
+    transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s;
+    display:flex;
+    flex-direction:column;
+    animation:apareceCard .5s ease both;
+    padding:16px;
 }
 
-.regla-card-nombre{
-    font-size:14px;
-    font-weight:700;
-    color:#192987;
+@keyframes apareceCard{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.producto-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 16px 34px rgba(2,44,99,.18);
+}
+
+.producto-card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
     margin-bottom:6px;
 }
 
-.regla-card-condicion{
-    font-size:11.5px;
+.producto-card-nombre{
+    font-size:14px;
+    font-weight:700;
+    color:#022C63;
+    margin:0;
+    line-height:1.25;
+}
+
+.producto-card-frecuencia{
+    font-size:10.5px;
+    font-weight:700;
     color:#5b6472;
-    line-height:1.5;
+    background:#f4f7fc;
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+}
+
+.producto-card-linea{
+    width:28px;
+    height:3px;
+    background:#c9a84c;
+    border-radius:2px;
+    margin:3px 0 8px;
+    transition:width .3s;
+}
+
+.producto-card:hover .producto-card-linea{
+    width:52px;
+}
+
+.producto-card-stats{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+    margin-bottom:10px;
+    padding:10px;
+    background:#f8faff;
+    border-radius:10px;
+}
+
+.stat-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    min-width:0;
+}
+
+.stat-item i{
+    color:#3556ff;
+    font-size:15px;
+    flex-shrink:0;
+}
+
+.stat-item-textos{
+    display:flex;
+    flex-direction:column;
+    line-height:1.25;
+    min-width:0;
+}
+
+.stat-valor{
+    font-size:12px;
+    font-weight:700;
+    color:#022C63;
+    white-space:nowrap;
+}
+
+.stat-etiqueta{
+    font-size:9.5px;
+    color:#8a93a6;
+    white-space:nowrap;
+}
+
+.chips-productos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
     margin-bottom:10px;
 }
 
-.regla-card-footer{
+.chip-producto{
+    background:#f4f7fc;
+    color:#022C63;
+    font-size:10.5px;
+    font-weight:600;
+    padding:3px 9px;
+    border-radius:20px;
+    border:1px solid rgba(2,44,99,.08);
+}
+
+.caja-preview{
+    background:#eef4ff;
+    border:1px dashed #3556ff;
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:11.5px;
+    color:#192987;
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    gap:6px;
+    flex:1;
+    min-width:0;
+}
+
+.caja-preview strong{
+    font-size:13px;
+}
+
+.producto-card-fila-inferior{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.producto-card-estado-fila{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    flex-shrink:0;
+}
+
+.producto-card-acciones{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:auto;
 }
 
 .btn-toggle-regla{
     border:none;
     border-radius:30px;
     padding:6px 14px;
-    font-size:12px;
+    font-size:11.5px;
     font-weight:600;
     transition:.3s;
 }
@@ -233,22 +510,241 @@ body{
 .btn-toggle-regla.inactiva{ background:#e9ecef; color:#5b6472; }
 .btn-toggle-regla:hover{ transform:translateY(-2px); }
 
+/* El badge de estado ahora ES el control de activar/desactivar:
+   se ve igual que un badge normal, pero es un <button> dentro de
+   un <form> que hace el toggle. Así no hace falta un botón aparte. */
+.form-toggle-estado{
+    display:inline-block;
+    margin:0;
+}
+
+.badge-estado-toggle{
+    border:none;
+    cursor:pointer;
+    padding:6px 12px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.badge-estado-toggle.bg-success:hover{
+    background-color:#157347 !important;
+    transform:translateY(-2px);
+}
+
+.badge-estado-toggle.bg-secondary:hover{
+    background-color:#5c636a !important;
+    transform:translateY(-2px);
+}
+
+.producto-card-acciones-editar{
+    display:flex;
+    gap:6px;
+}
+
+.producto-card-acciones-editar .btn{
+    padding:5px 8px;
+    font-size:11px;
+}
+
+.estado-vacio{
+    text-align:center;
+    padding:60px 20px;
+}
+
+/*==========================================================
+   PIE DEL BLOQUE: vista + paginación en una sola línea
+===========================================================*/
+
+.pie-productos{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    padding:14px 20px;
+    border-top:1px solid rgba(2,44,99,.08);
+    background:white;
+}
+
+.paginacion-inline{
+    margin:0;
+}
+
+.paginacion-inline .pagination{
+    margin:0;
+    flex-wrap:wrap;
+}
+
+.paginacion-inline .page-link{
+    color:#192987;
+    border-color:#dfe3ef;
+}
+
+.paginacion-inline .page-link:hover{
+    color:#192987;
+    background-color:#eef2ff;
+    border-color:#dfe3ef;
+}
+
+.paginacion-inline .page-item.active .page-link{
+    background-color:#192987;
+    border-color:#192987;
+    color:white;
+}
+
+/*==========================
+      RESPONSIVE
+===========================*/
+
 @media(max-width:768px){
-    .encabezado{ flex-direction:column; text-align:center; }
-    .titulo{ font-size:28px; }
-    .barra-vista{ justify-content:center; }
-    .tabla-productos thead th, .tabla-productos tbody td{ padding:4px 3px; font-size:9px; }
-    .img-producto{ width:33px; height:27px; }
-    .acciones{ flex-direction:column; }
-    .grid-reglas{ grid-template-columns:1fr; padding:10px; gap:10px; }
+
+    .encabezado{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .titulo{
+        font-size:28px;
+    }
+
+    .barra-vista{
+        justify-content:center;
+    }
+
+    .pie-productos{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .paginacion-inline .pagination{
+        justify-content:center;
+    }
+
+    .grid-productos{
+        grid-template-columns:1fr;
+        padding:10px;
+        gap:9px;
+    }
+
+    .tabla-productos thead th,
+    .tabla-productos tbody td{
+        padding:4px 3px;
+        font-size:9px;
+    }
+
+    .img-producto{
+        width:33px;
+        height:27px;
+    }
+
+    .acciones{
+        flex-direction:column;
+    }
+}
+
+@media(prefers-reduced-motion: reduce){
+    .producto-card{ animation:none; }
+}
+
+/*==========================================================
+   MENSAJES (django messages) COMO TOAST EN ESQUINA SUPERIOR
+===========================================================*/
+
+.contenedor-toasts{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:99999;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-width:360px;
+    max-width:min(360px, calc(100vw - 40px));
+}
+
+.toast-mensaje{
+    background:white;
+    border-radius:14px;
+    box-shadow:0 15px 35px rgba(0,0,0,.2);
+    padding:14px 16px;
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    animation:toastEntra .35s cubic-bezier(.25,.8,.25,1) both;
+    border-left:5px solid #198754;
+    transition:opacity .3s, transform .3s;
+}
+
+.toast-mensaje.toast-error,
+.toast-mensaje.toast-danger{ border-left-color:#dc3545; }
+.toast-mensaje.toast-warning{ border-left-color:#ffc107; }
+.toast-mensaje.toast-info{ border-left-color:#0d6efd; }
+
+.toast-mensaje-icono{
+    font-size:17px;
+    color:#198754;
+    margin-top:1px;
+}
+.toast-mensaje.toast-error .toast-mensaje-icono,
+.toast-mensaje.toast-danger .toast-mensaje-icono{ color:#dc3545; }
+.toast-mensaje.toast-warning .toast-mensaje-icono{ color:#ffc107; }
+.toast-mensaje.toast-info .toast-mensaje-icono{ color:#0d6efd; }
+
+.toast-mensaje-texto{
+    flex:1;
+    font-size:13px;
+    color:#022C63;
+    line-height:1.4;
+}
+
+.toast-mensaje-cerrar{
+    background:transparent;
+    border:none;
+    color:#8a8a8a;
+    font-size:14px;
+    cursor:pointer;
+    padding:0;
+    line-height:1;
+}
+
+.toast-mensaje-cerrar:hover{
+    color:#333;
+}
+
+@keyframes toastEntra{
+    from{ opacity:0; transform:translateX(40px); }
+    to{ opacity:1; transform:translateX(0); }
+}
+
+@media(max-width:576px){
+    .contenedor-toasts{
+        top:10px;
+        right:10px;
+        left:10px;
+        max-width:none;
+    }
 }
 
 </style>
 
 {% if messages %}
-    <div class="container-fluid mt-3">
+    <div class="contenedor-toasts" id="contenedorToasts">
         {% for m in messages %}
-            <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+            <div class="toast-mensaje toast-{{ m.tags }}">
+                <span class="toast-mensaje-icono">
+                    {% if m.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+                    {% elif m.tags == 'error' or m.tags == 'danger' %}<i class="bi bi-x-circle-fill"></i>
+                    {% elif m.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>
+                    {% else %}<i class="bi bi-info-circle-fill"></i>
+                    {% endif %}
+                </span>
+                <span class="toast-mensaje-texto">{{ m }}</span>
+                <button type="button" class="toast-mensaje-cerrar" onclick="this.closest('.toast-mensaje').remove()" aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
         {% endfor %}
     </div>
 {% endif %}
@@ -264,172 +760,505 @@ body{
                     Gestión de Descuentos
                 </h1>
                 <p class="subtitulo">
-                    Aplica y controla las ofertas de tus productos.
+                    Campañas por lotería para productos que no se están vendiendo.
                 </p>
             </div>
-            <a href="{% url 'crear_regla_descuento' %}" class="btn-nuevo">
+            <a href="{% url 'crear_campana_descuento' %}" class="btn btn-nuevo">
                 <i class="bi bi-plus-circle-fill"></i>
-                Nueva regla automática
+                Nueva Campaña
             </a>
         </div>
 
-        <div class="p-3">
-            <div class="buscador-descuentos mb-3">
-                <form method="get" class="d-flex gap-2 w-100">
-                    <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query }}">
-                    <button type="submit"><i class="bi bi-search"></i></button>
-                </form>
-            </div>
-        
-            <div class="pb-2 mb-3" style="border-bottom:1px solid rgba(2,44,99,.08);">
-                <div class="barra-vista">
-                    <span>Ver:</span>
-                    <div class="selector-vista" role="group">
-                        <button type="button" class="btn-vista activo" id="btnVistaProductos" onclick="cambiarVistaDescuentos('productos')">
-                            <i class="bi bi-basket-fill"></i> Productos
-                            <span class="badge bg-secondary ms-1">{{ productos|length }}</span>
-                        </button>
-                        <button type="button" class="btn-vista" id="btnVistaReglas" onclick="cambiarVistaDescuentos('reglas')">
-                            <i class="bi bi-gear-fill"></i> Reglas automáticas
-                            <span class="badge bg-secondary ms-1">{{ reglas|length }}</span>
-                        </button>
-                    </div>
+        <!-- Buscador: en vivo, sin recargar la página (igual que en Productos) -->
+        <div class="barra-busqueda-wrapper">
+            <form method="get" class="barra-busqueda" id="formBuscarDescuento">
+                <div class="campo-busqueda">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="q" id="inputBuscarDescuento" class="input-busqueda"
+                           placeholder="Buscar producto o campaña..." value="{{ query }}" autocomplete="off">
                 </div>
-            </div>
+                <button type="submit" class="btn-buscar" aria-label="Buscar">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
         </div>
 
-        <!-- ============ VISTA: PRODUCTOS ============ -->
-        <div id="vistaProductosDescuento" class="table-responsive">
-            <table class="table table-hover tabla-productos align-middle">
-                <thead>
-                    <tr>
-                        <th class="d-none d-sm-table-cell">Imagen</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th class="d-none d-md-table-cell">Stock</th>
-                        <th>Descuento</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for p in productos %}
-                    <tr>
-                        <td class="d-none d-sm-table-cell">
-                            {% if p.imagen %}
-                                <img src="{{ p.imagen.url }}" class="img-producto">
-                            {% else %}
-                                <img src="{% static 'img/no-image.png' %}" class="img-producto">
-                            {% endif %}
-                        </td>
-                        <td><strong>{{ p.nombre }}</strong></td>
-                        <td class="precio">$ {{ p.precio }}</td>
-                        <td class="d-none d-md-table-cell">
-                            <strong>{{ p.stock_actual }}</strong>
-                            {% if p.stock_actual <= p.stock_minimo %}
-                                <span class="badge bg-warning text-dark badge-stock">bajo</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if p.descuento_vigente %}
-                                <span class="badge-oferta">
-                                    <i class="bi bi-tag-fill"></i> {{ p.descuento_vigente.porcentaje }}% OFF
-                                </span>
-                            {% else %}
-                                <span class="badge-sin-oferta">Sin oferta</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="acciones">
-                                <a href="{% url 'aplicar_descuento' p.id %}" class="btn btn-editar btn-sm" title="Aplicar descuento">
-                                    <i class="bi bi-tag"></i>
-                                </a>
-                                {% if p.descuento_vigente %}
-                                <a href="{% url 'quitar_descuento' p.descuento_vigente.id %}" class="btn btn-eliminar btn-sm" title="Quitar descuento">
-                                    <i class="bi bi-x-lg"></i>
-                                </a>
+        <!-- Todo lo de aquí para abajo se reemplaza vía fetch() al buscar
+             o al paginar, sin recargar la página completa. -->
+        <div id="contenedorListaDescuento">
+
+            <!-- ============ VISTA: PRODUCTOS ============ -->
+            <div id="vistaProductosDescuento" class="table-responsive">
+                <table class="table table-hover tabla-productos align-middle">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-sm-table-cell">Producto</th>
+                            <th>Precio</th>
+                            <th class="d-none d-md-table-cell">Stock</th>
+                            <th>Campaña activa</th>
+                            <th class="d-none d-lg-table-cell">Premios vigentes</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in productos %}
+                        <tr data-tiene-campana="{% if p.tiene_campana_activa %}true{% else %}false{% endif %}">
+                            <td class="d-none d-sm-table-cell">
+                                {% if p.imagen %}
+                                    <img src="{{ p.imagen.url }}" class="img-producto" alt="{{ p.nombre }}">
+                                {% else %}
+                                    <img src="{% static 'img/no-image.png' %}" class="img-producto" alt="{{ p.nombre }}">
                                 {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="estado-vacio">
-                            <i class="bi bi-tags display-4 text-secondary"></i>
-                            <h5 class="mt-3">No hay productos disponibles.</h5>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                                <strong>{{ p.nombre }}</strong>
+                            </td>
+                            <td class="precio">
+                                $ {{ p.precio }}
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <strong>{{ p.stock_actual }}</strong>
+                                {% if p.stock_actual <= p.stock_minimo %}
+                                    <span class="badge bg-warning text-dark badge-stock">bajo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.tiene_campana_activa %}
+                                    <span class="badge-oferta">
+                                        <i class="bi bi-tag-fill"></i> Sí, {{ p.campanas_activas_count }} campaña(s)
+                                    </span>
+                                {% else %}
+                                    <span class="badge-sin-oferta">Sin campaña</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-lg-table-cell">
+                                <strong>{{ p.premios_activos_count }}</strong> cliente(s) con premio sin usar
+                            </td>
+                            <td>
+                                <div class="acciones">
+                                    <button type="button" class="btn btn-editar btn-sm btn-previsualizar" title="Ver previsualización"
+                                            data-producto-id="{{ p.id }}" data-producto-nombre="{{ p.nombre }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="estado-vacio">
+                                <i class="bi bi-tags display-4 text-secondary"></i>
+                                <h5 class="mt-3">
+                                    {% if query %}
+                                        No encontramos productos para "<strong>{{ query }}</strong>".
+                                    {% else %}
+                                        No hay productos disponibles.
+                                    {% endif %}
+                                </h5>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- ============ VISTA: REGLAS AUTOMÁTICAS ============ -->
-        <div id="vistaReglasDescuento" class="grid-reglas vista-oculta">
-            {% for r in reglas %}
-                <div class="regla-card">
-                    <div class="regla-card-nombre">{{ r.nombre }}</div>
-                    <div class="regla-card-condicion">
-                        {% if r.dias_sin_venderse_min %}<div>≥ {{ r.dias_sin_venderse_min }} días sin venta</div>{% endif %}
-                        {% if r.stock_multiplicador_min %}<div>Stock ≥ {{ r.stock_multiplicador_min }}× el mínimo</div>{% endif %}
-                        {% if r.dias_antes_vencimiento_max %}<div>≤ {{ r.dias_antes_vencimiento_max }} días para vencer</div>{% endif %}
-                        <div class="mt-1"><span class="badge-oferta"><i class="bi bi-tag-fill"></i> {{ r.descuento_porcentaje }}%</span></div>
-                    </div>
-                    <div class="regla-card-footer">
-                        <span class="text-muted" style="font-size:11px;">Prioridad {{ r.prioridad }}</span>
-                        <div class="d-flex align-items-center gap-2">
-                            <form method="post" action="{% url 'toggle_regla_descuento' r.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-toggle-regla {% if r.activa %}activa{% else %}inactiva{% endif %}">
-                                    {% if r.activa %}Activa{% else %}Inactiva{% endif %}
-                                </button>
-                            </form>
-                            <a href="{% url 'editar_regla_descuento' r.id %}" class="btn btn-editar btn-sm" title="Editar regla">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a href="{% url 'eliminar_regla_descuento' r.id %}" class="btn btn-eliminar btn-sm" title="Eliminar regla">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
+            <!-- ============ VISTA: CAMPAÑAS DE DESCUENTO ============ -->
+            <div id="vistaReglasDescuento" class="grid-productos vista-oculta">
+                {% for c in campanas %}
+                    <div class="producto-card" data-activa="{% if c.activo %}true{% else %}false{% endif %}">
+                        <div class="producto-card-top">
+                            <h3 class="producto-card-nombre">{{ c.nombre }}</h3>
+                            <span class="producto-card-frecuencia">{{ c.get_frecuencia_display }}</span>
+                        </div>
+                        <div class="producto-card-linea"></div>
+
+                        <div class="chips-productos">
+                            {% for prod in c.productos.all %}
+                                <span class="chip-producto">{{ prod.nombre }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="producto-card-stats">
+                            <div class="stat-item">
+                                <i class="bi bi-calendar-x"></i>
+                                <span class="stat-item-textos">
+                                    <span class="stat-valor">{{ c.dias_sin_compra }} días</span>
+                                    <span class="stat-etiqueta">Sin comprar</span>
+                                </span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="bi bi-percent"></i>
+                                <span class="stat-item-textos">
+                                    <span class="stat-valor">{{ c.porcentaje_maximo_clientes }}%</span>
+                                    <span class="stat-etiqueta">Tope clientes</span>
+                                </span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="bi bi-hourglass-split"></i>
+                                <span class="stat-item-textos">
+                                    <span class="stat-valor">{{ c.dias_validez_premio }} días</span>
+                                    <span class="stat-etiqueta">Validez premio</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="producto-card-fila-inferior">
+                            <div class="caja-preview">
+                                <i class="bi bi-people-fill"></i>
+                                Aplicará a <strong>{{ c.preview_clientes }}</strong> cliente(s)
+                            </div>
+                            <div class="producto-card-estado-fila">
+                                <span class="badge-oferta"><i class="bi bi-tag-fill"></i> {{ c.porcentaje_descuento }}%</span>
+                                <form method="post" action="{% url 'toggle_campana_descuento' c.id %}" class="form-toggle-estado">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="badge-estado-toggle {% if c.activo %}bg-success text-white{% else %}bg-secondary text-white{% endif %}"
+                                            title="Clic para {% if c.activo %}desactivar{% else %}activar{% endif %}">
+                                        {% if c.activo %}Activa{% else %}Inactiva{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="producto-card-acciones">
+                            <div class="producto-card-acciones-editar">
+                                <a href="{% url 'editar_campana_descuento' c.id %}" class="btn btn-editar btn-sm" title="Editar campaña">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'eliminar_campana_descuento' c.id %}" class="btn btn-eliminar btn-sm" title="Eliminar campaña">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
+                {% empty %}
+                    <div class="estado-vacio">
+                        <i class="bi bi-gear display-4 text-secondary"></i>
+                        <h5 class="mt-3">
+                            {% if query %}
+                                No encontramos campañas para "<strong>{{ query }}</strong>".
+                            {% else %}
+                                Aún no hay campañas creadas.
+                            {% endif %}
+                        </h5>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
+            <div class="pie-productos">
+
+                <div class="barra-vista">
+                    <span>Vista:</span>
+                    <div class="selector-vista" role="group" aria-label="Selector de vista">
+                        <button type="button" class="btn-vista activo" id="btnVistaProductos" onclick="cambiarVistaDescuentos('productos')">
+                            <i class="bi bi-basket-fill"></i> Productos
+                            <span class="badge bg-secondary ms-1">{{ productos.paginator.count }}</span>
+                        </button>
+                        <button type="button" class="btn-vista" id="btnVistaReglas" onclick="cambiarVistaDescuentos('campanas')">
+                            <i class="bi bi-gear-fill"></i> Campañas
+                            <span class="badge bg-secondary ms-1">{{ campanas.paginator.count }}</span>
+                        </button>
+                    </div>
                 </div>
-            {% empty %}
-                <div class="estado-vacio">
-                    <i class="bi bi-gear display-4 text-secondary"></i>
-                    <h5 class="mt-3">Aún no hay reglas creadas.</h5>
-                </div>
-            {% endfor %}
+
+                <!-- Paginación de Productos (solo se muestra en esa vista) -->
+                <nav class="paginacion-inline paginacion-productos" aria-label="Paginación de productos">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if productos.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if campanas.number %}&page_campanas={{ campanas.number }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if campanas.number %}&page_campanas={{ campanas.number }}{% endif %}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for pagina in productos.paginator.page_range %}
+                            {% if pagina == productos.number %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ pagina }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ pagina }}{% if query %}&q={{ query }}{% endif %}{% if campanas.number %}&page_campanas={{ campanas.number }}{% endif %}">{{ pagina }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if productos.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if campanas.number %}&page_campanas={{ campanas.number }}{% endif %}">&raquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if campanas.number %}&page_campanas={{ campanas.number }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <!-- Paginación de Campañas (solo se muestra en esa vista) -->
+                <nav class="paginacion-inline paginacion-campanas vista-oculta" aria-label="Paginación de campañas">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if campanas.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_campanas=1{% if query %}&q={{ query }}{% endif %}{% if productos.number %}&page={{ productos.number }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_campanas={{ campanas.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if productos.number %}&page={{ productos.number }}{% endif %}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for pagina in campanas.paginator.page_range %}
+                            {% if pagina == campanas.number %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ pagina }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page_campanas={{ pagina }}{% if query %}&q={{ query }}{% endif %}{% if productos.number %}&page={{ productos.number }}{% endif %}">{{ pagina }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if campanas.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page_campanas={{ campanas.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if productos.number %}&page={{ productos.number }}{% endif %}">&raquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page_campanas={{ campanas.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if productos.number %}&page={{ productos.number }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+            </div>
+
         </div>
 
+    </div>
+
+</div>
+
+<!-- ============ MODAL: PREVISUALIZACIÓN DE PRODUCTO ============ -->
+<div class="modal fade" id="modalPrevisualizacion" tabindex="-1" aria-labelledby="modalPrevisualizacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden;">
+            <div class="modal-header" style="background:linear-gradient(135deg,#192987,#3556ff); color:white;">
+                <h5 class="modal-title" id="modalPrevisualizacionLabel">Previsualización</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="contenidoPrevisualizacion">
+                <div class="text-center py-4">
+                    <div class="spinner-border" role="status"></div>
+                    <p class="mt-2 text-secondary">Calculando...</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
+function verPrevisualizacion(productoId, nombreProducto){
+    const modalEl = document.getElementById('modalPrevisualizacion');
+    const contenedor = document.getElementById('contenidoPrevisualizacion');
+    document.getElementById('modalPrevisualizacionLabel').textContent = 'Previsualización — ' + nombreProducto;
+
+    contenedor.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border" role="status"></div>
+            <p class="mt-2 text-secondary">Calculando...</p>
+        </div>`;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+
+    fetch(`/descuentos/producto/${productoId}/previsualizar/`, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(function(resp){
+        if(!resp.ok){ throw new Error('respuesta no válida'); }
+        return resp.json();
+    })
+    .then(function(data){
+        if(!data.previsualizaciones || data.previsualizaciones.length === 0){
+            contenedor.innerHTML = `
+                <div class="estado-vacio">
+                    <i class="bi bi-info-circle display-6 text-secondary"></i>
+                    <h6 class="mt-3">Este producto no está incluido en ninguna campaña activa.</h6>
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        data.previsualizaciones.forEach(function(campana){
+            if(campana.error){
+                html += `<div class="alert alert-warning"><strong>${campana.campana}</strong>: ${campana.error}</div>`;
+                return;
+            }
+            html += `<h6 class="mb-2" style="color:#022C63;">${campana.campana}</h6>`;
+            (campana.detalle || []).forEach(function(d){
+                html += `
+                    <div class="caja-preview mb-3" style="display:block;">
+                        <div class="mb-2"><i class="bi bi-people-fill"></i>
+                            Aplicará a <strong>${d.clientes_que_recibiran_el_premio}</strong> cliente(s)
+                        </div>
+                        <table class="table table-sm table-bordered mb-0" style="font-size:12px;">
+                            <tbody>
+                                <tr><td>Clientes activos totales</td><td class="text-end"><strong>${d.total_clientes_activos}</strong></td></tr>
+                                <tr><td>Tope por % configurado</td><td class="text-end"><strong>${d.limite_por_porcentaje}</strong></td></tr>
+                                <tr><td>Stock disponible para oferta</td><td class="text-end"><strong>${d.stock_ofertable}</strong></td></tr>
+                                <tr><td>Clientes elegibles encontrados</td><td class="text-end"><strong>${d.clientes_elegibles_encontrados}</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            });
+        });
+        contenedor.innerHTML = html;
+    })
+    .catch(function(){
+        contenedor.innerHTML = `
+            <div class="alert alert-danger mb-0">
+                No se pudo cargar la previsualización. Intenta de nuevo.
+            </div>`;
+    });
+}
+
+/* ---- Selector de vista: Productos / Campañas (se re-aplica también
+   después de cada fetch(), porque el DOM interno se reemplaza) ---- */
 function cambiarVistaDescuentos(vista){
     const vp = document.getElementById('vistaProductosDescuento');
     const vr = document.getElementById('vistaReglasDescuento');
     const bp = document.getElementById('btnVistaProductos');
     const br = document.getElementById('btnVistaReglas');
+    const paginacionProductos = document.querySelector('.paginacion-productos');
+    const paginacionCampanas = document.querySelector('.paginacion-campanas');
 
-    if(vista === 'reglas'){
+    if(!vp || !vr || !bp || !br) return;
+
+    if(vista === 'campanas'){
         vp.classList.add('vista-oculta');
         vr.classList.remove('vista-oculta');
         br.classList.add('activo');
         bp.classList.remove('activo');
+        if(paginacionProductos) paginacionProductos.classList.add('vista-oculta');
+        if(paginacionCampanas) paginacionCampanas.classList.remove('vista-oculta');
     } else {
         vr.classList.add('vista-oculta');
         vp.classList.remove('vista-oculta');
         bp.classList.add('activo');
         br.classList.remove('activo');
+        if(paginacionProductos) paginacionProductos.classList.remove('vista-oculta');
+        if(paginacionCampanas) paginacionCampanas.classList.add('vista-oculta');
     }
     localStorage.setItem('vistaDescuentos', vista);
 }
 
-document.addEventListener('DOMContentLoaded', function(){
+function aplicarVistaDescuentosGuardada(){
     const guardada = localStorage.getItem('vistaDescuentos');
-    if(guardada === 'reglas'){
-        cambiarVistaDescuentos('reglas');
+    if(guardada === 'campanas'){
+        cambiarVistaDescuentos('campanas');
     }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+    aplicarVistaDescuentosGuardada();
+
+    if(window.bootstrap){
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
+            new bootstrap.Tooltip(el);
+        });
+    }
+
+    // Cada toast de mensaje se cierra solo después de unos segundos,
+    // escalonado para que no desaparezcan todos exactamente al tiempo.
+    document.querySelectorAll('.toast-mensaje').forEach(function(toast, i){
+        setTimeout(function(){
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(40px)';
+            setTimeout(function(){ toast.remove(); }, 300);
+        }, 4000 + i * 300);
+    });
 });
+
+/* ---- Botón "Ver previsualización": delegado en document para que
+   siga funcionando aunque el buscador reemplace el innerHTML del
+   contenedor (evita interpolar el nombre del producto dentro de un
+   string de JS, que era lo que rompía con nombres con comillas). ---- */
+document.addEventListener('click', function(e){
+    const boton = e.target.closest('.btn-previsualizar');
+    if(!boton) return;
+    const productoId = boton.dataset.productoId;
+    const nombreProducto = boton.dataset.productoNombre;
+    verPrevisualizacion(productoId, nombreProducto);
+});
+
+/* ---- Búsqueda en vivo + paginación sin recargar la página, igual que
+   en el panel de Productos: pide la página completa por fetch() y se
+   queda solo con el contenido de #contenedorListaDescuento ---- */
+(function () {
+    const form = document.getElementById('formBuscarDescuento');
+    const input = document.getElementById('inputBuscarDescuento');
+    const contenedor = document.getElementById('contenedorListaDescuento');
+    if (!form || !input || !contenedor) return;
+
+    let timer = null;
+
+    function extraerContenedor(htmlTexto) {
+        const doc = new DOMParser().parseFromString(htmlTexto, 'text/html');
+        return doc.getElementById('contenedorListaDescuento');
+    }
+
+    function actualizarDesdeUrl(url) {
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then((res) => res.text())
+            .then((htmlTexto) => {
+                const nuevoContenedor = extraerContenedor(htmlTexto);
+                if (nuevoContenedor) {
+                    contenedor.innerHTML = nuevoContenedor.innerHTML;
+                }
+                // El DOM interno se reemplazó, así que hay que re-aplicar
+                // la vista guardada (productos/campañas) y los tooltips.
+                aplicarVistaDescuentosGuardada();
+                if(window.bootstrap){
+                    contenedor.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
+                        new bootstrap.Tooltip(el);
+                    });
+                }
+                window.history.replaceState({}, '', url);
+            })
+            .catch(() => {
+                contenedor.innerHTML = `
+                    <div class="estado-vacio">
+                        <i class="bi bi-exclamation-triangle display-6 text-danger"></i>
+                        <h5 class="mt-3">Ocurrió un error al buscar. Intenta de nuevo.</h5>
+                    </div>`;
+            });
+    }
+
+    function buscar(query) {
+        const url = query
+            ? `${window.location.pathname}?q=${encodeURIComponent(query)}`
+            : window.location.pathname;
+        actualizarDesdeUrl(url);
+    }
+
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        const q = input.value.trim();
+        timer = setTimeout(() => buscar(q), 300);
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        clearTimeout(timer);
+        buscar(input.value.trim());
+    });
+
+    // La paginación (Primera, «, números, », Última) pasa por el mismo
+    // fetch(), sin recargar la página. Se delega en el contenedor, que
+    // persiste entre reemplazos de innerHTML (solo cambia su contenido).
+    contenedor.addEventListener('click', (e) => {
+        const link = e.target.closest('.paginacion-inline a.page-link');
+        if (!link) return;
+        e.preventDefault();
+        const url = new URL(link.href);
+        actualizarDesdeUrl(`${url.pathname}${url.search}`);
+        window.scrollTo({ top: contenedor.offsetTop - 20, behavior: 'smooth' });
+    });
+})();
 </script>
 
 {% endblock %}

@@ -7,7 +7,19 @@ SECRET_KEY = 'django-insecure-+95a3_wj16y$#(+rg&)urdt%pbc-dl6vx&le0oz0bw+fy&p8+y
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+# para la misma red
+#Usar el comando python manage.py runserver 0.0.0.0:8000 para ejecutar lo en otra pc y http://192.168.1.51:8000/
+
+# ngrok http 8000
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app',
+    'https://*.ngrok-free.dev',
+]
+
+# para hacer la simulacion de los descuentos:
+#python manage.py simular_flujo_descuentos   para correr
+#python manage.py simular_flujo_descuentos --limpiar   para eliminar todos los usuarios creados para la simulacion
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,9 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'home',
     'usuarios',
     'carrito',
-    'home',
     'dashboard',
     'producto',
     'descuentos',
@@ -59,7 +71,7 @@ WSGI_APPLICATION = 'lzapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_lacteos_z',
+        'NAME': 'db_lzapp',
         'USER': 'root',
         'PASSWORD': 'www309edt',
         'HOST': 'localhost',

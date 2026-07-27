@@ -119,6 +119,16 @@
     border-color: rgba(201, 168, 76, 0.35);
   }
 
+  .carrito-item__imagen {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+    border: 1px solid var(--gris-borde);
+    background: var(--blanco);
+}
+
   .carrito-item__info {
     display: flex;
     flex-direction: column;
@@ -368,12 +378,12 @@
     </div>
   </div>
 
-  <div class="carrito-widget__lista">
     {% for i,j in request.session.carro.items %}
       <div class="carrito-item">
+        <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
         <div class="carrito-item__info">
           <span class="carrito-item__nombre">{{ j.nombre }}</span>
-          <span class="carrito-item__cantidad">Cantidad: {{ j.cantidad }}</span>
+          <span class="carrito-item__cantidad">Cantidad: {{ j.cantidad }} · $ {{ j.precio|floatformat:0|intcomma }} c/u</span>
         </div>
         <div class="carrito-item__controles">
           <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
