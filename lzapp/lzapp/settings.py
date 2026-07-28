@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_lzapp',
         'USER': 'root',
-        'PASSWORD': 'Rojas123fj',
+        'PASSWORD': 'www309edt',
         'HOST': 'localhost',
         'PORT': '3306',
     }
