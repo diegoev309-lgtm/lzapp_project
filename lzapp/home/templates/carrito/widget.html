@@ -353,6 +353,23 @@
       max-width: 100%;
     }
   }
+
+  .btn-pagar-mp {
+    display: block;
+    text-align: center;
+    background-color: var(--azul-profundo, #022C63);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 12px;
+    transition: background-color 0.2s ease;
+  }
+  .btn-pagar-mp:hover {
+    background-color: var(--dorado, #c9a84c);
+    color: #022C63;
+  }
 </style>
 
 <!-- Botón flotante (solo móvil/tablet) -->
@@ -405,8 +422,8 @@
       <strong>$ {{ totalizar_carro|floatformat:0|intcomma }}</strong>
     </div>
     <div class="carrito-widget__acciones">
-      <a href="" class="btn-dorado" style="justify-content:center;">
-        Finalizar compra
+      <a href="{% url 'carro:crear_preferencia' %}" class="btn-pagar-mp">
+          Pagar con Mercado Pago
       </a>
       <form action="{% url 'carro:limpiar' %}" method="post" onsubmit="return confirm('¿Vaciar el carrito?');">
         {% csrf_token %}

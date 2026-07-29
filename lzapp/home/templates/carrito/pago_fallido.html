@@ -1,0 +1,36 @@
+{% extends "masterpage.html" %}
+{% load static %}
+
+{% block title %}Pago no procesado - Lácteos Zulianos{% endblock %}
+
+{% block content %}
+<section class="confirmacion-pago">
+    <div class="confirmacion-card confirmacion-card--fallido">
+
+        <div class="confirmacion-icono confirmacion-icono--fallido">
+            <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="40" r="38" fill="none" stroke="#c0392b" stroke-width="3"/>
+                <path class="x-path x-path-1" d="M28 28 L52 52"
+                      fill="none" stroke="#022C63" stroke-width="5" stroke-linecap="round"/>
+                <path class="x-path x-path-2" d="M52 28 L28 52"
+                      fill="none" stroke="#022C63" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <h1>No pudimos procesar tu pago</h1>
+        <p class="confirmacion-subtexto">
+            La transacción fue rechazada o cancelada. No se realizó ningún cobro. Puedes intentarlo de nuevo o usar otro medio de pago.
+        </p>
+
+        <div class="confirmacion-acciones">
+            <a href="{% url 'carro:crear_preferencia' %}" class="btn-confirmacion btn-confirmacion-primario">
+                Intentar de nuevo
+            </a>
+            <a href="{% url 'home:index' %}" class="btn-confirmacion btn-confirmacion-secundario">
+                Volver al inicio
+            </a>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -21,6 +21,13 @@ CSRF_TRUSTED_ORIGINS = [
 #python manage.py simular_flujo_descuentos   para correr
 #python manage.py simular_flujo_descuentos --limpiar   para eliminar todos los usuarios creados para la simulacion
 
+# settings.py
+#MERCADOPAGO_ACCESS_TOKEN = "TEST-XXXXXXXXXXXXXXXX-XXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX"
+#MERCADOPAGO_PUBLIC_KEY = "TEST-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+
+# URL base de tu sitio (para back_urls y notificaciones)
+SITE_URL = "http://127.0.0.1:8000"
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

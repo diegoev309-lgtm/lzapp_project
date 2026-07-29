@@ -1,0 +1,44 @@
+{% extends "masterpage.html" %}
+{% load static %}
+
+{% block title %}Pago pendiente - Lácteos Zulianos{% endblock %}
+
+{% block content %}
+<section class="confirmacion-pago">
+    <div class="confirmacion-card confirmacion-card--pendiente">
+
+        <div class="confirmacion-icono confirmacion-icono--pendiente">
+            <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="40" r="38" fill="none" stroke="#d68910" stroke-width="3"/>
+                <circle class="reloj-punto" cx="40" cy="40" r="3" fill="#022C63"/>
+                <line class="reloj-manecilla-min" x1="40" y1="40" x2="40" y2="20"
+                      stroke="#022C63" stroke-width="4" stroke-linecap="round"/>
+                <line class="reloj-manecilla-hor" x1="40" y1="40" x2="55" y2="40"
+                      stroke="#022C63" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <h1>Tu pago está en proceso</h1>
+        <p class="confirmacion-subtexto">
+            Estamos esperando la confirmación de tu medio de pago (por ejemplo PSE o Efecty).
+            Te avisaremos por correo apenas se confirme, normalmente en minutos u horas.
+        </p>
+
+        {% if payment_id %}
+        <div class="confirmacion-detalles">
+            <div class="detalle-fila">
+                <span class="detalle-label">Número de referencia</span>
+                <span class="detalle-valor">{{ payment_id }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="confirmacion-acciones">
+            <a href="{% url 'home:index' %}" class="btn-confirmacion btn-confirmacion-primario">
+                Volver al inicio
+            </a>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
