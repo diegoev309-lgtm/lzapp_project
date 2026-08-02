@@ -1,5 +1,6 @@
 from django.urls import path
-from home.views import main, user, client, carro, buscar_productos_ajax #home
+from home.views import main, user, client, carro, buscar_productos_ajax  #home
+
 
 urlpatterns = [
     path('', user, name="user"),

@@ -221,7 +221,7 @@
 
             <div class="nav flex-column nav-lateral">
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Inicio' %}active{% endif %}"
+                <a class="nav-link {% if request.resolver_match.url_name == 'Inicio_dash' %}active{% endif %}"
                    href="{% url 'Inicio_dash'  %}">
                     <i class="bi bi-house-door-fill me-2"></i>
                     Inicio
@@ -245,8 +245,8 @@
                     Producción
                 </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Ventas' %}active{% endif %}"
-                   href="{% url 'Ventas' %}">
+                <a class="nav-link {% if request.resolver_match.url_name == 'panel_ventas' %}active{% endif %}"
+                   href="{% url 'panel_ventas' %}">
                     <i class="bi bi-cash-stack me-2"></i>
                     Ventas
                 </a>
@@ -312,7 +312,7 @@
                         Producción
                     </a>
 
-                    <a class="nav-link" href="{% url 'Ventas' %}">
+                    <a class="nav-link" href="{% url 'panel_ventas' %}">
                         <i class="bi bi-cash-stack me-2"></i>
                         Ventas
                     </a>

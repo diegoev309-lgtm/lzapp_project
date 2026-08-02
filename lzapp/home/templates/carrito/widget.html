@@ -1,3 +1,4 @@
+{% load static %}
 {% load humanize %}
 <style>
   :root {
@@ -12,7 +13,9 @@
   }
 
   /* ============================================================
-     SIDEBAR — Carrito (fondo blanco, acentos azul/dorado)
+     SIDEBAR — Carrito. Ahora es SIEMPRE panel superpuesto
+     (off-canvas) en cualquier tamaño de pantalla, controlado
+     por el botón flotante.
      ============================================================ */
   .carrito-widget {
     position: fixed;
@@ -20,33 +23,41 @@
     right: 0;
     height: 100vh;
     width: 340px;
+    max-width: 85%;
     background: var(--blanco);
     color: var(--azul-profundo);
     font-family: 'Montserrat', sans-serif;
-    box-shadow: -8px 0 30px rgba(2, 44, 99, 0.12);
+    box-shadow: -10px 0 40px rgba(2, 44, 99, 0.3);
     border-left: 1px solid var(--gris-borde);
     z-index: 1050;
     display: flex;
     flex-direction: column;
-    padding: 24px 20px;
-    overflow-y: auto;
+    padding: 0;
+    overflow: hidden;
+    transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  .carrito-widget::-webkit-scrollbar { width: 6px; }
-  .carrito-widget::-webkit-scrollbar-thumb {
-    background: rgba(201, 168, 76, 0.4);
-    border-radius: 4px;
+  .carrito-widget.activo {
+    transform: translateX(0);
   }
 
-  /* --- Header --- */
+  @media (max-width: 420px) {
+    .carrito-widget {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  /* --- Header: fijo arriba, nunca se mueve --- */
   .carrito-widget__header {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    padding: 20px 20px 16px;
     border-bottom: 1px solid var(--gris-borde);
+    background: var(--blanco);
   }
 
   .carrito-widget__header h3 {
@@ -75,7 +86,7 @@
   }
 
   .carrito-widget__cerrar {
-    display: none;
+    display: flex;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -94,12 +105,21 @@
     color: var(--azul-profundo);
   }
 
-  /* --- Lista de items --- */
+  /* --- Lista de items: ÚNICA zona con scroll --- */
   .carrito-widget__lista {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;              /* clave para que el scroll interno funcione en flexbox */
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 16px 20px;
+  }
+
+  .carrito-widget__lista::-webkit-scrollbar { width: 6px; }
+  .carrito-widget__lista::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.4);
+    border-radius: 4px;
   }
 
   .carrito-item {
@@ -111,6 +131,7 @@
     border-radius: 12px;
     background: var(--azul-claro);
     border: 1px solid transparent;
+    flex-shrink: 0;
     transition: background 0.25s ease, border-color 0.2s ease;
   }
 
@@ -127,12 +148,14 @@
     flex-shrink: 0;
     border: 1px solid var(--gris-borde);
     background: var(--blanco);
-}
+  }
 
   .carrito-item__info {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex: 1;
+    min-width: 0;
   }
 
   .carrito-item__nombre {
@@ -208,11 +231,13 @@
     opacity: 0.8;
   }
 
-  /* --- Footer --- */
+  /* --- Footer: fijo abajo, SIEMPRE visible mientras haya productos --- */
   .carrito-widget__footer {
-    margin-top: 16px;
-    padding-top: 16px;
+    flex-shrink: 0;
+    padding: 16px 20px 20px;
     border-top: 1px solid var(--gris-borde);
+    background: var(--blanco);
+    box-shadow: 0 -6px 16px rgba(2, 44, 99, 0.06);
   }
 
   .carrito-widget__total {
@@ -261,10 +286,10 @@
   }
 
   /* ============================================================
-     BOTÓN FLOTANTE — solo visible en móvil/tablet
+     BOTÓN FLOTANTE — visible SIEMPRE, en cualquier tamaño
      ============================================================ */
   .carrito-toggle {
-    display: none;
+    display: flex;
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -307,7 +332,7 @@
     border: 2px solid var(--blanco);
   }
 
-  /* --- Fondo oscuro detrás del panel en móvil --- */
+  /* --- Fondo oscuro detrás del panel, en cualquier tamaño --- */
   .carrito-overlay {
     display: none;
     position: fixed;
@@ -323,56 +348,87 @@
     opacity: 1;
   }
 
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
-  @media (max-width: 991px) {
-    .carrito-widget {
-      width: 85%;
-      max-width: 340px;
-      transform: translateX(100%);
-      box-shadow: -10px 0 40px rgba(2, 44, 99, 0.3);
-    }
-
-    .carrito-widget.activo {
-      transform: translateX(0);
-    }
-
-    .carrito-widget__cerrar {
-      display: flex;
-    }
-
-    .carrito-toggle {
-      display: flex;
-    }
-  }
-
-  @media (max-width: 420px) {
-    .carrito-widget {
-      width: 100%;
-      max-width: 100%;
-    }
-  }
+  /* ---- Estilos de Mercado Pago (sin cambios) ---- */
+  .carrito-pago { width: 100%; margin-top: 12px; position: relative; }
+  #wallet_container { width: 100%; margin-top: 12px; }
+  .mp-error { color: #c0392b; font-size: 0.85rem; text-align: center; margin-top: 8px; }
 
   .btn-pagar-mp {
-    display: block;
-    text-align: center;
-    background-color: var(--azul-profundo, #022C63);
-    color: #fff;
-    padding: 14px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    margin-top: 12px;
-    transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      background-color: #FFE600;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   }
+
   .btn-pagar-mp:hover {
-    background-color: var(--dorado, #c9a84c);
-    color: #022C63;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      background-color: #ffe14d;
+  }
+
+  .btn-pagar-mp:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .mp-mensaje-redireccion {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      padding: 24px 16px;
+      background-color: #f7f7f5;
+      border-radius: 10px;
+      border: 1px solid #e5e5e2;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .mp-mensaje-redireccion.mp-visible { display: flex; opacity: 1; transform: translateY(0); }
+  .mp-mensaje-redireccion.mp-desvanecer { opacity: 0; transform: translateY(-6px); }
+  .mp-mensaje-icono { width: 32px; height: 32px; }
+  .mp-mensaje-redireccion p { color: var(--azul-profundo); font-size: 0.9rem; font-weight: 500; margin: 0; }
+
+  .mp-mensaje-barra { width: 120px; height: 4px; background-color: #e5e5e2; border-radius: 4px; overflow: hidden; }
+  .mp-mensaje-barra span {
+      display: block; height: 100%; width: 0%;
+      background-color: var(--dorado); border-radius: 4px;
+      animation: cargarBarra 1.4s ease-in-out forwards;
+  }
+  @keyframes cargarBarra { to { width: 100%; } }
+
+    .mp-wallet-container { opacity: 0; transform: translateY(8px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .mp-wallet-container.mp-visible { opacity: 1; transform: translateY(0); }
+    .carrito-item--premio {
+    background: linear-gradient(120deg, rgba(201,168,76,0.18), rgba(240,217,138,0.12));
+    border-color: rgba(201, 168, 76, 0.5);
+  }
+
+  .carrito-item__badge-premio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--azul-profundo);
+    background: var(--dorado-claro);
+    padding: 1px 7px;
+    border-radius: 50px;
+    margin-left: 6px;
+    vertical-align: middle;
   }
 </style>
 
-<!-- Botón flotante (solo móvil/tablet) -->
+<!-- Botón flotante: SIEMPRE visible, en cualquier pantalla -->
 <button class="carrito-toggle" id="carritoToggle" type="button" aria-label="Abrir carrito">
   <i class="bi bi-cart3"></i>
   {% if request.session.carro %}
@@ -380,7 +436,7 @@
   {% endif %}
 </button>
 
-<!-- Fondo oscuro al abrir en móvil -->
+<!-- Fondo oscuro al abrir -->
 <div class="carrito-overlay" id="carritoOverlay"></div>
 
 <aside class="carrito-widget" id="carritoWidget">
@@ -395,23 +451,32 @@
     </div>
   </div>
 
+  <div class="carrito-widget__lista">
     {% for i,j in request.session.carro.items %}
-      <div class="carrito-item">
-        <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
-        <div class="carrito-item__info">
-          <span class="carrito-item__nombre">{{ j.nombre }}</span>
-          <span class="carrito-item__cantidad">Cantidad: {{ j.cantidad }} · $ {{ j.precio|floatformat:0|intcomma }} c/u</span>
-        </div>
-        <div class="carrito-item__controles">
-          <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
+    <div class="carrito-item {% if j.es_premio %}carrito-item--premio{% endif %}">
+      <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
+      <div class="carrito-item__info">
+        <span class="carrito-item__nombre">
+          {{ j.nombre }}
+          {% if j.es_premio %}<span class="carrito-item__badge-premio"><i class="bi bi-gift-fill"></i> Premio</span>{% endif %}
+        </span>
+        <span class="carrito-item__cantidad">
+          Cantidad: {{ j.cantidad }} ·
+          {% if j.es_premio %}
+            <s>$ {{ j.precio_original|floatformat:0|intcomma }}</s>
+            <strong>$ {{ j.precio|floatformat:0|intcomma }}</strong> c/u
+          {% else %}
+            $ {{ j.precio|floatformat:0|intcomma }} c/u
+          {% endif %}
+        </span>
+      </div>
+      <div class="carrito-item__controles">
+        <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
+        {% if not j.es_premio %}
           <a href="{% url 'carro:agregar' i %}" class="btn-qty btn-qty--sumar">+</a>
-        </div>
+        {% endif %}
       </div>
-    {% empty %}
-      <div class="carrito-widget__vacio">
-        <i class="bi bi-bag-x"></i>
-        Sin productos
-      </div>
+    </div>
     {% endfor %}
   </div>
 
@@ -422,9 +487,24 @@
       <strong>$ {{ totalizar_carro|floatformat:0|intcomma }}</strong>
     </div>
     <div class="carrito-widget__acciones">
-      <a href="{% url 'carro:crear_preferencia' %}" class="btn-pagar-mp">
-          Pagar con Mercado Pago
-      </a>
+
+      <div class="carrito-pago">
+        <button type="button" id="btn-iniciar-pago" class="btn-pagar-mp">
+          Pagar con mercado pago
+        </button>
+
+        <div id="mp-mensaje-redireccion" class="mp-mensaje-redireccion">
+          <svg class="mp-mensaje-icono" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#022C63" stroke-width="1.5"/>
+              <path d="M9 12l2 2 4-4" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p>Serás redirigido a la página segura de Mercado Pago para completar tu compra.</p>
+          <div class="mp-mensaje-barra"><span></span></div>
+        </div>
+
+        <div id="wallet_container" class="mp-wallet-container"></div>
+      </div>
+
       <form action="{% url 'carro:limpiar' %}" method="post" onsubmit="return confirm('¿Vaciar el carrito?');">
         {% csrf_token %}
         <button type="submit" class="btn-vaciar">Vaciar carrito</button>
@@ -435,7 +515,76 @@
 
 </aside>
 
+<script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
+  const mp = new MercadoPago('{{ MP_PUBLIC_KEY }}', { locale: 'es-CO' });
+
+  const btnPago = document.getElementById('btn-iniciar-pago');
+  const mensaje = document.getElementById('mp-mensaje-redireccion');
+  const walletContainer = document.getElementById('wallet_container');
+
+  if (btnPago) {
+    btnPago.addEventListener('click', async function () {
+      btnPago.disabled = true;
+      btnPago.textContent = 'Preparando el pago...';
+
+      try {
+        const response = await fetch("{% url 'carro:crear_preferencia_ajax' %}");
+        const data = await response.json();
+
+        if (!data.id) {
+          mostrarError('No se pudo iniciar el pago. Intenta de nuevo.');
+          return;
+        }
+
+        btnPago.classList.add('mp-desvanecer');
+
+        setTimeout(() => {
+          btnPago.style.display = 'none';
+          mensaje.classList.add('mp-visible');
+
+          setTimeout(() => {
+            mensaje.classList.add('mp-desvanecer');
+
+            setTimeout(() => {
+              mensaje.style.display = 'none';
+              walletContainer.classList.add('mp-visible');
+
+              mp.bricks().create("wallet", "wallet_container", {
+                initialization: { preferenceId: data.id },
+                customization: {
+                  theme: 'default',
+                  valueProp: 'security_safety',
+                  customStyle: {
+                    valuePropColor: 'blue',
+                    buttonHeight: '48px',
+                    borderRadius: '12px',
+                    verticalPadding: '10px',
+                    horizontalPadding: '10px',
+                  }
+                },
+                callbacks: {
+                  onError: (error) => console.error(error),
+                }
+              });
+            }, 350);
+          }, 1400);
+        }, 300);
+
+      } catch (error) {
+        mostrarError('Ocurrió un error al conectar con Mercado Pago.');
+      }
+    });
+  }
+
+  function mostrarError(texto) {
+    walletContainer.innerHTML = `<p class="mp-error">${texto}</p>`;
+    walletContainer.classList.add('mp-visible');
+    btnPago.disabled = false;
+    btnPago.style.display = 'block';
+    btnPago.textContent = 'Pagar con Mercado Pago';
+  }
+
   (function () {
     const widget = document.getElementById('carritoWidget');
     const toggle = document.getElementById('carritoToggle');
@@ -457,13 +606,5 @@
     if (toggle) toggle.addEventListener('click', abrirCarrito);
     if (cerrar) cerrar.addEventListener('click', cerrarCarrito);
     if (overlay) overlay.addEventListener('click', cerrarCarrito);
-
-    // Si la pantalla se agranda y el panel quedó abierto en modo móvil, limpiar estado
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 991) {
-        overlay.classList.remove('activo');
-        document.body.style.overflow = '';
-      }
-    });
   })();
 </script>

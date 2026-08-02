@@ -139,7 +139,6 @@ def previsualizar_producto(request, pk):
     return JsonResponse({'producto': producto.nombre, 'previsualizaciones': previsualizaciones})
 
 
-#@login_required
 def marcar_premio_mostrado(request):
     """
     Llamado por el JS del home justo después de que termina la animación

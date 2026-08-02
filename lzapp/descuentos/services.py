@@ -7,14 +7,14 @@ from dashboard.models import CampanaDescuento, DescuentoAsignado, DetalleVenta
 
 
 def obtener_ids_clientes_elegibles(campana: CampanaDescuento, producto):
-    """
-    Devuelve solo los IDs (no los objetos completos, para no cargar
-    memoria de más) de los clientes que:
-    - no son staff/admin
-    - NO han comprado ESTE producto en los últimos `dias_sin_compra` días
-      (o nunca lo han comprado)
-    - no tienen ya un premio de esta campaña para este producto
-    """
+    #"""
+    #Devuelve solo los IDs (no los objetos completos, para no cargar
+    #memoria de más) de los clientes que:
+    #- no son staff/admin
+    #- NO han comprado ESTE producto en los últimos `dias_sin_compra` días
+    #  (o nunca lo han comprado)
+    #- no tienen ya un premio de esta campaña para este producto
+    #"""
     limite_fecha = timezone.now() - timedelta(days=campana.dias_sin_compra)
 
     usuarios_que_si_compraron = DetalleVenta.objects.filter(
@@ -37,26 +37,26 @@ def obtener_ids_clientes_elegibles(campana: CampanaDescuento, producto):
 
 
 def calcular_stock_disponible_para_oferta(producto):
-    """
-    Stock que sí se puede comprometer en la oferta, dejando intacto
-    tanto el stock_minimo del producto como el colchón extra de la
-    campaña (stock_reservado_no_ofertable).
-    """
+    #"""
+    #Stock que sí se puede comprometer en la oferta, dejando intacto
+    #tanto el stock_minimo del producto como el colchón extra de la
+    #campaña (stock_reservado_no_ofertable).
+    #"""
     return max(producto.stock_actual - producto.stock_minimo, 0)
 
 
 def calcular_limite_clientes(campana: CampanaDescuento, producto):
-    """
-    Calcula CUÁNTOS clientes realmente pueden recibir el premio para
-    este producto, cruzando las 3 restricciones:
-      1) tope configurado (cantidad_clientes)
-      2) % máximo de la base total de clientes activos
-      3) stock disponible (menos el colchón reservado)
-
-    Devuelve un dict con el detalle, para poder informarlo/loguearlo
-    ANTES de ejecutar el sorteo (ideal para mostrarlo en el admin o
-    en una vista de "previsualizar campaña").
-    """
+    #"""
+    #Calcula CUÁNTOS clientes realmente pueden recibir el premio para
+    #este producto, cruzando las 3 restricciones:
+    #  1) tope configurado (cantidad_clientes)
+    #  2) % máximo de la base total de clientes activos
+    #  3) stock disponible (menos el colchón reservado)
+#
+    #Devuelve un dict con el detalle, para poder informarlo/loguearlo
+    #ANTES de ejecutar el sorteo (ideal para mostrarlo en el admin o
+    #en una vista de "previsualizar campaña").
+    #"""
     total_clientes_activos = User.objects.filter(is_staff=False, is_active=True).count()
     limite_por_porcentaje = int(total_clientes_activos * (campana.porcentaje_maximo_clientes / 100))
 
@@ -84,11 +84,11 @@ def calcular_limite_clientes(campana: CampanaDescuento, producto):
 
 
 def previsualizar_campana(campana: CampanaDescuento):
-    """
-    Muestra, SIN crear ningún registro todavía, a cuántos clientes se
-    les aplicaría el descuento por cada producto de la campaña.
-    Útil para revisar antes de lanzarla de verdad.
-    """
+    #"""
+    #Muestra, SIN crear ningún registro todavía, a cuántos clientes se
+    #les aplicaría el descuento por cada producto de la campaña.
+    #Útil para revisar antes de lanzarla de verdad.
+    #"""
     if not campana.esta_vigente():
         return {'campana': campana.nombre, 'error': 'La campaña no está activa o está fuera de fechas.'}
 
@@ -97,12 +97,12 @@ def previsualizar_campana(campana: CampanaDescuento):
 
 
 def ejecutar_campana(campana: CampanaDescuento):
-    """
-    Corre el sorteo de UNA campaña: por cada producto, calcula el
-    límite real de clientes (stock + % + tope), sortea sobre los IDs
-    elegibles (liviano en memoria) y crea el DescuentoAsignado de cada
-    ganador.
-    """
+    #"""
+    #Corre el sorteo de UNA campaña: por cada producto, calcula el
+    #límite real de clientes (stock + % + tope), sortea sobre los IDs
+    #elegibles (liviano en memoria) y crea el DescuentoAsignado de cada
+    #ganador.
+    #"""
     resumen = {'campana': campana.nombre, 'productos': []}
 
     if not campana.esta_vigente():
@@ -147,11 +147,11 @@ def ejecutar_campana(campana: CampanaDescuento):
 
 
 def ejecutar_campanas_pendientes():
-    """
-    Recorre TODAS las campañas activas y ejecuta las que les toque
-    según su frecuencia (semanal/mensual). Esto es lo que se llama
-    desde el comando programado (cron / Celery beat).
-    """
+    #"""
+    #Recorre TODAS las campañas activas y ejecuta las que les toque
+    #según su frecuencia (semanal/mensual). Esto es lo que se llama
+    #desde el comando programado (cron / Celery beat).
+    #"""
     resultados = []
     for campana in CampanaDescuento.objects.filter(activo=True):
         if campana.debe_ejecutarse():
@@ -159,15 +159,36 @@ def ejecutar_campanas_pendientes():
     return resultados
 
 
-def obtener_premio_activo_para_home(usuario):
-    """
-    Para usar directamente en la vista del home: devuelve el premio
-    (DescuentoAsignado) más reciente y aún vigente para mostrar la
-    tarjeta de "ganaste un descuento", o None si no tiene ninguno.
-    """
-    return (
+def obtener_premio_activo_para_home(usuario, solo_mostrados=False):
+    #"""
+    #Para usar directamente en la vista del home: devuelve el premio
+    #(DescuentoAsignado) más reciente y aún vigente para mostrar la
+    #tarjeta de "ganaste un descuento", o None si no tiene ninguno.
+#
+    #solo_mostrados=True → solo devuelve el premio si el cliente YA vio
+    #la animación de revelación (mostrado=True). Úsalo en cualquier
+    #vista que NO sea el home, para que el premio no aparezca "de la
+    #nada" antes de que el usuario lo haya reclamado visualmente.
+    #"""
+    qs = DescuentoAsignado.objects.filter(
+        usuario=usuario, usado=False, fecha_expiracion__gte=timezone.now()
+    )
+    if solo_mostrados:
+        qs = qs.filter(mostrado=True)
+    return qs.order_by('-fecha_asignacion').first()
+
+def obtener_producto_ids_con_premio_activo(usuario):
+    #"""
+    #IDs de productos que el usuario tiene con un premio vigente y sin usar
+    #(independiente de si ya vio la animación o ya lo agregó al carrito).
+    #Se usa para OCULTAR esos productos de la lista normal de catálogo,
+    #ya que mientras el descuento siga activo no deben competir con su
+    #versión de precio completo.
+    #"""
+    if not usuario.is_authenticated:
+        return set()
+    return set(
         DescuentoAsignado.objects
         .filter(usuario=usuario, usado=False, fecha_expiracion__gte=timezone.now())
-        .order_by('-fecha_asignacion')
-        .first()
+        .values_list('producto_id', flat=True)
     )

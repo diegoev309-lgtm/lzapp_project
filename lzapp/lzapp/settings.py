@@ -22,11 +22,11 @@ CSRF_TRUSTED_ORIGINS = [
 #python manage.py simular_flujo_descuentos --limpiar   para eliminar todos los usuarios creados para la simulacion
 
 # settings.py
-#MERCADOPAGO_ACCESS_TOKEN = "TEST-XXXXXXXXXXXXXXXX-XXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX"
-#MERCADOPAGO_PUBLIC_KEY = "TEST-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+MERCADOPAGO_ACCESS_TOKEN = "APP_USR-3569434423018606-072916-47fd605aeda608e3647b1d515e5f680b-3575141051"
+MERCADOPAGO_PUBLIC_KEY = "APP_USR-e9497343-694d-4adc-83e6-2403bcab07c0"
 
 # URL base de tu sitio (para back_urls y notificaciones)
-SITE_URL = "http://127.0.0.1:8000"
+SITE_URL = "https://spent-daycare-sludge.ngrok-free.dev"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'producto',
     'descuentos',
     'produccion',
+    'venta',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'carrito.context_processor.totalizar_carro',
+                "carrito.context_processor.mercadopago_public_key",
             ],
         },
     },

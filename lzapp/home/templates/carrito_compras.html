@@ -14,20 +14,6 @@
 
     <style>
         /* ============================================================
-           AJUSTE DE LAYOUT — deja espacio para el carrito fijo
-           ============================================================ */
-        body {
-            margin-right: 340px;
-            transition: margin-right 0.3s ease;
-        }
-
-        @media (max-width: 991px) {
-            body {
-                margin-right: 0;
-            }
-        }
-
-        /* ============================================================
         TARJETAS DE PRODUCTO — una por fila, horizontal,
         descripción siempre visible
         ============================================================ */
@@ -199,9 +185,11 @@
            Bootstrap intente centrar un container de 1140/1320px en un
            espacio menor */
         .seccion-productos .container {
-            max-width: 100%;
-            padding-left: 2rem;
-            padding-right: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
         }
 
         /* --- Encabezado de la sección: título y descripción más chicos --- */
@@ -455,30 +443,6 @@
         .buscador-btn:hover::before {
             opacity: 1;
         }
-        /* ============================================================
-           AJUSTE DE LAYOUT — deja espacio para el carrito fijo
-           ============================================================ */
-        body {
-            margin-right: 340px !important;   /* !important para ganarle a home.css */
-            transition: margin-right 0.3s ease;
-        }
-
-        /* El navbar es fixed-top: no hereda el margin del body,
-           así que hay que recortarlo manualmente */
-        #mainNav.navbar.fixed-top {
-            right: 340px;
-            left: 0;
-            transition: right 0.3s ease;
-        }
-
-        @media (max-width: 991px) {
-            body {
-                margin-right: 0 !important;
-            }
-            #mainNav.navbar.fixed-top {
-                right: 0;
-            }
-        }
 
         /* ============================================================
            NAVBAR — en esta página no hay hero, así que se queda
@@ -610,13 +574,341 @@
             flex: 1 0 auto;
         }
 
+        /* --- Tarjeta destacada del premio en el grid de productos --- */
+        .producto-card--premio {
+            position: relative;
+            overflow: visible;
+            border: 2px solid var(--dorado);
+            box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25);
+            animation: premioCardBrillo 2.6s ease-in-out infinite;
+        }
+
+        @keyframes premioCardBrillo {
+            0%, 100% { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25); }
+            50%      { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.12), 0 0 22px rgba(240, 217, 138, 0.55), 0 0 0 3px rgba(201, 168, 76, 0.55); }
+        }
+
+        .premio-cinta-mini {
+            position: absolute;
+            top: 14px;
+            right: -30px;
+            background: var(--dorado);
+            color: #1a1a1a;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            padding: 3px 34px;
+            transform: rotate(35deg);
+            z-index: 5;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .badge-stock.premio {
+            background: var(--dorado);
+            color: #1a1a1a;
+        }
+
+        .precio-tachado {
+            text-decoration: line-through;
+            color: #8a8a8a;
+            font-size: 0.75em;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .producto-card--premio { animation: none; }
+        }
+
+        /* ============================================================
+           PÁGINA CARRITO — solo las diferencias respecto a la tarjeta
+           base: layout horizontal en vez de vertical, y todo un poco
+           más compacto porque el carrito fijo le resta ancho a la página.
+           ============================================================ */
+
+        .pagina-carrito .producto-card {
+            border: none;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: row;
+            min-height: 140px;
+        }
+
+        .pagina-carrito .producto-img-wrapper {
+            width: 150px;
+            padding: 10px;
+        }
+
+        .pagina-carrito .imagen-producto {
+            max-height: 130px;
+        }
+
+        .pagina-carrito .badge-stock {
+            top: 8px;
+            left: 8px;
+            font-size: 0.6rem;
+            padding: 0.22rem 0.6rem;
+        }
+
+        .pagina-carrito .card-body {
+            padding: 0.85rem 1rem 0.3rem;
+        }
+
+        .pagina-carrito .estrellas {
+            font-size: 0.72rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .pagina-carrito .precio-fila {
+            gap: 10px;
+            margin-bottom: 0.4rem;
+        }
+
+        .pagina-carrito .titulo-producto {
+            font-size: 0.95rem;
+        }
+
+        .pagina-carrito .precio {
+            font-size: 1.05rem;
+        }
+
+        .pagina-carrito .producto-descripcion {
+            font-size: 0.78rem;
+            line-height: 1.4;
+        }
+
+        .pagina-carrito .card-footer {
+            padding: 0.4rem 1rem 0.85rem;
+        }
+
+        .pagina-carrito .btn-carrito {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        /* La tarjeta de premio también respeta el layout horizontal
+           compacto del carrito; solo se ajusta la cinta para que no
+           se salga tanto en un ancho de tarjeta más angosto. */
+        .pagina-carrito .premio-cinta-mini {
+            right: -26px;
+            font-size: 9px;
+            padding: 3px 30px;
+        }
+
+        @media (min-width: 992px) and (max-width: 1200px) {
+            .pagina-carrito .producto-img-wrapper { width: 130px; }
+            .pagina-carrito .imagen-producto { max-height: 110px; }
+        }
+
+        @media (max-width: 576px) {
+            .pagina-carrito .producto-card {
+                flex-direction: column;
+                min-height: auto;
+            }
+        
+            .pagina-carrito .producto-img-wrapper {
+                width: 100%;
+                padding: 16px;
+            }
+        
+            .pagina-carrito .imagen-producto {
+                max-height: 180px;
+            }
+        
+            .pagina-carrito .card-body {
+                padding: 1rem 1.2rem 0.3rem;
+            }
+        
+            .pagina-carrito .precio-fila {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+        
+            .pagina-carrito .titulo-producto {
+                font-size: 1.05rem;
+                white-space: normal;      /* permite que el nombre haga wrap normal, no letra por letra */
+            }
+        
+            .pagina-carrito .precio {
+                font-size: 1.2rem;
+            }
+        
+            .pagina-carrito .card-footer {
+                padding: 0.6rem 1.2rem 1.2rem;
+            }
+        
+            .pagina-carrito .btn-carrito {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .pagina-carrito .seccion-productos {
+            padding-top: 130px;
+        }
+
+        @media (max-width: 991px) {
+            .pagina-carrito .seccion-productos {
+                padding-top: 110px;
+            }
+        }
+
+        .pagina-carrito .seccion-productos .container {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .pagina-carrito .seccion-productos .container.py-5 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        .pagina-carrito .seccion-productos .section-titulo {
+            font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .pagina-carrito .seccion-productos .section-eyebrow {
+            font-size: 0.68rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .pagina-carrito .seccion-productos .section-descripcion {
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        .pagina-carrito .seccion-productos .row.mb-5 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .pagina-carrito .seccion-productos h2 {
+            font-size: 1.3rem;
+        }
+
+        .pagina-carrito #contadorProductos {
+            font-size: 0.78rem !important;
+        }
+
+        .pagina-carrito .buscador-wrapper {
+            max-width: 480px;
+            margin-bottom: 1.2rem;
+        }
+
+        .pagina-carrito .buscador-input {
+            padding: 0.7rem 2.2rem 0.7rem 2.8rem;
+            font-size: 0.85rem;
+        }
+
+        .pagina-carrito .buscador-icono {
+            left: 18px;
+            font-size: 0.9rem;
+        }
+
+        .pagina-carrito .buscador-btn {
+            padding: 0 1.4rem;
+            font-size: 0.82rem;
+        }
+
+        @media (max-width: 480px) {
+            .pagina-carrito .buscador-productos {
+                flex-direction: column;
+                border-radius: 20px;
+            }
+            .pagina-carrito .buscador-input {
+                padding: 0.85rem 1.2rem;
+            }
+            .pagina-carrito .buscador-icono {
+                left: 16px;
+            }
+            .pagina-carrito .buscador-btn {
+                padding: 0.7rem 1rem;
+                justify-content: center;
+                border-radius: 0 0 18px 18px;
+            }
+        }
+
         footer {
             flex-shrink: 0;
         }
+
+        .mp-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 44, 99, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            animation: mpOverlayFadeIn 0.3s ease forwards;
+        }
+
+        @keyframes mpOverlayFadeIn {
+            to { opacity: 1; }
+        }
+
+        .mp-overlay-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px 32px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(20px) scale(0.96);
+            opacity: 0;
+            animation: mpCardEntrar 0.4s ease 0.15s forwards;
+        }
+
+        @keyframes mpCardEntrar {
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .mp-overlay--exitoso .mp-overlay-card { border-top: 4px solid var(--dorado, #c9a84c); }
+        .mp-overlay--pendiente .mp-overlay-card { border-top: 4px solid #d68910; }
+        .mp-overlay--fallido .mp-overlay-card { border-top: 4px solid #c0392b; }
+
+        .mp-overlay-icono { width: 72px; height: 72px; margin: 0 auto 20px; }
+        .mp-overlay-icono svg { width: 100%; height: 100%; }
+
+        .mp-overlay-card h2 { color: var(--azul-profundo, #022C63); font-size: 1.4rem; margin-bottom: 10px; }
+        .mp-overlay-card p { color: #555; font-size: 0.9rem; margin-bottom: 6px; }
+        .mp-overlay-ref { color: #999; font-size: 0.8rem; }
+
+        .mp-overlay-btn {
+            margin-top: 20px;
+            background: var(--azul-profundo, #022C63);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .mp-overlay-btn:hover { background: var(--dorado, #c9a84c); color: #022C63; }
+
+        /* Animaciones de los íconos, iguales a las que ya tenías */
+        .mp-check-path { stroke-dasharray: 60; stroke-dashoffset: 60; animation: mpDibujar 0.6s ease-out 0.4s forwards; }
+        .mp-x-path { stroke-dasharray: 34; stroke-dashoffset: 34; }
+        .mp-x-path-1 { animation: mpDibujar 0.4s ease-out 0.4s forwards; }
+        .mp-x-path-2 { animation: mpDibujar 0.4s ease-out 0.65s forwards; }
+        @keyframes mpDibujar { to { stroke-dashoffset: 0; } }
+
+        .mp-reloj-min { transform-origin: 40px 40px; animation: mpGirar 3s linear infinite; }
+        .mp-reloj-hor { transform-origin: 40px 40px; animation: mpGirar 12s linear infinite; }
+        @keyframes mpGirar { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="pagina-carrito">
+
     {% include 'carrito/widget.html' %}
+
 
     <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
     <header>
@@ -694,6 +986,52 @@
         </nav>
     </header>
 
+    {% if pago_status %}
+    <div id="mp-overlay" class="mp-overlay mp-overlay--{{ pago_status }}">
+        <div class="mp-overlay-card">
+
+            {% if pago_status == "exitoso" %}
+                <div class="mp-overlay-icono">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="40" cy="40" r="38" fill="none" stroke="#c9a84c" stroke-width="3"/>
+                        <path class="mp-check-path" d="M22 41 L34 53 L58 27" fill="none" stroke="#022C63" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2>¡Pago realizado con éxito!</h2>
+                <p>Gracias por tu compra. Tu pedido está siendo preparado.</p>
+                {% if pago_payment_id %}<p class="mp-overlay-ref">Referencia: {{ pago_payment_id }}</p>{% endif %}
+
+            {% elif pago_status == "pendiente" %}
+                <div class="mp-overlay-icono">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="40" cy="40" r="38" fill="none" stroke="#d68910" stroke-width="3"/>
+                        <circle cx="40" cy="40" r="3" fill="#022C63"/>
+                        <line class="mp-reloj-min" x1="40" y1="40" x2="40" y2="20" stroke="#022C63" stroke-width="4" stroke-linecap="round"/>
+                        <line class="mp-reloj-hor" x1="40" y1="40" x2="55" y2="40" stroke="#022C63" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2>Tu pago está en proceso</h2>
+                <p>Te avisaremos por correo apenas se confirme.</p>
+
+            {% else %}
+                <div class="mp-overlay-icono">
+                    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="40" cy="40" r="38" fill="none" stroke="#c0392b" stroke-width="3"/>
+                        <path class="mp-x-path mp-x-path-1" d="M28 28 L52 52" fill="none" stroke="#022C63" stroke-width="5" stroke-linecap="round"/>
+                        <path class="mp-x-path mp-x-path-2" d="M52 28 L28 52" fill="none" stroke="#022C63" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2>No pudimos procesar tu pago</h2>
+                <p>No se realizó ningún cobro. Puedes intentarlo de nuevo.</p>
+            {% endif %}
+
+            <button type="button" id="mp-overlay-cerrar" class="mp-overlay-btn">Continuar</button>
+        </div>
+    </div>
+    {% endif %}
+
+    {% block content %}
+
     <!-- ===== SECCIÓN PRODUCTOS ===== -->
     <section class="seccion-productos" id="productos">
 
@@ -706,7 +1044,6 @@
                  data-layout="horizontal">
                 <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
                     <div class="buscador-input-wrapper">
-                        <i class="bi bi-search buscador-icono"></i>
                         <input
                             type="text"
                             name="q"
@@ -729,6 +1066,45 @@
             </div>
 
             <div class="row g-4" id="listaProductos">
+                {% if premio_activo %}
+                <div class="col-12">
+                    <div class="card producto-card producto-card--premio">
+                        <span class="premio-cinta-mini">TU PREMIO</span>
+                        <div class="producto-img-wrapper">
+                            <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
+                            {% if premio_activo.producto.imagen %}
+                                <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
+                            {% else %}
+                                <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                            {% endif %}
+                        </div>
+                        <div class="producto-info">
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-stars"></i> Premio de la lotería
+                                </div>
+                                <div class="precio-fila">
+                                    <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
+                                    <p class="precio">
+                                        $ {{ premio_activo.precio_con_descuento }}
+                                        <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
+                                    </p>
+                                </div>
+                                <p class="producto-descripcion">
+                                    Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <div class="footer-botones">
+                                    <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito">
+                                        <i class="bi bi-gift-fill"></i> Reclamar premio
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 {% for i in productos %}
                 <div class="col-12">
                     <div class="card producto-card">
@@ -790,6 +1166,8 @@
         </div>
     </section>
 
+    {% endblock %}
+
     <!-- ===== FOOTER ===== -->
     <footer>
         <div class="container">
@@ -821,7 +1199,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'home/js/home.js' %}"></script>
     <script>
         document.querySelectorAll('.favorito').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -835,6 +1212,18 @@
             btn.addEventListener('click', () => {
                 btn.closest('.producto-card').classList.toggle('abierta');
             });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const overlay = document.getElementById('mp-overlay');
+            const cerrarBtn = document.getElementById('mp-overlay-cerrar');
+        
+            if (overlay && cerrarBtn) {
+                cerrarBtn.addEventListener('click', function () {
+                    overlay.style.animation = 'mpOverlayFadeIn 0.25s ease reverse forwards';
+                    setTimeout(() => overlay.remove(), 250);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                });
+            }
         });
 
         /* ---- Buscador en vivo: filtra directamente el grid de productos ---- */

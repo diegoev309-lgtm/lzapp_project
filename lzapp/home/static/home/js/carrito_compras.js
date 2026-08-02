@@ -11,6 +11,18 @@ document.querySelectorAll('.favorito').forEach(btn => {
                 btn.closest('.producto-card').classList.toggle('abierta');
             });
         });
+        document.addEventListener('DOMContentLoaded', function () {
+            const overlay = document.getElementById('mp-overlay');
+            const cerrarBtn = document.getElementById('mp-overlay-cerrar');
+        
+            if (overlay && cerrarBtn) {
+                cerrarBtn.addEventListener('click', function () {
+                    overlay.style.animation = 'mpOverlayFadeIn 0.25s ease reverse forwards';
+                    setTimeout(() => overlay.remove(), 250);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                });
+            }
+        });
 
         /* ---- Buscador en vivo: filtra directamente el grid de productos ---- */
         (function () {
