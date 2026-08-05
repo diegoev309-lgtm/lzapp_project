@@ -9,4 +9,5 @@ urlpatterns = [
     path('campana/<int:pk>/toggle/', views.toggle_campana_descuento, name='toggle_campana_descuento'),
     path('producto/<int:pk>/previsualizar/', views.previsualizar_producto, name='previsualizar_producto'),
     path('premio/marcar-mostrado/', views.marcar_premio_mostrado, name='marcar_premio_mostrado'),
+    path('descuentos/pdf/', views.generar_pdf_descuentos, name='generar_pdf_descuentos'),
 ]

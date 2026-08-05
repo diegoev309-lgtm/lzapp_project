@@ -616,47 +616,6 @@ body{
             </a>
         </div>
 
-        <!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
-        <div class="barra-controles">
-            <div class="selector-vista" role="group" aria-label="Selector de vista">
-                <button type="button" class="btn-vista activo" id="btnVistaResumen" onclick="cambiarVistaVentas('resumen')">
-                    <i class="bi bi-speedometer2"></i> Resumen
-                </button>
-                <button type="button" class="btn-vista" id="btnVistaHistorial" onclick="cambiarVistaVentas('historial')">
-                    <i class="bi bi-table"></i> Historial de ventas
-                </button>
-            </div>
-
-            <div class="dropdown">
-                <button class="btn-vista activo dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    <i class="bi bi-calendar3"></i>
-                    {% if filtro == 'semana' %}Última semana{% elif filtro == 'rango' %}{{ desde|date:"d/m" }} - {{ hasta|date:"d/m" }}{% else %}Último mes{% endif %}
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end filtro-menu">
-                    <li>
-                        <a class="dropdown-item {% if filtro == 'semana' %}active{% endif %}" href="?filtro=semana">
-                            <i class="bi bi-calendar-week"></i> Última semana
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item {% if filtro == 'mes' %}active{% endif %}" href="?filtro=mes">
-                            <i class="bi bi-calendar-month"></i> Último mes
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <span class="etiqueta-periodo"><i class="bi bi-calendar-range"></i> Rango personalizado</span>
-                        <form method="get" class="rango-personalizado">
-                            <input type="hidden" name="filtro" value="rango">
-                            <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
-                            <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
-                            <button type="submit" class="btn-aplicar-rango">Aplicar</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
         <!-- ============ VISTA RESUMEN: SOLO GRÁFICOS (CARRUSEL) ============ -->
         <div id="vistaResumen" class="vista-resumen">
             <div class="carrusel-graficos">
@@ -709,6 +668,47 @@ body{
                     <button type="button" class="punto" onclick="irASlide(1)" aria-label="Ver ventas por día"></button>
                     <button type="button" class="punto" onclick="irASlide(2)" aria-label="Ver participación por producto"></button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
+        <div class="barra-controles">
+            <div class="selector-vista" role="group" aria-label="Selector de vista">
+                <button type="button" class="btn-vista activo" id="btnVistaResumen" onclick="cambiarVistaVentas('resumen')">
+                    <i class="bi bi-speedometer2"></i> Resumen
+                </button>
+                <button type="button" class="btn-vista" id="btnVistaHistorial" onclick="cambiarVistaVentas('historial')">
+                    <i class="bi bi-table"></i> Historial de ventas
+                </button>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn-vista activo dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    <i class="bi bi-calendar3"></i>
+                    {% if filtro == 'semana' %}Última semana{% elif filtro == 'rango' %}{{ desde|date:"d/m" }} - {{ hasta|date:"d/m" }}{% else %}Último mes{% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end filtro-menu">
+                    <li>
+                        <a class="dropdown-item {% if filtro == 'semana' %}active{% endif %}" href="?filtro=semana">
+                            <i class="bi bi-calendar-week"></i> Última semana
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item {% if filtro == 'mes' %}active{% endif %}" href="?filtro=mes">
+                            <i class="bi bi-calendar-month"></i> Último mes
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <span class="etiqueta-periodo"><i class="bi bi-calendar-range"></i> Rango personalizado</span>
+                        <form method="get" class="rango-personalizado">
+                            <input type="hidden" name="filtro" value="rango">
+                            <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
+                            <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
+                            <button type="submit" class="btn-aplicar-rango">Aplicar</button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
 

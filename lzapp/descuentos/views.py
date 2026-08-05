@@ -5,6 +5,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from weasyprint import HTML
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado
 from .forms import CampanaDescuentoForm
@@ -155,3 +158,26 @@ def marcar_premio_mostrado(request):
     ).update(mostrado=True)
 
     return JsonResponse({'ok': True, 'actualizado': bool(actualizados)})
+
+def generar_pdf_descuentos(request):
+    campanas = (
+        CampanaDescuento.objects
+        .all()
+        .prefetch_related('productos')
+        .order_by('-activo', 'nombre')
+    )
+
+    contexto = {
+        'campanas': campanas,
+        'total_campanas': campanas.count(),
+        'campanas_activas': campanas.filter(activo=True).count(),
+        'campanas_inactivas': campanas.filter(activo=False).count(),
+        'fecha_generacion': timezone.now(),
+    }
+
+    html_string = render_to_string('reporte_descuentos.html', contexto)
+    pdf_bytes = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="reporte_descuentos.pdf"'
+    return response
