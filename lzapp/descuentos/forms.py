@@ -1,8 +1,21 @@
 from django import forms
-from dashboard.models import CampanaDescuento
+from django.db.models import F
+from dashboard.models import CampanaDescuento, Producto
 
 
 class CampanaDescuentoForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Sugerencia visual de vencimiento: los productos que vencen antes
+        # aparecen primero en la lista de checkboxes, para que sea más fácil
+        # detectar cuáles conviene mover con la campaña. Los que no tienen
+        # fecha_vencimiento cargada quedan al final. Esto NO autoselecciona
+        # nada, solo cambia el orden en el que se listan.
+        self.fields['productos'].queryset = Producto.objects.all().order_by(
+            F('fecha_vencimiento').asc(nulls_last=True), 'nombre'
+        )
+
     class Meta:
         model = CampanaDescuento
         fields = [

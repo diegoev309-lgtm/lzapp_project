@@ -30,6 +30,11 @@ class Producto(models.Model):
     stock_actual = models.PositiveIntegerField(default=0)
     stock_minimo = models.PositiveIntegerField(default=15)
     disponibilidad = models.BooleanField(default=True)
+    fecha_vencimiento = models.DateField(
+        null=True, blank=True,
+        help_text='Fecha de vencimiento del lote actual (se carga manualmente). '
+                   'Se usa solo como sugerencia visual al armar campañas de descuento.'
+    )
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 

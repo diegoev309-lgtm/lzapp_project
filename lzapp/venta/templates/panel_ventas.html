@@ -1,621 +1,305 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
 
-{% block content %}
+{% block title %}LzApp · Panel de Ventas{% endblock %}
+{% block page_icon %}bi-graph-up-arrow{% endblock %}
+{% block page_title %}Panel de Ventas{% endblock %}
+{% block page_subtitle %}Ganancias, ventas y productos más vendidos{% endblock %}
 
+{% block header_actions %}
+<a href="#" class="dash-btn dash-btn-solid">
+    <i class="bi bi-file-earmark-pdf-fill"></i> Exportar PDF
+</a>
+{% endblock %}
+
+{% block extra_css %}
 <style>
 
-body{
-    background:#f4f7fc;
-}
-
 /*==========================================================
-   BLOQUE UNIFICADO (mismo patrón que Gestión de Descuentos)
+   PANEL DE VENTAS — extensiones sobre main.css
+   (reutiliza variables --gold, --bg-panel, --text-*, etc.)
 ===========================================================*/
 
-.bloque-productos{
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
-}
-
-/*==========================
-        ENCABEZADO
-===========================*/
-
-.encabezado{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    padding:20px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:16px;
-}
-
-.titulo{
-    margin:0;
-    font-size:26px;
-    font-weight:bold;
-}
-
-.subtitulo{
-    margin-top:4px;
-    font-size:13px;
-    opacity:.9;
-}
-
-.btn-nuevo{
-    background:linear-gradient(135deg,#ffffff,#d7dce4);
-    color:#192987;
-    border:1px solid rgba(255,255,255,.5);
-    padding:10px 18px;
-    border-radius:12px;
-    font-weight:bold;
-    font-size:13px;
-    transition:.3s;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-}
-
-.btn-nuevo:hover{
-    background:linear-gradient(135deg,#eef0f3,#c2c8d2);
-    color:#14206b;
-    transform:translateY(-3px);
-    box-shadow:0 10px 22px rgba(0,0,0,.2);
-}
-
-/*==========================
-   BARRA: VISTA + FILTRO DE PERÍODO
-===========================*/
-
-.barra-controles{
-    padding:14px 30px 0;
+.ventas-toolbar{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
     flex-wrap:wrap;
+    margin-bottom: var(--gap);
 }
 
-.selector-vista{
-    display:inline-flex;
-    background:#f4f7fc;
-    border-radius:12px;
-    padding:4px;
-    border:1px solid rgba(2,44,99,.06);
-}
-
-.btn-vista{
-    border:none;
-    background:transparent;
-    color:#192987;
-    padding:6px 14px;
-    border-radius:9px;
-    font-weight:600;
-    font-size:12.5px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:.25s;
-    text-decoration:none;
-    cursor:pointer;
-}
-
-.btn-vista:hover{
-    background:#eef2ff;
-    color:#192987;
-}
-
-.btn-vista.activo{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    box-shadow:0 5px 14px rgba(25,41,135,.35);
-}
-
-.vista-oculta{
-    display:none !important;
-}
-
-/* ---- Dropdown de período (reemplaza los 3 botones) ---- */
+/* ---- Dropdown de período (custom, sin Bootstrap) ---- */
+.filtro-wrap{ position:relative; }
 
 .filtro-menu{
-    min-width:230px;
+    position:absolute;
+    top: calc(100% + 8px);
+    right:0;
+    min-width:250px;
     padding:8px;
-    border-radius:14px;
-    border:1px solid rgba(2,44,99,.08);
-    box-shadow:0 14px 32px rgba(2,44,99,.14);
+    border-radius: var(--radius-panel);
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    box-shadow: 0 20px 45px rgba(0,0,0,.45);
+    z-index:60;
+    display:none;
 }
+.filtro-menu.show{ display:block; }
 
-.filtro-menu .dropdown-item{
-    border-radius:9px;
-    font-size:12.5px;
-    font-weight:600;
-    color:#192987;
-    padding:8px 10px;
+.filtro-item{
     display:flex;
     align-items:center;
     gap:8px;
+    padding:9px 10px;
+    border-radius: var(--radius-btn);
+    font-size:12.5px;
+    font-weight:600;
+    color: var(--text-secondary);
+    cursor:pointer;
 }
+.filtro-item:hover{ background: rgba(255,255,255,.05); color: var(--text-primary); }
+.filtro-item.active{ background: var(--gold-dim); color: var(--gold); }
 
-.filtro-menu .dropdown-item:hover{
-    background:#eef2ff;
-    color:#192987;
-}
-
-.filtro-menu .dropdown-item.active{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-}
+.filtro-divider{ height:1px; background: var(--border-subtle); margin:6px 2px; }
 
 .etiqueta-periodo{
-    font-size:11.5px;
-    color:#8a93a6;
+    font-size:11px;
+    color: var(--text-tertiary);
     font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.4px;
     display:flex;
     align-items:center;
     gap:6px;
-    padding:2px 8px;
+    padding:4px 10px;
 }
 
 .rango-personalizado{
     display:flex;
     flex-direction:column;
-    gap:6px;
-    padding:2px 8px 4px;
+    gap:8px;
+    padding:2px 10px 6px;
 }
 
 .rango-personalizado input[type="date"]{
-    border:1px solid rgba(2,44,99,.12);
-    border-radius:10px;
-    padding:6px 10px;
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-btn);
+    padding:7px 10px;
     font-size:12.5px;
-    color:#192987;
-    background:#f7f9fd;
+    color: var(--text-primary);
+    background: var(--bg-canvas);
+    color-scheme: dark;
 }
-
 .rango-personalizado input[type="date"]:focus{
     outline:none;
-    border-color:#3556ff;
-    background:white;
+    border-color: var(--gold);
 }
 
 .btn-aplicar-rango{
     border:none;
-    border-radius:10px;
-    padding:7px 14px;
+    border-radius: var(--radius-btn);
+    padding:8px 14px;
     font-size:12.5px;
-    font-weight:600;
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    transition:.3s;
+    font-weight:700;
+    background: var(--gold);
+    color:#1A1A2E;
+    cursor:pointer;
+    transition:.2s;
 }
-
-.btn-aplicar-rango:hover{
-    color:white;
-    transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(25,41,135,.3);
-}
-
-@media(max-width:768px){
-    .barra-controles{
-        padding:14px 16px 0;
-        flex-direction:column;
-        align-items:stretch;
-    }
-    .selector-vista{
-        justify-content:center;
-    }
-}
+.btn-aplicar-rango:hover{ background:#EFD48C; }
 
 /*==========================
-   VISTA: RESUMEN (solo gráficos)
+   VISTA: RESUMEN (carrusel)
 ===========================*/
 
-.vista-resumen{
-    padding:14px 30px 20px;
-}
+.carrusel-graficos{ position:relative; }
 
-.carrusel-graficos{
-    position:relative;
-}
+.carrusel-viewport{ overflow:hidden; border-radius: var(--radius-panel); }
 
-.carrusel-viewport{
-    overflow:hidden;
-    border-radius:14px;
-}
+.carrusel-track{ display:flex; transition: transform .4s ease; }
 
-.carrusel-track{
-    display:flex;
-    transition:transform .4s ease;
-}
+.carrusel-slide{ min-width:100%; box-sizing:border-box; }
 
-.carrusel-slide{
-    min-width:100%;
-    box-sizing:border-box;
-}
-
-.carrusel-slide .panel-caja{
-    height:min(54vh, 430px);
-}
+.carrusel-slide .dash-panel{ height:min(54vh, 430px); display:flex; flex-direction:column; }
 
 .carrusel-flecha{
     position:absolute;
     top:50%;
     transform:translateY(-50%);
-    width:36px;
-    height:36px;
+    width:36px; height:36px;
     border-radius:50%;
-    border:1px solid rgba(2,44,99,.1);
-    background:white;
-    color:#192987;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 6px 16px rgba(2,44,99,.12);
-    transition:.25s;
+    border:1px solid var(--border-hair);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 24px rgba(0,0,0,.4);
     cursor:pointer;
+    transition:.2s;
 }
-
-.carrusel-flecha:hover{
-    background:#192987;
-    color:white;
-}
-
+.carrusel-flecha:hover{ background: var(--gold); color:#1A1A2E; border-color: var(--gold); }
 .carrusel-flecha-izq{ left:-14px; }
 .carrusel-flecha-der{ right:-14px; }
 
-.carrusel-puntos{
-    display:flex;
-    justify-content:center;
-    gap:8px;
-    margin-top:12px;
-}
+.carrusel-puntos{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
 
 .carrusel-puntos .punto{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    border:none;
-    background:#d7dce4;
-    padding:0;
-    cursor:pointer;
-    transition:.25s;
+    width:8px; height:8px; border-radius:50%; border:none;
+    background: rgba(255,255,255,.15);
+    padding:0; cursor:pointer; transition:.2s;
 }
-
-.carrusel-puntos .punto.activo{
-    width:22px;
-    border-radius:5px;
-    background:linear-gradient(135deg,#192987,#3556ff);
-}
+.carrusel-puntos .punto.activo{ width:22px; border-radius:5px; background: var(--gold); }
 
 @media(max-width:576px){
     .carrusel-flecha-izq{ left:4px; }
     .carrusel-flecha-der{ right:4px; }
 }
 
-.panel-caja{
-    background:white;
-    border:1px solid rgba(2,44,99,.08);
-    border-radius:14px;
-    padding:16px;
-    box-shadow:0 6px 16px rgba(2,44,99,.06);
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-}
-
-.panel-titulo{
-    font-size:13.5px;
-    font-weight:700;
-    color:#022C63;
-    margin-bottom:8px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-shrink:0;
-}
-
-.panel-titulo i{
-    color:#3556ff;
-}
-
-.panel-titulo small{
+.panel-subtitulo{
     font-weight:500;
-    color:#8a93a6;
+    color: var(--text-tertiary);
     font-size:11px;
     margin-left:auto;
 }
 
-.contenedor-grafico{
-    position:relative;
-    flex:1;
-    min-height:0;
-}
+.contenedor-grafico{ position:relative; flex:1; min-height:0; }
 
 /*==========================
-   VISTA: HISTORIAL DE VENTAS
+   VISTA: HISTORIAL
 ===========================*/
 
-.vista-historial{
-    padding:14px 30px 20px;
-}
-
-.kpi-grid{
+.historial-grid{
     display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:14px;
-    margin-bottom:14px;
+    grid-template-columns: 1fr 1.6fr;
+    gap: var(--gap);
 }
-
-.kpi-card{
-    background:white;
-    border:1px solid rgba(2,44,99,.08);
-    border-radius:14px;
-    padding:14px;
-    box-shadow:0 6px 16px rgba(2,44,99,.06);
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.kpi-icono{
-    width:42px;
-    height:42px;
-    min-width:42px;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    color:white;
-    background:linear-gradient(135deg,#192987,#3556ff);
-}
-
-.kpi-icono.dorado{ background:linear-gradient(135deg,#c9a84c,#e8c874); }
-.kpi-icono.verde{ background:linear-gradient(135deg,#198754,#2de25a); }
-
-.kpi-textos{
-    min-width:0;
-}
-
-.kpi-valor{
-    font-size:18px;
-    font-weight:800;
-    color:#022C63;
-    line-height:1.2;
-    white-space:nowrap;
-}
-
-.kpi-etiqueta{
-    font-size:11px;
-    color:#8a93a6;
-    font-weight:600;
-}
-
 @media(max-width:991px){
-    .kpi-grid{ grid-template-columns:repeat(2, 1fr); }
-}
-@media(max-width:576px){
-    .kpi-grid{ grid-template-columns:1fr; }
+    .historial-grid{ grid-template-columns:1fr; }
 }
 
-.fila-historial{
-    display:grid;
-    grid-template-columns:1fr 1.6fr;
-    gap:14px;
-}
-
-@media(max-width:991px){
-    .fila-historial{ grid-template-columns:1fr; }
-}
-
-.top-producto-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:9px 0;
-    border-bottom:1px solid rgba(2,44,99,.06);
-}
-
-.top-producto-item:last-child{
-    border-bottom:none;
-}
-
-.top-producto-rango{
-    width:22px;
-    height:22px;
-    min-width:22px;
+.rank-badge{
+    width:24px; height:24px; min-width:24px;
     border-radius:50%;
-    background:#f4f7fc;
-    color:#192987;
-    font-size:11px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    background: rgba(255,255,255,.06);
+    color: var(--gold);
+    font-size:11px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
 }
 
-.top-producto-info{
-    flex:1;
-    min-width:0;
+.estado-vacio{ text-align:center; padding:36px 16px; color: var(--text-tertiary); }
+.estado-vacio i{ font-size:34px; opacity:.5; }
+
+/* ---- Tabla resumen diario (usa .dash-table de main.css) ---- */
+.dash-table tbody tr{ cursor:pointer; transition:.15s; }
+.dash-table tbody tr:hover{ background: rgba(255,255,255,.03); }
+
+/* ---- Paginación ---- */
+.pie-ventas{
+    display:flex; justify-content:flex-end; align-items:center;
+    gap:6px; margin-top:14px; flex-wrap:wrap;
 }
-
-.top-producto-nombre{
-    font-size:12.5px;
-    font-weight:600;
-    color:#022C63;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-.top-producto-cifras{
-    text-align:right;
-    white-space:nowrap;
-}
-
-.top-producto-ingreso{
-    font-size:12.5px;
-    font-weight:700;
-    color:#198754;
-}
-
-.top-producto-unidades{
-    font-size:10.5px;
-    color:#8a93a6;
-}
-
-.estado-vacio{
-    text-align:center;
-    padding:40px 20px;
-}
-
-/*==========================
-      TABLA RESUMEN DIARIO
-===========================*/
-
-.table{
-    margin-bottom:0;
-}
-
-.tabla-productos thead{
-    background:#eef2ff;
-}
-
-.tabla-productos thead th{
-    color:#000;
-    border:none;
-    padding:8px;
-    text-align:center;
-    font-size:13px;
-    white-space:nowrap;
-}
-
-.tabla-productos tbody td{
-    vertical-align:middle;
-    text-align:center;
-    padding:7px 6px;
-    font-size:13px;
-}
-
-.tabla-productos tbody tr{
-    transition:.3s;
+.pg-link{
+    min-width:30px; height:30px; padding:0 8px;
+    border-radius: var(--radius-btn);
+    border:1px solid var(--border-hair);
+    color: var(--text-secondary);
+    font-size:12px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
     cursor:pointer;
 }
-
-.tabla-productos tbody tr:hover{
-    background:#eef4ff;
-}
-
-.precio{
-    color:#198754;
-    font-weight:bold;
-    font-size:12.5px;
-    white-space:nowrap;
-}
-
-.fecha-celda{
-    font-weight:600;
-    color:#022C63;
-}
-
-/*==========================================================
-   PIE DEL BLOQUE: paginación
-===========================================================*/
-
-.pie-productos{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-    padding:12px 4px 0;
-}
-
-.paginacion-inline{
-    margin:0;
-}
-
-.paginacion-inline .pagination{
-    margin:0;
-    flex-wrap:wrap;
-}
-
-.paginacion-inline .page-link{
-    color:#192987;
-    border-color:#dfe3ef;
-}
-
-.paginacion-inline .page-link:hover{
-    color:#192987;
-    background-color:#eef2ff;
-    border-color:#dfe3ef;
-}
-
-.paginacion-inline .page-item.active .page-link{
-    background-color:#192987;
-    border-color:#192987;
-    color:white;
-}
+.pg-link:hover{ border-color: rgba(255,255,255,.25); color: var(--text-primary); }
+.pg-link.active{ background: var(--gold); border-color: var(--gold); color:#1A1A2E; }
 
 /*==========================
-      RESPONSIVE GENERAL
+   MODAL DE DETALLE (custom)
 ===========================*/
 
+.modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background: rgba(0,0,0,.6);
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+.modal-overlay.show{ display:flex; }
+
+.modal-box{
+    width:100%;
+    max-width:440px;
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-panel);
+    overflow:hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5);
+}
+
+.modal-box-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--border-subtle);
+}
+.modal-box-header h6{ margin:0; font-size:14.5px; font-weight:700; }
+
+.modal-close-btn{
+    width:30px; height:30px; border-radius:50%;
+    border:none; background: rgba(255,255,255,.06);
+    color: var(--text-secondary);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+}
+.modal-close-btn:hover{ background: rgba(255,255,255,.12); color: var(--text-primary); }
+
+.modal-box-body{ padding:18px 20px 20px; }
+
+.mini-stats-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:10px;
+    margin-bottom:16px;
+}
+.mini-stat{
+    background: rgba(255,255,255,.03);
+    border:1px solid var(--border-subtle);
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+}
+.mini-stat .valor{ font-size:15px; font-weight:800; }
+.mini-stat .etiqueta{ font-size:10.5px; color: var(--text-tertiary); margin-top:2px; }
+
+.spin{
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,.15);
+    border-top-color: var(--gold);
+    border-radius:50%;
+    display:inline-block;
+    animation: spin .7s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
 @media(max-width:768px){
-
-    .encabezado{
-        flex-direction:column;
-        text-align:center;
-    }
-
-    .titulo{
-        font-size:22px;
-    }
-
-    .pie-productos{
-        justify-content:center;
-    }
-
-    .vista-resumen, .vista-historial{
-        padding-left:16px;
-        padding-right:16px;
-    }
-
-    .tabla-productos thead th,
-    .tabla-productos tbody td{
-        padding:5px 3px;
-        font-size:10px;
-    }
+    .ventas-toolbar{ justify-content:center; }
 }
 
 </style>
+{% endblock %}
 
-<div class="container-fluid contenedor-productos">
+{% block content %}
 
-    <div class="bloque-productos">
-
-        <div class="encabezado">
-            <div>
-                <h1 class="titulo">
-                    <i class="bi bi-graph-up-arrow"></i>
-                    Panel de Ventas
-                </h1>
-                <p class="subtitulo">
-                    Ganancias, ventas y productos más vendidos.
-                </p>
-            </div>
-            <a href="#" class="btn btn-nuevo">
-                <i class="bi bi-file-earmark-pdf-fill"></i>
-                Exportar ganancias en PDF
-            </a>
+<!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
+<div class="ventas-toolbar">
+    <div class="tab-group" role="group" aria-label="Selector de vista">
+        <div class="tab-item active" id="btnVistaResumen" onclick="cambiarVistaVentas('resumen')">
+            <i class="bi bi-speedometer2"></i> Resumen
         </div>
+        <div class="tab-item" id="btnVistaHistorial" onclick="cambiarVistaVentas('historial')">
+            <i class="bi bi-table"></i> Historial de ventas
+        </div>
+    </div>
 
+<<<<<<< HEAD
         <!-- ============ VISTA RESUMEN: SOLO GRÁFICOS (CARRUSEL) ============ -->
         <div id="vistaResumen" class="vista-resumen">
             <div class="carrusel-graficos">
@@ -631,46 +315,71 @@ body{
                                 </div>
                                 <div class="contenedor-grafico" id="chartIngresos"></div>
                             </div>
-                        </div>
+=======
+    <div class="filtro-wrap">
+        <div class="select-chip" id="filtroTrigger" onclick="toggleFiltroMenu()">
+            <i class="bi bi-calendar3"></i>
+            {% if filtro == 'semana' %}Última semana{% elif filtro == 'rango' %}{{ desde|date:"d/m" }} - {{ hasta|date:"d/m" }}{% else %}Último mes{% endif %}
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="filtro-menu" id="filtroMenu">
+            <a class="filtro-item {% if filtro == 'semana' %}active{% endif %}" href="?filtro=semana">
+                <i class="bi bi-calendar-week"></i> Última semana
+            </a>
+            <a class="filtro-item {% if filtro == 'mes' %}active{% endif %}" href="?filtro=mes">
+                <i class="bi bi-calendar-month"></i> Último mes
+            </a>
+            <div class="filtro-divider"></div>
+            <span class="etiqueta-periodo"><i class="bi bi-calendar-range"></i> Rango personalizado</span>
+            <form method="get" class="rango-personalizado">
+                <input type="hidden" name="filtro" value="rango">
+                <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
+                <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
+                <button type="submit" class="btn-aplicar-rango">Aplicar</button>
+            </form>
+        </div>
+    </div>
+</div>
 
-                        <div class="carrusel-slide">
-                            <div class="panel-caja">
-                                <div class="panel-titulo">
-                                    <i class="bi bi-bar-chart-line-fill"></i>
-                                    Ventas por día
-                                </div>
-                                <div class="contenedor-grafico" id="chartVentas"></div>
-                            </div>
-                        </div>
+<!-- ============ VISTA RESUMEN: SOLO GRÁFICOS (CARRUSEL) ============ -->
+<div id="vistaResumen">
+    <div class="carrusel-graficos">
+        <div class="carrusel-viewport">
+            <div class="carrusel-track" id="carruselTrack">
 
-                        <div class="carrusel-slide">
-                            <div class="panel-caja">
-                                <div class="panel-titulo">
-                                    <i class="bi bi-pie-chart-fill"></i>
-                                    Participación por producto
-                                </div>
-                                <div class="contenedor-grafico" id="chartDona"></div>
-                            </div>
+                <div class="carrusel-slide">
+                    <div class="dash-panel">
+                        <div class="dash-panel-head">
+                            <span class="dash-panel-title"><i class="bi bi-graph-up" style="color:var(--gold)"></i> Ingresos por día</span>
+                            <span class="panel-subtitulo">Clic en un punto para ver el detalle</span>
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
                         </div>
-
+                        <div class="contenedor-grafico" id="chartIngresos"></div>
                     </div>
                 </div>
 
-                <button type="button" class="carrusel-flecha carrusel-flecha-izq" onclick="moverCarrusel(-1)" aria-label="Gráfico anterior">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <button type="button" class="carrusel-flecha carrusel-flecha-der" onclick="moverCarrusel(1)" aria-label="Gráfico siguiente">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-
-                <div class="carrusel-puntos" id="carruselPuntos">
-                    <button type="button" class="punto activo" onclick="irASlide(0)" aria-label="Ver ingresos por día"></button>
-                    <button type="button" class="punto" onclick="irASlide(1)" aria-label="Ver ventas por día"></button>
-                    <button type="button" class="punto" onclick="irASlide(2)" aria-label="Ver participación por producto"></button>
+                <div class="carrusel-slide">
+                    <div class="dash-panel">
+                        <div class="dash-panel-head">
+                            <span class="dash-panel-title"><i class="bi bi-bar-chart-line-fill" style="color:var(--gold)"></i> Ventas por día</span>
+                        </div>
+                        <div class="contenedor-grafico" id="chartVentas"></div>
+                    </div>
                 </div>
+
+                <div class="carrusel-slide">
+                    <div class="dash-panel">
+                        <div class="dash-panel-head">
+                            <span class="dash-panel-title"><i class="bi bi-pie-chart-fill" style="color:var(--gold)"></i> Participación por producto</span>
+                        </div>
+                        <div class="contenedor-grafico" id="chartDona"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
+<<<<<<< HEAD
         <!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
         <div class="barra-controles">
             <div class="selector-vista" role="group" aria-label="Selector de vista">
@@ -714,166 +423,163 @@ body{
 
         <!-- ============ VISTA HISTORIAL: KPIs + TOP PRODUCTOS + RESUMEN DIARIO ============ -->
         <div id="vistaHistorial" class="vista-historial vista-oculta">
+=======
+        <button type="button" class="carrusel-flecha carrusel-flecha-izq" onclick="moverCarrusel(-1)" aria-label="Gráfico anterior">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button type="button" class="carrusel-flecha carrusel-flecha-der" onclick="moverCarrusel(1)" aria-label="Gráfico siguiente">
+            <i class="bi bi-chevron-right"></i>
+        </button>
 
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icono verde"><i class="bi bi-cash-coin"></i></div>
-                    <div class="kpi-textos">
-                        <div class="kpi-valor">$ {{ total_ingresos|floatformat:2 }}</div>
-                        <div class="kpi-etiqueta">Ingresos del período</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icono"><i class="bi bi-receipt"></i></div>
-                    <div class="kpi-textos">
-                        <div class="kpi-valor">{{ cantidad_ventas }}</div>
-                        <div class="kpi-etiqueta">Ventas realizadas</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icono dorado"><i class="bi bi-box-seam"></i></div>
-                    <div class="kpi-textos">
-                        <div class="kpi-valor">{{ unidades_vendidas }}</div>
-                        <div class="kpi-etiqueta">Unidades vendidas</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icono"><i class="bi bi-graph-up"></i></div>
-                    <div class="kpi-textos">
-                        <div class="kpi-valor">$ {{ ticket_promedio|floatformat:2 }}</div>
-                        <div class="kpi-etiqueta">Ticket promedio</div>
-                    </div>
-                </div>
+        <div class="carrusel-puntos" id="carruselPuntos">
+            <button type="button" class="punto activo" onclick="irASlide(0)" aria-label="Ver ingresos por día"></button>
+            <button type="button" class="punto" onclick="irASlide(1)" aria-label="Ver ventas por día"></button>
+            <button type="button" class="punto" onclick="irASlide(2)" aria-label="Ver participación por producto"></button>
+        </div>
+    </div>
+</div>
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
+
+<!-- ============ VISTA HISTORIAL: KPIs + TOP PRODUCTOS + RESUMEN DIARIO ============ -->
+<div id="vistaHistorial" style="display:none;">
+
+    <div class="dash-stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-cash-coin"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">$ {{ total_ingresos|floatformat:2 }}</div>
+                <div class="stat-label">Ingresos del período</div>
             </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ cantidad_ventas }}</div>
+                <div class="stat-label">Ventas realizadas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon gold"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ unidades_vendidas }}</div>
+                <div class="stat-label">Unidades vendidas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">$ {{ ticket_promedio|floatformat:2 }}</div>
+                <div class="stat-label">Ticket promedio</div>
+            </div>
+        </div>
+    </div>
 
-            <div class="fila-historial">
+    <div class="historial-grid">
 
-                <div class="panel-caja">
-                    <div class="panel-titulo">
-                        <i class="bi bi-trophy-fill"></i>
-                        Top productos más vendidos
-                    </div>
-                    {% if top_productos %}
-                        {% for item in top_productos|slice:":4" %}
-                            <div class="top-producto-item">
-                                <div class="top-producto-rango">{{ forloop.counter }}</div>
-                                <div class="top-producto-info">
-                                    <div class="top-producto-nombre">{{ item.producto__nombre }}</div>
-                                </div>
-                                <div class="top-producto-cifras">
-                                    <div class="top-producto-ingreso">$ {{ item.ingresos|floatformat:2 }}</div>
-                                    <div class="top-producto-unidades">{{ item.unidades }} und.</div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="estado-vacio">
-                            <i class="bi bi-inboxes display-6 text-secondary"></i>
-                            <p class="mt-2 text-secondary mb-0">Sin ventas en este período.</p>
+        <section class="dash-panel">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title"><i class="bi bi-trophy-fill" style="color:var(--gold)"></i> Top productos más vendidos</span>
+            </div>
+            {% if top_productos %}
+                {% for item in top_productos|slice:":4" %}
+                    <div class="tx-row">
+                        <div class="rank-badge">{{ forloop.counter }}</div>
+                        <div class="tx-info">
+                            <div class="tx-name">{{ item.producto__nombre }}</div>
+                            <div class="tx-date">{{ item.unidades }} und. vendidas</div>
                         </div>
+                        <div class="tx-amount pos">$ {{ item.ingresos|floatformat:2 }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="estado-vacio">
+                    <i class="bi bi-inboxes"></i>
+                    <p class="mt-2 mb-0">Sin ventas en este período.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="dash-panel">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title"><i class="bi bi-calendar3" style="color:var(--gold)"></i> Resumen diario</span>
+                <span class="panel-subtitulo">Clic en una fila para ver el detalle</span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Ventas</th>
+                            <th>Unidades</th>
+                            <th>Ingresos</th>
+                            <th>Ticket prom.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for d in resumen_diario_pagina %}
+                        <tr onclick="mostrarDetalleDia('{{ d.fecha|date:'Y-m-d' }}')">
+                            <td style="font-weight:600;">{{ d.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ d.ventas }}</td>
+                            <td>{{ d.unidades }}</td>
+                            <td class="amount" style="color:var(--green);">$ {{ d.ingresos|floatformat:2 }}</td>
+                            <td>$ {{ d.ticket_promedio|floatformat:2 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="estado-vacio">
+                                <i class="bi bi-receipt-cutoff"></i>
+                                <h6 class="mt-3">No hay ventas registradas en este período.</h6>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ============ PAGINACIÓN ============ -->
+            <div class="pie-ventas">
+                {% if resumen_diario_pagina.has_previous %}
+                    <a class="pg-link" href="?page=1&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Primera</a>
+                    <a class="pg-link" href="?page={{ resumen_diario_pagina.previous_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&laquo;</a>
+                {% endif %}
+                {% for pagina in resumen_diario_pagina.paginator.page_range %}
+                    {% if pagina == resumen_diario_pagina.number %}
+                        <span class="pg-link active">{{ pagina }}</span>
+                    {% else %}
+                        <a class="pg-link" href="?page={{ pagina }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">{{ pagina }}</a>
                     {% endif %}
-                </div>
-
-                <div class="panel-caja">
-                    <div class="panel-titulo">
-                        <i class="bi bi-calendar3"></i>
-                        Resumen diario
-                        <small>Clic en una fila para ver el detalle</small>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover tabla-productos align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Ventas</th>
-                                    <th>Unidades</th>
-                                    <th>Ingresos</th>
-                                    <th>Ticket prom.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for d in resumen_diario_pagina %}
-                                <tr onclick="mostrarDetalleDia('{{ d.fecha|date:'Y-m-d' }}')">
-                                    <td class="fecha-celda">{{ d.fecha|date:"d/m/Y" }}</td>
-                                    <td>{{ d.ventas }}</td>
-                                    <td>{{ d.unidades }}</td>
-                                    <td class="precio">$ {{ d.ingresos|floatformat:2 }}</td>
-                                    <td>$ {{ d.ticket_promedio|floatformat:2 }}</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="5" class="estado-vacio">
-                                        <i class="bi bi-receipt-cutoff display-4 text-secondary"></i>
-                                        <h6 class="mt-3">No hay ventas registradas en este período.</h6>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- ============ PIE: PAGINACIÓN DEL RESUMEN DIARIO ============ -->
-                    <div class="pie-productos">
-                        <nav class="paginacion-inline" aria-label="Paginación del resumen diario">
-                            <ul class="pagination pagination-sm mb-0">
-                                {% if resumen_diario_pagina.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=1&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Primera</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ resumen_diario_pagina.previous_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&laquo;</a>
-                                    </li>
-                                {% endif %}
-                                {% for pagina in resumen_diario_pagina.paginator.page_range %}
-                                    {% if pagina == resumen_diario_pagina.number %}
-                                        <li class="page-item active">
-                                            <span class="page-link">{{ pagina }}</span>
-                                        </li>
-                                    {% else %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ pagina }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">{{ pagina }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-                                {% if resumen_diario_pagina.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ resumen_diario_pagina.next_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&raquo;</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ resumen_diario_pagina.paginator.num_pages }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Última</a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
-
-                </div>
-
+                {% endfor %}
+                {% if resumen_diario_pagina.has_next %}
+                    <a class="pg-link" href="?page={{ resumen_diario_pagina.next_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&raquo;</a>
+                    <a class="pg-link" href="?page={{ resumen_diario_pagina.paginator.num_pages }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Última</a>
+                {% endif %}
             </div>
-
-        </div>
+        </section>
 
     </div>
 
 </div>
 
-<!-- ============ MODAL: DETALLE DE UN DÍA ============ -->
-<div class="modal fade" id="modalDetalleDia" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:16px; overflow:hidden;">
-            <div class="modal-header" style="background:linear-gradient(135deg,#192987,#3556ff); color:white;">
-                <h6 class="modal-title" id="modalDetalleDiaFecha">Detalle del día</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body" id="modalDetalleDiaCuerpo">
-                <div class="text-center text-secondary py-4">
-                    <div class="spinner-border spinner-border-sm"></div> Cargando...
-                </div>
+<!-- ============ MODAL: DETALLE DE UN DÍA (custom, sin Bootstrap) ============ -->
+<div class="modal-overlay" id="modalDetalleDia">
+    <div class="modal-box">
+        <div class="modal-box-header">
+            <h6 id="modalDetalleDiaFecha">Detalle del día</h6>
+            <button type="button" class="modal-close-btn" onclick="cerrarModalDetalle()" aria-label="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="modal-box-body" id="modalDetalleDiaCuerpo">
+            <div class="text-center" style="text-align:center; color:var(--text-tertiary); padding:24px 0;">
+                <span class="spin"></span> Cargando...
             </div>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.2/apexcharts.min.js"></script>
 <script>
 
@@ -892,12 +598,16 @@ function formatoMoneda(valor){
     return '$ ' + Number(valor).toLocaleString('es-CO', { minimumFractionDigits: 2 });
 }
 
+const ejeClaro = { style: { fontSize: '9.5px', colors: '#9CA3AF' } };
+
 /* ---- Gráfico de línea: ingresos por día ---- */
 const chartIngresos = new ApexCharts(document.querySelector('#chartIngresos'), {
     chart: {
         type: 'area',
         height: '100%',
         toolbar: { show: false },
+        background: 'transparent',
+        foreColor: '#9CA3AF',
         events: {
             dataPointSelection: function(event, chartContext, config){
                 const fecha = fechasIngresos[config.dataPointIndex];
@@ -905,23 +615,21 @@ const chartIngresos = new ApexCharts(document.querySelector('#chartIngresos'), {
             }
         }
     },
+    theme: { mode: 'dark' },
     series: [{ name: 'Ingresos', data: valoresIngresos }],
     xaxis: {
         categories: etiquetasIngresos,
-        labels: {
-            style: { fontSize: '9.5px' },
-            rotate: -45,
-            rotateAlways: etiquetasIngresos.length > 8,
-            hideOverlappingLabels: false,
-        },
+        labels: { style: ejeClaro.style, rotate: -45, rotateAlways: etiquetasIngresos.length > 8, hideOverlappingLabels: false },
+        axisBorder: { color: 'rgba(255,255,255,.08)' },
+        axisTicks: { color: 'rgba(255,255,255,.08)' },
     },
-    yaxis: { labels: { formatter: (v) => '$ ' + Number(v).toLocaleString('es-CO') } },
-    colors: ['#3556ff'],
+    yaxis: { labels: { style: ejeClaro.style, formatter: (v) => '$ ' + Number(v).toLocaleString('es-CO') } },
+    colors: ['#E4C870'],
     fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05 } },
     stroke: { curve: 'smooth', width: 3 },
     dataLabels: { enabled: false },
-    tooltip: { y: { formatter: formatoMoneda } },
-    grid: { strokeDashArray: 4 },
+    tooltip: { theme: 'dark', y: { formatter: formatoMoneda } },
+    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)' },
 });
 chartIngresos.render();
 
@@ -931,6 +639,8 @@ const chartVentas = new ApexCharts(document.querySelector('#chartVentas'), {
         type: 'bar',
         height: '100%',
         toolbar: { show: false },
+        background: 'transparent',
+        foreColor: '#9CA3AF',
         events: {
             dataPointSelection: function(event, chartContext, config){
                 const fecha = fechasVentas[config.dataPointIndex];
@@ -938,39 +648,41 @@ const chartVentas = new ApexCharts(document.querySelector('#chartVentas'), {
             }
         }
     },
+    theme: { mode: 'dark' },
     series: [{ name: 'Ventas', data: valoresVentas }],
     xaxis: {
         categories: etiquetasVentas,
-        labels: {
-            style: { fontSize: '9.5px' },
-            rotate: -45,
-            rotateAlways: etiquetasVentas.length > 8,
-            hideOverlappingLabels: false,
-        },
+        labels: { style: ejeClaro.style, rotate: -45, rotateAlways: etiquetasVentas.length > 8, hideOverlappingLabels: false },
+        axisBorder: { color: 'rgba(255,255,255,.08)' },
+        axisTicks: { color: 'rgba(255,255,255,.08)' },
     },
-    colors: ['#192987'],
+    yaxis: { labels: { style: ejeClaro.style } },
+    colors: ['#E4C870'],
     plotOptions: { bar: { borderRadius: 5, columnWidth: '55%' } },
     dataLabels: { enabled: false },
-    grid: { strokeDashArray: 4 },
+    tooltip: { theme: 'dark' },
+    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)' },
 });
 chartVentas.render();
 
 /* ---- Dona: participación de productos en los ingresos ---- */
 const chartDona = new ApexCharts(document.querySelector('#chartDona'), {
-    chart: { type: 'donut', height: '100%' },
+    chart: { type: 'donut', height: '100%', background: 'transparent', foreColor: '#9CA3AF' },
+    theme: { mode: 'dark' },
     series: valoresDona,
     labels: etiquetasDona,
-    colors: ['#192987', '#3556ff', '#c9a84c', '#198754', '#8a93a6', '#e8c874'],
-    legend: { position: 'bottom', fontSize: '11px' },
+    colors: ['#E4C870', '#8B5CF6', '#2DD4BF', '#38BDF8', '#4ADE80', '#EF4444'],
+    legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#9CA3AF' } },
     dataLabels: { enabled: true, formatter: (val) => val.toFixed(1) + '%' },
-    tooltip: { y: { formatter: formatoMoneda } },
-    noData: { text: 'Sin ventas en este período' },
+    stroke: { colors: ['#1E1E2D'] },
+    tooltip: { theme: 'dark', y: { formatter: formatoMoneda } },
+    noData: { text: 'Sin ventas en este período', style: { color: '#9CA3AF' } },
 });
 chartDona.render();
 
-// Recálculo de seguridad: al cargar, los paneles 2 y 3 del carrusel están
-// fuera del área visible y a veces el navegador no les da su tamaño real
-// a tiempo para ApexCharts. Forzamos un resize apenas termina de pintar.
+// Recálculo de seguridad: los paneles 2 y 3 del carrusel están fuera del
+// área visible al cargar y a veces ApexCharts no toma su tamaño real a
+// tiempo. Forzamos un resize apenas termina de pintar.
 setTimeout(function(){
     window.dispatchEvent(new Event('resize'));
 }, 50);
@@ -986,8 +698,6 @@ function actualizarCarrusel(){
     document.querySelectorAll('#carruselPuntos .punto').forEach((punto, i) => {
         punto.classList.toggle('activo', i === carruselIndice);
     });
-    // Los gráficos que no son el primero arrancan fuera del área visible;
-    // forzamos un recálculo de tamaño para que ApexCharts los dibuje bien.
     [chartIngresos, chartVentas, chartDona].forEach(function(chart){
         chart.updateOptions({}, false, true);
     });
@@ -1012,15 +722,16 @@ function cambiarVistaVentas(vista){
     if(!vResumen || !vHistorial || !bResumen || !bHistorial) return;
 
     if(vista === 'historial'){
-        vResumen.classList.add('vista-oculta');
-        vHistorial.classList.remove('vista-oculta');
-        bHistorial.classList.add('activo');
-        bResumen.classList.remove('activo');
+        vResumen.style.display = 'none';
+        vHistorial.style.display = 'block';
+        bHistorial.classList.add('active');
+        bResumen.classList.remove('active');
     } else {
-        vHistorial.classList.add('vista-oculta');
-        vResumen.classList.remove('vista-oculta');
-        bResumen.classList.add('activo');
-        bHistorial.classList.remove('activo');
+        vHistorial.style.display = 'none';
+        vResumen.style.display = 'block';
+        bResumen.classList.add('active');
+        bHistorial.classList.remove('active');
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     }
     localStorage.setItem('vistaVentas', vista);
 }
@@ -1032,72 +743,76 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 });
 
+/* ---- Dropdown de período (custom) ---- */
+function toggleFiltroMenu(){
+    document.getElementById('filtroMenu').classList.toggle('show');
+}
+document.addEventListener('click', function(e){
+    const wrap = document.querySelector('.filtro-wrap');
+    if(wrap && !wrap.contains(e.target)){
+        document.getElementById('filtroMenu').classList.remove('show');
+    }
+});
+
 /* ---- Modal de detalle de un día (usa el endpoint detalle_dia_ventas) ---- */
+function cerrarModalDetalle(){
+    document.getElementById('modalDetalleDia').classList.remove('show');
+}
+
 function mostrarDetalleDia(fecha){
-    const modalEl = document.getElementById('modalDetalleDia');
+    const overlay = document.getElementById('modalDetalleDia');
     const cuerpo = document.getElementById('modalDetalleDiaCuerpo');
     const tituloFecha = document.getElementById('modalDetalleDiaFecha');
 
-    cuerpo.innerHTML = '<div class="text-center text-secondary py-4"><div class="spinner-border spinner-border-sm"></div> Cargando...</div>';
+    cuerpo.innerHTML = '<div style="text-align:center; color:var(--text-tertiary); padding:24px 0;"><span class="spin"></span> Cargando...</div>';
     tituloFecha.textContent = 'Detalle del día';
-
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
+    overlay.classList.add('show');
 
     fetch(`{% url 'detalle_dia_ventas' %}?fecha=${fecha}`)
         .then(r => r.json())
         .then(data => {
             if(!data.ok){
-                cuerpo.innerHTML = '<p class="text-danger mb-0">No se pudo cargar el detalle.</p>';
+                cuerpo.innerHTML = '<p style="color:var(--red); margin:0;">No se pudo cargar el detalle.</p>';
                 return;
             }
             tituloFecha.textContent = data.fecha;
 
-            let topHtml = '<p class="text-secondary small mb-0">Sin ventas ese día.</p>';
+            let topHtml = '<p style="color:var(--text-tertiary); font-size:12.5px; margin:0;">Sin ventas ese día.</p>';
             if(data.top_productos.length){
                 topHtml = data.top_productos.map((p, i) => `
-                    <div class="top-producto-item">
-                        <div class="top-producto-rango">${i + 1}</div>
-                        <div class="top-producto-info">
-                            <div class="top-producto-nombre">${p.nombre}</div>
+                    <div class="tx-row">
+                        <div class="rank-badge">${i + 1}</div>
+                        <div class="tx-info">
+                            <div class="tx-name">${p.nombre}</div>
+                            <div class="tx-date">${p.unidades} und.</div>
                         </div>
-                        <div class="top-producto-cifras">
-                            <div class="top-producto-ingreso">${formatoMoneda(p.ingresos)}</div>
-                            <div class="top-producto-unidades">${p.unidades} und.</div>
-                        </div>
+                        <div class="tx-amount pos">${formatoMoneda(p.ingresos)}</div>
                     </div>
                 `).join('');
             }
 
             cuerpo.innerHTML = `
-                <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:16px;">
-                    <div class="kpi-card" style="padding:10px;">
-                        <div class="kpi-textos">
-                            <div class="kpi-valor" style="font-size:15px;">${formatoMoneda(data.total_ingresos)}</div>
-                            <div class="kpi-etiqueta">Ingresos</div>
-                        </div>
+                <div class="mini-stats-grid">
+                    <div class="mini-stat">
+                        <div class="valor">${formatoMoneda(data.total_ingresos)}</div>
+                        <div class="etiqueta">Ingresos</div>
                     </div>
-                    <div class="kpi-card" style="padding:10px;">
-                        <div class="kpi-textos">
-                            <div class="kpi-valor" style="font-size:15px;">${data.cantidad_ventas}</div>
-                            <div class="kpi-etiqueta">Ventas</div>
-                        </div>
+                    <div class="mini-stat">
+                        <div class="valor">${data.cantidad_ventas}</div>
+                        <div class="etiqueta">Ventas</div>
                     </div>
-                    <div class="kpi-card" style="padding:10px;">
-                        <div class="kpi-textos">
-                            <div class="kpi-valor" style="font-size:15px;">${data.unidades_vendidas}</div>
-                            <div class="kpi-etiqueta">Unidades</div>
-                        </div>
+                    <div class="mini-stat">
+                        <div class="valor">${data.unidades_vendidas}</div>
+                        <div class="etiqueta">Unidades</div>
                     </div>
                 </div>
-                <div class="panel-titulo"><i class="bi bi-trophy-fill"></i> Top productos del día</div>
+                <div class="dash-panel-title" style="margin-bottom:8px;"><i class="bi bi-trophy-fill" style="color:var(--gold)"></i> Top productos del día</div>
                 ${topHtml}
             `;
         })
         .catch(() => {
-            cuerpo.innerHTML = '<p class="text-danger mb-0">Ocurrió un error al cargar el detalle.</p>';
+            cuerpo.innerHTML = '<p style="color:var(--red); margin:0;">Ocurrió un error al cargar el detalle.</p>';
         });
 }
 </script>
-
 {% endblock %}

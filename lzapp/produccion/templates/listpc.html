@@ -6,20 +6,16 @@
 
 <style>
 
-body{
-    background:#f4f7fc;
-}
-
 /*==========================================================
    BLOQUE UNIFICADO: encabezado + tabla + pie (paginación)
-   Mismo lenguaje visual que la vista de Productos.
 ===========================================================*/
 
 .bloque-produccion{
-    background:white;
-    border-radius:20px;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
     overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
 }
 
 /*==========================
@@ -27,9 +23,10 @@ body{
 ===========================*/
 
 .encabezado{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    padding:30px;
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
+    border-bottom:1px solid var(--border-subtle);
+    color:var(--text-primary);
+    padding:26px 30px;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -39,33 +36,42 @@ body{
 
 .titulo{
     margin:0;
-    font-size:35px;
-    font-weight:bold;
-    color:white;
+    font-size:23px;
+    font-weight:700;
+    color:var(--text-primary);
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.titulo i{
+    color:var(--gold);
+    font-size:20px;
 }
 
 .subtitulo{
-    margin-top:8px;
-    opacity:.9;
+    margin-top:6px;
+    color:var(--text-secondary);
+    font-size:13px;
 }
 
-/* Botón "Nueva Producción": blanco/gris difuminado, texto azul oscuro,
-   igual que "Nuevo Producto" en la vista de Productos */
+/* Botón "Nueva Producción" */
 .btn-nuevo{
-    background:linear-gradient(135deg,#ffffff,#d7dce4);
-    color:#192987;
-    border:1px solid rgba(255,255,255,.5);
-    padding:12px 22px;
-    border-radius:12px;
-    font-weight:bold;
+    background:var(--gold);
+    color:#1A1A2E;
+    border:1px solid var(--gold);
+    padding:11px 20px;
+    border-radius:var(--radius-btn);
+    font-weight:600;
+    font-size:13.5px;
     transition:.3s;
 }
 
 .btn-nuevo:hover{
-    background:linear-gradient(135deg,#eef0f3,#c2c8d2);
-    color:#14206b;
-    transform:translateY(-3px);
-    box-shadow:0 10px 22px rgba(0,0,0,.2);
+    background:#EFD48C;
+    color:#1A1A2E;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(228,200,112,.25);
 }
 
 /*==========================
@@ -77,36 +83,63 @@ body{
 }
 
 .tabla-produccion thead{
-    background:#192987;
+    background:transparent;
 }
 
 .tabla-produccion thead th{
-    color:#000000;
+    color:var(--text-tertiary);
+    text-transform:uppercase;
+    letter-spacing:.4px;
     border:none;
-    padding:8px;
+    border-bottom:1px solid var(--border-subtle);
+    padding:12px 8px;
     text-align:center;
-    font-size:14px;
+    font-size:11px;
+    font-weight:600;
     white-space:nowrap;
 }
 
 .tabla-produccion tbody td{
     vertical-align:middle;
     text-align:center;
-    padding:5px 6px;
+    padding:12px 6px;
     font-size:13px;
+    color:var(--text-secondary);
+    border-bottom:1px solid var(--border-subtle);
 }
 
 .tabla-produccion tbody tr{
-    transition:.3s;
+    transition:.2s;
+}
+
+.tabla-produccion tbody tr:last-child td{
+    border-bottom:none;
 }
 
 .tabla-produccion tbody tr:hover{
-    background:#eef4ff;
+    background:rgba(255,255,255,.03);
 }
 
 .badge-cantidad{
-    font-size:11px;
-    padding:5px 9px;
+    font-size:11.5px;
+    font-weight:600;
+    padding:5px 10px;
+    border-radius:var(--radius-pill);
+    background:var(--green-dim) !important;
+    color:var(--green) !important;
+    border:none;
+}
+
+.text-muted{
+    color:var(--text-tertiary) !important;
+}
+
+.estado-vacio i{
+    color:var(--text-tertiary) !important;
+}
+
+.estado-vacio h5{
+    color:var(--text-secondary);
 }
 
 /*==========================================================
@@ -120,8 +153,8 @@ body{
     flex-wrap:wrap;
     gap:12px;
     padding:14px 20px;
-    border-top:1px solid rgba(2,44,99,.08);
-    background:white;
+    border-top:1px solid var(--border-subtle);
+    background:var(--bg-panel);
 }
 
 .paginacion-inline{
@@ -134,20 +167,22 @@ body{
 }
 
 .paginacion-inline .page-link{
-    color:#192987;
-    border-color:#dfe3ef;
+    color:var(--text-secondary);
+    background:transparent;
+    border-color:var(--border-hair);
 }
 
 .paginacion-inline .page-link:hover{
-    color:#192987;
-    background-color:#eef2ff;
-    border-color:#dfe3ef;
+    color:var(--text-primary);
+    background-color:rgba(255,255,255,.05);
+    border-color:var(--border-hair);
 }
 
 .paginacion-inline .page-item.active .page-link{
-    background-color:#192987;
-    border-color:#192987;
-    color:white;
+    background-color:var(--gold);
+    border-color:var(--gold);
+    color:#1A1A2E;
+    font-weight:600;
 }
 
 /*==========================
@@ -162,7 +197,7 @@ body{
     }
 
     .titulo{
-        font-size:28px;
+        font-size:20px;
     }
 
     .pie-produccion{

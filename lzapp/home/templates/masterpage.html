@@ -134,14 +134,41 @@
                         <div class="quesos-interactivos"
                             data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
                             data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
-                            data-tiene-premio="{% if premio_activo %}true{% else %}false{% endif %}"
+                            {% if premio_activo %}
+                            data-origen-premio="campana"
+                            data-tiene-premio="true"
+                            data-premio-tipo=""
                             data-premio-producto="{{ premio_activo.producto.nombre|default:'' }}"
                             data-premio-porcentaje="{{ premio_activo.campana.porcentaje_descuento|default:'0' }}"
                             data-premio-precio-original="{{ premio_activo.precio_original|default:'0' }}"
                             data-premio-precio-descuento="{{ premio_activo.precio_con_descuento|default:'0' }}"
                             data-premio-codigo="{{ premio_activo.codigo|default:'' }}"
+                            data-premio-imagen="{% if premio_activo.producto.imagen %}{{ premio_activo.producto.imagen.url }}{% endif %}"
+                            {% elif juego_diario.estado == 'ganado' %}
+                            data-origen-premio="ruleta_diaria"
+                            data-tiene-premio="true"
+                            data-premio-tipo="{{ juego_diario.tirada.resultado }}"
+                            data-premio-producto=""
+                            data-premio-porcentaje="{% if juego_diario.tirada.resultado == 'CUPON_5' %}5{% else %}0{% endif %}"
+                            data-premio-precio-original="0"
+                            data-premio-precio-descuento="0"
+                            data-premio-codigo=""
+                            data-premio-imagen=""
+                            {% else %}
+                            data-origen-premio="ruleta_diaria"
+                            data-tiene-premio="false"
+                            data-premio-tipo=""
+                            data-premio-producto=""
+                            data-premio-porcentaje="0"
+                            data-premio-precio-original="0"
+                            data-premio-precio-descuento="0"
+                            data-premio-codigo=""
+                            data-premio-imagen=""
+                            {% endif %}
+                            data-estado-juego-diario="{{ juego_diario.estado|default:'' }}"
                             data-url-marcar-mostrado="{% url 'marcar_premio_mostrado' %}"
-                            data-premio-imagen="{% if premio_activo.producto.imagen %}{{ premio_activo.producto.imagen.url }}{% endif %}">
+                            data-url-jugar-ruleta="{% url 'jugar_ruleta_dia' %}"
+                            data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
 
                             <!-- Queso 1: el oscuro/tostado de la izquierda (conectado a datos reales) -->
                             {% with p=productos_oferta.0 %}
@@ -269,22 +296,24 @@
                             </div>
                         </div>
 
-                        <div class="oferta-globo-wrap" id="ofertaGloboWrap" {% if not premio_activo %}style="display:none;"{% endif %}>
+                        {% if user.is_authenticated %}
+                        <div class="oferta-globo-wrap" id="ofertaGloboWrap">
                             <div class="globo-fragmentos" id="globoFragmentos"></div>
                             <div class="globo-indicador" id="globoIndicador">
-                            <i class="bi bi-hand-index-thumb"></i>
-                            Presiona para ver nuevas ofertas
-                        </div>
-                        <button type="button" class="globo-ofertas" id="botonOfertas" aria-label="Ver ofertas">
-                            <span class="globo-cuerpo">
-                                <i class="bi bi-tag-fill"></i>
-                                <span class="globo-numero">%</span>
-                            </span>
-                            <span class="globo-brillo"></span>
-                            <span class="globo-nudo"></span>
-                            <span class="globo-hilo"></span>
+                                <i class="bi bi-hand-index-thumb"></i>
+                                Presiona para ver nuevas ofertas
+                            </div>
+                            <button type="button" class="globo-ofertas" id="botonOfertas" aria-label="Ver ofertas">
+                                <span class="globo-cuerpo">
+                                    <i class="bi bi-tag-fill"></i>
+                                    <span class="globo-numero">%</span>
+                                </span>
+                                <span class="globo-brillo"></span>
+                                <span class="globo-nudo"></span>
+                                <span class="globo-hilo"></span>
                             </button>
                         </div>
+                        {% endif %}
 
                         <div class="oferta-banner" id="ofertaBanner">
                             Enciende los 3 quesos para revelar la oferta de hoy
@@ -299,16 +328,23 @@
                             <div class="oferta-reveal-tarjeta">
                                 <div class="oferta-reveal-queso-wrap">
                                     <img src="{% static 'home/media/fb36d63f777712b60e871eaefa443eb2bf3b3515 (1).png' %}"
-                                        alt="Queso en oferta" class="oferta-reveal-queso" id="ofertaRevealImagen">
+                                        alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen">
+                                    <!-- Ícono usado como placeholder cuando el premio (ruleta diaria)
+                                        no tiene producto/foto real: CUPON_5, ENVIO_GRATIS, BOLETO_DORADO,
+                                        y la variante "vuelve mañana". Oculto por defecto. -->
+                                    <i class="oferta-reveal-icono bi" id="ofertaRevealIcono" style="display:none;"></i>
                                     <span class="oferta-reveal-badge" id="ofertaRevealBadge">-50%</span>
                                 </div>
-                                <strong class="oferta-reveal-titulo">¡Felicidades!</strong>
+                                <strong class="oferta-reveal-titulo" id="ofertaRevealTitulo">¡Felicidades!</strong>
                                 <span class="oferta-reveal-subtitulo" id="ofertaRevealSubtitulo">Tienes 50% de descuento</span>
-                                <div class="oferta-reveal-precios">
+                                <div class="oferta-reveal-precios" id="ofertaRevealPrecios">
                                     <span class="oferta-reveal-precio-anterior" id="ofertaRevealPrecioAnterior">$12.000</span>
                                     <span class="oferta-reveal-precio-nuevo" id="ofertaRevealPrecioNuevo">$6.000</span>
                                     <span class="oferta-reveal-credencial">Oferta</span>
                                 </div>
+                                <!-- Nota adicional para premios de la ruleta diaria sin precio real
+                                    (ej. "se aplica automáticamente al pagar"). Oculta por defecto. -->
+                                <span class="oferta-reveal-nota" id="ofertaRevealNota" style="display:none;"></span>
                             </div>
                         </div>
                         <div class="oferta-rueda-wrap" id="ofertaRuedaWrap">
@@ -659,6 +695,57 @@
                                 <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
                                     <i class="bi bi-gift-fill"></i> Reclamar premio
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif juego_diario.estado == 'ganado' %}
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                            <span class="premio-cinta-mini">TU PREMIO</span>
+                            <div class="producto-img-wrapper d-flex align-items-center justify-content-center" style="min-height:180px;">
+                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                                    <span class="badge-stock premio">-5%</span>
+                                    <i class="bi bi-ticket-perforated-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                                    <span class="badge-stock premio">GRATIS</span>
+                                    <i class="bi bi-truck" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                                    <span class="badge-stock premio">🎫</span>
+                                    <i class="bi bi-award-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="estrellas">
+                                    <i class="bi bi-stars"></i> Premio de la ruleta diaria
+                                </div>
+                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                                    <h5 class="titulo-producto">Cupón 5% próxima compra</h5>
+                                    <p class="producto-descripcion">
+                                        Se aplica automáticamente al total de tu carrito. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                    </p>
+                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                                    <h5 class="titulo-producto">Envío gratis</h5>
+                                    <p class="producto-descripcion">
+                                        Se aplica automáticamente en tu próximo pedido. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                    </p>
+                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                                    <h5 class="titulo-producto">Boleto dorado</h5>
+                                    <p class="producto-descripcion">
+                                        Quedas participando en el próximo sorteo de premios especiales. Vigente hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                {% if juego_diario.tirada.reclamado %}
+                                    <button type="button" class="btn btn-carrito w-100" disabled>
+                                        <i class="bi bi-check-circle-fill"></i> Ya reclamado
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-carrito w-100 boton-reclamar-premio-dia"
+                                        data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
+                                        <i class="bi bi-gift-fill"></i> Reclamar premio
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -1261,16 +1348,57 @@
         const botonSortearWrap = document.getElementById('botonSortearWrap');
         const botonSortear = document.getElementById('botonSortear');
 
-        // --- Datos reales del premio, inyectados desde el backend (ver punto A) ---
+        // --- Datos reales del premio, inyectados desde el backend ---
+        // origenPremio distingue de DÓNDE viene el premio que se está por
+        // mostrar/sortear: 'campana' (DescuentoAsignado, comportamiento
+        // 100% igual al de siempre) o 'ruleta_diaria' (TiradaDiaria, Parte 2).
+        // estadoJuegoDiario solo aplica cuando origenPremio es 'ruleta_diaria'.
+        const origenPremio = wrap.dataset.origenPremio || 'ninguno'; // 'campana' | 'ruleta_diaria' | 'ninguno'
+        const estadoJuegoDiario = wrap.dataset.estadoJuegoDiario || ''; // 'disponible' | 'ganado' | 'sin_premio' | ''
 
         const tienePremio = wrap.dataset.tienePremio === 'true';
-        const premioProducto = wrap.dataset.premioProducto || '';
-        const premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
-        const premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
-        const premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
-        const premioCodigo = wrap.dataset.premioCodigo || '';
-        const premioImagen = wrap.dataset.premioImagen || '';
+        // premioTipo: '' (campaña) | 'CUPON_5' | 'ENVIO_GRATIS' | 'BOLETO_DORADO'.
+        // Se reasigna en tiempo real cuando el resultado llega por fetch
+        // (caso estadoJuegoDiario === 'disponible').
+        let premioTipo = wrap.dataset.premioTipo || '';
+        let premioProducto = wrap.dataset.premioProducto || '';
+        let premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
+        let premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
+        let premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
+        let premioCodigo = wrap.dataset.premioCodigo || '';
+        let premioImagen = wrap.dataset.premioImagen || '';
         const urlMarcarMostrado = wrap.dataset.urlMarcarMostrado || '';
+        const urlJugarRuleta = wrap.dataset.urlJugarRuleta || '';
+        const urlReclamarPremioDia = wrap.dataset.urlReclamarPremioDia || '';
+
+        // Textos/ícono para los premios de la ruleta diaria que no tienen
+        // producto/foto/precio real (ver explicación al inicio de la respuesta).
+        const CONFIG_PREMIO_RULETA = {
+            CUPON_5: {
+                icono: 'bi-ticket-perforated-fill',
+                badge: '-5%',
+                titulo: '¡Felicidades!',
+                subtitulo: () => `Tienes 5% de descuento en ${premioProducto}`,
+                mostrarPrecios: false,
+                nota: 'Se aplica automáticamente al pagar tu carrito.',
+            },
+            ENVIO_GRATIS: {
+                icono: 'bi-truck',
+                badge: 'GRATIS',
+                titulo: '¡Felicidades!',
+                subtitulo: () => 'Ganaste envío gratis en tu próximo pedido',
+                mostrarPrecios: false,
+                nota: 'Se aplica automáticamente al pagar tu carrito.',
+            },
+            BOLETO_DORADO: {
+                icono: 'bi-award-fill',
+                badge: '🎫',
+                titulo: '¡Boleto dorado!',
+                subtitulo: () => 'Quedas participando en el próximo sorteo de premios especiales',
+                mostrarPrecios: false,
+                nota: 'Te avisaremos si resultas ganador.',
+            },
+        };
 
         function getCookie(nombre) {
             let valor = null;
@@ -1339,6 +1467,24 @@
                 ruedaWrap.classList.add('visible');
             }
         }
+
+        // "Ya jugaste hoy y no salió premio" (ruleta diaria): a diferencia
+        // de 'ganado', esta variante NO deja jugar la ruleta otra vez —
+        // se muestra directamente el aviso reutilizando el mismo
+        // #ofertaRuedaWrap que ya usa el flujo de campaña para "ya tienes
+        // el descuento de hoy".
+        if (estadoJuegoDiario === 'sin_premio') {
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho');
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) texto.textContent = 'Vuelve mañana';
+                if (aviso) aviso.textContent = 'Hoy no salió premio, vuelve mañana por otra tirada';
+                ruedaWrap.classList.add('visible');
+            }
+        }
+        
 
         function obtenerVideo(p) {
             const reverso = p.querySelector('.queso-punto-reverso');
@@ -1438,53 +1584,206 @@
 
         function iniciarSorteo() {
             if (sorteoEnCurso || sorteoHecho) return;
-        
+            if (origenPremio === 'ninguno') return; // salvaguarda, no debería pasar
+
             sorteoEnCurso = true;
             botonSortear.disabled = true;
             botonSortearWrap.classList.remove('visible');
-        
-            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
-            // El % ya no se inventa aquí: viene decidido por el backend (DescuentoAsignado).
-            mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
-            setTimeout(() => mostrarFelicidades(), 2600);
+
+            if (origenPremio === 'ruleta_diaria' && estadoJuegoDiario === 'disponible') {
+                // Único caso donde el resultado NO viene precalculado desde
+                // el contexto: hay que pedirlo al backend antes de animar.
+                jugarRuletaDiariaYContinuar();
+                return;
+            }
+
+            // 'campana' (premio_activo) o 'ganado' (ya jugó hoy y ganó):
+            // el resultado ya viene precalculado en los data-* del wrap.
+            continuarConResultadoConocido();
+        }
+
+        function continuarConResultadoConocido() {
+            // Solo animamos el número (%) cuando ese % es real:
+            // campaña oficial, o CUPON_5 (5% real). ENVIO_GRATIS y
+            // BOLETO_DORADO no tienen un % que mostrar, así que se salta
+            // ese paso e igual se reutiliza la MISMA tarjeta de revelación.
+            const hayPorcentajeReal = origenPremio === 'campana' || premioTipo === 'CUPON_5';
+            if (hayPorcentajeReal) {
+                const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+                mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
+                setTimeout(() => mostrarFelicidades(), 2600);
+            } else {
+                setTimeout(() => mostrarFelicidades(), 600);
+            }
+        }
+
+        function jugarRuletaDiariaYContinuar() {
+            fetch(urlJugarRuleta, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (!data.ok) throw new Error(data.error || 'No se pudo jugar la ruleta');
+
+                    premioTipo = data.resultado;
+
+                    if (data.resultado === 'SIGUE_INTENTANDO') {
+                        setTimeout(() => mostrarSinPremioHoy(), 300);
+                        return;
+                    }
+
+                    if (data.resultado === 'CUPON_5') {
+                        premioProducto = 'tu próxima compra';
+                        premioPorcentaje = 5;
+                    } else if (data.resultado === 'ENVIO_GRATIS') {
+                        premioProducto = 'tu próximo pedido';
+                        premioPorcentaje = 0;
+                    } else if (data.resultado === 'BOLETO_DORADO') {
+                        premioProducto = '';
+                        premioPorcentaje = 0;
+                    }
+
+                    continuarConResultadoConocido();
+                })
+                .catch(() => {
+                    // Si falla el fetch, deshacemos el "bloqueo" visual para
+                    // que el usuario pueda reintentar sin recargar la página.
+                    sorteoEnCurso = false;
+                    botonSortear.disabled = false;
+                    botonSortearWrap && botonSortearWrap.classList.add('visible');
+                });
         }
         
         function mostrarFelicidades() {
             const overlay = document.getElementById('ofertaRevealOverlay');
+            const titulo = document.getElementById('ofertaRevealTitulo');
             const subtitulo = document.getElementById('ofertaRevealSubtitulo');
             const badge = document.getElementById('ofertaRevealBadge');
+            const precios = document.getElementById('ofertaRevealPrecios');
             const precioAnterior = document.getElementById('ofertaRevealPrecioAnterior');
             const precioNuevo = document.getElementById('ofertaRevealPrecioNuevo');
             const imagenReveal = document.getElementById('ofertaRevealImagen');
+            const iconoReveal = document.getElementById('ofertaRevealIcono');
+            const nota = document.getElementById('ofertaRevealNota');
 
-            if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
-            if (badge) badge.textContent = `-${premioPorcentaje}%`;
-            if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
-            if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
-            if (imagenReveal && premioImagen) imagenReveal.src = premioImagen;
+            const esPremioRuletaSinDatosReales = origenPremio === 'ruleta_diaria' && CONFIG_PREMIO_RULETA[premioTipo];
+            const config = esPremioRuletaSinDatosReales ? CONFIG_PREMIO_RULETA[premioTipo] : null;
+
+            if (config) {
+                // CUPON_5 / ENVIO_GRATIS / BOLETO_DORADO: sin producto/foto
+                // real -> ícono en vez de <img>, sin fila de precios.
+                if (imagenReveal) imagenReveal.style.display = 'none';
+                if (iconoReveal) {
+                    iconoReveal.className = `oferta-reveal-icono bi ${config.icono}`;
+                    iconoReveal.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:3.2rem;color:#c9a84c;';
+                }
+                if (badge) { badge.style.display = ''; badge.textContent = config.badge; }
+                if (titulo) titulo.textContent = config.titulo;
+                if (subtitulo) subtitulo.textContent = config.subtitulo();
+                if (precios) precios.style.display = 'none';
+                if (nota) { nota.textContent = config.nota; nota.style.display = ''; }
+            } else {
+                // Comportamiento original: premio real de campaña (premio_activo).
+                if (iconoReveal) iconoReveal.style.display = 'none';
+                if (imagenReveal) {
+                    imagenReveal.style.display = '';
+                    if (premioImagen) imagenReveal.src = premioImagen;
+                }
+                if (titulo) titulo.textContent = '¡Felicidades!';
+                if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
+                if (badge) { badge.style.display = ''; badge.textContent = `-${premioPorcentaje}%`; }
+                if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
+                if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
+                if (precios) precios.style.display = '';
+                if (nota) nota.style.display = 'none';
+            }
 
             if (overlay) overlay.classList.add('visible');
             lanzarConfetti(90);
 
             setTimeout(() => cerrarReveal(), 2800);
         }
-        
-        function cerrarReveal() {
+
+        function mostrarSinPremioHoy() {
+            // Variante "vuelve mañana" tras jugar y salir SIGUE_INTENTANDO.
+            // Reusa el MISMO overlay, sin badge ni confetti, sin animación nueva.
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            const titulo = document.getElementById('ofertaRevealTitulo');
+            const subtitulo = document.getElementById('ofertaRevealSubtitulo');
+            const badge = document.getElementById('ofertaRevealBadge');
+            const precios = document.getElementById('ofertaRevealPrecios');
+            const imagenReveal = document.getElementById('ofertaRevealImagen');
+            const iconoReveal = document.getElementById('ofertaRevealIcono');
+            const nota = document.getElementById('ofertaRevealNota');
+
+            if (imagenReveal) imagenReveal.style.display = 'none';
+            if (iconoReveal) {
+                iconoReveal.className = 'oferta-reveal-icono bi bi-calendar-heart';
+                iconoReveal.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:3.2rem;color:#c9a84c;';
+            }
+            if (badge) badge.style.display = 'none';
+            if (titulo) titulo.textContent = 'Sigue intentando';
+            if (subtitulo) subtitulo.textContent = 'Hoy no salió premio, vuelve mañana por otra tirada';
+            if (precios) precios.style.display = 'none';
+            if (nota) nota.style.display = 'none';
+
+            if (overlay) overlay.classList.add('visible');
+            // Sin confetti: no hay nada que celebrar acá.
+
+            setTimeout(() => cerrarRevealSinPremio(), 2600);
+        }
+
+        function cerrarRevealSinPremio() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             if (overlay) overlay.classList.remove('visible');
-        
+            const badge = document.getElementById('ofertaRevealBadge');
+            if (badge) badge.style.display = '';
+
             sorteoEnCurso = false;
             sorteoHecho = true;
             wrap.classList.add('sorteo-hecho');
-            guardarOfertaDelDia(premioPorcentaje);
-            marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
-        
+
             quesosArr.forEach((q) => {
                 q.classList.remove('volteado');
                 pausarVideoQueso(q);
             });
             wrap.classList.remove('todos-encendidos');
+
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) texto.textContent = 'Vuelve mañana';
+                if (aviso) aviso.textContent = 'Ya jugaste hoy, inténtalo de nuevo mañana';
+                ruedaWrap.classList.add('visible');
+            }
+            // No se llama a reclamar-premio-dia: SIGUE_INTENTANDO no tiene nada que reclamar.
+        }
         
+        function cerrarReveal() {
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            if (overlay) overlay.classList.remove('visible');
+
+            sorteoEnCurso = false;
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho');
+
+            if (origenPremio === 'campana') {
+                guardarOfertaDelDia(premioPorcentaje);
+                marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
+            } else if (origenPremio === 'ruleta_diaria') {
+                reclamarPremioDia(); // aplica el efecto real: cupón/envío en sesión, o marca el boleto dorado
+            }
+
+            quesosArr.forEach((q) => {
+                q.classList.remove('volteado');
+                pausarVideoQueso(q);
+            });
+            wrap.classList.remove('todos-encendidos');
+
             let sumX = 0, sumY = 0, n = 0;
             quesosArr.forEach((q) => {
                 sumX += parseFloat(q.dataset.centroX) || 50;
@@ -1493,8 +1792,26 @@
             });
             const cx = n ? sumX / n : 50;
             const cy = n ? sumY / n : 50;
-        
-            setTimeout(() => volarBrilloHaciaBadge(cx, cy, premioPorcentaje), 500);
+
+            // Para campaña, el valor numérico real; para ruleta diaria, null
+            // (volarBrilloHaciaBadge arma el texto según premioTipo).
+            const valorParaGlobo = origenPremio === 'campana' ? premioPorcentaje : null;
+            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valorParaGlobo), 500);
+        }
+
+        function reclamarPremioDia() {
+            if (!urlReclamarPremioDia) return;
+            fetch(urlReclamarPremioDia, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }).catch(() => {
+                // silencioso, igual que marcarPremioMostrado: si falla, el
+                // cliente ya vio la animación igual, y puede reintentar
+                // reclamar desde la tarjeta del listado de productos.
+            });
         }
 
         function volarBrilloHaciaBadge(cx, cy, valor) {
@@ -1520,7 +1837,18 @@
             spark.addEventListener('animationend', () => {
                 spark.remove();
                 const texto = ruedaWrap.querySelector('.rueda-descuento');
-                if (texto) texto.textContent = `${valor}% de descuento hoy`;
+                if (texto) {
+                    if (valor !== null) {
+                        texto.textContent = `${valor}% de descuento hoy`;
+                    } else {
+                        const textos = {
+                            CUPON_5: '5% de descuento hoy',
+                            ENVIO_GRATIS: 'Envío gratis hoy',
+                            BOLETO_DORADO: 'Boleto dorado hoy',
+                        };
+                        texto.textContent = textos[premioTipo] || 'Premio de hoy reclamado';
+                    }
+                }
                 ruedaWrap.classList.add('visible', 'aparicion-pop');
             });
         }
@@ -1886,5 +2214,49 @@
         });
     })();
     </script>
+    <script>
+(function () {
+    function getCookie(nombre) {
+        let valor = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach((cookie) => {
+                cookie = cookie.trim();
+                if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                    valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                }
+            });
+        }
+        return valor;
+    }
+
+    document.querySelectorAll('.boton-reclamar-premio-dia').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const url = btn.dataset.urlReclamarPremioDia;
+            if (!url) return;
+            btn.disabled = true;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.ok) {
+                        // Recargamos para que la tarjeta pase a mostrar
+                        // "Ya reclamado" y el contexto (cupón/envío en
+                        // sesión) quede reflejado en el resto de la página.
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                    }
+                })
+                .catch(() => { btn.disabled = false; });
+        });
+    });
+})();
+</script>
+    
 </body>
 </html>

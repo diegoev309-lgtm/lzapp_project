@@ -5,19 +5,16 @@
 
 <style>
 
-body{
-    background:#f4f7fc;
-}
-
 /*==========================================================
    BLOQUE UNIFICADO: encabezado + tabla/tarjetas + pie
 ===========================================================*/
 
 .bloque-productos{
-    background:white;
-    border-radius:20px;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
     overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
 }
 
 /*==========================
@@ -25,9 +22,16 @@ body{
 ===========================*/
 
 .encabezado{
+<<<<<<< HEAD
     background:linear-gradient(135deg,#192987,#3556ff);
     color:white;
     padding:20px 30px;
+=======
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
+    border-bottom:1px solid var(--border-subtle);
+    color:var(--text-primary);
+    padding:26px 30px;
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -37,6 +41,7 @@ body{
 
 .titulo{
     margin:0;
+<<<<<<< HEAD
     font-size:26px;
     font-weight:bold;
 }
@@ -55,6 +60,34 @@ body{
     border-radius:12px;
     font-weight:bold;
     font-size:13px;
+=======
+    font-size:23px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.titulo i{
+    color:var(--gold);
+    font-size:20px;
+}
+
+.subtitulo{
+    margin-top:6px;
+    color:var(--text-secondary);
+    font-size:13px;
+}
+
+.btn-nuevo{
+    background:var(--gold);
+    color:#1A1A2E;
+    border:1px solid var(--gold);
+    padding:11px 20px;
+    border-radius:var(--radius-btn);
+    font-weight:600;
+    font-size:13.5px;
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.3s;
     text-decoration:none;
     display:inline-flex;
@@ -63,10 +96,10 @@ body{
 }
 
 .btn-nuevo:hover{
-    background:linear-gradient(135deg,#eef0f3,#c2c8d2);
-    color:#14206b;
-    transform:translateY(-3px);
-    box-shadow:0 10px 22px rgba(0,0,0,.2);
+    background:#EFD48C;
+    color:#1A1A2E;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(228,200,112,.25);
 }
 
 /*==========================
@@ -98,33 +131,48 @@ body{
     top:50%;
     left:14px;
     transform:translateY(-50%);
+<<<<<<< HEAD
     color:#9aa3b4;
     font-size:14px;
+=======
+    color:var(--text-tertiary);
+    font-size:15px;
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     pointer-events:none;
 }
 
 .input-busqueda{
     width:100%;
+<<<<<<< HEAD
     border:1px solid rgba(2,44,99,.12);
     border-radius:10px;
     padding:8px 14px 8px 38px;
     font-size:13px;
     color:#192987;
     background:#f7f9fd;
+=======
+    border:1px solid var(--border-hair);
+    border-radius:var(--radius-btn);
+    padding:11px 16px 11px 42px;
+    font-size:14px;
+    color:var(--text-primary);
+    background:rgba(255,255,255,.03);
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.25s;
 }
 
 .input-busqueda:focus{
     outline:none;
-    border-color:#3556ff;
-    background:white;
-    box-shadow:0 0 0 4px rgba(53,86,255,.12);
+    border-color:var(--gold);
+    background:rgba(255,255,255,.05);
+    box-shadow:0 0 0 4px var(--gold-dim);
 }
 
 .input-busqueda::placeholder{
-    color:#9aa3b4;
+    color:var(--text-tertiary);
 }
 
+<<<<<<< HEAD
 .btn-nueva-campana{
     background:linear-gradient(135deg,#192987,#3556ff);
     color:white;
@@ -138,16 +186,35 @@ body{
     align-items:center;
     gap:6px;
     text-decoration:none;
+=======
+.btn-buscar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:46px;
+    height:46px;
+    flex-shrink:0;
+    border:none;
+    border-radius:var(--radius-btn);
+    background:var(--gold);
+    color:#1A1A2E;
+    font-size:16px;
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.3s;
     flex-shrink:0;
     white-space:nowrap;
     margin-left:auto;
 }
 
+<<<<<<< HEAD
 .btn-nueva-campana:hover{
     color:white;
+=======
+.btn-buscar:hover{
+    color:#1A1A2E;
+>>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(25,41,135,.3);
+    box-shadow:0 8px 18px rgba(228,200,112,.3);
 }
 
 @media(max-width:768px){
@@ -180,41 +247,50 @@ body{
 
 .barra-vista span{
     font-size:13px;
-    color:#f3f4f7;
+    color:var(--text-secondary);
     font-weight:600;
     margin-right:4px;
 }
 
 .selector-vista{
     display:inline-flex;
-    background:#f4f7fc;
-    border-radius:12px;
+    background:rgba(255,255,255,.03);
+    border-radius:var(--radius-pill);
     padding:4px;
-    border:1px solid rgba(250, 250, 250, 0.06);
+    border:1px solid var(--border-hair);
 }
 
 .btn-vista{
     border:none;
     background:transparent;
-    color:#192987;
+    color:var(--text-secondary);
     padding:7px 14px;
-    border-radius:9px;
-    font-weight:600;
-    font-size:13px;
+    border-radius:var(--radius-pill);
+    font-weight:500;
+    font-size:12.5px;
     display:flex;
     align-items:center;
     gap:6px;
-    transition:.25s;
+    transition:.2s;
 }
 
 .btn-vista:hover{
-    background:#eef2ff;
+    color:var(--text-primary);
 }
 
 .btn-vista.activo{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    box-shadow:0 5px 14px rgba(25,41,135,.35);
+    background:var(--gold-dim);
+    color:var(--gold);
+}
+
+.btn-vista .badge{
+    background:rgba(255,255,255,.1) !important;
+    color:var(--text-secondary) !important;
+}
+
+.btn-vista.activo .badge{
+    background:rgba(228,200,112,.25) !important;
+    color:var(--gold) !important;
 }
 
 .vista-oculta{
@@ -230,31 +306,41 @@ body{
 }
 
 .tabla-productos thead{
-    background:#192987;
+    background:transparent;
 }
 
 .tabla-productos thead th{
-    color:#000000;
+    color:var(--text-tertiary);
+    text-transform:uppercase;
+    letter-spacing:.4px;
     border:none;
-    padding:8px;
+    border-bottom:1px solid var(--border-subtle);
+    padding:12px 8px;
     text-align:center;
-    font-size:14px;
+    font-size:11px;
+    font-weight:600;
     white-space:nowrap;
 }
 
 .tabla-productos tbody td{
     vertical-align:middle;
     text-align:center;
-    padding:5px 6px;
+    padding:12px 6px;
     font-size:13px;
+    color:var(--text-secondary);
+    border-bottom:1px solid var(--border-subtle);
 }
 
 .tabla-productos tbody tr{
-    transition:.3s;
+    transition:.2s;
+}
+
+.tabla-productos tbody tr:last-child td{
+    border-bottom:none;
 }
 
 .tabla-productos tbody tr:hover{
-    background:#eef4ff;
+    background:rgba(255,255,255,.03);
 }
 
 .img-producto{
@@ -262,8 +348,10 @@ body{
     height:38px;
     object-fit:cover;
     border-radius:8px;
-    border:2px solid #e8e8e8;
+    border:1px solid var(--border-hair);
     transition:.3s;
+    margin-right:8px;
+    vertical-align:middle;
 }
 
 .img-producto:hover{
@@ -271,45 +359,52 @@ body{
 }
 
 .btn-editar{
-    background:#0d6efd;
-    color:white;
+    background:rgba(56,189,248,.14);
+    color:var(--blue);
     border:none;
-    border-radius:10px;
-    transition:.3s;
+    border-radius:var(--radius-btn);
+    transition:.2s;
 }
 
 .btn-eliminar{
-    background:#dc3545;
-    color:white;
+    background:var(--red-dim);
+    color:var(--red);
     border:none;
-    border-radius:10px;
-    transition:.3s;
+    border-radius:var(--radius-btn);
+    transition:.2s;
 }
 
 .btn-editar:hover{
-    background:#0a58ca;
-    color:white;
+    background:rgba(56,189,248,.25);
+    color:var(--blue);
     transform:translateY(-2px);
 }
 
 .btn-eliminar:hover{
-    background:#bb2d3b;
-    color:white;
+    background:rgba(239,68,68,.25);
+    color:var(--red);
     transform:translateY(-2px);
 }
 
 .acciones{
     display:flex;
-    gap:4px;
+    gap:6px;
     justify-content:center;
     flex-wrap:wrap;
     font-size:12px;
 }
 
 .badge-stock, .badge{
-    padding:6px 12px;
-    border-radius:30px;
-    font-size:12px;
+    padding:5px 12px;
+    border-radius:var(--radius-pill);
+    font-size:11.5px;
+    font-weight:600;
+    border:none;
+}
+
+.badge.bg-warning{
+    background:var(--gold-dim) !important;
+    color:var(--gold) !important;
 }
 
 .badge-stock{
@@ -317,34 +412,35 @@ body{
 }
 
 .badge-oferta{
-    background:#2de25a;
-    color:white;
+    background:var(--green-dim);
+    color:var(--green);
     padding:6px 12px;
-    border-radius:30px;
-    font-size:12px;
+    border-radius:var(--radius-pill);
+    font-size:11.5px;
+    font-weight:600;
     display:inline-flex;
     align-items:center;
     gap:5px;
 }
 
 .badge-sin-oferta{
-    background:#f4f7fc;
-    color:#8a8a8a;
-    border:1px solid #dfe3ef;
+    background:rgba(255,255,255,.05);
+    color:var(--text-tertiary);
+    border:1px solid var(--border-hair);
     padding:6px 12px;
-    border-radius:30px;
-    font-size:12px;
+    border-radius:var(--radius-pill);
+    font-size:11.5px;
 }
 
 .precio{
-    color:#198754;
-    font-weight:bold;
-    font-size:12px;
+    color:var(--green);
+    font-weight:700;
+    font-size:12.5px;
     white-space:nowrap;
 }
 
 /*==========================================================
-   VISTA DE TARJETAS ANIMADAS (campañas de descuento)
+   VISTA DE TARJETAS (campañas de descuento)
 ===========================================================*/
 
 .grid-productos{
@@ -355,11 +451,11 @@ body{
 }
 
 .producto-card{
-    background:white;
-    border:1px solid rgba(2,44,99,.08);
+    background:var(--bg-app);
+    border:1px solid var(--border-subtle);
     border-radius:14px;
     overflow:hidden;
-    box-shadow:0 6px 16px rgba(2,44,99,.08);
+    box-shadow:0 6px 16px rgba(0,0,0,.25);
     transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s;
     display:flex;
     flex-direction:column;
@@ -374,7 +470,8 @@ body{
 
 .producto-card:hover{
     transform:translateY(-6px);
-    box-shadow:0 16px 34px rgba(2,44,99,.18);
+    box-shadow:0 16px 34px rgba(0,0,0,.45);
+    border-color:rgba(255,255,255,.15);
 }
 
 .producto-card-top{
@@ -388,7 +485,7 @@ body{
 .producto-card-nombre{
     font-size:14px;
     font-weight:700;
-    color:#022C63;
+    color:var(--text-primary);
     margin:0;
     line-height:1.25;
 }
@@ -396,17 +493,17 @@ body{
 .producto-card-frecuencia{
     font-size:10.5px;
     font-weight:700;
-    color:#5b6472;
-    background:#f4f7fc;
+    color:var(--text-secondary);
+    background:rgba(255,255,255,.05);
     padding:4px 9px;
-    border-radius:20px;
+    border-radius:var(--radius-pill);
     white-space:nowrap;
 }
 
 .producto-card-linea{
     width:28px;
     height:3px;
-    background:#c9a84c;
+    background:var(--gold);
     border-radius:2px;
     margin:3px 0 8px;
     transition:width .3s;
@@ -422,7 +519,7 @@ body{
     gap:8px;
     margin-bottom:10px;
     padding:10px;
-    background:#f8faff;
+    background:rgba(255,255,255,.03);
     border-radius:10px;
 }
 
@@ -434,7 +531,7 @@ body{
 }
 
 .stat-item i{
-    color:#3556ff;
+    color:var(--gold);
     font-size:15px;
     flex-shrink:0;
 }
@@ -449,13 +546,13 @@ body{
 .stat-valor{
     font-size:12px;
     font-weight:700;
-    color:#022C63;
+    color:var(--text-primary);
     white-space:nowrap;
 }
 
 .stat-etiqueta{
     font-size:9.5px;
-    color:#8a93a6;
+    color:var(--text-tertiary);
     white-space:nowrap;
 }
 
@@ -467,22 +564,22 @@ body{
 }
 
 .chip-producto{
-    background:#f4f7fc;
-    color:#022C63;
+    background:rgba(255,255,255,.05);
+    color:var(--text-secondary);
     font-size:10.5px;
     font-weight:600;
     padding:3px 9px;
-    border-radius:20px;
-    border:1px solid rgba(2,44,99,.08);
+    border-radius:var(--radius-pill);
+    border:1px solid var(--border-hair);
 }
 
 .caja-preview{
-    background:#eef4ff;
-    border:1px dashed #3556ff;
+    background:var(--gold-dim);
+    border:1px dashed rgba(228,200,112,.5);
     border-radius:10px;
     padding:8px 10px;
     font-size:11.5px;
-    color:#192987;
+    color:var(--text-primary);
     display:flex;
     align-items:center;
     gap:6px;
@@ -490,8 +587,13 @@ body{
     min-width:0;
 }
 
+.caja-preview i{
+    color:var(--gold);
+}
+
 .caja-preview strong{
     font-size:13px;
+    color:var(--gold);
 }
 
 .producto-card-fila-inferior{
@@ -519,19 +621,16 @@ body{
 
 .btn-toggle-regla{
     border:none;
-    border-radius:30px;
+    border-radius:var(--radius-pill);
     padding:6px 14px;
     font-size:11.5px;
     font-weight:600;
     transition:.3s;
 }
-.btn-toggle-regla.activa{ background:#198754; color:white; }
-.btn-toggle-regla.inactiva{ background:#e9ecef; color:#5b6472; }
+.btn-toggle-regla.activa{ background:var(--green-dim); color:var(--green); }
+.btn-toggle-regla.inactiva{ background:rgba(255,255,255,.06); color:var(--text-tertiary); }
 .btn-toggle-regla:hover{ transform:translateY(-2px); }
 
-/* El badge de estado ahora ES el control de activar/desactivar:
-   se ve igual que un badge normal, pero es un <button> dentro de
-   un <form> que hace el toggle. Así no hace falta un botón aparte. */
 .form-toggle-estado{
     display:inline-block;
     margin:0;
@@ -541,19 +640,29 @@ body{
     border:none;
     cursor:pointer;
     padding:6px 12px;
-    border-radius:30px;
-    font-size:12px;
+    border-radius:var(--radius-pill);
+    font-size:11.5px;
     font-weight:600;
     transition:.3s;
 }
 
+.badge-estado-toggle.bg-success{
+    background-color:var(--green-dim) !important;
+    color:var(--green) !important;
+}
+
+.badge-estado-toggle.bg-secondary{
+    background-color:rgba(255,255,255,.06) !important;
+    color:var(--text-tertiary) !important;
+}
+
 .badge-estado-toggle.bg-success:hover{
-    background-color:#157347 !important;
+    background-color:rgba(74,222,128,.28) !important;
     transform:translateY(-2px);
 }
 
 .badge-estado-toggle.bg-secondary:hover{
-    background-color:#ffffff !important;
+    background-color:rgba(255,255,255,.12) !important;
     transform:translateY(-2px);
 }
 
@@ -572,8 +681,16 @@ body{
     padding:60px 20px;
 }
 
+.estado-vacio i{
+    color:var(--text-tertiary) !important;
+}
+
+.estado-vacio h5, .estado-vacio h6{
+    color:var(--text-secondary);
+}
+
 /*==========================================================
-   PIE DEL BLOQUE: vista + paginación en una sola línea
+   PIE DEL BLOQUE
 ===========================================================*/
 
 .pie-productos{
@@ -583,8 +700,8 @@ body{
     flex-wrap:wrap;
     gap:12px;
     padding:14px 20px;
-    border-top:1px solid rgba(2,44,99,.08);
-    background:white;
+    border-top:1px solid var(--border-subtle);
+    background:var(--bg-panel);
 }
 
 .paginacion-inline{
@@ -597,20 +714,22 @@ body{
 }
 
 .paginacion-inline .page-link{
-    color:#192987;
-    border-color:#dfe3ef;
+    color:var(--text-secondary);
+    background:transparent;
+    border-color:var(--border-hair);
 }
 
 .paginacion-inline .page-link:hover{
-    color:#192987;
-    background-color:#eef2ff;
-    border-color:#dfe3ef;
+    color:var(--text-primary);
+    background-color:rgba(255,255,255,.05);
+    border-color:var(--border-hair);
 }
 
 .paginacion-inline .page-item.active .page-link{
-    background-color:#192987;
-    border-color:#192987;
-    color:white;
+    background-color:var(--gold);
+    border-color:var(--gold);
+    color:#1A1A2E;
+    font-weight:600;
 }
 
 /*==========================
@@ -625,7 +744,7 @@ body{
     }
 
     .titulo{
-        font-size:28px;
+        font-size:20px;
     }
 
     .barra-vista{
@@ -668,7 +787,7 @@ body{
 }
 
 /*==========================================================
-   MENSAJES (django messages) COMO TOAST EN ESQUINA SUPERIOR
+   MENSAJES (django messages) COMO TOAST
 ===========================================================*/
 
 .contenedor-toasts{
@@ -679,49 +798,49 @@ body{
     display:flex;
     flex-direction:column;
     gap:10px;
-    max-width:360px;
     max-width:min(360px, calc(100vw - 40px));
 }
 
 .toast-mensaje{
-    background:white;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
     border-radius:14px;
-    box-shadow:0 15px 35px rgba(0,0,0,.2);
+    box-shadow:0 15px 35px rgba(0,0,0,.5);
     padding:14px 16px;
     display:flex;
     align-items:flex-start;
     gap:10px;
     animation:toastEntra .35s cubic-bezier(.25,.8,.25,1) both;
-    border-left:5px solid #198754;
+    border-left:4px solid var(--green);
     transition:opacity .3s, transform .3s;
 }
 
 .toast-mensaje.toast-error,
-.toast-mensaje.toast-danger{ border-left-color:#dc3545; }
-.toast-mensaje.toast-warning{ border-left-color:#ffc107; }
-.toast-mensaje.toast-info{ border-left-color:#0d6efd; }
+.toast-mensaje.toast-danger{ border-left-color:var(--red); }
+.toast-mensaje.toast-warning{ border-left-color:var(--gold); }
+.toast-mensaje.toast-info{ border-left-color:var(--blue); }
 
 .toast-mensaje-icono{
     font-size:17px;
-    color:#198754;
+    color:var(--green);
     margin-top:1px;
 }
 .toast-mensaje.toast-error .toast-mensaje-icono,
-.toast-mensaje.toast-danger .toast-mensaje-icono{ color:#dc3545; }
-.toast-mensaje.toast-warning .toast-mensaje-icono{ color:#ffc107; }
-.toast-mensaje.toast-info .toast-mensaje-icono{ color:#0d6efd; }
+.toast-mensaje.toast-danger .toast-mensaje-icono{ color:var(--red); }
+.toast-mensaje.toast-warning .toast-mensaje-icono{ color:var(--gold); }
+.toast-mensaje.toast-info .toast-mensaje-icono{ color:var(--blue); }
 
 .toast-mensaje-texto{
     flex:1;
     font-size:13px;
-    color:#022C63;
+    color:var(--text-primary);
     line-height:1.4;
 }
 
 .toast-mensaje-cerrar{
     background:transparent;
     border:none;
-    color:#8a8a8a;
+    color:var(--text-tertiary);
     font-size:14px;
     cursor:pointer;
     padding:0;
@@ -729,7 +848,7 @@ body{
 }
 
 .toast-mensaje-cerrar:hover{
-    color:#333;
+    color:var(--text-primary);
 }
 
 @keyframes toastEntra{
@@ -744,6 +863,63 @@ body{
         left:10px;
         max-width:none;
     }
+}
+
+/*==========================================================
+   MODAL DE PREVISUALIZACIÓN (dark)
+===========================================================*/
+
+#modalPrevisualizacion .modal-content{
+    background:var(--bg-panel);
+    color:var(--text-primary);
+    border:1px solid var(--border-subtle);
+}
+
+#modalPrevisualizacion .modal-header{
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel)) !important;
+    color:var(--text-primary) !important;
+    border-bottom:1px solid var(--border-subtle);
+}
+
+#modalPrevisualizacion .modal-title{
+    color:var(--text-primary);
+}
+
+#contenidoPrevisualizacion h6{
+    color:var(--text-primary) !important;
+}
+
+#contenidoPrevisualizacion .table{
+    color:var(--text-secondary);
+}
+
+#contenidoPrevisualizacion .table td{
+    border-color:var(--border-subtle);
+    background:transparent;
+}
+
+#contenidoPrevisualizacion .caja-preview{
+    display:block !important;
+}
+
+#contenidoPrevisualizacion .alert-warning{
+    background:var(--gold-dim);
+    color:var(--gold);
+    border:1px solid rgba(228,200,112,.3);
+}
+
+#contenidoPrevisualizacion .alert-danger{
+    background:var(--red-dim);
+    color:var(--red);
+    border:1px solid rgba(239,68,68,.3);
+}
+
+#contenidoPrevisualizacion .spinner-border{
+    color:var(--gold);
+}
+
+#contenidoPrevisualizacion .text-secondary{
+    color:var(--text-secondary) !important;
 }
 
 </style>
@@ -1057,7 +1233,7 @@ body{
 <div class="modal fade" id="modalPrevisualizacion" tabindex="-1" aria-labelledby="modalPrevisualizacionLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content" style="border-radius:16px; overflow:hidden;">
-            <div class="modal-header" style="background:linear-gradient(135deg,#192987,#3556ff); color:white;">
+            <div class="modal-header">
                 <h5 class="modal-title" id="modalPrevisualizacionLabel">Previsualización</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -1109,10 +1285,10 @@ function verPrevisualizacion(productoId, nombreProducto){
                 html += `<div class="alert alert-warning"><strong>${campana.campana}</strong>: ${campana.error}</div>`;
                 return;
             }
-            html += `<h6 class="mb-2" style="color:#022C63;">${campana.campana}</h6>`;
+            html += `<h6 class="mb-2">${campana.campana}</h6>`;
             (campana.detalle || []).forEach(function(d){
                 html += `
-                    <div class="caja-preview mb-3" style="display:block;">
+                    <div class="caja-preview mb-3">
                         <div class="mb-2"><i class="bi bi-people-fill"></i>
                             Aplicará a <strong>${d.clientes_que_recibiran_el_premio}</strong> cliente(s)
                         </div>

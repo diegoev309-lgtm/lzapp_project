@@ -1,7 +1,9 @@
 from django.shortcuts import render
 
-def dview(resquet):
-    return render(resquet, "masterpage_dashboard.html")
+from django.shortcuts import render, redirect
+
+def dview(request):
+    return redirect('Inicio_dash')
 
 def Inicio(request):
     return render(request, "Inicio.html")
