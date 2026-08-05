@@ -6,17 +6,18 @@
 <style>
 
 .bloque-confirmar{
-    background:white;
-    border-radius:20px;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
     overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
     max-width:520px;
     margin:60px auto;
     text-align:center;
 }
 
 .encabezado-confirmar{
-    background:linear-gradient(135deg,#dc3545,#bb2d3b);
+    background:linear-gradient(135deg,#7f1d1d, var(--red));
     color:white;
     padding:26px;
 }
@@ -29,7 +30,7 @@
 .encabezado-confirmar h1{
     margin:0;
     font-size:22px;
-    font-weight:bold;
+    font-weight:700;
 }
 
 .cuerpo-confirmar{
@@ -37,12 +38,12 @@
 }
 
 .cuerpo-confirmar p{
-    color:#5b6472;
+    color:var(--text-secondary);
     font-size:14px;
 }
 
 .cuerpo-confirmar strong{
-    color:#022C63;
+    color:var(--text-primary);
 }
 
 .pie-confirmar{
@@ -50,30 +51,31 @@
     justify-content:center;
     gap:12px;
     padding:20px 30px;
-    border-top:1px solid rgba(2,44,99,.08);
-    background:#fafbff;
+    border-top:1px solid var(--border-subtle);
+    background:var(--bg-sidebar);
 }
 
 .btn-confirmar-eliminar{
-    background:linear-gradient(135deg,#dc3545,#bb2d3b);
+    background:var(--red);
     color:white;
     border:none;
     padding:10px 24px;
     border-radius:12px;
-    font-weight:bold;
+    font-weight:700;
     transition:.3s;
 }
 
 .btn-confirmar-eliminar:hover{
     color:white;
+    background:#c1352f;
     transform:translateY(-2px);
-    box-shadow:0 10px 22px rgba(220,53,69,.3);
+    box-shadow:0 10px 22px rgba(239,68,68,.3);
 }
 
 .btn-cancelar-confirmar{
-    background:#f4f7fc;
-    color:#5b6472;
-    border:1px solid rgba(2,44,99,.1);
+    background:rgba(255,255,255,.06);
+    color:var(--text-primary);
+    border:1px solid var(--border-hair);
     padding:10px 24px;
     border-radius:12px;
     font-weight:600;
@@ -82,8 +84,9 @@
 }
 
 .btn-cancelar-confirmar:hover{
-    background:#e9ecef;
-    color:#333;
+    background:rgba(255,255,255,.1);
+    color:var(--text-primary);
+    border-color:rgba(255,255,255,.25);
 }
 
 </style>

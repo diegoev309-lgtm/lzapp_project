@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Q
 from django.templatetags.static import static
+from django.utils import timezone
 from dashboard.models import Producto
+from descuentos.models import TiradaDiaria
 from descuentos.services import obtener_premio_activo_para_home
 from carrito.logic import limpiar_premios_invalidos_del_carrito, premio_ya_en_carrito
 from descuentos.services import obtener_premio_activo_para_home, obtener_producto_ids_con_premio_activo
@@ -72,14 +74,49 @@ def _premio_para_animacion(request):
     return premio
 
 
+def _estado_juego_diario(request):
+    """
+    Estado de la ruleta diaria, para llenar el "hueco vacío" de
+    oferta-globo-wrap cuando el usuario NO tiene premio_activo de campaña
+    oficial (sin campaña vigente, no sorteado, o visitante anónimo).
+    Todos pueden jugar una vez al día, registrados y anónimos.
+
+    Devuelve un dict con 'estado' en:
+      - 'disponible': todavía no jugó hoy -> puede tocar los quesos y sortear.
+      - 'ganado': jugó y ganó (CUPON_5/ENVIO_GRATIS/BOLETO_DORADO) -> incluye
+        la tirada, para mostrar la tarjeta de resultado + botón reclamar.
+      - 'sin_premio': jugó y salió SIGUE_INTENTANDO -> "vuelve mañana".
+    """
+    hoy = timezone.now().date()
+    if request.user.is_authenticated:
+        tirada = TiradaDiaria.objects.filter(usuario=request.user, fecha=hoy).first()
+    else:
+        session_key = request.session.session_key
+        tirada = (
+            TiradaDiaria.objects.filter(sesion_key=session_key, fecha=hoy, usuario__isnull=True).first()
+            if session_key else None
+        )
+
+    if not tirada:
+        return {'estado': 'disponible'}
+    if tirada.resultado == TiradaDiaria.Resultado.SIGUE_INTENTANDO:
+        return {'estado': 'sin_premio', 'tirada': tirada}
+    return {'estado': 'ganado', 'tirada': tirada}
+
+
 def main(request):
     premio_para_animacion = _premio_para_animacion(request)
+    # Prioridad: si hay premio de campaña oficial, se muestra tal cual
+    # (sin cambios). Si no, se llena el hueco con el estado de la ruleta
+    # diaria en vez de dejar oferta-globo-wrap oculto.
+    juego_diario = None if premio_para_animacion else _estado_juego_diario(request)
     ids_con_premio = obtener_producto_ids_con_premio_activo(request.user) if request.user.is_authenticated else set()
     productos, query = obtener_productos_filtrados(request, excluir_ids=ids_con_premio)
     context = {
         'productos': productos,
         'query': query,
         'premio_activo': premio_para_animacion,
+        'juego_diario': juego_diario,
     }
     return render(request, "masterpage.html", context)
 
@@ -90,12 +127,15 @@ def user(request):
 
 
 def client(request):
+    premio_activo = _premio_activo_o_none(request)
+    juego_diario = None if premio_activo else _estado_juego_diario(request)
     ids_con_premio = obtener_producto_ids_con_premio_activo(request.user) if request.user.is_authenticated else set()
     productos, query = obtener_productos_filtrados(request, excluir_ids=ids_con_premio)
     context = {
         'productos': productos,
         'query': query,
-        'premio_activo': _premio_activo_o_none(request),
+        'premio_activo': premio_activo,
+        'juego_diario': juego_diario,
     }
     return render(request, "clients.html", context)
 
@@ -123,10 +163,14 @@ def carro(request):
             pago_status = "fallido"
             request.session.pop("mp_items_comprados", None)
 
+    premio_activo = _premio_activo_o_none(request, solo_mostrados=True)
+    juego_diario = None if premio_activo else _estado_juego_diario(request)
+
     context = {
         "productos": productos,
         "query": query,
-        'premio_activo': _premio_activo_o_none(request, solo_mostrados=True),
+        'premio_activo': premio_activo,
+        'juego_diario': juego_diario,
         "pago_status": pago_status,
         "pago_payment_id": payment_id,
     }

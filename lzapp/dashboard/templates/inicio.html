@@ -1,12 +1,233 @@
 {% extends "masterpage_dashboard.html" %}
-
 {% load static %}
+
+{% block title %}LzApp · Inicio{% endblock %}
+{% block page_icon %}bi-house-door-fill{% endblock %}
+{% block page_title %}Inicio{% endblock %}
+{% block page_subtitle %}Resumen general de ventas, producción y pedidos{% endblock %}
+
+{% block header_actions %}
+<div class="select-chip">
+    <i class="bi bi-calendar3"></i> Este mes
+</div>
+{% endblock %}
 
 {% block content %}
 
-<div class="card shadow p-1">
-    <h2>Inicio</h2>
-    <p>Aquí aparecerán los resumenes.</p>
+<!-- ===== Stat cards ===== -->
+<div class="dash-stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon gold"><i class="bi bi-cash-stack"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">$186,400</div>
+            <div class="stat-label">Ventas del mes</div>
+            <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>12.4% vs. mes anterior</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-truck"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">14</div>
+            <div class="stat-label">Pedidos pendientes</div>
+            <div class="stat-trend down"><i class="bi bi-arrow-down-short"></i>3 menos que ayer</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-basket-fill"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">42</div>
+            <div class="stat-label">Productos activos</div>
+            <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>3 nuevos esta semana</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">328</div>
+            <div class="stat-label">Usuarios registrados</div>
+            <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>18 nuevos</div>
+        </div>
+    </div>
 </div>
 
+<!-- ===== Grid superior: ventas mensuales + pedidos recientes ===== -->
+<div class="dash-grid-top">
+
+    <section class="dash-panel">
+        <div class="dash-panel-head">
+            <span class="dash-panel-title">Ventas mensuales</span>
+            <div class="select-chip">
+                Año 2026
+                <i class="bi bi-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="bars-wrap">
+            <div class="bars-yaxis">
+                <span>$200k</span><span>$160k</span><span>$120k</span><span>$80k</span><span>$40k</span><span>$0</span>
+            </div>
+            <div class="bars-plot" id="barsPlot"></div>
+        </div>
+    </section>
+
+    <div class="dash-col-right">
+
+        <section class="dash-panel flex-1">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title">Pedidos recientes</span>
+                <a class="dash-link-arrow" href="{% url 'Pedidos' %}">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="tx-row">
+                <div class="tx-icon"><i class="bi bi-basket2-fill"></i></div>
+                <div class="tx-info"><div class="tx-name">Pedido #1024 · Queso Guayanés</div><div class="tx-date">Hoy, 10:20am</div></div>
+                <div class="tx-amount pos">$4,200</div>
+            </div>
+            <div class="tx-row">
+                <div class="tx-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div class="tx-info"><div class="tx-name">Pedido #1023 · Queso Palmita</div><div class="tx-date">Hoy, 8:05am</div></div>
+                <div class="tx-amount pending">Pendiente</div>
+            </div>
+            <div class="tx-row">
+                <div class="tx-icon"><i class="bi bi-truck"></i></div>
+                <div class="tx-info"><div class="tx-name">Pedido #1021 · Queso Duro Zuliano</div><div class="tx-date">Ayer, 4:40pm</div></div>
+                <div class="tx-amount pos">$7,850</div>
+            </div>
+            <div class="tx-row">
+                <div class="tx-icon"><i class="bi bi-x-circle"></i></div>
+                <div class="tx-info"><div class="tx-name">Pedido #1019 · Cancelado</div><div class="tx-date">Ayer, 11:15am</div></div>
+                <div class="tx-amount neg">$0</div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- ===== Grid inferior: metas, distribución, stock ===== -->
+<div class="dash-grid-bottom">
+
+    <section class="dash-panel">
+        <div class="dash-panel-head">
+            <span class="dash-panel-title">Metas del mes</span>
+            <a class="dash-link-arrow" href="{% url 'panel_ventas' %}">
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="goal-row">
+            <div class="goal-ring" style="--pct:74; --ring-color:var(--green);"><span>74%</span></div>
+            <div class="goal-info">
+                <div class="goal-name">Meta de ventas</div>
+                <div class="goal-deadline">Cierre: 31 Ago, 2026</div>
+            </div>
+            <div class="goal-amounts">
+                <div class="label">Alcanzado / Meta</div>
+                <div class="value">$186,400 / $250,000</div>
+            </div>
+        </div>
+
+        <div class="goal-row">
+            <div class="goal-ring" style="--pct:40; --ring-color:var(--gold);"><span>40%</span></div>
+            <div class="goal-info">
+                <div class="goal-name">Producción semanal</div>
+                <div class="goal-deadline">Cierre: 9 Ago, 2026</div>
+            </div>
+            <div class="goal-amounts">
+                <div class="label">Producido / Meta</div>
+                <div class="value">120 / 300 kg</div>
+            </div>
+        </div>
+
+        <div class="goal-row">
+            <div class="goal-ring" style="--pct:18; --ring-color:var(--red);"><span>18%</span></div>
+            <div class="goal-info">
+                <div class="goal-name">Nuevos clientes</div>
+                <div class="goal-deadline">Cierre: 31 Ago, 2026</div>
+            </div>
+            <div class="goal-amounts">
+                <div class="label">Logrado / Meta</div>
+                <div class="value">18 / 100</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-panel">
+        <div class="dash-panel-head">
+            <span class="dash-panel-title">Distribución de ventas</span>
+            <div class="select-chip">
+                Mes
+                <i class="bi bi-chevron-down"></i>
+            </div>
+        </div>
+        <div class="donut-wrap">
+            <div class="donut" style="--s1:52%; --s2:80%;"></div>
+            <div class="legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Quesos duros</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Quesos frescos</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Otros productos</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-panel">
+        <div class="dash-panel-head">
+            <span class="dash-panel-title">Stock del día</span>
+        </div>
+        <div class="limit-top">
+            <div class="amt">340 kg <span>vendidos de 500 kg disponibles</span></div>
+            <div class="limit-pct">68%</div>
+        </div>
+        <div class="limit-track">
+            <div class="limit-fill" style="width:68%"></div>
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const barsPlot = document.getElementById('barsPlot');
+    if (!barsPlot) return;
+
+    // TODO: reemplazar por datos reales (ej. desde una vista/API que agregue ventas por mes)
+    const meses = [
+        { m: 'Ene', v: 95 },  { m: 'Feb', v: 120 }, { m: 'Mar', v: 88 },
+        { m: 'Abr', v: 140 }, { m: 'May', v: 160 }, { m: 'Jun', v: 186 },
+        { m: 'Jul', v: 150 }, { m: 'Ago', v: 132 }, { m: 'Sep', v: 0 },
+        { m: 'Oct', v: 0 },   { m: 'Nov', v: 0 },   { m: 'Dic', v: 0 }
+    ];
+    const maxVal = 200; // escala = $200k
+
+    meses.forEach(({ m, v }) => {
+        const col = document.createElement('div');
+        col.className = 'bar-col';
+
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = (v / maxVal * 100) + '%';
+        col.appendChild(bar);
+
+        if (m === 'Jun') {
+            const tip = document.createElement('div');
+            tip.className = 'bar-tooltip';
+            tip.textContent = '$186,400';
+            col.appendChild(tip);
+        }
+
+        const label = document.createElement('div');
+        label.className = 'bar-month';
+        label.textContent = m;
+        col.appendChild(label);
+
+        barsPlot.appendChild(col);
+    });
+});
+</script>
 {% endblock %}

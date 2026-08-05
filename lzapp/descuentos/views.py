@@ -8,7 +8,11 @@ from django.utils import timezone
 
 from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado
 from .forms import CampanaDescuentoForm
-from .services import previsualizar_campana
+from .models import TiradaDiaria
+from .services import (
+    previsualizar_campana, obtener_badges_vencimiento_productos,
+    jugar_ruleta_del_dia, reclamar_premio_dia,
+)
 
 
 #@login_required
@@ -73,7 +77,11 @@ def crear_campana_descuento(request):
             return redirect('panel_descuentos')
     else:
         form = CampanaDescuentoForm()
-    return render(request, 'formdes.html', {'form': form, 'modo': 'crear'})
+    return render(request, 'formdes.html', {
+        'form': form,
+        'modo': 'crear',
+        'productos_badges': obtener_badges_vencimiento_productos(),
+    })
 
 
 #@login_required
@@ -88,7 +96,12 @@ def editar_campana_descuento(request, pk):
             return redirect('panel_descuentos')
     else:
         form = CampanaDescuentoForm(instance=campana)
-    return render(request, 'formdes.html', {'form': form, 'modo': 'editar', 'campana': campana})
+    return render(request, 'formdes.html', {
+        'form': form,
+        'modo': 'editar',
+        'campana': campana,
+        'productos_badges': obtener_badges_vencimiento_productos(),
+    })
 
 
 #@login_required
@@ -155,3 +168,49 @@ def marcar_premio_mostrado(request):
     ).update(mostrado=True)
 
     return JsonResponse({'ok': True, 'actualizado': bool(actualizados)})
+
+
+def jugar_ruleta_dia(request):
+    """
+    Llamado por el fetch() del JS del home cuando el usuario ya tocó los
+    3 quesos y le da a "¡Sortear la oferta del día!" en el modo del
+    juego diario (todos pueden jugar, registrados y anónimos). Devuelve
+    el resultado para que el JS dispare la MISMA animación que ya existe
+    (mostrarNumeroConGiro / mostrarFelicidades).
+    """
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'metodo no permitido'}, status=405)
+
+    tirada, es_nueva = jugar_ruleta_del_dia(request)
+
+    return JsonResponse({
+        'ok': True,
+        'ya_jugado': not es_nueva,
+        'resultado': tirada.resultado,
+        'resultado_texto': tirada.get_resultado_display(),
+        'reclamado': tirada.reclamado,
+        'fecha_expiracion': tirada.fecha_expiracion.isoformat(),
+    })
+
+
+def reclamar_premio_dia_ajax(request):
+    """
+    Llamado justo después de la animación de "¡Felicidades!" cuando el
+    premio ganado es de la ruleta diaria (no de campaña oficial). Marca
+    la tirada de hoy como reclamada y aplica su efecto (cupón/envío en
+    sesión, o deja el boleto dorado listo para la próxima ejecución).
+    """
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'metodo no permitido'}, status=405)
+
+    tirada, estado = reclamar_premio_dia(request)
+    if tirada is None:
+        return JsonResponse({'ok': False, 'error': estado}, status=400)
+
+    return JsonResponse({
+        'ok': estado == 'ok',
+        'estado': estado,
+        'resultado': tirada.resultado,
+        'resultado_texto': tirada.get_resultado_display(),
+        'reclamado': tirada.reclamado,
+    })

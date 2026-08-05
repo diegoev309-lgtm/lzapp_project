@@ -1,355 +1,302 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Dashboard{% endblock %}</title>
+    <title>{% block title %}LzApp · Dashboard{% endblock %}</title>
 
-    {% load static %}
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Aplica el tema guardado ANTES de pintar, para que no haya parpadeo -->
+    <script>
+        (function () {
+            const tema = localStorage.getItem('lzapp-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', tema);
+        })();
+    </script>
 
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- Fuente -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS del dashboard -->
+    <link rel="stylesheet" href="{% static 'dashboard/CSS/main.css' %}">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
-
-    <style>
-        :root{
-            --azul-oscuro:#192987;
-            --azul-claro:#3556ff;
-            --degradado-marca:linear-gradient(135deg,var(--azul-oscuro),var(--azul-claro));
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: #f8f9fa;
-        }
-
-        /*==========================
-              SIDEBAR ESCRITORIO
-        ===========================*/
-
-        aside.sidebar{
-            border-right:1px solid rgba(2,44,99,.06);
-        }
-
-        /* Línea de acento superior, mismo degradado que el resto de la app */
-        aside.sidebar::before{
-            content:"";
-            display:block;
-            height:4px;
-            background:var(--degradado-marca);
-        }
-
-        /*==========================
-          LOGO CON TEXTO DIFUMINADO
-        ===========================*/
-
-        .logo-marca{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:10px;
-            padding:22px 10px 18px;
-            margin-bottom:10px;
-            border-bottom:1px solid rgba(2,44,99,.08);
-        }
-
-        .logo-marca-icono{
-            width:38px;
-            height:38px;
-            flex-shrink:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            border-radius:11px;
-            background:var(--degradado-marca);
-            color:white;
-            font-size:18px;
-            box-shadow:0 6px 14px rgba(25,41,135,.3);
-        }
-
-        .logo-marca-texto{
-            margin:0;
-            font-size:22px;
-            font-weight:800;
-            letter-spacing:.3px;
-            background:var(--degradado-marca);
-            -webkit-background-clip:text;
-            background-clip:text;
-            -webkit-text-fill-color:transparent;
-            color:var(--azul-oscuro); /* respaldo si el navegador no soporta el degradado en texto */
-        }
-
-        /*==========================
-            ENLACES DE NAVEGACIÓN
-        ===========================*/
-
-        .nav-lateral{
-            padding:0 10px;
-        }
-
-        .nav-link {
-            position:relative;
-            display:flex;
-            align-items:center;
-            color: #4a5163;
-            padding: 11px 14px;
-            border-radius: 10px;
-            margin-bottom: 4px;
-            font-size:14.5px;
-            font-weight:500;
-            transition:.25s;
-        }
-
-        .nav-link i{
-            font-size:16px;
-            width:20px;
-            transition:.25s;
-        }
-
-        .nav-link:hover {
-            background: #eef1fb;
-            color:var(--azul-oscuro);
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: var(--degradado-marca);
-            color: white !important;
-            font-weight: 600;
-            box-shadow:0 6px 14px rgba(25,41,135,.28);
-        }
-
-        /* Barra de acento a la izquierda del item activo */
-        .nav-link.active::before{
-            content:"";
-            position:absolute;
-            left:-10px;
-            top:50%;
-            transform:translateY(-50%);
-            width:4px;
-            height:60%;
-            border-radius:4px;
-            background:var(--azul-claro);
-        }
-
-        /* Foco visible para navegación con teclado */
-        .nav-link:focus-visible{
-            outline:2px solid var(--azul-claro);
-            outline-offset:2px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 15px;
-        }
-
-        /*==========================
-          BOTÓN MENÚ (móvil)
-        ===========================*/
-
-        .barra-menu-movil{
-            background:white;
-            border-bottom:1px solid rgba(2,44,99,.08);
-        }
-
-        .btn-menu {
-            background: var(--degradado-marca);
-            color: white;
-            border: none;
-            border-radius:10px;
-            padding:9px 16px;
-            font-weight:600;
-            transition:.25s;
-        }
-
-        .btn-menu:hover {
-            color: white;
-            transform:translateY(-1px);
-            box-shadow:0 8px 18px rgba(25,41,135,.3);
-        }
-
-        .btn-menu:focus,
-        .btn-menu:active {
-            color: white !important;
-            box-shadow: 0 0 0 0.25rem rgba(25, 41, 135, 0.25);
-        }
-
-        /* Logo también difuminado dentro del menú offcanvas */
-        .offcanvas-header .logo-marca-texto-sm{
-            background:var(--degradado-marca);
-            -webkit-background-clip:text;
-            background-clip:text;
-            -webkit-text-fill-color:transparent;
-            color:var(--azul-oscuro);
-            font-weight:800;
-        }
-
-        @media(prefers-reduced-motion: reduce){
-            .nav-link, .btn-menu{ transition:none; }
-        }
-    </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
+<div class="dash-frame">
 
-        <!-- Botón menú para móviles -->
-        <div class="d-md-none p-2 barra-menu-movil">
-            <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                <i class="bi bi-list"></i> Menu
-            </button>
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="dash-overlay" id="dashOverlay"></div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="dash-sidebar" id="dashSidebar">
+        <div class="dash-logo" title="LzApp">
+            <i class="bi bi-shop"></i>
         </div>
 
-        <!-- Sidebar escritorio -->
-        <aside class="sidebar col-md-3 col-lg-2 d-none d-md-block bg-light vh-100 shadow p-0">
+        <nav class="dash-nav">
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'Inicio_dash' %}active{% endif %}"
+               data-tip="Inicio" href="{% url 'Inicio_dash' %}">
+                <i class="bi bi-house-door-fill"></i>
+            </a>
 
-            <div class="logo-marca">
-                <span class="logo-marca-icono">
-                    <i class="bi bi-shop"></i>
-                </span>
-                <h3 class="logo-marca-texto">LzApp</h3>
-            </div>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_productos' %}active{% endif %}"
+               data-tip="Productos" href="{% url 'listar_productos' %}">
+                <i class="bi bi-basket-fill"></i>
+            </a>
 
-            <div class="nav flex-column nav-lateral">
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_descuentos' %}active{% endif %}"
+               data-tip="Descuentos" href="{% url 'panel_descuentos' %}">
+                <i class="bi bi-tags-fill"></i>
+            </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Inicio_dash' %}active{% endif %}"
-                   href="{% url 'Inicio_dash'  %}">
-                    <i class="bi bi-house-door-fill me-2"></i>
-                    Inicio
-                </a>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
+               data-tip="Producción" href="{% url 'listar_producciones' %}">
+                <i class="bi bi-box-seam-fill"></i>
+            </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'listar_productos' %}active{% endif %}"
-                   href="{% url 'listar_productos' %}">
-                    <i class="bi bi-basket-fill me-2"></i>
-                    Productos
-                </a>
-                
-                <a class="nav-link {% if request.resolver_match.url_name == 'panel_descuentos' %}active{% endif %}"
-                   href="{% url 'panel_descuentos' %}">
-                    <i class="bi bi-tags-fill me-2"></i>
-                    Descuentos
-                </a>
-                
-                <a class="nav-link {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
-                   href="{% url 'listar_producciones' %}">
-                    <i class="bi bi-box-seam me-2"></i>
-                    Producción
-                </a>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_ventas' %}active{% endif %}"
+               data-tip="Ventas" href="{% url 'panel_ventas' %}">
+                <i class="bi bi-cash-stack"></i>
+            </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'panel_ventas' %}active{% endif %}"
-                   href="{% url 'panel_ventas' %}">
-                    <i class="bi bi-cash-stack me-2"></i>
-                    Ventas
-                </a>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'Pedidos' %}active{% endif %}"
+               data-tip="Pedidos" href="{% url 'Pedidos' %}">
+                <i class="bi bi-truck"></i>
+            </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Pedidos' %}active{% endif %}"
-                   href="{% url 'Pedidos' %}">
-                    <i class="bi bi-truck me-2"></i>
-                    Pedidos
-                </a>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'Usuarios' %}active{% endif %}"
+               data-tip="Usuarios" href="{% url 'Usuarios' %}">
+                <i class="bi bi-people-fill"></i>
+            </a>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Usuarios' %}active{% endif %}"
-                   href="{% url 'Usuarios' %}">
-                    <i class="bi bi-people-fill me-2"></i>
-                    Usuarios
-                </a>
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'Notificaciones' %}active{% endif %}"
+               data-tip="Notificaciones" href="{% url 'Notificaciones' %}">
+                <i class="bi bi-bell-fill"></i>
+            </a>
+        </nav>
 
-                <a class="nav-link {% if request.resolver_match.url_name == 'Notificaciones' %}active{% endif %}"
-                   href="{% url 'Notificaciones' %}">
-                    <i class="bi bi-bell-fill me-2"></i>
-                    Notificaciones
-                </a>
+        <button class="dash-toggle" id="themeToggle" title="Cambiar modo" type="button">
+            <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
+        </button>
+    </aside>
 
-            </div>
+    <!-- ============ MAIN ============ -->
+    <main class="dash-main">
 
-        </aside>
-
-        <!-- Sidebar móvil -->
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
-
-            <div class="offcanvas-header">
-                <h5>
-                    <i class="bi bi-shop"></i>
-                    <span class="logo-marca-texto-sm">LzApp</span>
-                </h5>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="offcanvas">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <button class="dash-mobile-toggle" id="mobileToggle" type="button" aria-label="Abrir menú">
+                    <i class="bi bi-list"></i>
                 </button>
-            </div>
-
-            <div class="offcanvas-body">
-
-                <div class="nav flex-column nav-lateral">
-
-                    <a class="nav-link" href="{% url 'Inicio_dash' %}">
-                        <i class="bi bi-house-door-fill me-2"></i>
-                        Inicio
-                    </a>
-
-                    <a class="nav-link" href="{% url 'listar_productos' %}">
-                        <i class="bi bi-basket-fill me-2"></i>
-                        Productos
-                    </a>
-
-                    <a class="nav-link" href="{% url 'panel_descuentos' %}">
-                        <i class="bi bi-tags-fill me-2"></i>
-                        Descuentos
-                    </a>
-
-                    <a class="nav-link" href="{% url 'listar_producciones' %}">
-                        <i class="bi bi-box-seam me-2"></i>
-                        Producción
-                    </a>
-
-                    <a class="nav-link" href="{% url 'panel_ventas' %}">
-                        <i class="bi bi-cash-stack me-2"></i>
-                        Ventas
-                    </a>
-
-                    <a class="nav-link" href="{% url 'Pedidos' %}">
-                        <i class="bi bi-truck me-2"></i>
-                        Pedidos
-                    </a>
-
-                    <a class="nav-link" href="{% url 'Usuarios' %}">
-                        <i class="bi bi-people-fill me-2"></i>
-                        Usuarios
-                    </a>
-
-                    <a class="nav-link" href="{% url 'Notificaciones' %}">
-                        <i class="bi bi-bell-fill me-2"></i>
-                        Notificaciones
-                    </a>
-
+                <div>
+                    <h1><i class="bi {% block page_icon %}bi-grid-fill{% endblock %}"></i>{% block page_title %}Dashboard{% endblock %}</h1>
+                    <p>{% block page_subtitle %}Resumen general del sistema{% endblock %}</p>
                 </div>
-
             </div>
 
-        </div>
+            <div class="dash-header-actions">
+                {% block header_actions %}{% endblock %}
 
-        <!-- Contenido -->
-        <main class="col-md-9 col-lg-10 p-4">
+                <a href="{% url 'Notificaciones' %}" class="dash-icon-btn" title="Notificaciones">
+                    <i class="bi bi-bell"></i>
+                    <span class="dot"></span>
+                </a>
 
-            {% block content %}
-            {% endblock %}
+                <div class="dash-user-wrap">
+                    <button class="dash-avatar" id="userMenuTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        {% if request.user.is_authenticated %}{{ request.user.username|first|upper }}{% else %}U{% endif %}
+                    </button>
 
-        </main>
+                    <div class="dash-user-menu" id="userMenu">
+                        <div class="dash-user-menu-head">
+                            <div class="dash-user-menu-name">
+                                {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Invitado{% endif %}
+                            </div>
+                            {% if request.user.is_authenticated and request.user.email %}
+                                <div class="dash-user-menu-email">{{ request.user.email }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="dash-user-menu-divider"></div>
+                        <a href="{% url 'Usuarios' %}" class="dash-user-menu-item">
+                            <i class="bi bi-person"></i> Mi perfil
+                        </a>
+                        <a href="{% url 'logout' %}" class="dash-user-menu-item danger">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    </div>
+        {% block content %}
+        {% endblock %}
+
+    </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+/* ============ Tema claro ============ */
+/* Sobrescribe las variables de main.css cuando html[data-theme="light"] */
+:root[data-theme="light"]{
+    --bg-app:        #F4F6FB;
+    --bg-canvas:     #EEF1F8;
+    --bg-panel:      #FFFFFF;
+    --bg-sidebar:    #FFFFFF;
+    --border-subtle: rgba(2,44,99,.07);
+    --border-hair:   rgba(2,44,99,.12);
+
+    --text-primary:   #0F172A;
+    --text-secondary: #4B5568;
+    --text-tertiary:  #8A93A6;
+}
+
+:root[data-theme="light"] .dash-frame{ background: var(--bg-canvas); }
+
+:root[data-theme="light"] .dash-sidebar,
+:root[data-theme="light"] .dash-panel,
+:root[data-theme="light"] .stat-card,
+:root[data-theme="light"] .dash-icon-btn,
+:root[data-theme="light"] .dash-user-menu,
+:root[data-theme="light"] .select-chip,
+:root[data-theme="light"] .filtro-menu,
+:root[data-theme="light"] .modal-box{
+    box-shadow: 0 6px 18px rgba(2,44,99,.06);
+}
+
+:root[data-theme="light"] .dash-nav-item[data-tip]:hover::after{
+    background:#0F172A;
+    color:#fff;
+}
+
+:root[data-theme="light"] .bar-tooltip{
+    background:#0F172A;
+    color:#fff;
+}
+:root[data-theme="light"] .bar-tooltip::after{
+    border-top-color:#0F172A;
+}
+
+:root[data-theme="light"] .goal-ring::before,
+:root[data-theme="light"] .donut::before{
+    background: var(--bg-panel);
+}
+
+/* ============ Menú desplegable del usuario ============ */
+.dash-user-wrap{ position: relative; }
+
+.dash-avatar{
+    width:38px; height:38px;
+    border-radius:50%;
+    background: linear-gradient(135deg,#8B5CF6,#38BDF8);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+    flex-shrink:0;
+    border:none;
+    color:#fff;
+    cursor:pointer;
+    padding:0;
+}
+
+.dash-user-menu{
+    display:none;
+    position:absolute;
+    top: calc(100% + 10px);
+    right:0;
+    min-width:220px;
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-panel);
+    box-shadow: 0 20px 45px rgba(0,0,0,.45);
+    padding:8px;
+    z-index:70;
+}
+.dash-user-menu.show{ display:block; }
+
+.dash-user-menu-head{ padding:8px 10px 10px; }
+.dash-user-menu-name{ font-size:13.5px; font-weight:700; color: var(--text-primary); }
+.dash-user-menu-email{ font-size:11.5px; color: var(--text-tertiary); margin-top:2px; }
+
+.dash-user-menu-divider{ height:1px; background: var(--border-subtle); margin:2px 0 6px; }
+
+.dash-user-menu-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 10px;
+    border-radius: var(--radius-btn);
+    font-size:13px;
+    font-weight:600;
+    color: var(--text-secondary);
+}
+.dash-user-menu-item:hover{ background: rgba(255,255,255,.05); color: var(--text-primary); }
+.dash-user-menu-item.danger{ color: var(--red); }
+.dash-user-menu-item.danger:hover{ background: var(--red-dim); color: var(--red); }
+</style>
+
+<script>
+    // Toggle sidebar en móvil
+    (function () {
+        const sidebar = document.getElementById('dashSidebar');
+        const overlay = document.getElementById('dashOverlay');
+        const mobileBtn = document.getElementById('mobileToggle');
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+
+        mobileBtn && mobileBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+        overlay && overlay.addEventListener('click', closeSidebar);
+    })();
+
+    // Modo claro / oscuro
+    (function () {
+        const toggleBtn = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeToggleIcon');
+        if (!toggleBtn || !icon) return;
+
+        function pintarIcono(tema) {
+            icon.className = tema === 'light' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
+
+        pintarIcono(document.documentElement.getAttribute('data-theme') || 'dark');
+
+        toggleBtn.addEventListener('click', () => {
+            const actual = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nuevo = actual === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', nuevo);
+            localStorage.setItem('lzapp-theme', nuevo);
+            pintarIcono(nuevo);
+        });
+    })();
+
+    // Menú desplegable del usuario
+    (function () {
+        const trigger = document.getElementById('userMenuTrigger');
+        const menu = document.getElementById('userMenu');
+        if (!trigger || !menu) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = menu.classList.toggle('show');
+            trigger.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && e.target !== trigger) {
+                menu.classList.remove('show');
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    })();
+</script>
+
+{% block extra_js %}{% endblock %}
 
 </body>
 </html>
