@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Avg, Count
 
 import random
 import string
@@ -23,20 +24,20 @@ class Perfil(models.Model):
 #tabla de productos
 
 class Producto(models.Model):
-    nombre = models.CharField(max_length=100, null=True)
-    descripcion = models.TextField(blank=True)
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, null=True)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_actual = models.PositiveIntegerField(default=0)
-    stock_minimo = models.PositiveIntegerField(default=15)
-    disponibilidad = models.BooleanField(default=True)
+    stock_actual = models.PositiveIntegerField(default=0, null=True)
+    stock_minimo = models.PositiveIntegerField(default=15, null=True)
+    disponibilidad = models.BooleanField(default=True, null=True)
     fecha_vencimiento = models.DateField(
         null=True, blank=True,
         help_text='Fecha de vencimiento del lote actual (se carga manualmente). '
                    'Se usa solo como sugerencia visual al armar campañas de descuento.'
     )
-    fecha_registro = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True, null=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         db_table = 'producto'
@@ -243,3 +244,22 @@ class DescuentoAsignado(models.Model):
         self.usado = True
         self.fecha_uso = timezone.now()
         self.save(update_fields=['usado', 'fecha_uso'])
+
+
+class Calificacion(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='calificaciones')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='calificaciones_hechas')
+    puntaje = models.PositiveSmallIntegerField(
+        choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
+    )
+    fecha = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'calificacion'
+        constraints = [
+            models.UniqueConstraint(fields=['producto', 'usuario'], name='una_calificacion_por_usuario_por_producto')
+        ]
+
+    def __str__(self):
+        return f'{self.usuario.username} -> {self.producto.nombre}: {self.puntaje}★'

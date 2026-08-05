@@ -1,4 +1,4 @@
-{% extends "masterpage_dashboard.html" %}
+listdes.html: {% extends "masterpage_dashboard.html" %}
 {% load static %}
 
 {% block content %}
@@ -22,45 +22,19 @@
 ===========================*/
 
 .encabezado{
-<<<<<<< HEAD
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    padding:20px 30px;
-=======
     background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
     border-bottom:1px solid var(--border-subtle);
     color:var(--text-primary);
     padding:26px 30px;
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     display:flex;
     justify-content:space-between;
     align-items:center;
     flex-wrap:wrap;
-    gap:16px;
+    gap:20px;
 }
 
 .titulo{
     margin:0;
-<<<<<<< HEAD
-    font-size:26px;
-    font-weight:bold;
-}
-
-.subtitulo{
-    margin-top:4px;
-    font-size:13px;
-    opacity:.9;
-}
-
-.btn-nuevo{
-    background:linear-gradient(135deg,#ffffff,#d7dce4);
-    color:#192987;
-    border:1px solid rgba(255,255,255,.5);
-    padding:10px 18px;
-    border-radius:12px;
-    font-weight:bold;
-    font-size:13px;
-=======
     font-size:23px;
     font-weight:700;
     display:flex;
@@ -87,7 +61,6 @@
     border-radius:var(--radius-btn);
     font-weight:600;
     font-size:13.5px;
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.3s;
     text-decoration:none;
     display:inline-flex;
@@ -107,57 +80,38 @@
 ===========================*/
 
 .barra-busqueda-wrapper{
-    padding:16px 30px 6px;
-}
-
-.fila-busqueda-acciones{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
+    padding:22px 30px 6px;
 }
 
 .barra-busqueda{
-    flex:1;
+    display:flex;
+    gap:10px;
     max-width:420px;
 }
 
 .campo-busqueda{
     position:relative;
+    flex:1;
 }
 
 .campo-busqueda i{
     position:absolute;
     top:50%;
-    left:14px;
+    left:16px;
     transform:translateY(-50%);
-<<<<<<< HEAD
-    color:#9aa3b4;
-    font-size:14px;
-=======
     color:var(--text-tertiary);
     font-size:15px;
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     pointer-events:none;
 }
 
 .input-busqueda{
     width:100%;
-<<<<<<< HEAD
-    border:1px solid rgba(2,44,99,.12);
-    border-radius:10px;
-    padding:8px 14px 8px 38px;
-    font-size:13px;
-    color:#192987;
-    background:#f7f9fd;
-=======
     border:1px solid var(--border-hair);
     border-radius:var(--radius-btn);
     padding:11px 16px 11px 42px;
     font-size:14px;
     color:var(--text-primary);
     background:rgba(255,255,255,.03);
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.25s;
 }
 
@@ -172,21 +126,6 @@
     color:var(--text-tertiary);
 }
 
-<<<<<<< HEAD
-.btn-nueva-campana{
-    background:linear-gradient(135deg,#192987,#3556ff);
-    color:white;
-    border:none;
-    height:38px;
-    padding:0 16px;
-    border-radius:10px;
-    font-weight:bold;
-    font-size:13px;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    text-decoration:none;
-=======
 .btn-buscar{
     display:flex;
     align-items:center;
@@ -199,38 +138,21 @@
     background:var(--gold);
     color:#1A1A2E;
     font-size:16px;
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transition:.3s;
-    flex-shrink:0;
-    white-space:nowrap;
-    margin-left:auto;
 }
 
-<<<<<<< HEAD
-.btn-nueva-campana:hover{
-    color:white;
-=======
 .btn-buscar:hover{
     color:#1A1A2E;
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
     transform:translateY(-2px);
     box-shadow:0 8px 18px rgba(228,200,112,.3);
 }
 
 @media(max-width:768px){
     .barra-busqueda-wrapper{
-        padding:14px 16px 4px;
-    }
-    .fila-busqueda-acciones{
-        flex-direction:column;
-        align-items:stretch;
+        padding:18px 16px 4px;
     }
     .barra-busqueda{
         max-width:100%;
-    }
-    .btn-nueva-campana{
-        justify-content:center;
-        margin-left:0;
     }
 }
 
@@ -958,27 +880,24 @@
                     Campañas por lotería para productos que no se están vendiendo.
                 </p>
             </div>
-            <a href="{% url 'generar_pdf_descuentos' %}" class="btn btn-nuevo" target="_blank">
-                <i class="bi bi-file-earmark-pdf-fill"></i>
-                Generar PDF
+            <a href="{% url 'crear_campana_descuento' %}" class="btn btn-nuevo">
+                <i class="bi bi-plus-circle-fill"></i>
+                Nueva Campaña
             </a>
         </div>
 
         <!-- Buscador: en vivo, sin recargar la página (igual que en Productos) -->
         <div class="barra-busqueda-wrapper">
-            <div class="fila-busqueda-acciones">
-                <form method="get" class="barra-busqueda" id="formBuscarDescuento">
-                    <div class="campo-busqueda">
-                        <i class="bi bi-search"></i>
-                        <input type="text" name="q" id="inputBuscarDescuento" class="input-busqueda"
-                               placeholder="Buscar producto o campaña..." value="{{ query }}" autocomplete="off">
-                    </div>
-                </form>
-                <a href="{% url 'crear_campana_descuento' %}" class="btn btn-nueva-campana">
-                    <i class="bi bi-plus-circle-fill"></i>
-                    Nueva Campaña
-                </a>
-            </div>
+            <form method="get" class="barra-busqueda" id="formBuscarDescuento">
+                <div class="campo-busqueda">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="q" id="inputBuscarDescuento" class="input-busqueda"
+                           placeholder="Buscar producto o campaña..." value="{{ query }}" autocomplete="off">
+                </div>
+                <button type="submit" class="btn-buscar" aria-label="Buscar">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
         </div>
 
         <!-- Todo lo de aquí para abajo se reemplaza vía fetch() al buscar
@@ -1143,6 +1062,7 @@
             <div class="pie-productos">
 
                 <div class="barra-vista">
+                    <span>Vista:</span>
                     <div class="selector-vista" role="group" aria-label="Selector de vista">
                         <button type="button" class="btn-vista activo" id="btnVistaProductos" onclick="cambiarVistaDescuentos('productos')">
                             <i class="bi bi-basket-fill"></i> Productos

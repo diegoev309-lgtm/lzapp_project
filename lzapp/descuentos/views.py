@@ -172,7 +172,7 @@ def marcar_premio_mostrado(request):
 
     return JsonResponse({'ok': True, 'actualizado': bool(actualizados)})
 
-<<<<<<< HEAD
+
 def generar_pdf_descuentos(request):
     campanas = (
         CampanaDescuento.objects
@@ -195,7 +195,7 @@ def generar_pdf_descuentos(request):
     response = HttpResponse(pdf_bytes, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="reporte_descuentos.pdf"'
     return response
-=======
+
 
 def jugar_ruleta_dia(request):
     """
@@ -241,4 +241,3 @@ def reclamar_premio_dia_ajax(request):
         'resultado_texto': tirada.get_resultado_display(),
         'reclamado': tirada.reclamado,
     })
->>>>>>> 61b10c5361a30f1653d706946d0e9270d3bdc40e
