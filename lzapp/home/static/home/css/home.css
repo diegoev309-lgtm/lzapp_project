@@ -568,6 +568,14 @@ HERO — escena 3D animada (slide 1 del carrusel)
     background: linear-gradient(to right, rgba(2, 44, 99, 0.82) 0%, rgba(2, 44, 99, 0.45) 55%, rgba(2, 44, 99, 0.2) 100%),
                 linear-gradient(to bottom, rgba(2, 44, 99, 0.5) 0%, transparent 22%);
     pointer-events: none;
+    transition: background 0.6s ease;
+}
+
+/* Cuando se enciende el último queso (los 3 encendidos), oscurece el
+   fondo para que la silueta dorada y el video resalten más. */
+.slide-imagen:has(.quesos-interactivos.todos-encendidos) .slide-imagen-overlay {
+    background: linear-gradient(to right, rgba(2, 20, 45, 0.94) 0%, rgba(2, 20, 45, 0.82) 55%, rgba(2, 20, 45, 0.65) 100%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.15) 22%);
 }
 
 .slide-imagen-contenido {
@@ -1117,6 +1125,36 @@ HERO — escena 3D animada (slide 1 del carrusel)
     padding: 5rem 0;
     position: relative;
     overflow: hidden;
+}
+.seccion-cta {
+    background: var(--azul-principal);
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+    /* quitamos isolation si la tenías, para que el z-index funcione simple */
+}
+
+.cta-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.cta-video-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(8, 59, 120, 0.35) 0%,
+        rgba(2, 44, 99, 0.25) 100%
+    );
+    pointer-events: none;
 }
 
 .seccion-cta::before {
@@ -1677,6 +1715,9 @@ footer .text-center.m-0 {
    Al ser un <polygon> con fill:none, solo se ve la línea del borde
    —justo lo que se ve en la referencia— sin tapar la foto de fondo. */
 .queso-punto-contorno {
+    display: none;
+}
+.silueta-unica {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1684,6 +1725,19 @@ footer .text-center.m-0 {
     pointer-events: none;
     z-index: 2;
     overflow: visible;
+}
+.silueta-unica-linea {
+    stroke: var(--dorado-claro);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px rgba(240, 217, 138, 0.95))
+            drop-shadow(0 0 14px rgba(201, 168, 76, 0.65));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.quesos-interactivos.todos-encendidos .silueta-unica-linea {
+    opacity: 0.92;
 }
 .queso-punto-contorno-linea {
     stroke: var(--dorado-claro);
@@ -2056,6 +2110,22 @@ footer .text-center.m-0 {
 @keyframes caerConfetti {
     0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(115vh) rotate(540deg); opacity: 0.85; }
+}
+
+/* Goteo suave de confetti dorado: pocas piezas, cayendo lento,
+   poco saturado. Se usa aparte del confetti "explosión" de siempre. */
+.confetti-pieza-suave {
+    position: absolute;
+    top: -20px;
+    opacity: 0;
+    border-radius: 2px;
+    animation: caerConfettiSuave linear forwards;
+}
+@keyframes caerConfettiSuave {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.95; }
+    90%  { opacity: 0.85; }
+    100% { transform: translateY(115vh) rotate(200deg); opacity: 0; }
 }
 
 /* ---------- Badge "Haz clic" ---------- */
