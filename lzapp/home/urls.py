@@ -1,11 +1,11 @@
 from django.urls import path
-from home.views import main, user, client, carro, buscar_productos_ajax  #home
+from . import views
 
 
 urlpatterns = [
-    path('',user, name="user"),
-    path('main',main, name="main"),
-    path('client',client, name="client"),
-    path('carro',carro, name="carro"),
-    path('buscar-ajax/',buscar_productos_ajax, name="buscar_ajax"),
+    path('',views.user, name="user"),
+    path('main',views.main, name="main"),
+    path('client',views.client, name="client"),
+    path('carro',views.carro, name="carro"),
+    path('buscar-ajax/',views.buscar_productos_ajax, name="buscar_ajax"),
 ]

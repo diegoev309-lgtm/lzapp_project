@@ -48,7 +48,9 @@ def _enviar_email_recuperacion(usuario_id, dominio, protocolo='https'):
 
     uid = urlsafe_base64_encode(force_bytes(usuario.pk))
     token = default_token_generator.make_token(usuario)
-    enlace_reset = f"{protocolo}://{dominio}/reset/{uid}/{token}/"
+    enlace_reset = (
+    f"{protocolo}://{dominio}/usuarios/reset/{uid}/{token}/"
+)
 
     html_content = render_to_string('emails/recuperacion_password.html', {
         'nombre': usuario.username,

@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from django.shortcuts import render, redirect
 
 def dview(request):
@@ -13,9 +12,6 @@ def Ventas(request):
 
 def Pedidos(request):
     return render(request, "pedidos.html")
-
-def Usuarios(request):
-    return render(request, "usuarios.html")
 
 def Notificaciones(request):
     return render(request, "notificaciones.html")

@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -9,9 +8,8 @@ from weasyprint import HTML
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 
-from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado
+from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado, TiradaDiaria
 from .forms import CampanaDescuentoForm
-from .models import TiradaDiaria
 from .services import (
     previsualizar_campana, obtener_badges_vencimiento_productos,
     jugar_ruleta_del_dia, reclamar_premio_dia,

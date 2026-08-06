@@ -1,11 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Avg, Count, OuterRef, Subquery, Value, IntegerField
 from django.templatetags.static import static
 from django.utils import timezone
-from dashboard.models import Producto
-from descuentos.models import TiradaDiaria
-from descuentos.services import obtener_premio_activo_para_home
+from dashboard.models import Producto, Calificacion,TiradaDiaria
 from carrito.logic import limpiar_premios_invalidos_del_carrito, premio_ya_en_carrito
 from descuentos.services import obtener_premio_activo_para_home, obtener_producto_ids_con_premio_activo
 
@@ -20,6 +18,18 @@ def obtener_productos_filtrados(request, excluir_ids=None):
 
     query = request.GET.get('q', '').strip()
     productos = Producto.objects.filter(disponibilidad=True)
+
+    mi_calificacion_sub = None
+    if request.user.is_authenticated:
+        mi_calificacion_sub = Calificacion.objects.filter(
+            producto=OuterRef('pk'), usuario=request.user
+        ).values('puntaje')[:1]
+
+    mi_calificacion_sub = None
+    if request.user.is_authenticated:
+        mi_calificacion_sub = Calificacion.objects.filter(
+            producto=OuterRef('pk'), usuario=request.user
+        ).values('puntaje')[:1]
 
     if excluir_ids:
         productos = productos.exclude(id__in=excluir_ids)
@@ -50,6 +60,9 @@ def buscar_productos_ajax(request):
             "stock_actual": p.stock_actual,
             "stock_minimo": p.stock_minimo,
             "imagen": p.imagen.url if p.imagen else static('img/no-image.png'),
+            "promedio_calificacion": round(p.promedio_calificacion, 1) if p.promedio_calificacion else None,
+            "total_calificaciones": p.total_calificaciones,
+            "mi_calificacion": p.mi_calificacion,
         })
 
     return JsonResponse({"productos": resultados, "query": query})

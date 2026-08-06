@@ -1,4 +1,3 @@
-# usuarios/tasks.py
 import threading
 import os
 from django.conf import settings
