@@ -10,3 +10,9 @@ class ProduccionForm(forms.ModelForm):
             (attrs={'class': 'form-control','min': 1,'placeholder': 'Ingrese la cantidad producida'}),
             'observacion': forms.Textarea
             (attrs={'class': 'form-control','rows': 4,'placeholder': 'Observaciones de la producción'}),}
+
+class ImportarProduccionForm(forms.Form):
+    archivo = forms.FileField(
+        label='Selecciona el archivo Excel (.xlsx)',
+        widget=forms.ClearableFileInput(attrs={'accept': '.xlsx,.xls', 'id': 'id_archivo_produccion'})
+    )

@@ -1,0 +1,271 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+.contenedor-productos{
+    padding: 26px 32px 40px;
+}
+
+.bloque-productos{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+
+.encabezado{
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
+    border-bottom:1px solid var(--border-subtle);
+    color:var(--text-primary);
+    padding:26px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.titulo{
+    margin:0;
+    font-size:23px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--text-primary);
+}
+
+.titulo i{
+    font-size:20px;
+}
+
+.subtitulo{
+    margin-top:6px;
+    color:var(--text-secondary);
+    font-size:13px;
+}
+
+.btn-nuevo{
+    background:var(--gold);
+    color:#1A1A2E;
+    border:1px solid var(--gold);
+    padding:11px 20px;
+    border-radius:var(--radius-btn);
+    font-weight:600;
+    font-size:13.5px;
+    transition:.2s;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
+
+.btn-nuevo:hover{
+    background:#EFD48C;
+    color:#1A1A2E;
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px rgba(228,200,112,.25);
+}
+
+/*==========================================================
+   GRID DE TARJETAS
+===========================================================*/
+
+.grid-productos{
+    padding:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+    gap:16px;
+}
+
+.producto-card{
+    background:var(--bg-app);
+    border:1px solid var(--border-subtle);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 6px 16px rgba(0,0,0,.25);
+    transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s;
+    display:flex;
+    flex-direction:column;
+    animation:apareceCard .5s ease both;
+}
+
+@keyframes apareceCard{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.producto-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 16px 34px rgba(0,0,0,.45);
+    border-color:rgba(255,255,255,.15);
+}
+
+.producto-card-img-wrapper{
+    position:relative;
+    overflow:hidden;
+    height:120px;
+    background:rgba(255,255,255,.03);
+}
+
+.producto-card-imagen{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:transform .6s ease;
+}
+
+.producto-card:hover .producto-card-imagen{
+    transform:scale(1.08);
+}
+
+.producto-card-body{
+    padding:14px 16px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex-grow:1;
+}
+
+.producto-card-nombre{
+    font-size:14px;
+    font-weight:700;
+    color:var(--text-primary);
+    margin:0;
+    line-height:1.25;
+}
+
+.producto-card-linea{
+    width:32px;
+    height:3px;
+    background:var(--gold);
+    border-radius:2px;
+    margin:6px 0 10px;
+    transition:width .3s;
+}
+
+.producto-card:hover .producto-card-linea{
+    width:60px;
+}
+
+.producto-card-precio-fila{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.producto-card-precio{
+    color:var(--green);
+    font-weight:700;
+    font-size:13.5px;
+}
+
+.producto-card-stock{
+    font-size:11.5px;
+    color:var(--text-tertiary);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+/*==========================================================
+   ESTADO VACÍO
+===========================================================*/
+
+.estado-vacio{
+    grid-column:1 / -1;
+    text-align:center;
+    padding:60px 20px;
+}
+
+.estado-vacio i{
+    color:var(--text-tertiary) !important;
+}
+
+.estado-vacio h5{
+    color:var(--text-secondary);
+    margin:0;
+}
+
+@media(max-width:768px){
+
+    .contenedor-productos{
+        padding: 18px 16px 30px;
+    }
+
+    .encabezado{
+        flex-direction:column;
+        text-align:center;
+        padding:20px;
+    }
+
+    .titulo{
+        font-size:20px;
+    }
+
+    .grid-productos{
+        grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+        padding:14px;
+        gap:12px;
+    }
+}
+
+@media(prefers-reduced-motion: reduce){
+    .producto-card{ animation:none; }
+}
+
+</style>
+
+<div class="container-fluid contenedor-productos">
+    <div class="bloque-productos">
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    Productos importados
+                </h1>
+                <p class="subtitulo">
+                    Estos son los productos agregados en la última importación.
+                </p>
+            </div>
+            <a href="{% url 'listar_productos' %}" class="btn btn-nuevo">
+                <i class="bi bi-arrow-left"></i>
+                Volver al listado
+            </a>
+        </div>
+
+        <div class="grid-productos">
+            {% for i in productos %}
+                <div class="producto-card">
+                    <div class="producto-card-img-wrapper">
+                        {% if i.imagen %}
+                            <img src="{{ i.imagen.url }}" class="producto-card-imagen">
+                        {% else %}
+                            <img src="{% static 'img/no-image.png' %}" class="producto-card-imagen">
+                        {% endif %}
+                    </div>
+                    <div class="producto-card-body">
+                        <h3 class="producto-card-nombre">{{ i.nombre }}</h3>
+                        <div class="producto-card-linea"></div>
+                        <div class="producto-card-precio-fila">
+                            <span class="producto-card-precio">$ {{ i.precio }}</span>
+                            <span class="producto-card-stock">
+                                <i class="bi bi-boxes"></i> {{ i.stock_actual }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="estado-vacio">
+                    <i class="bi bi-inboxes display-4 text-secondary"></i>
+                    <h5 class="mt-3">No hay productos importados recientemente.</h5>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -10,3 +10,9 @@ class ProductoForm(forms.ModelForm):
             # selector de fecha nativo en vez de un simple input de texto.
             'fecha_vencimiento': forms.DateInput(attrs={'type': 'date'}),
         }
+
+class ImportarProductosForm(forms.Form):
+    archivo = forms.FileField(
+        label='Selecciona el archivo Excel (.xlsx)',
+        widget=forms.ClearableFileInput(attrs={'accept': '.xlsx,.xls'})
+    )

@@ -712,6 +712,41 @@
     }
 }
 
+/*==========================================================
+   Diseño califiacion
+===========================================================*/
+
+.calificacion-widget{
+    display:flex;
+    align-items:center;
+    gap:2px;
+    justify-content:center;
+    flex-wrap:nowrap;
+}
+
+.calificacion-widget .estrella{
+    color:#d7dce4;
+    font-size:14px;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.calificacion-widget .estrella.activa{
+    color:#e8c874;
+}
+
+.calificacion-promedio{
+    font-size:11px;
+    font-weight:700;
+    color:#022C63;
+    margin-left:4px;
+}
+
+.calificacion-total{
+    font-size:9.5px;
+    color:#8a93a6;
+}
+
 </style>
 
 
@@ -772,6 +807,10 @@
                 <i class="bi bi-plus-circle-fill"></i>
                 Nuevo Producto
             </a>
+            <button type="button" class="dash-btn" onclick="abrirModalImportar()">
+                <i class="bi bi-file-earmark-excel"></i>
+                 Importar Excel
+            </button>
         </div>
 
         <!-- Buscador: en vivo, sin recargar la página -->
@@ -798,6 +837,7 @@
                             <th>Nombre</th>
                             <th>Precio</th>
                             <th class="d-none d-md-table-cell">Stock</th>
+                            <th>Calificacion</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -820,6 +860,16 @@
                             </td>
                             <td class="d-none d-md-table-cell">
                                 <strong>{{ i.stock_actual }}</strong>
+                            </td>
+                            <td>
+                                {% csrf_token %}
+                                <div class="calificacion-widget" data-producto-id="{{ i.id }}" data-mi-calificacion="{{ i.mi_calificacion|default:0 }}">
+                                    {% for n in "12345" %}
+                                        <i class="bi bi-star-fill estrella" data-valor="{{ forloop.counter }}"></i>
+                                    {% endfor %}
+                                    <span class="calificacion-promedio">{{ i.promedio_calificacion|floatformat:1|default:"—" }}</span>
+                                    <span class="calificacion-total">({{ i.total_calificaciones }})</span>
+                                </div>
                             </td>
                             <td>
                                 {% if i.disponibilidad %}
@@ -973,6 +1023,37 @@
 
 </div>
 
+<div class="modal-importar-overlay" id="modalImportarOverlay" onclick="cerrarModalImportarFondo(event)">
+    <div class="modal-importar-box">
+        <div class="modal-importar-header">
+            <h3><i class="bi bi-file-earmark-excel"></i> Importar productos</h3>
+            <button type="button" class="modal-importar-cerrar" onclick="cerrarModalImportar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <p class="modal-importar-subtitulo">
+            Sube un archivo <strong>.xlsx</strong> con las columnas: nombre, descripción, precio, stock actual, stock mínimo, disponibilidad.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'importar_productos' %}" class="modal-importar-form">
+            {% csrf_token %}
+            <label class="modal-importar-dropzone" id="dropzoneImportar" for="id_archivo">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+                <span id="dropzoneTexto">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                {{ formulario.archivo }}
+            </label>
+
+            <div class="modal-importar-footer">
+                <button type="button" class="dash-btn" onclick="cerrarModalImportar()">Cancelar</button>
+                <button type="submit" class="dash-btn dash-btn-solid">
+                    <i class="bi bi-upload"></i> Importar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 
     function cambiarVista(vista){
@@ -1088,6 +1169,90 @@
             window.scrollTo({ top: contenedor.offsetTop - 20, behavior: 'smooth' });
         });
     })();
+
+    function abrirModalImportar(){
+        document.getElementById('modalImportarOverlay').classList.add('show');
+    }
+    function cerrarModalImportar(){
+        document.getElementById('modalImportarOverlay').classList.remove('show');
+    }
+    function cerrarModalImportarFondo(event){
+        if(event.target.id === 'modalImportarOverlay') cerrarModalImportar();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function(){
+        const input = document.querySelector('.modal-importar-dropzone input[type="file"]');
+        const texto = document.getElementById('dropzoneTexto');
+        const dropzone = document.getElementById('dropzoneImportar');
+        if(!input) return;
+    
+        input.addEventListener('change', function(){
+            if(input.files.length > 0) texto.textContent = input.files[0].name;
+        });
+    
+        ['dragover','dragleave','drop'].forEach(evento => {
+            dropzone.addEventListener(evento, e => e.preventDefault());
+        });
+        dropzone.addEventListener('dragover', () => dropzone.classList.add('dragover'));
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', function(e){
+            dropzone.classList.remove('dragover');
+            if(e.dataTransfer.files.length > 0){
+                input.files = e.dataTransfer.files;
+                texto.textContent = e.dataTransfer.files[0].name;
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        document.querySelectorAll('.calificacion-widget').forEach(function(widget){
+            const estrellas = widget.querySelectorAll('.estrella');
+            let miCalificacion = parseInt(widget.dataset.miCalificacion) || 0;
+
+            function pintar(valor){
+                estrellas.forEach(function(estrella){
+                    estrella.classList.toggle('activa', parseInt(estrella.dataset.valor) <= valor);
+                });
+            }
+            pintar(miCalificacion);
+
+            estrellas.forEach(function(estrella){
+                estrella.addEventListener('mouseenter', function(){
+                    pintar(parseInt(estrella.dataset.valor));
+                });
+                estrella.addEventListener('mouseleave', function(){
+                    pintar(miCalificacion);
+                });
+                estrella.addEventListener('click', function(){
+                    const valor = parseInt(estrella.dataset.valor);
+                    const productoId = widget.dataset.productoId;
+
+                    fetch(`/productos/${productoId}/calificar/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `puntaje=${valor}`,
+                    })
+                    .then(function(resp){ return resp.json(); })
+                    .then(function(data){
+                        if(!data.ok) return;
+                        miCalificacion = valor;
+                        widget.dataset.miCalificacion = valor;
+                        pintar(valor);
+                        widget.querySelector('.calificacion-promedio').textContent = data.promedio;
+                        widget.querySelector('.calificacion-total').textContent = `(${data.total})`;
+                    })
+                    .catch(function(){
+                        console.error('No se pudo guardar la calificación.');
+                    });
+                });
+            });
+        });
+    });
 
 </script>
 

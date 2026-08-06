@@ -232,6 +232,10 @@
                 <i class="bi bi-plus-circle-fill"></i>
                 Nueva Producción
             </a>
+            <button type="button" class="dash-btn" onclick="abrirModalImportarProduccion()">
+                <i class="bi bi-file-earmark-excel"></i>
+                Importar Excel
+            </button>
         </div>
 
         <!-- table-responsive queda como red de seguridad; las columnas menos
@@ -319,9 +323,73 @@
                 </ul>
             </nav>
         </div>
-
     </div>
+    <div class="modal-importar-overlay" id="modalImportarProduccionOverlay" onclick="cerrarModalImportarProduccionFondo(event)">
+        <div class="modal-importar-box">
+            <div class="modal-importar-header">
+                <h3><i class="bi bi-file-earmark-excel"></i> Importar producciones</h3>
+                <button type="button" class="modal-importar-cerrar" onclick="cerrarModalImportarProduccion()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
 
+            <p class="modal-importar-subtitulo">
+                Sube un archivo <strong>.xlsx</strong> con las columnas: nombre del producto, cantidad producida, observación.
+            </p>
+
+            <form method="post" enctype="multipart/form-data" action="{% url 'importar_produccion' %}" class="modal-importar-form">
+                {% csrf_token %}
+                <label class="modal-importar-dropzone" id="dropzoneImportarProduccion" for="id_archivo_produccion">
+                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                    <span id="dropzoneTextoProduccion">Arrastra tu archivo aquí o haz clic para seleccionar</span>
+                    {{ formulario.archivo }}
+                </label>
+
+                <div class="modal-importar-footer">
+                    <button type="button" class="dash-btn" onclick="cerrarModalImportarProduccion()">Cancelar</button>
+                    <button type="submit" class="dash-btn dash-btn-solid">
+                        <i class="bi bi-upload"></i> Importar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    function abrirModalImportarProduccion(){
+        document.getElementById('modalImportarProduccionOverlay').classList.add('show');
+    }
+    function cerrarModalImportarProduccion(){
+        document.getElementById('modalImportarProduccionOverlay').classList.remove('show');
+    }
+    function cerrarModalImportarProduccionFondo(event){
+        if(event.target.id === 'modalImportarProduccionOverlay') cerrarModalImportarProduccion();
+    }
+    
+    document.addEventListener('DOMContentLoaded', function(){
+        const input = document.querySelector('#dropzoneImportarProduccion input[type="file"]');
+        const texto = document.getElementById('dropzoneTextoProduccion');
+        const dropzone = document.getElementById('dropzoneImportarProduccion');
+        if(!input) return;
+    
+        input.addEventListener('change', function(){
+            if(input.files.length > 0) texto.textContent = input.files[0].name;
+        });
+    
+        ['dragover','dragleave','drop'].forEach(evento => {
+            dropzone.addEventListener(evento, e => e.preventDefault());
+        });
+        dropzone.addEventListener('dragover', () => dropzone.classList.add('dragover'));
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', function(e){
+            dropzone.classList.remove('dragover');
+            if(e.dataTransfer.files.length > 0){
+                input.files = e.dataTransfer.files;
+                texto.textContent = e.dataTransfer.files[0].name;
+            }
+        });
+    });
+</script>
 
 {% endblock %}

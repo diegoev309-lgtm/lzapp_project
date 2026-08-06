@@ -1,0 +1,129 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+.contenedor-produccion-imp{ padding: 26px 32px 40px; }
+
+.bloque-produccion-imp{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
+    overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+
+.encabezado{
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
+    border-bottom:1px solid var(--border-subtle);
+    padding:26px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.titulo{
+    margin:0; font-size:23px; font-weight:700;
+    display:flex; align-items:center; gap:10px;
+    color:var(--text-primary);
+}
+
+.subtitulo{ margin-top:6px; color:var(--text-secondary); font-size:13px; }
+
+.btn-nuevo{
+    background:var(--gold); color:#1A1A2E; border:1px solid var(--gold);
+    padding:11px 20px; border-radius:var(--radius-btn); font-weight:600;
+    font-size:13.5px; transition:.2s; display:inline-flex; align-items:center; gap:8px;
+}
+.btn-nuevo:hover{ background:#EFD48C; color:#1A1A2E; transform:translateY(-2px); box-shadow:0 10px 22px rgba(228,200,112,.25); }
+
+.tabla-produccion-imp{ width:100%; border-collapse:collapse; }
+.tabla-produccion-imp thead th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px;
+    color:var(--text-tertiary); font-weight:600; padding:14px 20px 12px;
+    border-bottom:1px solid var(--border-subtle);
+}
+.tabla-produccion-imp tbody td{
+    padding:14px 20px; border-bottom:1px solid var(--border-subtle);
+    font-size:13.5px; color:var(--text-secondary); vertical-align:middle;
+}
+.tabla-produccion-imp tbody tr:last-child td{ border-bottom:none; }
+.tabla-produccion-imp tbody tr:hover{ background:rgba(255,255,255,.03); }
+.tabla-produccion-imp .nombre-producto{ color:var(--text-primary); font-weight:600; }
+.badge-cantidad-imp{
+    background:var(--green-dim); color:var(--green); font-size:11.5px;
+    font-weight:700; padding:4px 10px; border-radius:var(--radius-pill);
+}
+
+.estado-vacio{ text-align:center; padding:60px 20px; }
+.estado-vacio i{ color:var(--text-tertiary) !important; }
+.estado-vacio h5{ color:var(--text-secondary); margin-top:12px; }
+
+@media(max-width:768px){
+    .contenedor-produccion-imp{ padding:18px 16px 30px; }
+    .encabezado{ flex-direction:column; text-align:center; padding:20px; }
+    .titulo{ font-size:20px; }
+}
+
+</style>
+
+<div class="container-fluid contenedor-produccion-imp">
+    <div class="bloque-produccion-imp">
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    Producciones importadas
+                </h1>
+                <p class="subtitulo">
+                    Estos son los registros de producción agregados en la última importación.
+                </p>
+            </div>
+            <a href="{% url 'listar_producciones' %}" class="btn btn-nuevo">
+                <i class="bi bi-arrow-left"></i>
+                Volver al historial
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="tabla-produccion-imp">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for p in producciones %}
+                    <tr>
+                        <td class="nombre-producto">{{ p.producto.nombre }}</td>
+                        <td><span class="badge-cantidad-imp">+ {{ p.cantidad_producida }}</span></td>
+                        <td>{{ p.fecha_produccion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if p.observacion %}
+                                {{ p.observacion }}
+                            {% else %}
+                                <span class="text-muted">Sin observaciones</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="estado-vacio">
+                            <i class="bi bi-box display-4 text-secondary"></i>
+                            <h5>No hay producciones importadas recientemente.</h5>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

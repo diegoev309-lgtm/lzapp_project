@@ -525,3 +525,78 @@ a{ text-decoration:none; color:inherit; }
   .dash-grid-top{ grid-template-columns: 1fr; }
   .dash-grid-bottom{ grid-template-columns: 1fr; }
 }
+
+/*==========================================================
+   MODAL IMPORTAR EXCEL
+===========================================================*/
+
+.modal-importar-overlay{
+  display:none;
+  position:fixed; inset:0;
+  background: rgba(0,0,0,.6);
+  z-index:100;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(2px);
+}
+.modal-importar-overlay.show{ display:flex; }
+
+.modal-importar-box{
+  width:100%; max-width:440px;
+  background: var(--bg-panel);
+  border:1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  padding: 24px;
+  animation: modalImportarIn .2s ease;
+}
+@keyframes modalImportarIn{
+  from{ opacity:0; transform: translateY(10px) scale(.98); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
+}
+
+.modal-importar-header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px;
+}
+.modal-importar-header h3{
+  font-size:16px; font-weight:700; margin:0;
+  display:flex; align-items:center; gap:8px;
+  color: var(--text-primary);
+}
+.modal-importar-header h3 i{ color: var(--gold); }
+.modal-importar-cerrar{
+  background:transparent; border:none; color: var(--text-tertiary);
+  cursor:pointer; font-size:16px;
+}
+.modal-importar-cerrar:hover{ color: var(--text-primary); }
+
+.modal-importar-subtitulo{
+  font-size:12.5px; color: var(--text-secondary);
+  margin: 0 0 18px;
+  line-height:1.5;
+}
+
+.modal-importar-dropzone{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px;
+  border: 1.5px dashed var(--border-hair);
+  border-radius: var(--radius-btn);
+  padding: 32px 16px;
+  cursor:pointer;
+  transition:.2s;
+  position:relative;
+}
+.modal-importar-dropzone:hover,
+.modal-importar-dropzone.dragover{
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.modal-importar-dropzone i{ font-size:26px; color: var(--gold); }
+.modal-importar-dropzone span{ font-size:12.5px; color: var(--text-secondary); text-align:center; }
+.modal-importar-dropzone input[type="file"]{
+  position:absolute; inset:0; opacity:0; cursor:pointer;
+}
+
+.modal-importar-footer{
+  display:flex; justify-content:flex-end; gap:10px; margin-top:20px;
+}

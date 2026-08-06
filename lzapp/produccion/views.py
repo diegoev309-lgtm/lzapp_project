@@ -6,10 +6,12 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate, TruncWeek
+from django.contrib import messages
+from openpyxl import load_workbook
 
 from dashboard.models import Produccion, Producto, DetalleVenta
 from produccion.forms import ProduccionForm
-
+from .forms import ImportarProduccionForm
 
 UMBRAL_DIAS_STOCK = 7       # por debajo de esto, alertamos "reforzar producción"
 VENTANA_RITMO_VENTAS = 30   # días hacia atrás para medir el ritmo de venta real
@@ -171,12 +173,13 @@ def listar_producciones(request):
     producciones_periodo = Produccion.objects.filter(
         fecha_produccion__date__gte=desde,
         fecha_produccion__date__lte=hasta,
-    ).order_by('-fecha_produccion')
+    ).select_related('producto').order_by('-fecha_produccion')
 
     paginator = Paginator(producciones_periodo, 6)
     producciones = paginator.get_page(request.GET.get('page'))
 
     productos_criticos, productos_sin_produccion = _calcular_alertas()
+    formulario = ImportarProduccionForm()
 
     contexto = {
         'producciones': producciones,
@@ -185,6 +188,7 @@ def listar_producciones(request):
         'hasta': hasta,
         'productos_criticos': productos_criticos,
         'productos_sin_produccion': productos_sin_produccion,
+        'formulario': formulario,
         **_construir_contexto_periodo(desde, hasta),
     }
     return render(request, 'listpc.html', contexto)
@@ -201,3 +205,66 @@ def crear_produccion(request):
 
     return render(request, 'formpc.html', {'form': form})
 
+def importar_produccion(request):
+    if request.method == 'POST':
+        formulario = ImportarProduccionForm(request.POST, request.FILES)
+        if formulario.is_valid():
+            archivo = request.FILES['archivo']
+            try:
+                libro = load_workbook(archivo, data_only=True)
+            except Exception:
+                messages.error(request, 'El archivo no es un Excel válido.')
+                return redirect('importar_produccion')
+
+            hoja = libro.active
+            ids_nuevos = []
+            omitidos = 0
+            no_encontrados = []
+
+            for fila in hoja.iter_rows(min_row=2, values_only=True):
+                if not fila or not fila[0]:
+                    continue
+
+                nombre_producto = str(fila[0]).strip()
+                cantidad = fila[1] if len(fila) > 1 else None
+                observacion = fila[2] if len(fila) > 2 else None
+
+                if not cantidad or cantidad <= 0:
+                    omitidos += 1
+                    continue
+
+                try:
+                    producto = Producto.objects.get(nombre__iexact=nombre_producto)
+                except Producto.DoesNotExist:
+                    no_encontrados.append(nombre_producto)
+                    continue
+
+                # .create() dispara el save() del modelo, que ya suma
+                # automáticamente la cantidad al stock_actual del producto.
+                produccion = Produccion.objects.create(
+                    producto=producto,
+                    cantidad_producida=cantidad,
+                    observacion=observacion,
+                )
+                ids_nuevos.append(produccion.id)
+
+            request.session['producciones_importadas_ids'] = ids_nuevos
+
+            if no_encontrados:
+                messages.warning(request, f'No se encontraron estos productos, se omitieron sus filas: {", ".join(no_encontrados)}')
+            if omitidos:
+                messages.warning(request, f'{omitidos} filas se omitieron por no tener una cantidad válida.')
+            if ids_nuevos:
+                messages.success(request, f'Se registraron {len(ids_nuevos)} producciones correctamente.')
+
+            return redirect('producciones_importadas')
+    else:
+        formulario = ImportarProduccionForm()
+
+    return render(request, 'listpc.html', {'formulario': formulario})
+
+
+def producciones_importadas(request):
+    ids = request.session.get('producciones_importadas_ids', [])
+    producciones = Produccion.objects.filter(id__in=ids).select_related('producto').order_by('-fecha_produccion')
+    return render(request, 'producciones_importadas.html', {'producciones': producciones})
