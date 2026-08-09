@@ -3,8 +3,6 @@ from django.core.paginator import Paginator
 from django.db.models import F, Q, Avg, Count, OuterRef, Subquery, Value
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 from openpyxl import load_workbook
 from dashboard.models import Producto, Calificacion
 from producto.forms import ProductoForm, ImportarProductosForm
@@ -85,8 +83,6 @@ def eliminar_producto(request, id):
     return render(request, "deletept.html", {"producto": producto})
 
 
-@login_required
-@require_POST
 def calificar_producto(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     puntaje = request.POST.get('puntaje')

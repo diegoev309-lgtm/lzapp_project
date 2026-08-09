@@ -17,7 +17,7 @@ def migrar_tirada_anonima_a_usuario(sender, request, user, **kwargs):
     #probable, pero posible), no rompemos el login: dejamos la tirada
     #anónima huérfana tal cual, sin reasignar.
     #"""
-    from .models import TiradaDiaria  # import local: evita import circular al cargar la app
+    from dashboard.models import TiradaDiaria  # import local: evita import circular al cargar la app
 
     session_key = getattr(request.session, 'session_key', None)
     if not session_key:

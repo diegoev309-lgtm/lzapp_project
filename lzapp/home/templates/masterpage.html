@@ -805,13 +805,19 @@
                                 {% endif %}
                             </div>
                             <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
+                                {% if request.user.is_authenticated %}
+                                <div class="calificacion-widget-pub" data-producto-id="{{ i.id }}" data-mi-calificacion="{{ i.mi_calificacion|default:0 }}">
+                                    {% for n in "12345" %}
+                                        <i class="bi bi-star-fill estrella-pub" data-valor="{{ forloop.counter }}"></i>
+                                    {% endfor %}
+                                    <span class="calificacion-promedio-pub">{{ i.promedio_calificacion|floatformat:1|default:"—" }}</span>
+                                    <span class="calificacion-total-pub">({{ i.total_calificaciones }})</span>
                                 </div>
+                                {% else %}
+                                <button type="button" class="btn-promo-calificar" data-bs-toggle="modal" data-bs-target="#modalPromoRegistro">
+                                    <i class="bi bi-star"></i> Calificar
+                                </button>
+                                {% endif %}
                                 <h5 class="titulo-producto">{{ i.nombre }}</h5>
                                 <p class="producto-descripcion">
                                     {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}

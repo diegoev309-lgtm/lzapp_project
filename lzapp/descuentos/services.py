@@ -1,12 +1,9 @@
 import random
-
 from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
-from dashboard.models import CampanaDescuento, DescuentoAsignado, DetalleVenta, Producto
-from .models import TiradaDiaria
-
+from dashboard.models import CampanaDescuento, DescuentoAsignado, DetalleVenta, Producto, TiradaDiaria
 
 # =========================================================
 # 0) SUGERENCIA DE VENCIMIENTO (solo visual, para el modal
