@@ -11,6 +11,7 @@
 }
 
 :root {
+    --nav-h: 92px;
     --azul-profundo: #022C63;
     --azul-principal: #083b78;
     --azul-medio: #1a5fa8;
@@ -266,7 +267,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
     position: relative;
     z-index: 3;
     width: 100%;
-    padding-top: 96px;
+    padding-top: calc(var(--nav-h) + 28px);
     padding-bottom: 48px;
 }
 
@@ -361,7 +362,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
 /* --- Escena 3D (imágenes flotantes) --- */
 .hero-escena {
     position: relative;
-    min-height: 520px;
+    min-height: 420px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -388,8 +389,8 @@ HERO — escena 3D animada (slide 1 del carrusel)
 .pieza-rueda {
     position: relative;
     z-index: 2;
-    width: 78%;
-    max-width: 300px;
+    width: 66%;
+    max-width: 250px;
 }
 .pieza-rueda img {
     filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.45));
@@ -411,7 +412,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
     position: absolute;
     z-index: 3;
     width: 100%;
-    max-width: 150px;
+    max-width: 115px;
     top: 8%;
     right: 14%;
 }
@@ -582,7 +583,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
     position: relative;
     z-index: 3;
     width: 100%;
-    padding-top: 96px;
+    padding-top: calc(var(--nav-h) + 28px);
     padding-bottom: 48px;
     pointer-events: none; /* deja pasar el hover a lo que está debajo */
 }
@@ -1321,7 +1322,7 @@ footer .text-center.m-0 {
     }
 
 
-    .hero-inner, .slide-imagen-contenido { padding-top: 90px; padding-bottom: 16px; text-align: center; }
+    .hero-inner, .slide-imagen-contenido { padding-bottom: 16px; text-align: center; }
 
     .hero-eyebrow { margin-left: auto; margin-right: auto; }
     .hero-sub { margin-left: auto; margin-right: auto; }
@@ -1361,10 +1362,10 @@ footer .text-center.m-0 {
     .hero-escena {
     position: relative;
     width: 100%;
-    max-width: 260px;
+    max-width: min(260px, 30vh);
     aspect-ratio: 1 / 1;
     min-height: 0;        /* 👈 anula el min-height:520px que hereda de la regla base de desktop */
-    margin: 1.5rem auto 2rem;
+    margin: clamp(0.75rem, 3vh, 1.5rem) auto clamp(1rem, 4vh, 2rem);
 }
 
 /* Logo: centrado exacto, siempre el elemento "ancla" de la composición */
@@ -1482,10 +1483,45 @@ footer .text-center.m-0 {
         background: linear-gradient(to bottom, rgba(2, 44, 99, 0.85) 0%, rgba(2, 44, 99, 0.55) 60%, rgba(2, 44, 99, 0.35) 100%);
     }
 
-    .carrusel-flecha { width: 42px; height: 42px; font-size: 1.05rem; }
-    .carrusel-flecha.prev { left: 12px; }
-    .carrusel-flecha.next { right: 12px; }
+    .carrusel-flecha { display: none; }
     .carrusel-puntos { right: 50%; transform: translateX(50%); bottom: 18px; }
+
+    .carrusel-swipe-hint {
+        position: absolute;
+        left: 50%;
+        bottom: 44px;
+        transform: translateX(-50%);
+        z-index: 6;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        pointer-events: none;
+        animation: swipeHintMover 2.2s ease-in-out infinite;
+    }
+    .carrusel-swipe-hint i {
+        font-size: 0.85rem;
+        color: var(--dorado-claro);
+    }
+    .carrusel-swipe-hint i:first-child { animation: swipeHintFlechaIzq 2.2s ease-in-out infinite; }
+    .carrusel-swipe-hint i:last-child { animation: swipeHintFlechaDer 2.2s ease-in-out infinite; }
+
+    @keyframes swipeHintMover {
+        0%, 100% { opacity: 0.55; }
+        50%      { opacity: 1; }
+    }
+    @keyframes swipeHintFlechaIzq {
+        0%, 100% { transform: translateX(0); }
+        50%      { transform: translateX(-4px); }
+    }
+    @keyframes swipeHintFlechaDer {
+        0%, 100% { transform: translateX(0); }
+        50%      { transform: translateX(4px); }
+    }
 
     .border-md-end {
         border-right: none;
@@ -1510,7 +1546,6 @@ footer .text-center.m-0 {
    ============================================================ */
 @media (max-width: 991px) and (max-height: 750px) {
     .hero-inner, .slide-imagen-contenido {
-        padding-top: 70px;
         padding-bottom: 8px;
     }
 
@@ -1540,10 +1575,7 @@ footer .text-center.m-0 {
         font-size: 0.85rem;
     }
 
-    .hero-escena {
-        max-width: 150px;
-        margin: 0.75rem auto 1rem;
-    }
+    /* el tamaño del logo ya es fluido (ver .hero-escena arriba), no hace falta redefinirlo acá */
 
     .tracking-widget {
         max-width: 200px;
@@ -1573,7 +1605,7 @@ footer .text-center.m-0 {
 
 /* Teléfonos angostos (iPhone SE/12/13/14, Android compactos, etc.) */
 @media (max-width: 480px) {
-    .hero-inner { padding-top: 100px; padding-bottom: 56px; }
+    .hero-inner { padding-bottom: 56px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1794,10 +1826,9 @@ footer .text-center.m-0 {
    cada queso, y su visibilidad se controla con la clase .visible
    (agregada/quitada por JS en mouseenter/mouseleave/focus/blur). */
 
-/* En móvil no hay hover real: ocultamos el efecto para no romper el layout */
-@media (max-width: 991px) {
-    .quesos-interactivos { display: none; }
-}
+/* Antes se ocultaba por completo en mobile. Ahora SÍ se muestra: la
+   secuencia de "agitar el celular" necesita poder encender los 3
+   quesos y mostrar sus efectos igual que en desktop. */
 /* ---------- Globo de ofertas ---------- */
 .oferta-globo-wrap {
     position: absolute;
@@ -2042,7 +2073,26 @@ footer .text-center.m-0 {
 }
 
 @media (max-width: 991px) {
-    .oferta-rueda-wrap { display: none; }
+    .oferta-rueda-wrap {
+        display: flex;
+        top: 90px;
+        right: 16px;
+        left: auto;
+    }
+    .oferta-rueda-icono {
+        display: none;
+    }
+    .oferta-rueda-texto {
+        max-width: 150px;
+        padding: 0.55rem 0.85rem;
+    }
+    .rueda-descuento {
+        font-size: 0.82rem;
+    }
+    .rueda-aviso {
+        font-size: 0.65rem;
+        line-height: 1.3;
+    }
 }
 
 /* Pequeño destello en el momento del "pop", opcional pero le da vida */
@@ -2153,6 +2203,12 @@ footer .text-center.m-0 {
 .quesos-interactivos.modo-ofertas .queso-punto:not(.encendido) .queso-punto-tap {
     opacity: 1;
     animation: invitarClicTap 1.5s ease-in-out infinite;
+}
+
+@media (max-width: 991px) {
+    .queso-punto-tap {
+        display: none !important;
+    }
 }
 .queso-punto.encendido .queso-punto-tap,
 .queso-punto.volteado .queso-punto-tap { display: none; }
@@ -2474,9 +2530,9 @@ footer .text-center.m-0 {
     text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-@media (max-width: 991px) {
-    .oferta-info-unica { display: none; }
-}
+/* Ya no se oculta a la fuerza: su visibilidad la maneja la opacidad
+   del selector .quesos-interactivos.todos-encendidos + .oferta-info-unica,
+   que solo se activa cuando ya se prendieron los 3 quesos. */
 .oferta-ruleta-suelta {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -2775,6 +2831,27 @@ footer .text-center.m-0 {
     0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     70%  { opacity: 1; }
     100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3); }
+}
+.brillo-modal-volador {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--dorado-claro);
+    box-shadow: 0 0 20px 8px rgba(240,217,138,0.9);
+    transform: translate(-50%, -50%);
+    z-index: 9;
+    pointer-events: none;
+    opacity: 0;
+}
+.brillo-modal-volador.volando {
+    opacity: 1;
+    animation: volarBrilloModal 0.85s cubic-bezier(0.3,0,0.2,1) forwards;
+}
+@keyframes volarBrilloModal {
+    0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    55%  { opacity: 1; transform: translate(calc(-50% + var(--dx) * 0.92), calc(-50% + var(--dy) * 0.92)) scale(5); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(9); }
 }
 .oferta-rueda-wrap.aparicion-pop {
     animation: popBadge 0.5s cubic-bezier(0.34,1.56,0.64,1);
@@ -3075,6 +3152,219 @@ footer .text-center.m-0 {
         padding: 0.7rem 1rem;
         justify-content: center;
         border-radius: 0 0 18px 18px;
+    }
+}
+/* ============================================================
+   BOTONES DE SESIÓN EN MENÚ MOBILE (clonados por JS)
+   ============================================================ */
+@media (max-width: 991px) {
+    .navbar-actions-mobile {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0.7rem 1rem 0.3rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 0.3rem;
+    }
+    .navbar-actions-mobile ul.nav {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
+    .navbar-actions-mobile .nav-item {
+        margin: 0 !important;
+    }
+    .navbar-actions-mobile .btn-login,
+    .navbar-actions-mobile .btn-register {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+    }
+}
+/* ============================================================
+   OFERTAS EN MOBILE: se reemplaza el globo por gesto de agitar
+   ============================================================ */
+@media (max-width: 991px) {
+    .oferta-globo-wrap {
+        display: none;
+    }
+
+    .oferta-shake-hint {
+        position: absolute;
+        top: 90px;
+        right: 16px;
+        z-index: 6;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(2, 44, 99, 0.85);
+        border: 1px solid rgba(201, 168, 76, 0.5);
+        color: var(--dorado-claro);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.5rem 0.9rem;
+        border-radius: 50px;
+        max-width: 150px;
+        line-height: 1.3;
+        animation: flotarGlobo 3.4s ease-in-out infinite;
+    }
+
+    .oferta-shake-hint i {
+        font-size: 1rem;
+        color: var(--dorado);
+        flex-shrink: 0;
+    }
+
+    .oferta-shake-permiso {
+        position: absolute;
+        top: 90px;
+        right: 16px;
+        z-index: 6;
+        background: var(--dorado);
+        color: var(--azul-profundo);
+        border: none;
+        font-weight: 700;
+        font-size: 0.75rem;
+        padding: 0.55rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Respaldo universal: en varios Android (Samsung, algunos Realme,
+       etc.) el navegador nunca dispara 'devicemotion' aunque el
+       teléfono tenga sensor — bloqueo de fabricante/privacidad, no
+       hay forma de detectarlo de antemano. Este botón deja activar
+       la secuencia igual con un toque, sin depender del sensor. */
+    .oferta-shake-fallback {
+        position: absolute;
+        top: 130px;
+        right: 16px;
+        z-index: 6;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        background: rgba(2, 44, 99, 0.85);
+        border: 1px solid rgba(201, 168, 76, 0.5);
+        color: var(--dorado-claro);
+        font-weight: 600;
+        font-size: 0.68rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 50px;
+        max-width: 150px;
+        line-height: 1.25;
+    }
+    .oferta-shake-fallback.visible {
+        display: flex;
+    }
+    .oferta-shake-fallback i {
+        font-size: 0.9rem;
+        color: var(--dorado);
+        flex-shrink: 0;
+    }
+}
+
+@media (min-width: 992px) {
+    .oferta-shake-hint,
+    .oferta-shake-permiso,
+    .oferta-shake-fallback,
+    .carrusel-swipe-hint {
+        display: none !important;
+    }
+}
+
+
+/* ============================================================
+   SLIDE 2 (Variedad de Quesos) EN MOBILE: texto arriba, sin
+   descripción, botones a los lados abajo.
+   ============================================================ */
+@media (max-width: 991px) {
+    .carrusel-slide:nth-child(2) .slide-imagen {
+        align-items: flex-start;
+    }
+    .carrusel-slide:nth-child(2) .slide-imagen-contenido {
+        padding-top: calc(var(--nav-h) + 6px);
+        min-height: 100%;
+    }
+    .carrusel-slide:nth-child(2) .hero-eyebrow {
+        margin-bottom: 0.3rem;
+        font-size: 0.68rem;
+        padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+    }
+    .carrusel-slide:nth-child(2) .hero-title {
+        margin-bottom: 0;
+        font-size: clamp(1.7rem, 6vw, 2.4rem);
+    }
+    .carrusel-slide:nth-child(2) .hero-sub {
+        display: none !important;
+    }
+    .carrusel-slide:nth-child(2) .hero-actions {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 50px;
+        justify-content: space-between;
+        gap: 0;
+        opacity: 1;
+        animation: none;
+    }
+    .carrusel-slide:nth-child(2) .hero-actions .btn-dorado,
+    .carrusel-slide:nth-child(2) .hero-actions .btn-outline-blanco {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .oferta-shake-hint,
+    .oferta-shake-permiso {
+        top: 38%;
+    }
+
+    /* Solo se oculta la silueta dorada ÚNICA (la que abraza los 3
+       quesos juntos): está trazada sobre la imagen de DESKTOP, así
+       que en mobile sale desalineada/deforme. El glow y borde
+       normales de cada queso (.queso-punto-glow/.queso-punto-borde)
+       se dejan tal cual, en su lugar real, brillando detrás del
+       overlay oscurecido. */
+    .quesos-interactivos.todos-encendidos .silueta-unica-linea {
+        opacity: 0 !important;
+    }
+
+    /* Tarjeta de oferta como modal real: centrada y grande, SIN fondo
+       propio — el oscurecimiento ya lo da el .slide-imagen-overlay
+       (misma regla que en desktop), así los 3 quesos se siguen
+       viendo brillando en su lugar real por debajo de la tarjeta. */
+    .quesos-interactivos.todos-encendidos + .oferta-info-unica {
+        position: fixed !important;
+        inset: 0 !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        transform: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+    }
+
+    .oferta-descuento-tarjeta {
+        width: min(88%, 380px);
+    }
+    .oferta-descuento-tarjeta {
+        width: min(88%, 380px);
+    }
+
+    /* Botón "Sortear la oferta del día": más chico, más arriba, y por
+       encima de la tarjeta modal (z-index:20) para que se vea con su
+       color rojo real. */
+    .boton-sortear-wrap {
+        bottom: auto;
+        top: 68%;
+        z-index: 21;
+    }
+    .boton-sortear {
+        padding: 0.65rem 1.4rem;
+        font-size: 0.82rem;
+        gap: 6px;
     }
 }
 
