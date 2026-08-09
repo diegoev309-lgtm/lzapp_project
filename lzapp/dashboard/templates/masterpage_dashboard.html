@@ -14,10 +14,13 @@
         })();
     </script>
 
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- CSS del dashboard -->
+    <!-- CSS del dashboard (después de Bootstrap para poder sobrescribirlo) -->
     <link rel="stylesheet" href="{% static 'dashboard/CSS/main.css' %}">
 
     {% block extra_css %}{% endblock %}
@@ -37,43 +40,43 @@
 
         <nav class="dash-nav">
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Inicio_dash' %}active{% endif %}"
-               data-tip="Inicio" href="{% url 'Inicio_dash' %}">
-                <i class="bi bi-house-door-fill"></i>
+               href="{% url 'Inicio_dash' %}">
+               <i class="bi bi-house-door-fill"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_productos' %}active{% endif %}"
-               data-tip="Productos" href="{% url 'listar_productos' %}">
-                <i class="bi bi-basket-fill"></i>
+               href="{% url 'listar_productos' %}">
+               <i class="bi bi-basket-fill"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_descuentos' %}active{% endif %}"
-               data-tip="Descuentos" href="{% url 'panel_descuentos' %}">
-                <i class="bi bi-tags-fill"></i>
+               href="{% url 'panel_descuentos' %}">
+               <i class="bi bi-tags-fill"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
-               data-tip="Producción" href="{% url 'listar_producciones' %}">
-                <i class="bi bi-box-seam-fill"></i>
+               href="{% url 'listar_producciones' %}">
+               <i class="bi bi-box-seam-fill"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_ventas' %}active{% endif %}"
-               data-tip="Ventas" href="{% url 'panel_ventas' %}">
-                <i class="bi bi-cash-stack"></i>
+               href="{% url 'panel_ventas' %}">
+               <i class="bi bi-cash-stack"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Pedidos' %}active{% endif %}"
-               data-tip="Pedidos" href="{% url 'Pedidos' %}">
-                <i class="bi bi-truck"></i>
+               href="{% url 'Pedidos' %}">
+               <i class="bi bi-truck"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Usuario' %}active{% endif %}"
-               data-tip="Usuarios" href="{% url 'Usuario' %}">
-                <i class="bi bi-people-fill"></i>
+               href="{% url 'Usuario' %}">
+               <i class="bi bi-people-fill"></i>
             </a>
 
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Notificaciones' %}active{% endif %}"
-               data-tip="Notificaciones" href="{% url 'Notificaciones' %}">
-                <i class="bi bi-bell-fill"></i>
+               href="{% url 'Notificaciones' %}">
+               <i class="bi bi-bell-fill"></i>
             </a>
         </nav>
 
@@ -84,51 +87,59 @@
 
     <!-- ============ MAIN ============ -->
     <main class="dash-main">
-
-        <header class="dash-header">
-            <div class="dash-header-left">
+        <div class="dash-topbar-wrap">
+        
+            <!-- ===== Barra de navegación superior (fija) ===== -->
+            <nav class="dash-topbar">
                 <button class="dash-mobile-toggle" id="mobileToggle" type="button" aria-label="Abrir menú">
                     <i class="bi bi-list"></i>
                 </button>
-                <div>
-                    <h1><i class="bi {% block page_icon %}bi-grid-fill{% endblock %}"></i>{% block page_title %}Dashboard{% endblock %}</h1>
-                    <p>{% block page_subtitle %}Resumen general del sistema{% endblock %}</p>
-                </div>
-            </div>
-
-            <div class="dash-header-actions">
-                {% block header_actions %}{% endblock %}
-
-                <a href="{% url 'Notificaciones' %}" class="dash-icon-btn" title="Notificaciones">
-                    <i class="bi bi-bell"></i>
-                    <span class="dot"></span>
-                </a>
-
-                <div class="dash-user-wrap">
-                    <button class="dash-avatar" id="userMenuTrigger" type="button" aria-haspopup="true" aria-expanded="false">
-                        {% if request.user.is_authenticated %}{{ request.user.username|first|upper }}{% else %}U{% endif %}
-                    </button>
-
-                    <div class="dash-user-menu" id="userMenu">
-                        <div class="dash-user-menu-head">
-                            <div class="dash-user-menu-name">
-                                {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Invitado{% endif %}
+            
+                <div class="dash-header-actions">
+                    {% block header_actions %}{% endblock %}
+                
+                    <a href="{% url 'Notificaciones' %}" class="dash-icon-btn" title="Notificaciones">
+                        <i class="bi bi-bell"></i>
+                        <span class="dot"></span>
+                    </a>
+                
+                    <div class="dash-user-wrap">
+                        <button class="dash-avatar" id="userMenuTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            {% if request.user.is_authenticated %}{{ request.user.username|first|upper }}{% else %}U{% endif %}
+                        </button>
+                    
+                        <div class="dash-user-menu" id="userMenu">
+                            <div class="dash-user-menu-head">
+                                <div class="dash-user-menu-name">
+                                    {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Invitado{% endif %}
+                                </div>
+                                {% if request.user.is_authenticated and request.user.email %}
+                                    <div class="dash-user-menu-email">{{ request.user.email }}</div>
+                                {% endif %}
                             </div>
-                            {% if request.user.is_authenticated and request.user.email %}
-                                <div class="dash-user-menu-email">{{ request.user.email }}</div>
-                            {% endif %}
+                            <div class="dash-user-menu-divider"></div>
+                            <a href="{% url 'Usuario' %}" class="dash-user-menu-item">
+                                <i class="bi bi-person"></i> Mi perfil
+                            </a>
+                            <a href="{% url 'logout' %}" class="dash-user-menu-item danger">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                            </a>
                         </div>
-                        <div class="dash-user-menu-divider"></div>
-                        <a href="{% url 'Usuario' %}" class="dash-user-menu-item">
-                            <i class="bi bi-person"></i> Mi perfil
-                        </a>
-                        <a href="{% url 'logout' %}" class="dash-user-menu-item danger">
-                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                        </a>
                     </div>
                 </div>
-            </div>
-        </header>
+            </nav>
+        
+            <!-- ===== Título de la página (se desplaza con el contenido en móvil, se une a la topbar en desktop) ===== -->
+            <header class="dash-header">
+                <div class="dash-header-left">
+                    <div>
+                        <h1><i class="bi {% block page_icon %}bi-grid-fill{% endblock %}"></i>{% block page_title %}Dashboard{% endblock %}</h1>
+                        <p>{% block page_subtitle %}Resumen general del sistema{% endblock %}</p>
+                    </div>
+                </div>
+            </header>
+        
+        </div>
 
         {% block content %}
         {% endblock %}
@@ -295,6 +306,12 @@
         });
     })();
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ApexCharts (lo usarán todas las páginas hijas que tengan gráficos) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.2/apexcharts.min.js"></script>
 
 {% block extra_js %}{% endblock %}
 

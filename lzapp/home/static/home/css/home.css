@@ -3077,3 +3077,127 @@ footer .text-center.m-0 {
         border-radius: 0 0 18px 18px;
     }
 }
+
+/* ============================================================
+   DISEÑO DE LAS ESTRELLA DE PRODUCTOS 
+   ============================================================ */
+
+
+.calificacion-widget-pub{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.55rem;
+    margin-bottom: 0.7rem;
+    padding: 8px 14px;
+    background: #f8f9fc;
+    border: 1px solid rgba(2,44,99,.08);
+    border-radius: 12px;
+    width: fit-content;
+    box-shadow: 0 2px 6px rgba(2,44,99,.05);
+    transition: box-shadow .2s, border-color .2s;
+}
+
+.calificacion-widget-pub:hover{
+    border-color: rgba(201,168,76,.4);
+    box-shadow: 0 4px 12px rgba(2,44,99,.1);
+}
+
+.calificacion-widget-pub .estrella-pub{
+    color: #d7dce4;
+    cursor: pointer;
+    transition: transform .15s ease, color .15s ease;
+    line-height: 1;
+}
+
+.calificacion-widget-pub .estrella-pub:hover{
+    transform: scale(1.25);
+}
+
+.calificacion-widget-pub .estrella-pub.activa{
+    color: var(--dorado, #c9a84c);
+}
+
+.calificacion-widget-pub.anonima .estrella-pub:hover{
+    color: #e8c874;
+}
+
+.btn-promo-calificar{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--dorado, #c9a84c);
+    color: var(--azul-profundo, #022C63);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-bottom: 0.6rem;
+    transition: .2s;
+}
+
+.btn-promo-calificar:hover{
+    background: var(--dorado, #c9a84c);
+    color: #1a1a1a;
+}
+
+.promo-registro-modal{
+    border-radius: 20px;
+    border: none;
+    overflow: hidden;
+}
+
+.promo-registro-cerrar{
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+}
+
+.promo-registro-cuerpo{
+    padding: 34px 30px 30px;
+}
+
+.promo-registro-titulo{
+    color: var(--azul-profundo, #022C63);
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.promo-registro-item{
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.promo-registro-item i{
+    font-size: 1.3rem;
+    color: var(--dorado, #c9a84c);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.promo-registro-item strong{
+    display: block;
+    color: var(--azul-profundo, #022C63);
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+}
+
+.promo-registro-item p{
+    margin: 0;
+    font-size: 0.82rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.promo-registro-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}

@@ -559,3 +559,12 @@
                 min-width: 180px;
             }
         }
+
+        @media (max-width: 480px){
+          .btn-importar-header .btn-importar-texto{
+            display:none;
+          }
+          .btn-importar-header{
+            padding: 9px 11px;
+          }
+        }

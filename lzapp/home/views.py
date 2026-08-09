@@ -3,21 +3,15 @@ from django.http import JsonResponse
 from django.db.models import Q, Avg, Count, OuterRef, Subquery, Value, IntegerField
 from django.templatetags.static import static
 from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
 from dashboard.models import Producto, Calificacion,TiradaDiaria
 from carrito.logic import limpiar_premios_invalidos_del_carrito, premio_ya_en_carrito
 from descuentos.services import obtener_premio_activo_para_home, obtener_producto_ids_con_premio_activo
 
 
+
 def obtener_productos_filtrados(request, excluir_ids=None):
-
-    #Lógica de filtrado reutilizable: NO devuelve una respuesta HTTP, solo el
-    #queryset y el término de búsqueda. La usan tanto el endpoint JSON
-    #(buscar_productos_ajax) como las vistas que renderizan una página
-    #completa (main, client, carro), evitando que cada una reimplemente el
-    #mismo filtro por su cuenta.
-
     query = request.GET.get('q', '').strip()
-    productos = Producto.objects.filter(disponibilidad=True)
 
     mi_calificacion_sub = None
     if request.user.is_authenticated:
@@ -25,11 +19,11 @@ def obtener_productos_filtrados(request, excluir_ids=None):
             producto=OuterRef('pk'), usuario=request.user
         ).values('puntaje')[:1]
 
-    mi_calificacion_sub = None
-    if request.user.is_authenticated:
-        mi_calificacion_sub = Calificacion.objects.filter(
-            producto=OuterRef('pk'), usuario=request.user
-        ).values('puntaje')[:1]
+    productos = Producto.objects.filter(disponibilidad=True).annotate(
+        promedio_calificacion=Avg('calificaciones__puntaje'),
+        total_calificaciones=Count('calificaciones', distinct=True),
+        mi_calificacion=Subquery(mi_calificacion_sub) if mi_calificacion_sub is not None else Value(None, output_field=IntegerField()),
+    )
 
     if excluir_ids:
         productos = productos.exclude(id__in=excluir_ids)
@@ -116,7 +110,7 @@ def _estado_juego_diario(request):
         return {'estado': 'sin_premio', 'tirada': tirada}
     return {'estado': 'ganado', 'tirada': tirada}
 
-
+@ensure_csrf_cookie
 def main(request):
     premio_para_animacion = _premio_para_animacion(request)
     # Prioridad: si hay premio de campaña oficial, se muestra tal cual
@@ -133,12 +127,12 @@ def main(request):
     }
     return render(request, "masterpage.html", context)
 
-
+@ensure_csrf_cookie
 def user(request):
     productos = Producto.objects.filter(disponibilidad=True)
     return render(request, "users.html", {"productos": productos})
 
-
+@ensure_csrf_cookie
 def client(request):
     premio_activo = _premio_activo_o_none(request)
     juego_diario = None if premio_activo else _estado_juego_diario(request)
@@ -152,7 +146,7 @@ def client(request):
     }
     return render(request, "clients.html", context)
 
-
+@ensure_csrf_cookie
 def carro(request):
     limpiar_premios_invalidos_del_carrito(request)
     ids_con_premio = obtener_producto_ids_con_premio_activo(request.user) if request.user.is_authenticated else set()
@@ -189,20 +183,3 @@ def carro(request):
     }
 
     return render(request, "carrito_compras.html", context)
-
-
-def home(request):
-    """
-    Nota: esta vista queda redundante con client() ahora que ambas hacen
-    lo mismo (productos + query + premio_activo, render de clients.html).
-    La dejo tal cual para no romper tu urls.py si algo apunta a 'home',
-    pero probablemente quieras eliminar una de las dos y quedarte con un
-    solo nombre — dime cuál usa tu urls.py como home real y limpio la otra.
-    """
-    productos, query = obtener_productos_filtrados(request)
-    context = {
-        'productos': productos,
-        'query': query,
-        'premio_activo': _premio_activo_o_none(request),
-    }
-    return render(request, 'clients.html', context)

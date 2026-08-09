@@ -1,457 +1,65 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
+{% block page_icon %}bi bi-basket-fill{% endblock %}
+{% block page_title %}Productos{% endblock %}
+{% block page_subtitle %}Administra todos los productos registrados del sistema{% endblock %}
+
+{% block header_actions %}
+<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    <span class="btn-importar-texto">PDF</span>
+</a>
+{% endblock %}
 
 {% block content %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
 <style>
 
-/*==========================================================
-   BLOQUE UNIFICADO: encabezado + tabla/tarjetas + pie
-===========================================================*/
-
-.bloque-productos{
-    background:var(--bg-panel);
-    border:1px solid var(--border-subtle);
-    border-radius:var(--radius-panel);
-    overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-}
-
-/*==========================
-        ENCABEZADO
-===========================*/
-
-.encabezado{
-    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
-    border-bottom:1px solid var(--border-subtle);
-    color:var(--text-primary);
-    padding:26px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:20px;
-}
-
-.titulo{
-    margin:0;
-    font-size:23px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.titulo i{
-    color:var(--gold);
-    font-size:20px;
-}
-
-.subtitulo{
-    margin-top:6px;
-    color:var(--text-secondary);
-    font-size:13px;
-}
-
-.btn-nuevo{
-    background:var(--gold);
-    color:#1A1A2E;
-    border:1px solid var(--gold);
-    padding:11px 20px;
-    border-radius:var(--radius-btn);
-    font-weight:600;
-    font-size:13.5px;
-    transition:.2s;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-}
-
-.btn-nuevo:hover{
-    background:#EFD48C;
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 10px 22px rgba(228,200,112,.25);
-}
-
-/*==========================
-        BUSCADOR
-===========================*/
-
-.barra-busqueda-wrapper{
-    padding:22px 30px 6px;
-}
-
-.barra-busqueda{
-    display:flex;
-    gap:10px;
-    max-width:420px;
-}
-
-.campo-busqueda{
-    position:relative;
-    flex:1;
-}
-
-.campo-busqueda i{
-    position:absolute;
-    top:50%;
-    left:16px;
-    transform:translateY(-50%);
-    color:var(--text-tertiary);
-    font-size:15px;
-    pointer-events:none;
-}
-
-.input-busqueda{
-    width:100%;
-    border:1px solid var(--border-hair);
-    border-radius:var(--radius-btn);
-    padding:11px 16px 11px 42px;
-    font-size:14px;
-    color:var(--text-primary);
-    background:rgba(255,255,255,.03);
-    transition:.25s;
-}
-
-.input-busqueda:focus{
-    outline:none;
-    border-color:var(--gold);
-    background:rgba(255,255,255,.05);
-    box-shadow:0 0 0 4px var(--gold-dim);
-}
-
-.input-busqueda::placeholder{
-    color:var(--text-tertiary);
-}
-
-.btn-buscar{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:46px;
-    height:46px;
-    flex-shrink:0;
-    border:none;
-    border-radius:var(--radius-btn);
-    background:var(--gold);
-    color:#1A1A2E;
-    font-size:16px;
-    transition:.3s;
-}
-
-.btn-buscar:hover{
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(228,200,112,.3);
-}
-
-@media(max-width:768px){
-    .barra-busqueda-wrapper{
-        padding:18px 16px 4px;
-    }
-    .barra-busqueda{
-        max-width:100%;
-    }
-}
-
-/*==========================
-      SELECTOR DE VISTA
-===========================*/
-
-.barra-vista{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.barra-vista span{
-    font-size:13px;
-    color:var(--text-secondary);
-    font-weight:600;
-    margin-right:4px;
-}
-
-.selector-vista{
-    display:inline-flex;
-    background:rgba(255,255,255,.03);
-    border-radius:var(--radius-pill);
-    padding:4px;
-    border:1px solid var(--border-hair);
-}
-
-.btn-vista{
-    border:none;
-    background:transparent;
-    color:var(--text-secondary);
-    padding:7px 14px;
-    border-radius:var(--radius-pill);
-    font-weight:500;
-    font-size:12.5px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:.2s;
-}
-
-.btn-vista:hover{
-    color:var(--text-primary);
-}
-
-.btn-vista.activo{
-    background:var(--gold-dim);
-    color:var(--gold);
-}
-
-.vista-oculta{
-    display:none !important;
-}
-
-/*==========================
-          TABLA
-===========================*/
-
-.table{
-    margin-bottom:0;
-}
-
-.tabla-productos thead{
-    background:transparent;
-}
-
-.tabla-productos thead th{
-    color:var(--text-tertiary);
-    text-transform:uppercase;
-    letter-spacing:.4px;
-    border:none;
-    border-bottom:1px solid var(--border-subtle);
-    padding:12px 8px;
-    text-align:center;
-    font-size:11px;
-    font-weight:600;
-    white-space:nowrap;
-}
-
-.tabla-productos tbody td{
-    vertical-align:middle;
-    text-align:center;
-    padding:12px 6px;
-    font-size:13px;
-    color:var(--text-secondary);
-    border-bottom:1px solid var(--border-subtle);
-}
-
-.tabla-productos tbody tr{
-    transition:.2s;
-}
-
-.tabla-productos tbody tr:last-child td{
-    border-bottom:none;
-}
-
-.tabla-productos tbody tr:hover{
-    background:rgba(255,255,255,.03);
-}
-
-.img-producto{
-    width:52px;
-    height:38px;
-    object-fit:cover;
-    border-radius:8px;
-    border:1px solid var(--border-hair);
-    transition:.3s;
-}
-
-.img-producto:hover{
-    transform:scale(1.1);
-}
-
-.btn-editar{
-    background:rgba(56,189,248,.14);
-    color:var(--blue);
-    border:none;
-    border-radius:var(--radius-btn);
-    transition:.2s;
-}
-
-.btn-eliminar{
-    background:var(--red-dim);
-    color:var(--red);
-    border:none;
-    border-radius:var(--radius-btn);
-    transition:.2s;
-}
-
-.btn-editar:hover{
-    background:rgba(56,189,248,.25);
-    color:var(--blue);
-    transform:translateY(-2px);
-}
-
-.btn-eliminar:hover{
-    background:rgba(239,68,68,.25);
-    color:var(--red);
-    transform:translateY(-2px);
-}
-
-.acciones{
-    display:flex;
-    gap:6px;
-    justify-content:center;
-    flex-wrap:wrap;
-    font-size:12px;
-}
-
-.badge-stock, .badge{
-    padding:5px 12px;
-    border-radius:var(--radius-pill);
-    font-size:11.5px;
-    font-weight:600;
-    border:none;
-}
-
-.badge.bg-success{
-    background:var(--green-dim) !important;
-    color:var(--green) !important;
-}
-
-.badge.bg-secondary{
-    background:rgba(255,255,255,.08) !important;
-    color:var(--text-tertiary) !important;
-}
-
-.badge-stock{
-    margin-left:8px;
-}
-
-.precio{
-    color:var(--green);
-    font-weight:700;
-    font-size:12.5px;
-    white-space:nowrap;
-}
-
-.id-producto{
-    font-weight:700;
-    color:var(--gold);
-}
-
-/*==========================================================
-   VISTA DE TARJETAS
-===========================================================*/
-
+/* Ajustes propios de Productos sobre el bloque compartido de main.css */
 .grid-productos{
-    padding:15px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
-    gap:12px;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
 }
 
-.producto-card{
-    background:var(--bg-app);
-    border:1px solid var(--border-subtle);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 6px 16px rgba(0,0,0,.25);
-    transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s;
-    display:flex;
-    flex-direction:column;
-    animation:apareceCard .5s ease both;
+@media(max-width:800px){
+    .grid-productos{
+        grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    }
 }
 
-@keyframes apareceCard{
-    from{ opacity:0; transform:translateY(14px); }
-    to{ opacity:1; transform:translateY(0); }
-}
-
-.producto-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 16px 34px rgba(0,0,0,.45);
-    border-color:rgba(255,255,255,.15);
-}
+/*==========================================================
+   TARJETA DE PRODUCTO (contenido propio de Productos)
+===========================================================*/
 
 .producto-card-img-wrapper{
     position:relative;
     overflow:hidden;
-    height:90px;
+    height:150px;
     background:rgba(255,255,255,.03);
 }
-
 .producto-card-imagen{
     width:100%;
     height:100%;
     object-fit:cover;
     transition:transform .6s ease;
 }
-
-.producto-card:hover .producto-card-imagen{
-    transform:scale(1.08);
-}
-
-.producto-card-estado{
-    position:absolute;
-    top:8px;
-    right:8px;
-    z-index:2;
-}
-
+.producto-card:hover .producto-card-imagen{ transform:scale(1.08); }
+.producto-card-estado{ position:absolute; top:8px; right:8px; z-index:2; }
 .producto-card-body{
-    padding:9px 10px 10px;
+    padding:14px 16px 16px;
     display:flex;
     flex-direction:column;
-    gap:3px;
+    gap:6px;
     flex-grow:1;
 }
-
-.producto-card-nombre{
-    font-size:11px;
-    font-weight:700;
-    color:var(--text-primary);
-    margin:0;
-    line-height:1.25;
-}
-
-.producto-card-linea{
-    width:28px;
-    height:3px;
-    background:var(--gold);
-    border-radius:2px;
-    margin:3px 0 6px;
-    transition:width .3s;
-}
-
-.producto-card:hover .producto-card-linea{
-    width:52px;
-}
-
 .producto-card-precio-fila{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin:2px 0 8px;
+    margin:2px 0 10px;
 }
-
-.producto-card-precio{
-    color:var(--green);
-    font-weight:700;
-    font-size:11px;
-}
-
-.producto-card-stock{
-    font-size:9px;
-    color:var(--text-tertiary);
-    font-weight:600;
-}
-
-.producto-card-acciones{
-    display:flex;
-    gap:8px;
-    margin-top:auto;
-}
-
+.producto-card-precio{ color:var(--green); font-weight:700; font-size:15px; }
+.producto-card-stock{ font-size:11.5px; color:var(--text-tertiary); font-weight:600; }
+.producto-card-acciones{ display:flex; gap:8px; margin-top:auto; }
 .producto-card-acciones .btn{
     flex:1;
     display:flex;
@@ -460,116 +68,6 @@
     gap:3px;
     padding:5px 0;
     font-size:9px;
-}
-
-.estado-vacio{
-    text-align:center;
-    padding:60px 20px;
-}
-
-.estado-vacio i{
-    color:var(--text-tertiary) !important;
-}
-
-.estado-vacio h5{
-    color:var(--text-secondary);
-}
-
-/*==========================================================
-   PIE DEL BLOQUE
-===========================================================*/
-
-.pie-productos{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-    padding:14px 20px;
-    border-top:1px solid var(--border-subtle);
-    background:var(--bg-panel);
-}
-
-.paginacion-inline{
-    margin:0;
-}
-
-.paginacion-inline .pagination{
-    margin:0;
-    flex-wrap:wrap;
-}
-
-.paginacion-inline .page-link{
-    color:var(--text-secondary);
-    background:transparent;
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-link:hover{
-    color:var(--text-primary);
-    background-color:rgba(255,255,255,.05);
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-item.active .page-link{
-    background-color:var(--gold);
-    border-color:var(--gold);
-    color:#1A1A2E;
-    font-weight:600;
-}
-
-/*==========================
-      RESPONSIVE
-===========================*/
-
-@media(max-width:768px){
-
-    .encabezado{
-        flex-direction:column;
-        text-align:center;
-    }
-
-    .titulo{
-        font-size:20px;
-    }
-
-    .barra-vista{
-        justify-content:center;
-    }
-
-    .pie-productos{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .paginacion-inline .pagination{
-        justify-content:center;
-    }
-
-    .grid-productos{
-        grid-template-columns:repeat(auto-fill, minmax(113px, 1fr));
-        padding:10px;
-        gap:9px;
-    }
-
-    .tabla-productos thead th,
-    .tabla-productos tbody td{
-        padding:4px 3px;
-        font-size:9px;
-    }
-
-    .img-producto{
-        width:33px;
-        height:27px;
-    }
-
-    .acciones{
-        flex-direction:column;
-    }
-}
-
-@media(prefers-reduced-motion: reduce){
-    .producto-card{ animation:none; }
 }
 
 /*==========================================================
@@ -594,92 +92,21 @@
     overflow:hidden;
     animation:notifEntra .4s cubic-bezier(.25,.8,.25,1) both;
 }
-
 @keyframes notifEntra{
     from{ opacity:0; transform:translateX(40px); }
     to{ opacity:1; transform:translateX(0); }
 }
-
-.notif-stock-header{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:10px;
-    padding:14px 16px 10px;
-}
-
-.notif-stock-titulo{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-weight:700;
-    color:var(--red);
-    font-size:15px;
-}
-
-.notif-stock-cerrar{
-    background:transparent;
-    border:none;
-    color:var(--text-tertiary);
-    font-size:18px;
-    line-height:1;
-    padding:0 2px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.notif-stock-cerrar:hover{
-    color:var(--text-primary);
-}
-
-.notif-stock-mensaje{
-    padding:0 16px 10px;
-    font-size:12.5px;
-    color:var(--text-secondary);
-    line-height:1.5;
-}
-
-.notif-stock-mensaje strong{
-    color:var(--gold);
-}
-
-.notif-stock-lista{
-    overflow-y:auto;
-    max-height:220px;
-    padding:0 16px;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.notif-stock-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:var(--red-dim);
-    border:1px solid rgba(239,68,68,.3);
-    border-radius:10px;
-    padding:8px 10px;
-    gap:8px;
-}
-
-.notif-stock-item-nombre{
-    font-size:12.5px;
-    font-weight:600;
-    color:var(--text-primary);
-}
-
-.notif-stock-item-cifras{
-    font-size:11px;
-    color:var(--red);
-    font-weight:700;
-    white-space:nowrap;
-}
-
-.notif-stock-footer{
-    padding:14px 16px 16px;
-}
-
+.notif-stock-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:14px 16px 10px; }
+.notif-stock-titulo{ display:flex; align-items:center; gap:8px; font-weight:700; color:var(--red); font-size:15px; }
+.notif-stock-cerrar{ background:transparent; border:none; color:var(--text-tertiary); font-size:18px; line-height:1; padding:0 2px; cursor:pointer; transition:.2s; }
+.notif-stock-cerrar:hover{ color:var(--text-primary); }
+.notif-stock-mensaje{ padding:0 16px 10px; font-size:12.5px; color:var(--text-secondary); line-height:1.5; }
+.notif-stock-mensaje strong{ color:var(--gold); }
+.notif-stock-lista{ overflow-y:auto; max-height:220px; padding:0 16px; display:flex; flex-direction:column; gap:8px; }
+.notif-stock-item{ display:flex; justify-content:space-between; align-items:center; background:var(--red-dim); border:1px solid rgba(239,68,68,.3); border-radius:10px; padding:8px 10px; gap:8px; }
+.notif-stock-item-nombre{ font-size:12.5px; font-weight:600; color:var(--text-primary); }
+.notif-stock-item-cifras{ font-size:11px; color:var(--red); font-weight:700; white-space:nowrap; }
+.notif-stock-footer{ padding:14px 16px 16px; }
 .notif-stock-btn{
     display:flex;
     align-items:center;
@@ -696,59 +123,24 @@
     text-decoration:none;
     transition:.3s;
 }
-
-.notif-stock-btn:hover{
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(228,200,112,.3);
-}
-
+.notif-stock-btn:hover{ color:#1A1A2E; transform:translateY(-2px); box-shadow:0 8px 18px rgba(228,200,112,.3); }
 @media(max-width:576px){
-    .notif-stock{
-        top:10px;
-        right:10px;
-        left:10px;
-        width:auto;
-    }
+    .notif-stock{ top:10px; right:10px; left:10px; width:auto; }
 }
 
 /*==========================================================
-   Diseño califiacion
+   Calificación por estrellas
 ===========================================================*/
 
-.calificacion-widget{
-    display:flex;
-    align-items:center;
-    gap:2px;
-    justify-content:center;
-    flex-wrap:nowrap;
-}
-
-.calificacion-widget .estrella{
-    color:#d7dce4;
-    font-size:14px;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.calificacion-widget .estrella.activa{
-    color:#e8c874;
-}
-
-.calificacion-promedio{
-    font-size:11px;
-    font-weight:700;
-    color:#022C63;
-    margin-left:4px;
-}
-
-.calificacion-total{
-    font-size:9.5px;
-    color:#8a93a6;
-}
+.calificacion-widget{ display:flex; align-items:center; gap:2px; justify-content:center; flex-wrap:nowrap; }
+.calificacion-widget .estrella{ color:#d7dce4; font-size:14px; cursor:pointer; transition:.15s; }
+.calificacion-widget .estrella.activa{ color:#e8c874; }
+.calificacion-promedio{ font-size:11px; font-weight:700; color: var(--text-primary); margin-left:4px; }
+.calificacion-total{ font-size:9.5px; color: var(--text-tertiary); }
+.producto-card .calificacion-widget{ justify-content:flex-start; margin:2px 0 6px; }
+.producto-card .calificacion-widget .estrella{ font-size:12px; }
 
 </style>
-
 
 <!-- ============ NOTIFICACIÓN: PRODUCTOS CON STOCK BAJO ============ -->
 {% if productos_bajo_stock %}
@@ -788,43 +180,38 @@
 </div>
 {% endif %}
 
+<div class="productos-toolbar">
+    <div class="tab-group" role="group" aria-label="Selector de vista">
+        <div class="tab-item active" id="btnVistaTabla" onclick="cambiarVista('tabla')">
+            <i class="bi bi-table"></i> Tabla
+        </div>
+        <div class="tab-item" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
+            <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
+        </div>
+    </div>
 
-<div class="container-fluid contenedor-productos">
+    <a href="{% url 'crear_producto' %}" class="dash-btn dash-btn-solid">
+        <i class="bi bi-plus-circle-fill"></i> Nuevo Producto
+    </a>
+</div>
+
+<div class="contenedor-productos">
 
     <div class="bloque-productos">
 
-        <div class="encabezado">
-            <div>
-                <h1 class="titulo">
-                    <i class="bi bi-box-seam-fill"></i>
-                    Gestión de Productos
-                </h1>
-                <p class="subtitulo">
-                    Administra todos los productos registrados del sistema.
-                </p>
+    <div class="busqueda-fila">
+        <form method="get" class="barra-busqueda" id="formBuscarProducto">
+            <div class="campo-busqueda">
+                <i class="bi bi-search"></i>
+                <input type="text" name="q" id="inputBuscarProducto" class="input-busqueda" placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
             </div>
-            <a href="{% url 'crear_producto' %}" class="btn btn-nuevo">
-                <i class="bi bi-plus-circle-fill"></i>
-                Nuevo Producto
-            </a>
-            <button type="button" class="dash-btn" onclick="abrirModalImportar()">
-                <i class="bi bi-file-earmark-excel"></i>
-                 Importar Excel
-            </button>
-        </div>
+        </form>
 
-        <!-- Buscador: en vivo, sin recargar la página -->
-        <div class="barra-busqueda-wrapper">
-            <form method="get" class="barra-busqueda" id="formBuscarProducto">
-                <div class="campo-busqueda">
-                    <i class="bi bi-search"></i>
-                    <input type="text" name="q" id="inputBuscarProducto" class="input-busqueda" placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
-                </div>
-                <button type="submit" class="btn-buscar" aria-label="Buscar">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
-        </div>
+        <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
+            <i class="bi bi-file-earmark-excel"></i>
+            <span class="btn-importar-texto">Importar</span>
+        </button>
+    </div>
 
         <div id="contenedorListaProductos">
 
@@ -938,6 +325,15 @@
                         <div class="producto-card-body">
                             <h3 class="producto-card-nombre">{{ i.nombre }}</h3>
                             <div class="producto-card-linea"></div>
+
+                            <div class="calificacion-widget" data-producto-id="{{ i.id }}" data-mi-calificacion="{{ i.mi_calificacion|default:0 }}">
+                                {% for n in "12345" %}
+                                    <i class="bi bi-star-fill estrella" data-valor="{{ forloop.counter }}"></i>
+                                {% endfor %}
+                                <span class="calificacion-promedio">{{ i.promedio_calificacion|floatformat:1|default:"—" }}</span>
+                                <span class="calificacion-total">({{ i.total_calificaciones }})</span>
+                            </div>
+
                             <div class="producto-card-precio-fila">
                                 <span class="producto-card-precio">$ {{ i.precio }}</span>
                                 <span class="producto-card-stock">
@@ -970,18 +366,6 @@
 
             <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
             <div class="pie-productos">
-
-                <div class="barra-vista">
-                    <span>Vista:</span>
-                    <div class="selector-vista" role="group" aria-label="Selector de vista">
-                        <button type="button" class="btn-vista activo" id="btnVistaTabla" onclick="cambiarVista('tabla')">
-                            <i class="bi bi-table"></i> Tabla
-                        </button>
-                        <button type="button" class="btn-vista" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
-                            <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
-                        </button>
-                    </div>
-                </div>
 
                 <nav class="paginacion-inline" aria-label="Paginación de productos">
                     <ul class="pagination pagination-sm mb-0">
@@ -1055,7 +439,6 @@
 </div>
 
 <script>
-
     function cambiarVista(vista){
 
         const vistaTabla = document.getElementById('vistaTabla');
@@ -1068,13 +451,13 @@
         if(vista === 'tarjetas'){
             vistaTabla.classList.add('vista-oculta');
             vistaTarjetas.classList.remove('vista-oculta');
-            btnTarjetas.classList.add('activo');
-            btnTabla.classList.remove('activo');
+            btnTarjetas.classList.add('active');
+            btnTabla.classList.remove('active');
         } else {
             vistaTarjetas.classList.add('vista-oculta');
             vistaTabla.classList.remove('vista-oculta');
-            btnTabla.classList.add('activo');
-            btnTarjetas.classList.remove('activo');
+            btnTabla.classList.add('active');
+            btnTarjetas.classList.remove('active');
         }
 
         localStorage.setItem('vistaProductos', vista);

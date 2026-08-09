@@ -1,4 +1,6 @@
-/* ---- Navbar scroll effect ---- */
+        window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
+
+        /* ---- Navbar scroll effect ---- */
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 60);
@@ -198,7 +200,6 @@
 
         revealEls.forEach(el => observer.observe(el));
 
-
         (function () {
             const wrap = document.querySelector('.quesos-interactivos');
             if (!wrap) return;
@@ -219,6 +220,21 @@
                     const partes = par.trim().split(/\s+/);
                     return [parseFloat(partes[0]), parseFloat(partes[1])];
                 });
+            }
+
+            const siluetaUnica = document.getElementById('siluetaUnica');
+            const siluetaLinea = siluetaUnica ? siluetaUnica.querySelector('.silueta-unica-linea') : null;
+            let siluetaPuntosGlobal = null;
+            if (siluetaUnica) {
+                const sLeft = parseFloat(siluetaUnica.dataset.left);
+                const sTop = parseFloat(siluetaUnica.dataset.top);
+                const sWidth = parseFloat(siluetaUnica.dataset.width);
+                const sHeight = parseFloat(siluetaUnica.dataset.height);
+                const clipLocal = parsearPuntos(siluetaUnica.dataset.clip);
+                siluetaPuntosGlobal = clipLocal.map(([cx, cy]) => [
+                    sLeft + (cx / 100) * sWidth,
+                    sTop + (cy / 100) * sHeight
+                ]);
             }
 
             const quesos = Array.from(puntosEls).map((p) => {
@@ -352,6 +368,15 @@
                     }
                 });
 
+                if (siluetaUnica && siluetaLinea && siluetaPuntosGlobal) {
+                    siluetaUnica.setAttribute('viewBox', `0 0 ${geo.Cw} ${geo.Ch}`);
+                    const puntosPx = siluetaPuntosGlobal
+                        .map(([gx, gy]) => puntoAContenedor(gx, gy, geo))
+                        .map(([xPct, yPct]) => `${(xPct / 100 * geo.Cw).toFixed(2)},${(yPct / 100 * geo.Ch).toFixed(2)}`)
+                        .join(' ');
+                    siluetaLinea.setAttribute('points', puntosPx);
+                }
+
                 const infoUnica = document.getElementById('ofertaInfoUnica');
                 if (infoUnica) {
                     const izquierdaPct = 64;
@@ -422,16 +447,57 @@
         const botonSortearWrap = document.getElementById('botonSortearWrap');
         const botonSortear = document.getElementById('botonSortear');
 
-        // --- Datos reales del premio, inyectados desde el backend (ver punto A) ---
+        // --- Datos reales del premio, inyectados desde el backend ---
+        // origenPremio distingue de DÓNDE viene el premio que se está por
+        // mostrar/sortear: 'campana' (DescuentoAsignado, comportamiento
+        // 100% igual al de siempre) o 'ruleta_diaria' (TiradaDiaria, Parte 2).
+        // estadoJuegoDiario solo aplica cuando origenPremio es 'ruleta_diaria'.
+        const origenPremio = wrap.dataset.origenPremio || 'ninguno'; // 'campana' | 'ruleta_diaria' | 'ninguno'
+        const estadoJuegoDiario = wrap.dataset.estadoJuegoDiario || ''; // 'disponible' | 'ganado' | 'sin_premio' | ''
 
         const tienePremio = wrap.dataset.tienePremio === 'true';
-        const premioProducto = wrap.dataset.premioProducto || '';
-        const premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
-        const premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
-        const premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
-        const premioCodigo = wrap.dataset.premioCodigo || '';
-        const premioImagen = wrap.dataset.premioImagen || '';
+        // premioTipo: '' (campaña) | 'CUPON_5' | 'ENVIO_GRATIS' | 'BOLETO_DORADO'.
+        // Se reasigna en tiempo real cuando el resultado llega por fetch
+        // (caso estadoJuegoDiario === 'disponible').
+        let premioTipo = wrap.dataset.premioTipo || '';
+        let premioProducto = wrap.dataset.premioProducto || '';
+        let premioPorcentaje = parseFloat(wrap.dataset.premioPorcentaje) || 0;
+        let premioPrecioOriginal = parseFloat(wrap.dataset.premioPrecioOriginal) || 0;
+        let premioPrecioDescuento = parseFloat(wrap.dataset.premioPrecioDescuento) || 0;
+        let premioCodigo = wrap.dataset.premioCodigo || '';
+        let premioImagen = wrap.dataset.premioImagen || '';
         const urlMarcarMostrado = wrap.dataset.urlMarcarMostrado || '';
+        const urlJugarRuleta = wrap.dataset.urlJugarRuleta || '';
+        const urlReclamarPremioDia = wrap.dataset.urlReclamarPremioDia || '';
+
+        // Textos/ícono para los premios de la ruleta diaria que no tienen
+        // producto/foto/precio real (ver explicación al inicio de la respuesta).
+        const CONFIG_PREMIO_RULETA = {
+            CUPON_5: {
+                icono: 'bi-ticket-perforated-fill',
+                badge: '-5%',
+                titulo: '¡Felicidades!',
+                subtitulo: () => `Tienes 5% de descuento en ${premioProducto}`,
+                mostrarPrecios: false,
+                nota: 'Se aplica automáticamente al pagar tu carrito.',
+            },
+            ENVIO_GRATIS: {
+                icono: 'bi-truck',
+                badge: 'GRATIS',
+                titulo: '¡Felicidades!',
+                subtitulo: () => 'Ganaste envío gratis en tu próximo pedido',
+                mostrarPrecios: false,
+                nota: 'Se aplica automáticamente al pagar tu carrito.',
+            },
+            BOLETO_DORADO: {
+                icono: 'bi-award-fill',
+                badge: '🎫',
+                titulo: '¡Boleto dorado!',
+                subtitulo: () => 'Quedas participando en el próximo sorteo de premios especiales',
+                mostrarPrecios: false,
+                nota: 'Te avisaremos si resultas ganador.',
+            },
+        };
 
         function getCookie(nombre) {
             let valor = null;
@@ -500,6 +566,25 @@
                 ruedaWrap.classList.add('visible');
             }
         }
+
+        // "Ya jugaste hoy y no salió premio" (ruleta diaria): a diferencia
+        // de 'ganado', esta variante NO deja jugar la ruleta otra vez —
+        // se muestra directamente el aviso reutilizando el mismo
+        // #ofertaRuedaWrap que ya usa el flujo de campaña para "ya tienes
+        // el descuento de hoy".
+        if (estadoJuegoDiario === 'sin_premio') {
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho', 'modo-ofertas');
+            quesosArr.forEach((q) => q.classList.add('encendido'));
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) texto.textContent = 'Vuelve mañana';
+                if (aviso) aviso.textContent = 'Hoy no salió premio, vuelve mañana por otra tirada';
+                ruedaWrap.classList.add('visible');
+            }
+        }
+        
 
         function obtenerVideo(p) {
             const reverso = p.querySelector('.queso-punto-reverso');
@@ -599,53 +684,212 @@
 
         function iniciarSorteo() {
             if (sorteoEnCurso || sorteoHecho) return;
-        
+            if (origenPremio === 'ninguno') return; // salvaguarda, no debería pasar
+
             sorteoEnCurso = true;
             botonSortear.disabled = true;
             botonSortearWrap.classList.remove('visible');
-        
-            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
-            // El % ya no se inventa aquí: viene decidido por el backend (DescuentoAsignado).
-            mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
-            setTimeout(() => mostrarFelicidades(), 2600);
+
+            if (origenPremio === 'ruleta_diaria' && estadoJuegoDiario === 'disponible') {
+                // Único caso donde el resultado NO viene precalculado desde
+                // el contexto: hay que pedirlo al backend antes de animar.
+                jugarRuletaDiariaYContinuar();
+                return;
+            }
+
+            // 'campana' (premio_activo) o 'ganado' (ya jugó hoy y ganó):
+            // el resultado ya viene precalculado en los data-* del wrap.
+            continuarConResultadoConocido();
+        }
+
+        function continuarConResultadoConocido() {
+            // Solo animamos el número (%) cuando ese % es real:
+            // campaña oficial, o CUPON_5 (5% real). ENVIO_GRATIS y
+            // BOLETO_DORADO no tienen un % que mostrar, así que se salta
+            // ese paso e igual se reutiliza la MISMA tarjeta de revelación.
+            const hayPorcentajeReal = origenPremio === 'campana' || premioTipo === 'CUPON_5';
+            if (hayPorcentajeReal) {
+                const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+                mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
+                setTimeout(() => mostrarFelicidades(), 2600);
+            } else {
+                setTimeout(() => mostrarFelicidades(), 600);
+            }
+        }
+
+        function jugarRuletaDiariaYContinuar() {
+            fetch(urlJugarRuleta, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (!data.ok) throw new Error(data.error || 'No se pudo jugar la ruleta');
+
+                    premioTipo = data.resultado;
+
+                    if (data.resultado === 'SIGUE_INTENTANDO') {
+                        setTimeout(() => mostrarSinPremioHoy(), 300);
+                        return;
+                    }
+
+                    if (data.resultado === 'CUPON_5') {
+                        premioProducto = 'tu próxima compra';
+                        premioPorcentaje = 5;
+                    } else if (data.resultado === 'ENVIO_GRATIS') {
+                        premioProducto = 'tu próximo pedido';
+                        premioPorcentaje = 0;
+                    } else if (data.resultado === 'BOLETO_DORADO') {
+                        premioProducto = '';
+                        premioPorcentaje = 0;
+                    }
+
+                    continuarConResultadoConocido();
+                })
+                .catch(() => {
+                    // Si falla el fetch, deshacemos el "bloqueo" visual para
+                    // que el usuario pueda reintentar sin recargar la página.
+                    sorteoEnCurso = false;
+                    botonSortear.disabled = false;
+                    botonSortearWrap && botonSortearWrap.classList.add('visible');
+                });
         }
         
         function mostrarFelicidades() {
             const overlay = document.getElementById('ofertaRevealOverlay');
+            const titulo = document.getElementById('ofertaRevealTitulo');
             const subtitulo = document.getElementById('ofertaRevealSubtitulo');
             const badge = document.getElementById('ofertaRevealBadge');
+            const precios = document.getElementById('ofertaRevealPrecios');
             const precioAnterior = document.getElementById('ofertaRevealPrecioAnterior');
             const precioNuevo = document.getElementById('ofertaRevealPrecioNuevo');
             const imagenReveal = document.getElementById('ofertaRevealImagen');
+            const iconoReveal = document.getElementById('ofertaRevealIcono');
+            const nota = document.getElementById('ofertaRevealNota');
 
-            if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
-            if (badge) badge.textContent = `-${premioPorcentaje}%`;
-            if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
-            if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
-            if (imagenReveal && premioImagen) imagenReveal.src = premioImagen;
+            const esPremioRuletaSinDatosReales = origenPremio === 'ruleta_diaria' && CONFIG_PREMIO_RULETA[premioTipo];
+            const config = esPremioRuletaSinDatosReales ? CONFIG_PREMIO_RULETA[premioTipo] : null;
+
+            if (config) {
+                // CUPON_5 / ENVIO_GRATIS / BOLETO_DORADO: sin producto/foto
+                // real -> ícono en vez de <img>, sin fila de precios.
+                if (imagenReveal) imagenReveal.style.display = 'none';
+                if (iconoReveal) {
+                    iconoReveal.className = `oferta-reveal-icono bi ${config.icono}`;
+                    iconoReveal.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:3.2rem;color:#c9a84c;';
+                }
+                if (badge) { badge.style.display = ''; badge.textContent = config.badge; }
+                if (titulo) titulo.textContent = config.titulo;
+                if (subtitulo) subtitulo.textContent = config.subtitulo();
+                if (precios) precios.style.display = 'none';
+                if (nota) { nota.textContent = config.nota; nota.style.display = ''; }
+            } else {
+                // Comportamiento original: premio real de campaña (premio_activo).
+                if (iconoReveal) iconoReveal.style.display = 'none';
+                if (imagenReveal) {
+                    imagenReveal.style.display = '';
+                    if (premioImagen) imagenReveal.src = premioImagen;
+                }
+                if (titulo) titulo.textContent = '¡Felicidades!';
+                if (subtitulo) subtitulo.textContent = `Tienes ${premioPorcentaje}% de descuento en ${premioProducto}`;
+                if (badge) { badge.style.display = ''; badge.textContent = `-${premioPorcentaje}%`; }
+                if (precioAnterior) precioAnterior.textContent = formatearPrecio(premioPrecioOriginal);
+                if (precioNuevo) precioNuevo.textContent = formatearPrecio(premioPrecioDescuento);
+                if (precios) precios.style.display = '';
+                if (nota) nota.style.display = 'none';
+            }
 
             if (overlay) overlay.classList.add('visible');
             lanzarConfetti(90);
 
             setTimeout(() => cerrarReveal(), 2800);
         }
+
+        function mostrarSinPremioHoy() {
+            // Variante "vuelve mañana" tras jugar y salir SIGUE_INTENTANDO.
+            // Reusa el MISMO overlay, sin badge ni confetti, sin animación nueva.
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            const titulo = document.getElementById('ofertaRevealTitulo');
+            const subtitulo = document.getElementById('ofertaRevealSubtitulo');
+            const badge = document.getElementById('ofertaRevealBadge');
+            const precios = document.getElementById('ofertaRevealPrecios');
+            const imagenReveal = document.getElementById('ofertaRevealImagen');
+            const iconoReveal = document.getElementById('ofertaRevealIcono');
+            const nota = document.getElementById('ofertaRevealNota');
+
+            if (imagenReveal) imagenReveal.style.display = 'none';
+            if (iconoReveal) {
+                iconoReveal.className = 'oferta-reveal-icono bi bi-calendar-heart';
+                iconoReveal.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:3.2rem;color:#c9a84c;';
+            }
+            if (badge) badge.style.display = 'none';
+            if (titulo) titulo.textContent = 'Sigue intentando';
+            if (subtitulo) subtitulo.textContent = 'Hoy no salió premio, vuelve mañana por otra tirada';
+            if (precios) precios.style.display = 'none';
+            if (nota) nota.style.display = 'none';
+
+            if (overlay) overlay.classList.add('visible');
+            // Sin confetti: no hay nada que celebrar acá.
+
+            setTimeout(() => cerrarRevealSinPremio(), 2600);
+        }
+
+        function cerrarRevealSinPremio() {
+            const overlay = document.getElementById('ofertaRevealOverlay');
+            if (overlay) overlay.classList.remove('visible');
+            const badge = document.getElementById('ofertaRevealBadge');
+            if (badge) badge.style.display = '';
+
+            indicador && indicador.classList.remove('visible');
+
+            sorteoEnCurso = false;
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho');
+
+            // Se cierra la "ventana"/video del queso, pero se queda encendido (brillando).
+            quesosArr.forEach((q) => {
+                q.classList.remove('volteado');
+                pausarVideoQueso(q);
+                q.classList.add('encendido');
+            });
+            wrap.classList.remove('todos-encendidos');
+            detenerConfettiSuave();
+
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) texto.textContent = 'Vuelve mañana';
+                if (aviso) aviso.textContent = 'Ya jugaste hoy, inténtalo de nuevo mañana';
+                ruedaWrap.classList.add('visible');
+            }
+            // No se llama a reclamar-premio-dia: SIGUE_INTENTANDO no tiene nada que reclamar.
+        }
         
         function cerrarReveal() {
             const overlay = document.getElementById('ofertaRevealOverlay');
             if (overlay) overlay.classList.remove('visible');
-        
+
             sorteoEnCurso = false;
             sorteoHecho = true;
             wrap.classList.add('sorteo-hecho');
-            guardarOfertaDelDia(premioPorcentaje);
-            marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
-        
+
+            if (origenPremio === 'campana') {
+                guardarOfertaDelDia(premioPorcentaje);
+                marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
+            } else if (origenPremio === 'ruleta_diaria') {
+                reclamarPremioDia(); // aplica el efecto real: cupón/envío en sesión, o marca el boleto dorado
+            }
+
             quesosArr.forEach((q) => {
                 q.classList.remove('volteado');
                 pausarVideoQueso(q);
             });
             wrap.classList.remove('todos-encendidos');
-        
+            detenerConfettiSuave();
+
             let sumX = 0, sumY = 0, n = 0;
             quesosArr.forEach((q) => {
                 sumX += parseFloat(q.dataset.centroX) || 50;
@@ -654,8 +898,26 @@
             });
             const cx = n ? sumX / n : 50;
             const cy = n ? sumY / n : 50;
-        
-            setTimeout(() => volarBrilloHaciaBadge(cx, cy, premioPorcentaje), 500);
+
+            // Para campaña, el valor numérico real; para ruleta diaria, null
+            // (volarBrilloHaciaBadge arma el texto según premioTipo).
+            const valorParaGlobo = origenPremio === 'campana' ? premioPorcentaje : null;
+            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valorParaGlobo), 500);
+        }
+
+        function reclamarPremioDia() {
+            if (!urlReclamarPremioDia) return;
+            fetch(urlReclamarPremioDia, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }).catch(() => {
+                // silencioso, igual que marcarPremioMostrado: si falla, el
+                // cliente ya vio la animación igual, y puede reintentar
+                // reclamar desde la tarjeta del listado de productos.
+            });
         }
 
         function volarBrilloHaciaBadge(cx, cy, valor) {
@@ -681,7 +943,18 @@
             spark.addEventListener('animationend', () => {
                 spark.remove();
                 const texto = ruedaWrap.querySelector('.rueda-descuento');
-                if (texto) texto.textContent = `${valor}% de descuento hoy`;
+                if (texto) {
+                    if (valor !== null) {
+                        texto.textContent = `${valor}% de descuento hoy`;
+                    } else {
+                        const textos = {
+                            CUPON_5: '5% de descuento hoy',
+                            ENVIO_GRATIS: 'Envío gratis hoy',
+                            BOLETO_DORADO: 'Boleto dorado hoy',
+                        };
+                        texto.textContent = textos[premioTipo] || 'Premio de hoy reclamado';
+                    }
+                }
                 ruedaWrap.classList.add('visible', 'aparicion-pop');
             });
         }
@@ -720,7 +993,9 @@
             }
         }
 
-        setTimeout(() => indicador && indicador.classList.add('visible'), 900);
+        if (!sorteoHecho) {
+            setTimeout(() => indicador && indicador.classList.add('visible'), 900);
+        }
 
         const colores = ['#c9a84c', '#f0d98a', '#e2402d', '#ffffff', '#1a5fa8'];
 
@@ -761,6 +1036,35 @@
                 confettiWrap.appendChild(pieza);
                 pieza.addEventListener('animationend', () => pieza.remove());
             }
+        }
+
+        // --- Goteo suave de confetti dorado mientras están los 3 quesos encendidos ---
+        const coloresSuaves = ['#f0d98a', '#ffe9a8', '#c9a84c', '#ffd966'];
+        let confettiSuaveTimer = null;
+
+        function lanzarConfettiSuavePieza() {
+            if (!confettiWrap) return;
+            const pieza = document.createElement('span');
+            pieza.className = 'confetti-pieza-suave';
+            pieza.style.left = Math.random() * 100 + '%';
+            pieza.style.background = coloresSuaves[Math.floor(Math.random() * coloresSuaves.length)];
+            pieza.style.width = (3 + Math.random() * 3) + 'px';
+            pieza.style.height = (6 + Math.random() * 5) + 'px';
+            pieza.style.animationDuration = (4.5 + Math.random() * 2.5) + 's';
+            pieza.style.boxShadow = '0 0 6px rgba(240, 217, 138, 0.9)';
+            confettiWrap.appendChild(pieza);
+            pieza.addEventListener('animationend', () => pieza.remove());
+        }
+
+        function iniciarConfettiSuave() {
+            if (confettiSuaveTimer) return;
+            lanzarConfettiSuavePieza();
+            confettiSuaveTimer = setInterval(lanzarConfettiSuavePieza, 550);
+        }
+
+        function detenerConfettiSuave() {
+            clearInterval(confettiSuaveTimer);
+            confettiSuaveTimer = null;
         }
 
         let modoActivo = false;
@@ -828,6 +1132,7 @@
 
         boton.addEventListener('click', () => {
             window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+            if (sorteoHecho) return; // ya jugó hoy: nada que reventar/animar de nuevo
             if (modoActivo) {
                 desactivar();
                 return;
@@ -873,6 +1178,7 @@
                     quesosArr.forEach((q) => q.classList.add('volteado'));
                     wrap.classList.add('todos-encendidos');
                     reproducirTodosSincronizados();
+                    iniciarConfettiSuave();
                 
                     const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
                     const ruletaUnica = document.getElementById('ofertaInfoRuleta');
@@ -882,6 +1188,7 @@
                     mostrarBotonSortear();
                 } else {
                     wrap.classList.remove('todos-encendidos');
+                    detenerConfettiSuave();
                 }
             });
         });
@@ -925,6 +1232,21 @@
                 : 'Producto elaborado con los más altos estándares de calidad, fresco y natural.';
         }
 
+        function estrellasHtml(p) {
+            const anon = !window.LZ_USUARIO_AUTENTICADO;
+            let estrellas = '';
+            for (let v = 1; v <= 5; v++) {
+                estrellas += `<i class="bi bi-star estrella-pub" data-valor="${v}"></i>`;
+            }
+            return `
+                <div class="calificacion-widget-pub ${anon ? 'anonima' : ''}" data-producto-id="${p.id}"
+                     data-mi-calificacion="${p.mi_calificacion || 0}" data-anon="${anon}">
+                    ${estrellas}
+                    <span class="calificacion-promedio-pub">${p.promedio_calificacion != null ? p.promedio_calificacion : '—'}</span>
+                    <span class="calificacion-total-pub">(${p.total_calificaciones || 0})</span>
+                </div>`;
+        }
+
         function tarjetaHorizontal(p) {
             return `
                 <div class="col-12">
@@ -935,13 +1257,7 @@
                         </div>
                         <div class="producto-info">
                             <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                </div>
+                                ${estrellasHtml(p)}
                                 <div class="precio-fila">
                                     <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
                                     <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
@@ -971,13 +1287,7 @@
                             <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
                         </div>
                         <div class="card-body">
-                            <div class="estrellas">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
-                            </div>
+                            ${estrellasHtml(p)}
                             <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
                             <p class="producto-descripcion">${descripcionSegura(p)}</p>
                             <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
@@ -1026,6 +1336,7 @@
             }
 
             lista.innerHTML = productos.map(tarjetaHtml).join('');
+            window.LZ_activarWidgetsCalificacion && window.LZ_activarWidgetsCalificacion(lista);
         }
 
         input.addEventListener('input', () => {
@@ -1046,3 +1357,120 @@
             }, 300);
         });
     })();
+
+(function () {
+    function getCookie(nombre) {
+        let valor = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach((cookie) => {
+                cookie = cookie.trim();
+                if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                    valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                }
+            });
+        }
+        return valor;
+    }
+
+    document.querySelectorAll('.boton-reclamar-premio-dia').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const url = btn.dataset.urlReclamarPremioDia;
+            if (!url) return;
+            btn.disabled = true;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.ok) {
+                        // Recargamos para que la tarjeta pase a mostrar
+                        // "Ya reclamado" y el contexto (cupón/envío en
+                        // sesión) quede reflejado en el resto de la página.
+                        window.location.reload();
+                    } else {
+                        btn.disabled = false;
+                    }
+                })
+                .catch(() => { btn.disabled = false; });
+        });
+    });
+
+    (function () {
+        const csrfTokenPub = (function(){
+            const nombre = 'csrftoken';
+            let valor = null;
+            document.cookie.split(';').forEach(function(c){
+                c = c.trim();
+                if (c.indexOf(nombre + '=') === 0) valor = decodeURIComponent(c.substring(nombre.length + 1));
+            });
+            return valor;
+        })();
+    
+        function activarWidgetsCalificacion(root) {
+            (root || document).querySelectorAll('.calificacion-widget-pub').forEach(function(widget){
+                if (widget.dataset.activado) return;
+                widget.dataset.activado = '1';
+            
+                const estrellas = widget.querySelectorAll('.estrella-pub');
+                let miCalificacion = parseInt(widget.dataset.miCalificacion) || 0;
+            
+                function pintar(valor){
+                    estrellas.forEach(function(e){
+                        const activa = parseInt(e.dataset.valor) <= valor;
+                        e.classList.toggle('activa', activa);
+                        e.classList.toggle('bi-star-fill', activa);
+                        e.classList.toggle('bi-star', !activa);
+                    });
+                }
+                pintar(miCalificacion);
+            
+                estrellas.forEach(function(estrella){
+                    estrella.addEventListener('mouseenter', function(){ pintar(parseInt(estrella.dataset.valor)); });
+                    estrella.addEventListener('mouseleave', function(){ pintar(miCalificacion); });
+                    estrella.addEventListener('click', function(e){
+                        e.preventDefault();
+
+                        if (widget.dataset.anon === 'true') {
+                            const modalEl = document.getElementById('modalPromoRegistro');
+                            if (modalEl && window.bootstrap) {
+                                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                            }
+                            return;
+                        }
+                        
+                        const valor = parseInt(estrella.dataset.valor);
+                        const productoId = widget.dataset.productoId;
+                    
+                        fetch(`/productos/producto/${productoId}/calificar/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfTokenPub,
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `puntaje=${valor}`,
+                        })
+                        .then(function(resp){ return resp.json(); })
+                        .then(function(data){
+                            if (!data.ok) return;
+                            miCalificacion = valor;
+                            widget.dataset.miCalificacion = valor;
+                            pintar(valor);
+                            const promedioEl = widget.querySelector('.calificacion-promedio-pub');
+                            const totalEl = widget.querySelector('.calificacion-total-pub');
+                            if (promedioEl) promedioEl.textContent = data.promedio;
+                            if (totalEl) totalEl.textContent = `(${data.total})`;
+                        })
+                        .catch(function(){ console.error('No se pudo guardar la calificación.'); });
+                    });
+                });
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', function(){ activarWidgetsCalificacion(); });
+        window.LZ_activarWidgetsCalificacion = activarWidgetsCalificacion;
+    })();
+})();

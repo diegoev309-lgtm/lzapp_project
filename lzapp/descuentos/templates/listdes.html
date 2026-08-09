@@ -1,400 +1,35 @@
-listdes.html: {% extends "masterpage_dashboard.html" %}
+{% extends "masterpage_dashboard.html" %}
 {% load static %}
+{% block page_icon %}bi bi-tags-fill{% endblock %}
+{% block page_title %}Descuentos{% endblock %}
+{% block page_subtitle %}Campañas por lotería para productos que no se están vendiendo{% endblock %}
+
+{% block header_actions %}
+<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    <span class="btn-importar-texto">PDF</span>
+</a>
+{% endblock %}
 
 {% block content %}
 
 <style>
 
-/*==========================================================
-   BLOQUE UNIFICADO: encabezado + tabla/tarjetas + pie
-===========================================================*/
-
-.bloque-productos{
-    background:var(--bg-panel);
-    border:1px solid var(--border-subtle);
-    border-radius:var(--radius-panel);
-    overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-}
-
-/*==========================
-        ENCABEZADO
-===========================*/
-
-.encabezado{
-    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
-    border-bottom:1px solid var(--border-subtle);
-    color:var(--text-primary);
-    padding:26px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:20px;
-}
-
-.titulo{
-    margin:0;
-    font-size:23px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.titulo i{
-    color:var(--gold);
-    font-size:20px;
-}
-
-.subtitulo{
-    margin-top:6px;
-    color:var(--text-secondary);
-    font-size:13px;
-}
-
-.btn-nuevo{
-    background:var(--gold);
-    color:#1A1A2E;
-    border:1px solid var(--gold);
-    padding:11px 20px;
-    border-radius:var(--radius-btn);
-    font-weight:600;
-    font-size:13.5px;
-    transition:.3s;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-}
-
-.btn-nuevo:hover{
-    background:#EFD48C;
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 10px 22px rgba(228,200,112,.25);
-}
-
-/*==========================
-        BUSCADOR
-===========================*/
-
-.barra-busqueda-wrapper{
-    padding:22px 30px 6px;
-}
-
-.barra-busqueda{
-    display:flex;
-    gap:10px;
-    max-width:420px;
-}
-
-.campo-busqueda{
-    position:relative;
-    flex:1;
-}
-
-.campo-busqueda i{
-    position:absolute;
-    top:50%;
-    left:16px;
-    transform:translateY(-50%);
-    color:var(--text-tertiary);
-    font-size:15px;
-    pointer-events:none;
-}
-
-.input-busqueda{
-    width:100%;
-    border:1px solid var(--border-hair);
-    border-radius:var(--radius-btn);
-    padding:11px 16px 11px 42px;
-    font-size:14px;
-    color:var(--text-primary);
-    background:rgba(255,255,255,.03);
-    transition:.25s;
-}
-
-.input-busqueda:focus{
-    outline:none;
-    border-color:var(--gold);
-    background:rgba(255,255,255,.05);
-    box-shadow:0 0 0 4px var(--gold-dim);
-}
-
-.input-busqueda::placeholder{
-    color:var(--text-tertiary);
-}
-
-.btn-buscar{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:46px;
-    height:46px;
-    flex-shrink:0;
-    border:none;
-    border-radius:var(--radius-btn);
-    background:var(--gold);
-    color:#1A1A2E;
-    font-size:16px;
-    transition:.3s;
-}
-
-.btn-buscar:hover{
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 8px 18px rgba(228,200,112,.3);
-}
-
-@media(max-width:768px){
-    .barra-busqueda-wrapper{
-        padding:18px 16px 4px;
-    }
-    .barra-busqueda{
-        max-width:100%;
-    }
-}
-
-/*==========================
-      SELECTOR DE VISTA
-===========================*/
-
-.barra-vista{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.barra-vista span{
-    font-size:13px;
-    color:var(--text-secondary);
-    font-weight:600;
-    margin-right:4px;
-}
-
-.selector-vista{
-    display:inline-flex;
-    background:rgba(255,255,255,.03);
-    border-radius:var(--radius-pill);
-    padding:4px;
-    border:1px solid var(--border-hair);
-}
-
-.btn-vista{
-    border:none;
-    background:transparent;
-    color:var(--text-secondary);
-    padding:7px 14px;
-    border-radius:var(--radius-pill);
-    font-weight:500;
-    font-size:12.5px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    transition:.2s;
-}
-
-.btn-vista:hover{
-    color:var(--text-primary);
-}
-
-.btn-vista.activo{
-    background:var(--gold-dim);
-    color:var(--gold);
-}
-
-.btn-vista .badge{
-    background:rgba(255,255,255,.1) !important;
-    color:var(--text-secondary) !important;
-}
-
-.btn-vista.activo .badge{
-    background:rgba(228,200,112,.25) !important;
-    color:var(--gold) !important;
-}
-
-.vista-oculta{
-    display:none !important;
-}
-
-/*==========================
-          TABLA
-===========================*/
-
-.table{
-    margin-bottom:0;
-}
-
-.tabla-productos thead{
-    background:transparent;
-}
-
-.tabla-productos thead th{
-    color:var(--text-tertiary);
-    text-transform:uppercase;
-    letter-spacing:.4px;
-    border:none;
-    border-bottom:1px solid var(--border-subtle);
-    padding:12px 8px;
-    text-align:center;
-    font-size:11px;
-    font-weight:600;
-    white-space:nowrap;
-}
-
-.tabla-productos tbody td{
-    vertical-align:middle;
-    text-align:center;
-    padding:12px 6px;
-    font-size:13px;
-    color:var(--text-secondary);
-    border-bottom:1px solid var(--border-subtle);
-}
-
-.tabla-productos tbody tr{
-    transition:.2s;
-}
-
-.tabla-productos tbody tr:last-child td{
-    border-bottom:none;
-}
-
-.tabla-productos tbody tr:hover{
-    background:rgba(255,255,255,.03);
-}
-
-.img-producto{
-    width:52px;
-    height:38px;
-    object-fit:cover;
-    border-radius:8px;
-    border:1px solid var(--border-hair);
-    transition:.3s;
-    margin-right:8px;
-    vertical-align:middle;
-}
-
-.img-producto:hover{
-    transform:scale(1.1);
-}
-
-.btn-editar{
-    background:rgba(56,189,248,.14);
-    color:var(--blue);
-    border:none;
-    border-radius:var(--radius-btn);
-    transition:.2s;
-}
-
-.btn-eliminar{
-    background:var(--red-dim);
-    color:var(--red);
-    border:none;
-    border-radius:var(--radius-btn);
-    transition:.2s;
-}
-
-.btn-editar:hover{
-    background:rgba(56,189,248,.25);
-    color:var(--blue);
-    transform:translateY(-2px);
-}
-
-.btn-eliminar:hover{
-    background:rgba(239,68,68,.25);
-    color:var(--red);
-    transform:translateY(-2px);
-}
-
-.acciones{
-    display:flex;
-    gap:6px;
-    justify-content:center;
-    flex-wrap:wrap;
-    font-size:12px;
-}
-
-.badge-stock, .badge{
-    padding:5px 12px;
-    border-radius:var(--radius-pill);
-    font-size:11.5px;
-    font-weight:600;
-    border:none;
-}
-
-.badge.bg-warning{
-    background:var(--gold-dim) !important;
-    color:var(--gold) !important;
-}
-
-.badge-stock{
-    margin-left:8px;
-}
-
-.badge-oferta{
-    background:var(--green-dim);
-    color:var(--green);
-    padding:6px 12px;
-    border-radius:var(--radius-pill);
-    font-size:11.5px;
-    font-weight:600;
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-}
-
-.badge-sin-oferta{
-    background:rgba(255,255,255,.05);
-    color:var(--text-tertiary);
-    border:1px solid var(--border-hair);
-    padding:6px 12px;
-    border-radius:var(--radius-pill);
-    font-size:11.5px;
-}
-
-.precio{
-    color:var(--green);
-    font-weight:700;
-    font-size:12.5px;
-    white-space:nowrap;
-}
-
-/*==========================================================
-   VISTA DE TARJETAS (campañas de descuento)
-===========================================================*/
-
+/* Ajuste propio de Descuentos sobre el grid compartido de main.css */
 .grid-productos{
-    padding:15px;
-    display:grid;
     grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));
+    padding:15px;
     gap:14px;
 }
-
-.producto-card{
-    background:var(--bg-app);
-    border:1px solid var(--border-subtle);
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 6px 16px rgba(0,0,0,.25);
-    transition:transform .35s cubic-bezier(.25,.8,.25,1), box-shadow .35s;
-    display:flex;
-    flex-direction:column;
-    animation:apareceCard .5s ease both;
-    padding:16px;
+@media(max-width:800px){
+    .grid-productos{ grid-template-columns:1fr; padding:10px; gap:9px; }
 }
 
-@keyframes apareceCard{
-    from{ opacity:0; transform:translateY(14px); }
-    to{ opacity:1; transform:translateY(0); }
-}
+/*==========================================================
+   TARJETA DE CAMPAÑA (contenido propio de Descuentos)
+===========================================================*/
 
-.producto-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 16px 34px rgba(0,0,0,.45);
-    border-color:rgba(255,255,255,.15);
-}
+.producto-card{ padding:16px; }
 
 .producto-card-top{
     display:flex;
@@ -403,15 +38,6 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     gap:8px;
     margin-bottom:6px;
 }
-
-.producto-card-nombre{
-    font-size:14px;
-    font-weight:700;
-    color:var(--text-primary);
-    margin:0;
-    line-height:1.25;
-}
-
 .producto-card-frecuencia{
     font-size:10.5px;
     font-weight:700;
@@ -420,19 +46,6 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     padding:4px 9px;
     border-radius:var(--radius-pill);
     white-space:nowrap;
-}
-
-.producto-card-linea{
-    width:28px;
-    height:3px;
-    background:var(--gold);
-    border-radius:2px;
-    margin:3px 0 8px;
-    transition:width .3s;
-}
-
-.producto-card:hover .producto-card-linea{
-    width:52px;
 }
 
 .producto-card-stats{
@@ -444,47 +57,13 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     background:rgba(255,255,255,.03);
     border-radius:10px;
 }
+.stat-item{ display:flex; align-items:center; gap:6px; min-width:0; }
+.stat-item i{ color:var(--gold); font-size:15px; flex-shrink:0; }
+.stat-item-textos{ display:flex; flex-direction:column; line-height:1.25; min-width:0; }
+.stat-valor{ font-size:12px; font-weight:700; color:var(--text-primary); white-space:nowrap; }
+.stat-etiqueta{ font-size:9.5px; color:var(--text-tertiary); white-space:nowrap; }
 
-.stat-item{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    min-width:0;
-}
-
-.stat-item i{
-    color:var(--gold);
-    font-size:15px;
-    flex-shrink:0;
-}
-
-.stat-item-textos{
-    display:flex;
-    flex-direction:column;
-    line-height:1.25;
-    min-width:0;
-}
-
-.stat-valor{
-    font-size:12px;
-    font-weight:700;
-    color:var(--text-primary);
-    white-space:nowrap;
-}
-
-.stat-etiqueta{
-    font-size:9.5px;
-    color:var(--text-tertiary);
-    white-space:nowrap;
-}
-
-.chips-productos{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    margin-bottom:10px;
-}
-
+.chips-productos{ display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
 .chip-producto{
     background:rgba(255,255,255,.05);
     color:var(--text-secondary);
@@ -508,15 +87,8 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     flex:1;
     min-width:0;
 }
-
-.caja-preview i{
-    color:var(--gold);
-}
-
-.caja-preview strong{
-    font-size:13px;
-    color:var(--gold);
-}
+.caja-preview i{ color:var(--gold); }
+.caja-preview strong{ font-size:13px; color:var(--gold); }
 
 .producto-card-fila-inferior{
     display:flex;
@@ -526,38 +98,10 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     flex-wrap:wrap;
     margin-bottom:10px;
 }
+.producto-card-estado-fila{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex-shrink:0; }
+.producto-card-acciones{ display:flex; justify-content:flex-end; margin-top:auto; }
 
-.producto-card-estado-fila{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
-    flex-shrink:0;
-}
-
-.producto-card-acciones{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:auto;
-}
-
-.btn-toggle-regla{
-    border:none;
-    border-radius:var(--radius-pill);
-    padding:6px 14px;
-    font-size:11.5px;
-    font-weight:600;
-    transition:.3s;
-}
-.btn-toggle-regla.activa{ background:var(--green-dim); color:var(--green); }
-.btn-toggle-regla.inactiva{ background:rgba(255,255,255,.06); color:var(--text-tertiary); }
-.btn-toggle-regla:hover{ transform:translateY(-2px); }
-
-.form-toggle-estado{
-    display:inline-block;
-    margin:0;
-}
-
+.form-toggle-estado{ display:inline-block; margin:0; }
 .badge-estado-toggle{
     border:none;
     cursor:pointer;
@@ -567,146 +111,13 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     font-weight:600;
     transition:.3s;
 }
+.badge-estado-toggle.bg-success{ background-color:var(--green-dim) !important; color:var(--green) !important; }
+.badge-estado-toggle.bg-secondary{ background-color:rgba(255,255,255,.06) !important; color:var(--text-tertiary) !important; }
+.badge-estado-toggle.bg-success:hover{ background-color:rgba(74,222,128,.28) !important; transform:translateY(-2px); }
+.badge-estado-toggle.bg-secondary:hover{ background-color:rgba(255,255,255,.12) !important; transform:translateY(-2px); }
 
-.badge-estado-toggle.bg-success{
-    background-color:var(--green-dim) !important;
-    color:var(--green) !important;
-}
-
-.badge-estado-toggle.bg-secondary{
-    background-color:rgba(255,255,255,.06) !important;
-    color:var(--text-tertiary) !important;
-}
-
-.badge-estado-toggle.bg-success:hover{
-    background-color:rgba(74,222,128,.28) !important;
-    transform:translateY(-2px);
-}
-
-.badge-estado-toggle.bg-secondary:hover{
-    background-color:rgba(255,255,255,.12) !important;
-    transform:translateY(-2px);
-}
-
-.producto-card-acciones-editar{
-    display:flex;
-    gap:6px;
-}
-
-.producto-card-acciones-editar .btn{
-    padding:5px 8px;
-    font-size:11px;
-}
-
-.estado-vacio{
-    text-align:center;
-    padding:60px 20px;
-}
-
-.estado-vacio i{
-    color:var(--text-tertiary) !important;
-}
-
-.estado-vacio h5, .estado-vacio h6{
-    color:var(--text-secondary);
-}
-
-/*==========================================================
-   PIE DEL BLOQUE
-===========================================================*/
-
-.pie-productos{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-    padding:14px 20px;
-    border-top:1px solid var(--border-subtle);
-    background:var(--bg-panel);
-}
-
-.paginacion-inline{
-    margin:0;
-}
-
-.paginacion-inline .pagination{
-    margin:0;
-    flex-wrap:wrap;
-}
-
-.paginacion-inline .page-link{
-    color:var(--text-secondary);
-    background:transparent;
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-link:hover{
-    color:var(--text-primary);
-    background-color:rgba(255,255,255,.05);
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-item.active .page-link{
-    background-color:var(--gold);
-    border-color:var(--gold);
-    color:#1A1A2E;
-    font-weight:600;
-}
-
-/*==========================
-      RESPONSIVE
-===========================*/
-
-@media(max-width:768px){
-
-    .encabezado{
-        flex-direction:column;
-        text-align:center;
-    }
-
-    .titulo{
-        font-size:20px;
-    }
-
-    .barra-vista{
-        justify-content:center;
-    }
-
-    .pie-productos{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .paginacion-inline .pagination{
-        justify-content:center;
-    }
-
-    .grid-productos{
-        grid-template-columns:1fr;
-        padding:10px;
-        gap:9px;
-    }
-
-    .tabla-productos thead th,
-    .tabla-productos tbody td{
-        padding:4px 3px;
-        font-size:9px;
-    }
-
-    .img-producto{
-        width:33px;
-        height:27px;
-    }
-
-    .acciones{
-        flex-direction:column;
-    }
-}
-
-@media(prefers-reduced-motion: reduce){
-    .producto-card{ animation:none; }
-}
+.producto-card-acciones-editar{ display:flex; gap:6px; }
+.producto-card-acciones-editar .btn{ padding:5px 8px; font-size:11px; }
 
 /*==========================================================
    MENSAJES (django messages) COMO TOAST
@@ -722,7 +133,6 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     gap:10px;
     max-width:min(360px, calc(100vw - 40px));
 }
-
 .toast-mensaje{
     background:var(--bg-panel);
     border:1px solid var(--border-subtle);
@@ -736,113 +146,39 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     border-left:4px solid var(--green);
     transition:opacity .3s, transform .3s;
 }
-
-.toast-mensaje.toast-error,
-.toast-mensaje.toast-danger{ border-left-color:var(--red); }
+.toast-mensaje.toast-error, .toast-mensaje.toast-danger{ border-left-color:var(--red); }
 .toast-mensaje.toast-warning{ border-left-color:var(--gold); }
 .toast-mensaje.toast-info{ border-left-color:var(--blue); }
-
-.toast-mensaje-icono{
-    font-size:17px;
-    color:var(--green);
-    margin-top:1px;
-}
-.toast-mensaje.toast-error .toast-mensaje-icono,
-.toast-mensaje.toast-danger .toast-mensaje-icono{ color:var(--red); }
+.toast-mensaje-icono{ font-size:17px; color:var(--green); margin-top:1px; }
+.toast-mensaje.toast-error .toast-mensaje-icono, .toast-mensaje.toast-danger .toast-mensaje-icono{ color:var(--red); }
 .toast-mensaje.toast-warning .toast-mensaje-icono{ color:var(--gold); }
 .toast-mensaje.toast-info .toast-mensaje-icono{ color:var(--blue); }
-
-.toast-mensaje-texto{
-    flex:1;
-    font-size:13px;
-    color:var(--text-primary);
-    line-height:1.4;
-}
-
-.toast-mensaje-cerrar{
-    background:transparent;
-    border:none;
-    color:var(--text-tertiary);
-    font-size:14px;
-    cursor:pointer;
-    padding:0;
-    line-height:1;
-}
-
-.toast-mensaje-cerrar:hover{
-    color:var(--text-primary);
-}
-
+.toast-mensaje-texto{ flex:1; font-size:13px; color:var(--text-primary); line-height:1.4; }
+.toast-mensaje-cerrar{ background:transparent; border:none; color:var(--text-tertiary); font-size:14px; cursor:pointer; padding:0; line-height:1; }
+.toast-mensaje-cerrar:hover{ color:var(--text-primary); }
 @keyframes toastEntra{
     from{ opacity:0; transform:translateX(40px); }
     to{ opacity:1; transform:translateX(0); }
 }
-
 @media(max-width:576px){
-    .contenedor-toasts{
-        top:10px;
-        right:10px;
-        left:10px;
-        max-width:none;
-    }
+    .contenedor-toasts{ top:10px; right:10px; left:10px; max-width:none; }
 }
 
 /*==========================================================
    MODAL DE PREVISUALIZACIÓN (dark)
 ===========================================================*/
 
-#modalPrevisualizacion .modal-content{
-    background:var(--bg-panel);
-    color:var(--text-primary);
-    border:1px solid var(--border-subtle);
-}
-
-#modalPrevisualizacion .modal-header{
-    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel)) !important;
-    color:var(--text-primary) !important;
-    border-bottom:1px solid var(--border-subtle);
-}
-
-#modalPrevisualizacion .modal-title{
-    color:var(--text-primary);
-}
-
-#contenidoPrevisualizacion h6{
-    color:var(--text-primary) !important;
-}
-
-#contenidoPrevisualizacion .table{
-    color:var(--text-secondary);
-}
-
-#contenidoPrevisualizacion .table td{
-    border-color:var(--border-subtle);
-    background:transparent;
-}
-
-#contenidoPrevisualizacion .caja-preview{
-    display:block !important;
-}
-
-#contenidoPrevisualizacion .alert-warning{
-    background:var(--gold-dim);
-    color:var(--gold);
-    border:1px solid rgba(228,200,112,.3);
-}
-
-#contenidoPrevisualizacion .alert-danger{
-    background:var(--red-dim);
-    color:var(--red);
-    border:1px solid rgba(239,68,68,.3);
-}
-
-#contenidoPrevisualizacion .spinner-border{
-    color:var(--gold);
-}
-
-#contenidoPrevisualizacion .text-secondary{
-    color:var(--text-secondary) !important;
-}
+#modalPrevisualizacion .modal-content{ background:var(--bg-panel); color:var(--text-primary); border:1px solid var(--border-subtle); }
+#modalPrevisualizacion .modal-header{ background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel)) !important; color:var(--text-primary) !important; border-bottom:1px solid var(--border-subtle); }
+#modalPrevisualizacion .modal-title{ color:var(--text-primary); }
+#contenidoPrevisualizacion h6{ color:var(--text-primary) !important; }
+#contenidoPrevisualizacion .table{ color:var(--text-secondary); }
+#contenidoPrevisualizacion .table td{ border-color:var(--border-subtle); background:transparent; }
+#contenidoPrevisualizacion .caja-preview{ display:block !important; }
+#contenidoPrevisualizacion .alert-warning{ background:var(--gold-dim); color:var(--gold); border:1px solid rgba(228,200,112,.3); }
+#contenidoPrevisualizacion .alert-danger{ background:var(--red-dim); color:var(--red); border:1px solid rgba(239,68,68,.3); }
+#contenidoPrevisualizacion .spinner-border{ color:var(--gold); }
+#contenidoPrevisualizacion .text-secondary{ color:var(--text-secondary) !important; }
 
 </style>
 
@@ -866,42 +202,35 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
     </div>
 {% endif %}
 
-<div class="container-fluid contenedor-productos">
+<div class="productos-toolbar">
+    <div class="tab-group" role="group" aria-label="Selector de vista">
+        <div class="tab-item active" id="btnVistaProductos" onclick="cambiarVistaDescuentos('productos')">
+            <i class="bi bi-basket-fill"></i> Productos
+        </div>
+        <div class="tab-item" id="btnVistaReglas" onclick="cambiarVistaDescuentos('campanas')">
+            <i class="bi bi-gear-fill"></i> Campañas
+        </div>
+    </div>
+
+    <a href="{% url 'crear_campana_descuento' %}" class="dash-btn dash-btn-solid">
+        <i class="bi bi-plus-circle-fill"></i> Nueva Campaña
+    </a>
+</div>
+
+<div class="contenedor-productos">
 
     <div class="bloque-productos">
 
-        <div class="encabezado">
-            <div>
-                <h1 class="titulo">
-                    <i class="bi bi-tags-fill"></i>
-                    Gestión de Descuentos
-                </h1>
-                <p class="subtitulo">
-                    Campañas por lotería para productos que no se están vendiendo.
-                </p>
-            </div>
-            <a href="{% url 'crear_campana_descuento' %}" class="btn btn-nuevo">
-                <i class="bi bi-plus-circle-fill"></i>
-                Nueva Campaña
-            </a>
-        </div>
-
-        <!-- Buscador: en vivo, sin recargar la página (igual que en Productos) -->
-        <div class="barra-busqueda-wrapper">
+        <div class="busqueda-fila">
             <form method="get" class="barra-busqueda" id="formBuscarDescuento">
                 <div class="campo-busqueda">
                     <i class="bi bi-search"></i>
                     <input type="text" name="q" id="inputBuscarDescuento" class="input-busqueda"
                            placeholder="Buscar producto o campaña..." value="{{ query }}" autocomplete="off">
                 </div>
-                <button type="submit" class="btn-buscar" aria-label="Buscar">
-                    <i class="bi bi-search"></i>
-                </button>
             </form>
         </div>
 
-        <!-- Todo lo de aquí para abajo se reemplaza vía fetch() al buscar
-             o al paginar, sin recargar la página completa. -->
         <div id="contenedorListaDescuento">
 
             <!-- ============ VISTA: PRODUCTOS ============ -->
@@ -1058,24 +387,9 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
                 {% endfor %}
             </div>
 
-            <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
+            <!-- ============ PIE: PAGINACIÓN ============ -->
             <div class="pie-productos">
 
-                <div class="barra-vista">
-                    <span>Vista:</span>
-                    <div class="selector-vista" role="group" aria-label="Selector de vista">
-                        <button type="button" class="btn-vista activo" id="btnVistaProductos" onclick="cambiarVistaDescuentos('productos')">
-                            <i class="bi bi-basket-fill"></i> Productos
-                            <span class="badge bg-secondary ms-1">{{ productos.paginator.count }}</span>
-                        </button>
-                        <button type="button" class="btn-vista" id="btnVistaReglas" onclick="cambiarVistaDescuentos('campanas')">
-                            <i class="bi bi-gear-fill"></i> Campañas
-                            <span class="badge bg-secondary ms-1">{{ campanas.paginator.count }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Paginación de Productos (solo se muestra en esa vista) -->
                 <nav class="paginacion-inline paginacion-productos" aria-label="Paginación de productos">
                     <ul class="pagination pagination-sm mb-0">
                         {% if productos.has_previous %}
@@ -1108,7 +422,6 @@ listdes.html: {% extends "masterpage_dashboard.html" %}
                     </ul>
                 </nav>
 
-                <!-- Paginación de Campañas (solo se muestra en esa vista) -->
                 <nav class="paginacion-inline paginacion-campanas vista-oculta" aria-label="Paginación de campañas">
                     <ul class="pagination pagination-sm mb-0">
                         {% if campanas.has_previous %}
@@ -1233,8 +546,7 @@ function verPrevisualizacion(productoId, nombreProducto){
     });
 }
 
-/* ---- Selector de vista: Productos / Campañas (se re-aplica también
-   después de cada fetch(), porque el DOM interno se reemplaza) ---- */
+/* ---- Selector de vista: Productos / Campañas ---- */
 function cambiarVistaDescuentos(vista){
     const vp = document.getElementById('vistaProductosDescuento');
     const vr = document.getElementById('vistaReglasDescuento');
@@ -1248,15 +560,15 @@ function cambiarVistaDescuentos(vista){
     if(vista === 'campanas'){
         vp.classList.add('vista-oculta');
         vr.classList.remove('vista-oculta');
-        br.classList.add('activo');
-        bp.classList.remove('activo');
+        br.classList.add('active');
+        bp.classList.remove('active');
         if(paginacionProductos) paginacionProductos.classList.add('vista-oculta');
         if(paginacionCampanas) paginacionCampanas.classList.remove('vista-oculta');
     } else {
         vr.classList.add('vista-oculta');
         vp.classList.remove('vista-oculta');
-        bp.classList.add('activo');
-        br.classList.remove('activo');
+        bp.classList.add('active');
+        br.classList.remove('active');
         if(paginacionProductos) paginacionProductos.classList.remove('vista-oculta');
         if(paginacionCampanas) paginacionCampanas.classList.add('vista-oculta');
     }
@@ -1279,8 +591,6 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 
-    // Cada toast de mensaje se cierra solo después de unos segundos,
-    // escalonado para que no desaparezcan todos exactamente al tiempo.
     document.querySelectorAll('.toast-mensaje').forEach(function(toast, i){
         setTimeout(function(){
             toast.style.opacity = '0';
@@ -1290,10 +600,6 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 });
 
-/* ---- Botón "Ver previsualización": delegado en document para que
-   siga funcionando aunque el buscador reemplace el innerHTML del
-   contenedor (evita interpolar el nombre del producto dentro de un
-   string de JS, que era lo que rompía con nombres con comillas). ---- */
 document.addEventListener('click', function(e){
     const boton = e.target.closest('.btn-previsualizar');
     if(!boton) return;
@@ -1302,9 +608,6 @@ document.addEventListener('click', function(e){
     verPrevisualizacion(productoId, nombreProducto);
 });
 
-/* ---- Búsqueda en vivo + paginación sin recargar la página, igual que
-   en el panel de Productos: pide la página completa por fetch() y se
-   queda solo con el contenido de #contenedorListaDescuento ---- */
 (function () {
     const form = document.getElementById('formBuscarDescuento');
     const input = document.getElementById('inputBuscarDescuento');
@@ -1326,8 +629,6 @@ document.addEventListener('click', function(e){
                 if (nuevoContenedor) {
                     contenedor.innerHTML = nuevoContenedor.innerHTML;
                 }
-                // El DOM interno se reemplazó, así que hay que re-aplicar
-                // la vista guardada (productos/campañas) y los tooltips.
                 aplicarVistaDescuentosGuardada();
                 if(window.bootstrap){
                     contenedor.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){
@@ -1364,9 +665,6 @@ document.addEventListener('click', function(e){
         buscar(input.value.trim());
     });
 
-    // La paginación (Primera, «, números, », Última) pasa por el mismo
-    // fetch(), sin recargar la página. Se delega en el contenedor, que
-    // persiste entre reemplazos de innerHTML (solo cambia su contenido).
     contenedor.addEventListener('click', (e) => {
         const link = e.target.closest('.paginacion-inline a.page-link');
         if (!link) return;
