@@ -37,9 +37,12 @@
                         <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                     </ul>
+                    <div class="navbar-actions-mobile d-lg-none" id="navbarActionsMobile"></div>
                 </div>
 
-                {% block navbar_actions %}{% endblock %}
+                <div class="navbar-actions-desktop d-none d-lg-flex" id="navbarActionsDesktop">
+                    {% block navbar_actions %}{% endblock %}
+                </div>
             </div>
         </nav>
     </header>
@@ -134,6 +137,7 @@
                         <!--SECCION DE QUESOS INTERACTIVOS-->
                         <div class="quesos-interactivos"
                             data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
+                            data-bg-mobile="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}"
                             data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
                             {% if premio_activo %}
                             data-origen-premio="campana"
@@ -180,7 +184,13 @@
                                 data-descripcion="{{ p.descripcion|default:'Suave y cremoso, con esa fibra característica que lo distingue.' }}"
                                 data-oferta-video="{% static 'home/media/brillos.mp4' %}"
                                 data-oferta-pos="center 30%"
-                                data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%">
+                                data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%"
+                                data-clip-mobile="24.60% 23.68%, 25.56% 23.70%, 26.52% 23.77%, 27.18% 23.87%, 27.84% 23.94%, 28.95% 23.92%, 29.81% 23.89%, 30.47% 23.80%, 31.18% 23.65%, 31.99% 23.56%, 32.70% 23.44%, 33.51% 23.39%, 34.37% 23.34%, 35.18% 23.34%, 35.88% 23.32%, 37.15% 23.34%, 38.01% 23.29%, 39.02% 23.22%, 40.08% 23.17%, 41.55% 23.15%, 43.32% 23.15%, 45.30% 23.12%, 46.56% 23.12%, 48.13% 23.10%, 49.44% 23.10%, 50.30% 23.24%, 50.86% 23.41%, 51.11% 23.68%, 51.52% 23.99%, 51.87% 24.23%, 52.28% 24.54%, 52.63% 24.76%, 53.09% 25.04%, 53.44% 25.28%, 53.90% 25.50%, 54.25% 25.79%, 54.61% 26.10%, 54.91% 26.36%, 55.11% 26.58%, 55.42% 26.92%, 55.82% 27.25%, 56.02% 27.47%, 56.33% 27.71%, 56.68% 28.09%, 57.14% 28.50%, 57.69% 28.69%, 58.10% 28.91%, 58.40% 29.17%, 58.81% 29.51%, 59.21% 29.84%, 59.67% 30.23%, 60.27% 30.56%, 60.78% 30.80%, 61.23% 31.07%, 61.74% 31.48%, 62.20% 32.08%, 62.80% 32.84%, 63.41% 33.30%, 63.97% 33.88%, 64.57% 34.45%, 65.13% 34.93%, 65.74% 35.46%, 66.45% 36.04%, 67.15% 36.66%, 67.91% 37.16%, 68.62% 37.79%, 69.38% 38.58%, 70.04% 39.32%, 70.80% 40.14%, 71.05% 41.03%, 71.46% 42.11%, 71.86% 43.09%, 72.42% 44.00%, 72.72% 44.36%, 73.53% 44.72%, 74.19% 45.04%, 74.95% 45.35%, 75.20% 45.56%, 75.00% 45.88%, 74.44% 46.40%, 74.09% 46.69%, 73.53% 46.88%, 72.47% 46.93%, 71.51% 47.00%, 69.94% 47.05%, 68.52% 46.88%, 67.26% 46.91%, 65.59% 46.91%, 64.57% 46.79%, 62.55% 46.67%, 60.98% 46.74%, 59.26% 46.84%, 58.20% 46.84%, 55.87% 46.88%, 53.70% 47.03%, 51.87% 47.10%, 48.79% 47.10%, 44.49% 46.96%, 39.17% 46.96%, 37.20% 47.05%, 35.28% 47.08%, 34.82% 46.74%, 34.82% 46.52%, 35.07% 46.45%, 35.68% 46.45%, 35.83% 46.21%, 35.58% 45.78%, 35.12% 45.59%, 34.77% 45.32%, 34.77% 44.58%, 34.82% 43.50%, 34.82% 42.42%, 34.82% 41.20%, 34.92% 40.16%, 34.87% 39.54%, 34.06% 38.10%, 32.49% 35.84%, 32.14% 35.56%, 31.53% 34.74%, 30.87% 33.95%, 28.14% 29.32%, 27.18% 27.76%, 26.73% 26.77%, 26.12% 25.81%, 25.97% 25.57%, 26.32% 25.52%, 26.73% 25.43%, 26.78% 25.16%, 26.32% 25.12%, 25.92% 25.12%, 25.61% 24.97%, 25.26% 24.54%, 24.90% 24.04%">
+                                <!-- TODO (queso 1 - mobile): pega aquí las coordenadas de tu
+                                     trazador sobre la imagen VERTICAL (data-bg-mobile), en %
+                                     ABSOLUTOS de la imagen completa (no relativos a una caja
+                                     local como data-clip). Formato:
+                                     data-clip-mobile="12.0% 8.5%, 15.2% 9.1%, 18.0% 12.4%, ..." -->
                                 <span class="queso-punto-glow"></span>
                                 <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                                     <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
@@ -212,14 +222,16 @@
                                 <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
                             </a>
                             {% endwith %}
-                            <!-- Queso 2: el del medio -->
+                           <!-- Queso 2: el del medio -->
                             <a href="#productos" class="queso-punto"
                                 data-left="55.8" data-top="15.8" data-width="23.2" data-height="55.6"
                                 data-descuento="50"
                                 data-descripcion="Fresco, suave y con la textura característica del queso venezolano."
                                 data-oferta-video="{% static 'home/media/brillos.mp4' %}"
                                 data-oferta-pos="center 30%"
-                                data-clip="5.1% 45.8%, 6.6% 43.2%, 6.6% 42.0%, 8.1% 40.5%, 11.2% 36.7%, 12.2% 34.8%, 8.1% 33.0%, 3.6% 31.4%, 1.5% 29.9%, 0.5% 26.1%, 0.0% 22.0%, 1.0% 18.9%, 3.0% 15.9%, 7.1% 9.8%, 12.2% 4.9%, 15.7% 1.9%, 18.8% 0.8%, 23.4% 0.0%, 25.9% 4.2%, 28.9% 10.6%, 31.0% 16.7%, 34.5% 25.0%, 36.0% 29.9%, 41.1% 32.2%, 46.7% 34.8%, 51.8% 37.5%, 55.8% 39.8%, 63.5% 44.3%, 71.1% 50.0%, 74.6% 53.0%, 80.2% 60.6%, 87.3% 72.7%, 90.4% 77.3%, 93.9% 87.1%, 96.4% 92.8%, 99.0% 92.4%, 100.0% 94.3%, 95.4% 99.6%, 77.2% 100.0%, 41.1% 99.6%, 35.5% 95.8%, 34.0% 90.9%, 31.5% 80.7%">
+                                data-clip="5.1% 45.8%, 6.6% 43.2%, 6.6% 42.0%, 8.1% 40.5%, 11.2% 36.7%, 12.2% 34.8%, 8.1% 33.0%, 3.6% 31.4%, 1.5% 29.9%, 0.5% 26.1%, 0.0% 22.0%, 1.0% 18.9%, 3.0% 15.9%, 7.1% 9.8%, 12.2% 4.9%, 15.7% 1.9%, 18.8% 0.8%, 23.4% 0.0%, 25.9% 4.2%, 28.9% 10.6%, 31.0% 16.7%, 34.5% 25.0%, 36.0% 29.9%, 41.1% 32.2%, 46.7% 34.8%, 51.8% 37.5%, 55.8% 39.8%, 63.5% 44.3%, 71.1% 50.0%, 74.6% 53.0%, 80.2% 60.6%, 87.3% 72.7%, 90.4% 77.3%, 93.9% 87.1%, 96.4% 92.8%, 99.0% 92.4%, 100.0% 94.3%, 95.4% 99.6%, 77.2% 100.0%, 41.1% 99.6%, 35.5% 95.8%, 34.0% 90.9%, 31.5% 80.7%"
+                                data-clip-mobile="18.3% 41.7%, 19.0% 41.9%, 19.4% 42.0%, 19.8% 42.2%, 21.2% 42.8%, 21.8% 43.0%, 23.3% 43.6%, 24.2% 43.9%, 24.9% 44.2%, 25.8% 44.5%, 26.8% 44.9%, 27.6% 45.2%, 28.5% 45.4%, 29.3% 45.8%, 30.3% 46.2%, 31.5% 46.7%, 32.4% 47.1%, 32.8% 47.3%, 33.3% 47.4%, 34.1% 47.4%, 35.0% 47.3%, 36.2% 47.3%, 37.3% 47.3%, 38.1% 47.3%, 39.0% 47.3%, 40.0% 47.3%, 41.1% 47.4%, 42.2% 47.4%, 43.2% 47.5%, 44.3% 47.5%, 45.5% 47.5%, 46.5% 47.6%, 48.0% 47.7%, 48.8% 47.8%, 49.8% 47.9%, 50.7% 48.0%, 51.8% 48.2%, 52.8% 48.3%, 53.8% 48.5%, 54.5% 48.5%, 55.1% 48.5%, 55.7% 48.4%, 56.5% 48.4%, 57.1% 48.5%, 57.4% 48.8%, 57.6% 49.1%, 58.0% 49.4%, 58.4% 49.7%, 59.3% 50.0%, 60.3% 50.3%, 61.1% 50.7%, 61.8% 50.9%, 62.7% 51.3%, 63.6% 51.6%, 64.5% 52.0%, 65.4% 52.4%, 66.3% 52.7%, 67.2% 53.1%, 67.8% 53.4%, 68.8% 54.0%, 69.9% 54.6%, 70.5% 54.9%, 71.4% 55.3%, 71.8% 55.5%, 72.2% 55.5%, 72.6% 55.3%, 73.2% 55.6%, 73.5% 56.2%, 73.6% 56.6%, 73.6% 57.2%, 73.7% 57.5%, 73.1% 57.8%, 72.3% 58.0%, 71.6% 58.4%, 70.7% 58.7%, 69.5% 59.0%, 68.0% 59.4%, 66.9% 59.7%, 66.2% 60.0%, 65.4% 60.2%, 64.9% 60.3%, 64.0% 60.6%, 63.0% 61.0%, 62.2% 61.3%, 61.3% 61.6%, 60.4% 62.0%, 59.7% 62.3%, 58.5% 62.7%, 57.5% 63.1%, 56.6% 63.4%, 55.5% 63.8%, 54.7% 64.1%, 53.7% 64.4%, 52.8% 64.7%, 52.2% 64.9%, 51.4% 65.1%, 50.7% 65.5%, 49.8% 65.8%, 49.0% 66.1%, 48.1% 66.3%, 47.3% 66.4%, 46.4% 66.6%, 45.6% 66.6%, 44.8% 66.8%, 43.6% 67.0%, 42.6% 67.1%, 41.4% 67.2%, 39.7% 67.1%, 38.5% 67.0%, 37.4% 66.9%, 36.6% 66.8%, 36.2% 66.7%, 36.3% 66.5%, 36.5% 66.2%, 36.7% 65.9%, 37.0% 65.8%, 37.5% 66.0%, 38.0% 66.1%, 38.6% 66.1%, 39.1% 66.2%, 39.7% 66.1%, 40.1% 66.1%, 39.4% 65.7%, 38.4% 65.5%, 37.7% 65.1%, 37.2% 64.7%, 36.0% 63.2%, 35.1% 62.7%, 34.6% 62.2%, 33.8% 61.6%, 33.1% 61.0%, 32.4% 60.4%, 31.6% 59.7%, 30.9% 59.1%, 30.1% 58.3%, 29.2% 57.5%, 28.5% 56.8%, 28.1% 56.4%, 27.5% 56.0%, 27.2% 55.6%, 26.9% 55.0%, 26.8% 54.4%, 26.5% 54.1%, 26.5% 53.7%, 26.3% 53.2%, 26.2% 52.7%, 26.0% 51.9%, 25.4% 51.8%, 24.6% 51.9%, 23.8% 52.1%, 22.7% 52.3%, 21.7% 52.4%, 20.8% 52.6%, 19.9% 52.8%, 19.1% 52.8%, 18.7% 52.4%, 18.2% 52.1%, 17.8% 51.8%, 17.3% 51.5%, 16.9% 51.2%, 16.5% 50.6%, 16.1% 50.1%, 15.9% 49.7%, 15.7% 49.4%, 15.6% 49.0%, 15.5% 48.5%, 15.4% 47.9%, 15.2% 47.3%, 15.1% 46.5%, 15.1% 46.2%, 15.2% 45.6%, 15.2% 45.1%, 15.3% 44.6%, 15.5% 44.1%, 15.6% 43.7%, 15.7% 43.3%, 15.8% 43.0%, 17.0% 42.4%, 17.4% 42.1%, 17.9% 41.9%">
+                                <!-- TODO (queso 2 - mobile): mismas instrucciones que queso 1. -->
                                 <span class="queso-punto-glow"></span>
                                 <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                                     <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
@@ -253,7 +265,9 @@
                                 data-descripcion="Artesanal, delicado y perfecto para derretir o disfrutar solo."
                                 data-oferta-video="{% static 'home/media/brillos.mp4' %}"
                                 data-oferta-pos="center 30%"
-                                data-clip="3.3% 47.2%, 4.3% 44.4%, 9.2% 38.4%, 11.4% 34.4%, 5.4% 31.6%, 1.1% 30.0%, 0.5% 26.8%, 0.0% 24.8%, 0.0% 19.6%, 1.6% 16.4%, 3.8% 12.8%, 7.1% 9.2%, 9.8% 6.0%, 13.6% 3.6%, 16.8% 0.8%, 23.9% 0.0%, 26.1% 3.2%, 28.3% 8.4%, 37.0% 29.6%, 48.9% 35.2%, 57.1% 39.6%, 69.6% 48.4%, 77.2% 54.8%, 83.2% 58.8%, 98.4% 66.8%, 98.4% 68.8%, 91.8% 77.6%, 92.4% 82.4%, 96.2% 91.6%, 98.9% 91.2%, 100.0% 92.4%, 98.4% 96.4%, 95.1% 100.0%, 80.4% 98.8%, 40.8% 98.4%, 35.9% 95.6%, 30.4% 81.6%, 22.8% 67.6%, 15.2% 57.2%">
+                                data-clip="3.3% 47.2%, 4.3% 44.4%, 9.2% 38.4%, 11.4% 34.4%, 5.4% 31.6%, 1.1% 30.0%, 0.5% 26.8%, 0.0% 24.8%, 0.0% 19.6%, 1.6% 16.4%, 3.8% 12.8%, 7.1% 9.2%, 9.8% 6.0%, 13.6% 3.6%, 16.8% 0.8%, 23.9% 0.0%, 26.1% 3.2%, 28.3% 8.4%, 37.0% 29.6%, 48.9% 35.2%, 57.1% 39.6%, 69.6% 48.4%, 77.2% 54.8%, 83.2% 58.8%, 98.4% 66.8%, 98.4% 68.8%, 91.8% 77.6%, 92.4% 82.4%, 96.2% 91.6%, 98.9% 91.2%, 100.0% 92.4%, 98.4% 96.4%, 95.1% 100.0%, 80.4% 98.8%, 40.8% 98.4%, 35.9% 95.6%, 30.4% 81.6%, 22.8% 67.6%, 15.2% 57.2%"
+                                data-clip-mobile="19.9% 62.0%, 20.5% 62.1%, 21.1% 62.3%, 22.0% 62.7%, 23.1% 63.1%, 24.2% 63.5%, 25.9% 64.1%, 26.8% 64.4%, 28.1% 64.9%, 30.0% 65.6%, 31.5% 66.1%, 32.9% 66.7%, 34.0% 67.2%, 34.8% 67.6%, 35.4% 67.5%, 36.5% 67.5%, 37.3% 67.3%, 38.3% 67.3%, 39.7% 67.2%, 41.1% 67.2%, 41.9% 67.2%, 42.8% 67.2%, 43.9% 67.1%, 44.8% 67.1%, 45.7% 66.9%, 46.7% 66.6%, 47.2% 66.5%, 47.9% 66.4%, 48.7% 66.3%, 49.8% 66.3%, 51.0% 66.3%, 52.2% 66.4%, 53.6% 66.6%, 54.7% 66.8%, 55.7% 67.0%, 57.0% 67.0%, 58.0% 67.0%, 59.0% 67.0%, 60.8% 67.0%, 62.6% 66.9%, 64.2% 66.8%, 65.9% 66.6%, 67.2% 66.6%, 67.7% 66.6%, 67.8% 67.0%, 68.2% 67.7%, 68.5% 68.3%, 68.8% 69.1%, 69.0% 69.7%, 69.4% 70.6%, 70.0% 70.9%, 71.3% 71.6%, 72.1% 72.0%, 72.9% 72.4%, 73.8% 72.9%, 74.8% 73.3%, 75.2% 73.1%, 75.5% 72.9%, 75.6% 72.4%, 75.9% 72.7%, 76.3% 73.2%, 76.4% 73.8%, 76.6% 74.4%, 76.8% 75.1%, 76.4% 75.7%, 75.3% 76.1%, 74.1% 76.5%, 73.2% 76.9%, 72.3% 77.2%, 71.3% 77.4%, 70.3% 77.9%, 69.3% 78.6%, 68.5% 79.1%, 67.7% 79.7%, 66.2% 80.4%, 64.6% 81.2%, 63.4% 81.8%, 62.3% 82.4%, 59.9% 83.5%, 58.7% 84.1%, 57.9% 84.5%, 56.9% 85.0%, 55.6% 85.6%, 54.3% 86.1%, 53.0% 86.5%, 51.4% 87.0%, 49.7% 87.5%, 47.5% 88.2%, 48.5% 88.1%, 49.1% 88.1%, 49.5% 88.4%, 49.6% 88.6%, 49.0% 88.7%, 48.1% 88.7%, 47.3% 88.9%, 46.1% 89.0%, 45.1% 88.9%, 44.2% 88.8%, 43.3% 88.7%, 43.5% 88.5%, 43.9% 88.4%, 44.5% 88.2%, 45.3% 87.9%, 44.6% 87.3%, 44.4% 86.9%, 43.8% 86.5%, 43.2% 85.8%, 42.7% 85.3%, 41.2% 84.2%, 40.4% 83.8%, 39.5% 82.9%, 38.6% 82.1%, 37.6% 81.2%, 36.9% 80.7%, 36.1% 80.1%, 35.4% 79.6%, 34.4% 78.9%, 33.4% 78.2%, 32.1% 77.3%, 31.1% 76.7%, 30.2% 76.0%, 29.6% 75.3%, 29.4% 74.7%, 29.1% 73.6%, 29.0% 72.8%, 28.5% 71.9%, 27.7% 71.7%, 26.4% 71.7%, 25.5% 71.9%, 24.1% 72.1%, 23.5% 71.9%, 22.9% 71.6%, 22.0% 71.4%, 21.2% 71.0%, 20.5% 70.6%, 19.9% 70.1%, 19.4% 69.5%, 18.9% 68.8%, 18.7% 68.1%, 18.4% 67.5%, 18.2% 66.7%, 18.0% 66.2%, 17.8% 65.5%, 17.8% 64.6%, 17.9% 63.8%, 17.9% 63.3%, 17.9% 63.1%, 18.5% 62.8%, 19.3% 62.4%, 19.6% 62.2%">
+                                <!-- TODO (queso 3 - mobile): mismas instrucciones que queso 1. -->
                                 <span class="queso-punto-glow"></span>
                                 <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                                     <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
@@ -320,6 +334,17 @@
                                 <span class="globo-hilo"></span>
                             </button>
                         </div>
+
+                        <div class="oferta-shake-hint" id="ofertaShakeHint">
+                            <i class="bi bi-phone-vibrate"></i>
+                            Agita tu celular para ver ofertas
+                        </div>
+                        <button type="button" class="oferta-shake-permiso" id="ofertaShakePermiso" style="display:none;">
+                            <i class="bi bi-hand-index-thumb"></i> Toca para activar el sensor
+                        </button>
+                        <button type="button" class="oferta-shake-fallback" id="ofertaShakeFallback">
+                            <i class="bi bi-hand-index-thumb"></i> Toca aquí si no vibra tu celular
+                        </button>
                         {% endif %}
 
                         <div class="oferta-banner" id="ofertaBanner">
@@ -564,6 +589,13 @@
                 <button class="carrusel-punto activo" data-slide="0" aria-label="Ir a la diapositiva 1"></button>
                 <button class="carrusel-punto" data-slide="1" aria-label="Ir a la diapositiva 2"></button>
                 <button class="carrusel-punto" data-slide="2" aria-label="Ir a la diapositiva 3"></button>
+            </div>
+
+            <!-- Indicador de swipe (solo mobile, reemplaza las flechas) -->
+            <div class="carrusel-swipe-hint" id="carruselSwipeHint">
+                <i class="bi bi-chevron-left"></i>
+                Desliza
+                <i class="bi bi-chevron-right"></i>
             </div>
 
             <!-- Barra de progreso del autoplay -->
@@ -934,11 +966,31 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        /* ---- Clonar botones de sesión hacia el menú mobile ---- */
+        (function () {
+            const origen = document.getElementById('navbarActionsDesktop');
+            const destino = document.getElementById('navbarActionsMobile');
+            if (origen && destino && origen.innerHTML.trim()) {
+                destino.innerHTML = origen.innerHTML;
+            }
+        })();
+    </script>
+
+    <script>
         /* ---- Navbar scroll effect ---- */
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 60);
         });
+
+        /* ---- Altura real del navbar como variable CSS ---- */
+        function actualizarAlturaNavbar() {
+            if (!nav) return;
+            document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+        }
+        actualizarAlturaNavbar();
+        window.addEventListener('load', actualizarAlturaNavbar);
+        window.addEventListener('resize', actualizarAlturaNavbar);
 
         /* ---- Parallax 3D con el mouse en el hero ---- */
         (function () {
@@ -1135,15 +1187,17 @@
         revealEls.forEach(el => observer.observe(el));
     </script>
 
-    <!-- Script independiente: posicionamiento de los quesos interactivos -->
+   <!-- Script independiente: posicionamiento de los quesos interactivos -->
     <script>
         (function () {
             const wrap = document.querySelector('.quesos-interactivos');
             if (!wrap) return;
 
             const slide = wrap.closest('.slide-imagen');
-            const img = slide.querySelector('.slide-imagen-fondo');
+            const imgDesktop = slide.querySelector('.slide-imagen-fondo-desktop') || slide.querySelector('.slide-imagen-fondo');
+            const imgMobile = slide.querySelector('.slide-imagen-fondo-mobile');
             const bgUrl = wrap.dataset.bg;
+            const bgMobileUrl = wrap.dataset.bgMobile || bgUrl; // si no hay mobile, usa la de desktop
             const ofertaFondoUrl = wrap.dataset.ofertaFondo;
             const puntosEls = wrap.querySelectorAll('.queso-punto');
             const imgOferta = new Image();
@@ -1159,6 +1213,17 @@
                 });
             }
 
+            function esMobileAhora() {
+                return window.matchMedia('(max-width: 991px)').matches;
+            }
+
+            // La imagen REALMENTE visible ahora mismo (desktop o mobile),
+            // según el breakpoint CSS de .slide-imagen-fondo-*.
+            function imgActivo() {
+                if (imgMobile && esMobileAhora()) return imgMobile;
+                return imgDesktop;
+            }
+
             const siluetaUnica = document.getElementById('siluetaUnica');
             const siluetaLinea = siluetaUnica ? siluetaUnica.querySelector('.silueta-unica-linea') : null;
             let siluetaPuntosGlobal = null;
@@ -1172,6 +1237,13 @@
                     sLeft + (cx / 100) * sWidth,
                     sTop + (cy / 100) * sHeight
                 ]);
+                // TODO (mobile): esta silueta dorada única (la que abraza los
+                // 3 quesos juntos) también está trazada sobre la imagen de
+                // DESKTOP. Si más adelante quieres que se vea perfecta en
+                // mobile igual, habría que agregarle un data-clip-mobile al
+                // <svg id="siluetaUnica"> del HTML, con el mismo formato.
+                // Por ahora en mobile puede quedar desalineada — no es grave,
+                // es solo decorativa.
             }
 
             const quesos = Array.from(puntosEls).map((p) => {
@@ -1181,10 +1253,16 @@
                 const height = parseFloat(p.dataset.height);
                 const clipLocal = parsearPuntos(p.dataset.clip);
 
-                const puntosGlobal = clipLocal.map(([cx, cy]) => [
+                const puntosGlobalDesktop = clipLocal.map(([cx, cy]) => [
                     left + (cx / 100) * width,
                     top + (cy / 100) * height
                 ]);
+
+                // data-clip-mobile viene en % ABSOLUTOS de la imagen mobile
+                // completa (no relativos a una caja local, a diferencia de
+                // data-clip). Pégalo tal cual lo entregue tu trazador.
+                const clipMobileRaw = (p.dataset.clipMobile || '').trim();
+                const puntosGlobalMobile = clipMobileRaw ? parsearPuntos(clipMobileRaw) : null;
 
                 const glow = p.querySelector('.queso-punto-glow');
                 const ventana = p.querySelector('.queso-punto-ventana');
@@ -1193,8 +1271,6 @@
                 const reverso = p.querySelector('.queso-punto-reverso');
                 const contornoSvg = p.querySelector('.queso-punto-contorno');
                 const contornoPoligono = p.querySelector('.queso-punto-contorno-linea');
-
-                ventana.style.backgroundImage = `url(${bgUrl})`;
 
                 const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
                 if (video && p.dataset.ofertaVideo) {
@@ -1208,11 +1284,12 @@
                     reverso.classList.toggle('con-descuento', tieneDescuento);
                     reverso.classList.toggle('sin-descuento', !tieneDescuento);
                 }
-                return { el: p, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobal };
+                return { el: p, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobalDesktop, puntosGlobalMobile };
             });
 
             function geometriaCover() {
-                const W = img.naturalWidth, H = img.naturalHeight;
+                const activo = imgActivo();
+                const W = activo.naturalWidth, H = activo.naturalHeight;
                 const rect = slide.getBoundingClientRect();
                 const Cw = rect.width, Ch = rect.height;
                 if (!W || !H || Cw < 50 || Ch < 50) return null;
@@ -1243,11 +1320,22 @@
                     return;
                 }
                 intentos = 0;
+
+                const mobileAhora = esMobileAhora();
+                const bgActual = mobileAhora ? bgMobileUrl : bgUrl;
+
                 window.LZ_CONTENEDOR_SIZE = { w: geo.Cw, h: geo.Ch };
                 window.LZ_PERIMETROS = window.LZ_PERIMETROS || [];
                 let uMinX = Infinity, uMaxX = -Infinity, uMinY = Infinity, uMaxY = -Infinity;
-                quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobal }, idx) => {
+                quesos.forEach(({ el, ventana, borde, glow, flip, video, reverso, contornoSvg, contornoPoligono, puntosGlobalDesktop, puntosGlobalMobile }, idx) => {
                     try {
+                        // En mobile usa data-clip-mobile SI ya tiene coordenadas
+                        // reales; si sigue vacío, cae de vuelta al recorte de
+                        // desktop (quedará desalineado hasta que las agregues).
+                        const puntosGlobal = (mobileAhora && puntosGlobalMobile) ? puntosGlobalMobile : puntosGlobalDesktop;
+
+                        if (ventana) ventana.style.backgroundImage = `url(${bgActual})`;
+
                         const puntosPantalla = puntosGlobal.map(([x, y]) => puntoAContenedor(x, y, geo));
                         window.LZ_PERIMETROS[idx] = puntosPantalla;
 
@@ -1261,9 +1349,6 @@
                         if (glow) glow.style.clipPath = clipStr;
                         if (flip) flip.style.clipPath = clipStr;
 
-                        // Contorno dorado real (stroke), usando los MISMOS
-                        // puntos del recorte pero en px del contenedor, para
-                        // que el <svg> no se deforme con el viewBox.
                         if (contornoSvg && contornoPoligono) {
                             contornoSvg.setAttribute('viewBox', `0 0 ${geo.Cw} ${geo.Ch}`);
                             const puntosPx = puntosPantalla
@@ -1287,8 +1372,8 @@
                         const centroX = (minX + maxX) / 2;
                         const centroY = (minY + maxY) / 2;
 
-                        borde.style.transformOrigin = `${centroX}% ${centroY}%`;
-                        ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        if (borde) borde.style.transformOrigin = `${centroX}% ${centroY}%`;
+                        if (ventana) ventana.style.transformOrigin = `${centroX}% ${centroY}%`;
                         if (glow) glow.style.transformOrigin = `${centroX}% ${centroY}%`;
                         el.dataset.centroX = centroX.toFixed(2);
                         el.dataset.centroY = centroY.toFixed(2);
@@ -1364,7 +1449,8 @@
                 }
             }
             window.addEventListener('resize', actualizar);
-            img.addEventListener('load', actualizar);
+            if (imgDesktop) imgDesktop.addEventListener('load', actualizar);
+            if (imgMobile) imgMobile.addEventListener('load', actualizar);
             actualizar();
             if (window.ResizeObserver) {
                 new ResizeObserver(actualizar).observe(slide);
@@ -1649,10 +1735,25 @@
             if (hayPorcentajeReal) {
                 const ruletaUnica = document.getElementById('ofertaInfoRuleta');
                 mostrarNumeroConGiro(ruletaUnica, premioPorcentaje);
-                setTimeout(() => mostrarFelicidades(), 2600);
+                setTimeout(() => {
+                    cerrarModalOfertaMobile();
+                    setTimeout(() => mostrarFelicidades(), 550);
+                }, 2600);
             } else {
+                cerrarModalOfertaMobile();
                 setTimeout(() => mostrarFelicidades(), 600);
             }
+        }
+
+        function cerrarModalOfertaMobile() {
+            // Cierra de inmediato la tarjeta/modal del sorteo (mobile) para
+            // dejar ver un instante los quesos encendidos/brillando antes
+            // de que aparezca el overlay de "¡Felicidades!". El fondo
+            // oscurecido (clase 'todos-encendidos') se mantiene a propósito:
+            // se quita 3s después, dentro de cerrarReveal().
+            const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
+            if (tarjetaDescuento) tarjetaDescuento.classList.remove('visible');
+            botonSortearWrap && botonSortearWrap.classList.remove('visible');
         }
 
         function jugarRuletaDiariaYContinuar() {
@@ -1825,8 +1926,6 @@
                 q.classList.remove('volteado');
                 pausarVideoQueso(q);
             });
-            wrap.classList.remove('todos-encendidos');
-            detenerConfettiSuave();
 
             let sumX = 0, sumY = 0, n = 0;
             quesosArr.forEach((q) => {
@@ -1840,7 +1939,15 @@
             // Para campaña, el valor numérico real; para ruleta diaria, null
             // (volarBrilloHaciaBadge arma el texto según premioTipo).
             const valorParaGlobo = origenPremio === 'campana' ? premioPorcentaje : null;
-            setTimeout(() => volarBrilloHaciaBadge(cx, cy, valorParaGlobo), 500);
+
+            // El fondo oscuro (todos-encendidos) y el confetti suave se
+            // mantienen 3s más tras cerrarse la tarjeta de felicidades,
+            // y solo entonces vuela el brillo hacia el testigo final.
+            setTimeout(() => {
+                wrap.classList.remove('todos-encendidos');
+                detenerConfettiSuave();
+                volarBrilloHaciaBadge(cx, cy, valorParaGlobo);
+            }, 1800);
         }
 
         function reclamarPremioDia() {
@@ -2086,6 +2193,218 @@
                 activar();
             }, 750);
         });
+
+        /* ---- Secuencia de encendido automático al agitar el celular ----
+           Prende los 3 quesos EN ORDEN, uno por uno, cada uno con su propio
+           confetti dorado, y al final dispara el mismo flujo de "todos
+           encendidos" que ya existía (tarjeta de descuento + botón sortear). */
+
+        function lanzarConfettiLocalDorado(xPct, yPct, cantidad = 26) {
+            if (!confettiWrap) return;
+            const coloresDorados = ['#c9a84c', '#f0d98a', '#ffe066', '#fff2c2'];
+            for (let i = 0; i < cantidad; i++) {
+                const pieza = document.createElement('span');
+                pieza.className = 'confetti-pieza-local';
+                pieza.style.left = xPct + '%';
+                pieza.style.top = yPct + '%';
+                pieza.style.background = coloresDorados[Math.floor(Math.random() * coloresDorados.length)];
+                pieza.style.width = (10 + Math.random() * 8) + 'px';
+                pieza.style.height = (16 + Math.random() * 12) + 'px';
+
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = 50 + Math.random() * 80;
+                pieza.style.setProperty('--cx', (Math.cos(angulo) * distancia) + 'px');
+                pieza.style.setProperty('--cy', (Math.sin(angulo) * distancia - 30) + 'px');
+                pieza.style.setProperty('--crot', (Math.random() * 720 - 360) + 'deg');
+                pieza.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
+                pieza.style.animationDelay = (Math.random() * 0.08) + 's';
+
+                confettiWrap.appendChild(pieza);
+                pieza.addEventListener('animationend', () => pieza.remove());
+            }
+        }
+
+        function encenderQuesoConConfetti(idx) {
+            const q = quesosArr[idx];
+            if (!q || q.classList.contains('encendido')) return;
+            q.classList.add('encendido');
+            vistos.add(q);
+            const cx = parseFloat(q.dataset.centroX) || 50;
+            const cy = parseFloat(q.dataset.centroY) || 50;
+            lanzarConfettiLocalDorado(cx, cy);
+        }
+
+        // Mobile simplificado: solo se enciende cada queso en orden y se
+        // quedan así. Nada de flip, video, ruleta, tarjeta ni botón sortear.
+        let agitadoCompletado = false;
+        let agitandoEnCurso = false;
+
+        function finalizarSecuenciaAgitado() {
+            agitandoEnCurso = false;
+            if (agitadoCompletado) return;
+            agitadoCompletado = true;
+            // Único elemento que desaparece al completarse: el aviso de "agitar".
+            if (shakeHint) shakeHint.style.display = 'none';
+            if (shakePermiso) shakePermiso.style.display = 'none';
+            if (shakeFallback) shakeFallback.classList.remove('visible');
+
+            let sumX = 0, sumY = 0, n = 0;
+            quesosArr.forEach((q) => {
+                sumX += parseFloat(q.dataset.centroX) || 50;
+                sumY += parseFloat(q.dataset.centroY) || 50;
+                n++;
+            });
+            const cx = n ? sumX / n : 50;
+            const cy = n ? sumY / n : 50;
+
+            volarBrilloAlModal(cx, cy);
+        }
+
+        function volarBrilloAlModal(cx, cy) {
+            const slide = wrap.closest('.slide-imagen');
+            if (!slide) { mostrarModalOfertaMobile(); return; }
+
+            const spark = document.createElement('span');
+            spark.className = 'brillo-modal-volador';
+            spark.style.left = cx + '%';
+            spark.style.top = cy + '%';
+            slide.appendChild(spark);
+
+            const rectSlide = slide.getBoundingClientRect();
+            const destinoX = rectSlide.left + rectSlide.width / 2;
+            const destinoY = rectSlide.top + rectSlide.height / 2;
+            const origenX = rectSlide.left + (cx / 100) * rectSlide.width;
+            const origenY = rectSlide.top + (cy / 100) * rectSlide.height;
+
+            spark.style.setProperty('--dx', (destinoX - origenX) + 'px');
+            spark.style.setProperty('--dy', (destinoY - origenY) + 'px');
+
+            requestAnimationFrame(() => spark.classList.add('volando'));
+
+            spark.addEventListener('animationend', () => {
+                spark.remove();
+                mostrarModalOfertaMobile();
+            });
+        }
+
+        function mostrarModalOfertaMobile() {
+            wrap.classList.add('todos-encendidos');
+
+            const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
+            const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+            if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
+            if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, premioPorcentaje);
+
+            iniciarConfettiSuave();
+            mostrarBotonSortear();
+        }
+
+        function iniciarSecuenciaAgitado() {
+            if (agitadoCompletado || agitandoEnCurso) return; // ya completado, o ya en curso
+
+            agitandoEnCurso = true;
+            wrap.classList.add('modo-ofertas'); // necesario para que el glow/borde dorado se vean
+
+            const INTERVALO_MS = 1000; // TODO: ajusta el ritmo entre queso y queso si lo quieres más rápido/lento
+
+            quesosArr.forEach((q, i) => {
+                setTimeout(() => encenderQuesoConConfetti(i), i * INTERVALO_MS);
+            });
+
+            setTimeout(finalizarSecuenciaAgitado, quesosArr.length * INTERVALO_MS + 300);
+        }
+
+        /* ---- Activar ofertas agitando el celular (mobile) ---- */
+        const shakeHint = document.getElementById('ofertaShakeHint');
+        const shakePermiso = document.getElementById('ofertaShakePermiso');
+        const shakeFallback = document.getElementById('ofertaShakeFallback');
+        const esMobile = window.matchMedia('(max-width: 991px)').matches;
+
+        // El botón de respaldo NUNCA se muestra a la vez que el aviso de
+        // "agita tu celular": solo aparece si, tras un tiempo prudente,
+        // el navegador jamás disparó un evento devicemotion real (caso
+        // Samsung y varios fabricantes que bloquean el sensor). Si el
+        // sensor sí funciona, el aviso de agitar se queda solo.
+        let sensorMovimientoDetectado = false;
+
+        function mostrarSoloFallback() {
+            if (shakeHint) shakeHint.style.display = 'none';
+            if (shakePermiso) shakePermiso.style.display = 'none';
+            if (shakeFallback) shakeFallback.classList.add('visible');
+        }
+
+        if (esMobile && shakeFallback) {
+            shakeFallback.addEventListener('click', () => {
+                window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+                iniciarSecuenciaAgitado();
+                shakeFallback.classList.remove('visible');
+            });
+        }
+
+        if (esMobile && window.DeviceMotionEvent) {
+            const UMBRAL_SHAKE = 45; // sensibilidad: más alto = necesita agitar más fuerte
+            let ultimaVez = 0;
+            let ultimaX = null, ultimaY = null, ultimaZ = null;
+
+            function alDetectarMovimiento(e) {
+                const acc = e.accelerationIncludingGravity;
+                if (!acc) return;
+
+                // Primer evento real recibido: el sensor SÍ funciona en
+                // este dispositivo, así que el botón de respaldo no hace
+                // falta y no debe aparecer.
+                if (!sensorMovimientoDetectado) {
+                    sensorMovimientoDetectado = true;
+                    if (shakeFallback) shakeFallback.classList.remove('visible');
+                }
+
+                const ahora = Date.now();
+                if (ahora - ultimaVez < 1000) return; // evita disparos repetidos
+
+                if (ultimaX !== null) {
+                    const delta = Math.abs(acc.x - ultimaX) + Math.abs(acc.y - ultimaY) + Math.abs(acc.z - ultimaZ);
+                    if (delta > UMBRAL_SHAKE) {
+                        ultimaVez = ahora;
+                        window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
+                        iniciarSecuenciaAgitado();
+                    }
+                }
+                ultimaX = acc.x; ultimaY = acc.y; ultimaZ = acc.z;
+            }
+
+            function activarEscuchaMovimiento() {
+                window.addEventListener('devicemotion', alDetectarMovimiento);
+                if (shakeHint) shakeHint.style.display = 'flex';
+                if (shakePermiso) shakePermiso.style.display = 'none';
+
+                // Si en 2.5s no llegó NINGÚN evento devicemotion real,
+                // asumimos que el navegador/fabricante lo está bloqueando
+                // en silencio (típico en varios Samsung) y se muestra
+                // solo el botón de respaldo.
+                setTimeout(() => {
+                    if (!sensorMovimientoDetectado) mostrarSoloFallback();
+                }, 2500);
+            }
+
+            // iOS 13+ exige permiso explícito con un toque del usuario
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                if (shakeHint) shakeHint.style.display = 'none';
+                if (shakePermiso) shakePermiso.style.display = 'flex';
+                shakePermiso && shakePermiso.addEventListener('click', () => {
+                    DeviceMotionEvent.requestPermission()
+                        .then((resultado) => {
+                            if (resultado === 'granted') activarEscuchaMovimiento();
+                            else mostrarSoloFallback();
+                        })
+                        .catch(() => mostrarSoloFallback());
+                });
+            } else {
+                activarEscuchaMovimiento();
+            }
+        } else if (esMobile) {
+            // Navegador sin soporte de DeviceMotionEvent en absoluto.
+            mostrarSoloFallback();
+        }
 
         wrap.querySelectorAll('.queso-punto').forEach((p) => {
             p.addEventListener('click', (e) => {
