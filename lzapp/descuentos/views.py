@@ -50,7 +50,7 @@ def panel_descuentos(request):
 
     # Página aparte para campañas (page_campanas) para que no choque con
     # la paginación de productos (page), ya que ambas viven en la misma URL.
-    paginator_campanas = Paginator(campanas_qs, 4)
+    paginator_campanas = Paginator(campanas_qs, 3)
     campanas = paginator_campanas.get_page(request.GET.get('page_campanas'))
 
     for c in campanas:

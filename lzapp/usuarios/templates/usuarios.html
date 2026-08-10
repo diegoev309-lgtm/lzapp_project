@@ -1,269 +1,72 @@
 {% extends 'masterpage_dashboard.html' %}
 {% load static %}
 
+{% block title %}LzApp · Usuarios{% endblock %}
+{% block page_icon %}bi-people-fill{% endblock %}
+{% block page_title %}Usuarios{% endblock %}
+{% block page_subtitle %}Administra usuarios, empleados y actividad del sistema{% endblock %}
+
+{% block header_actions %}
+<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    <span>PDF</span>
+</a>
+{% endblock %}
+
 {% block content %}
 
-<style>
-body{
-    background:#0F0F17 !important;
-}
-
-.usuarios-wrapper{
-    background:#13131A;
-    min-height:100vh;
-    padding:25px;
-    border-radius:24px;
-    color:#fff;
-}
-
-.usuarios-header{
-    background:linear-gradient(135deg,#1E1E2D,#25253A);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:22px;
-    padding:28px;
-    margin-bottom:24px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:18px;
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
-}
-
-.usuarios-header h2{
-    margin:0;
-    font-size:28px;
-    font-weight:800;
-    color:#fff;
-}
-
-.usuarios-header p{
-    margin:4px 0 0;
-    color:#9CA3AF;
-    font-size:14px;
-}
-
-.btn-add-user{
-    background:#E4C870;
-    color:#111827;
-    padding:10px 18px;
-    border-radius:12px;
-    font-weight:700;
-    text-decoration:none;
-    transition:.2s;
-    border:none;
-}
-
-.btn-add-user:hover{
-    background:#F1D98A;
-    color:#000;
-}
-
-.filter-btn{
-    background:#1E1E2D;
-    color:#9CA3AF;
-    border:1px solid rgba(255,255,255,.08);
-    padding:9px 16px;
-    border-radius:12px;
-    font-weight:600;
-    text-decoration:none;
-    transition:.2s;
-}
-
-.filter-btn:hover{
-    background:#25253A;
-    color:#fff;
-}
-
-.active-filter{
-    background:#E4C870;
-    color:#111827 !important;
-    border-color:#E4C870;
-}
-
-.stats-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:18px;
-    margin-bottom:24px;
-}
-
-.stat-card{
-    background:#1E1E2D;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:18px;
-    padding:22px;
-    box-shadow:0 8px 22px rgba(0,0,0,.28);
-}
-
-.stat-number{
-    font-size:32px;
-    font-weight:800;
-    color:#fff;
-}
-
-.stat-label{
-    margin-top:6px;
-    color:#9CA3AF;
-    font-size:13px;
-    font-weight:600;
-}
-
-.table-card{
-    background:#1E1E2D;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:22px;
-    padding:18px;
-    box-shadow:0 8px 22px rgba(0,0,0,.28);
-}
-
-.table-responsive{
-    overflow-x:auto;
-}
-
-.usuarios-table{
-    width:100%;
-    border-collapse:collapse;
-    color:#fff;
-}
-
-.usuarios-table thead th{
-    text-align:left;
-    padding:14px;
-    color:#9CA3AF;
-    font-size:12px;
-    text-transform:uppercase;
-    border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.usuarios-table tbody td{
-    padding:16px 14px;
-    border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.user-name{
-    font-weight:700;
-    color:#fff;
-}
-
-.user-email{
-    color:#9CA3AF;
-    font-size:13px;
-}
-
-.badge-phone{
-    background:rgba(56,189,248,.12);
-    color:#38BDF8;
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
-}
-
-.badge-empty{
-    background:rgba(255,255,255,.06);
-    color:#9CA3AF;
-}
-
-.badge-rol{
-    background:rgba(228,200,112,.12);
-    color:#E4C870;
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:700;
-}
-
-.btn-delete{
-    background:#EF4444;
-    color:#fff;
-    border:none;
-    padding:8px 14px;
-    border-radius:10px;
-    font-weight:600;
-    transition:.2s;
-    cursor:pointer;
-}
-
-.btn-delete:hover{
-    background:#DC2626;
-}
-
-.empty-state{
-    text-align:center;
-    padding:50px 20px;
-    color:#9CA3AF;
-}
-</style>
-
-<div class="usuarios-wrapper">
-
-```
-<div class="usuarios-header">
-
-    <div>
-        <h2>👥 Usuarios registrados</h2>
-        <p>Administra usuarios, empleados y actividad del sistema.</p>
+<!-- ===== Stat cards ===== -->
+<div class="dash-stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-person-fill"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_usuarios }}</div>
+            <div class="stat-label">Usuarios</div>
+            {% if diferencia_mes > 0 %}
+                <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>{{ diferencia_mes }} más que el mes anterior</div>
+            {% elif diferencia_mes < 0 %}
+                <div class="stat-trend down"><i class="bi bi-arrow-down-short"></i>{{ diferencia_mes }} vs. mes anterior</div>
+            {% else %}
+                <div class="stat-trend" style="color:var(--text-tertiary);">Sin cambios vs. mes anterior</div>
+            {% endif %}
+        </div>
     </div>
 
+    <div class="stat-card">
+        <div class="stat-icon gold"><i class="bi bi-person-workspace"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_empleados }}</div>
+            <div class="stat-label">Empleados</div>
+            {% if total_empleados > 0 %}
+                <div class="stat-trend up"><i class="bi bi-check-circle-fill"></i> Equipo activo</div>
+            {% else %}
+                <div class="stat-trend down"><i class="bi bi-exclamation-triangle-fill"></i> Aún no hay empleados registrados</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="productos-toolbar">
+    <div class="tab-group" role="group" aria-label="Filtrar por rol">
+        <a href="{% url 'Usuario' %}" class="tab-item {% if not filtro_rol %}active{% endif %}">Todos</a>
+        <a href="{% url 'Usuario' %}?rol=usuario" class="tab-item {% if filtro_rol == 'usuario' %}active{% endif %}">Usuarios</a>
+        <a href="{% url 'Usuario' %}?rol=empleado" class="tab-item {% if filtro_rol == 'empleado' %}active{% endif %}">Empleados</a>
+    </div>
     <div class="d-flex gap-2 flex-wrap">
-
-        <a href="{% url 'registro' %}" class="btn-add-user">
-            ➕ Usuario
+        <a href="{% url 'registro' %}" class="dash-btn dash-btn-solid">
+            <i class="bi bi-person-plus-fill"></i> Usuario
         </a>
-
-        <a href="{% url 'registro_empleado' %}" class="btn-add-user">
-            🧑‍💼 Empleado
+        <a href="{% url 'registro_empleado' %}" class="dash-btn dash-btn-solid">
+            <i class="bi bi-person-workspace"></i> Empleado
         </a>
-
     </div>
-
 </div>
 
-<div class="d-flex gap-2 flex-wrap mb-4">
+<!-- ===== Bloque tipo lista (mismo patrón que Productos) ===== -->
+<div class="bloque-productos">
 
-    <a href="{% url 'Usuario' %}"
-       class="filter-btn {% if not filtro_rol %}active-filter{% endif %}">
-        Todos
-    </a>
-
-    <a href="{% url 'Usuario' %}?rol=usuario"
-       class="filter-btn {% if filtro_rol == 'Usuario' %}active-filter{% endif %}">
-        👤 Usuarios
-    </a>
-
-    <a href="{% url 'Usuario' %}?rol=empleado"
-       class="filter-btn {% if filtro_rol == 'empleado' %}active-filter{% endif %}">
-        🧑‍💼 Empleados
-    </a>
-
-</div>
-
-<div class="stats-grid">
-
-    <div class="stat-card">
-        <div class="stat-number">{{ total_usuarios }}</div>
-        <div class="stat-label">Usuarios</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-number">{{ total_empleados }}</div>
-        <div class="stat-label">Empleados</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-number">{{ usuarios_con_compra }}</div>
-        <div class="stat-label">Han comprado</div>
-    </div>
-
-</div>
-
-<div class="table-card">
-
-    <div class="table-responsive">
-
-        <table class="usuarios-table">
-
+    <div style="padding: 4px 20px 20px; overflow-x:auto;">
+        <table class="dash-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -275,111 +78,73 @@ body{
                     <th>Acciones</th>
                 </tr>
             </thead>
-
             <tbody>
-
                 {% for usuario in usuarios %}
-
                 <tr>
-
-                    <td>#{{ usuario.id }}</td>
-
+                    <td class="muted">#{{ usuario.id }}</td>
+                    <td style="font-weight:600;">{{ usuario.username }}</td>
+                    <td class="muted">{{ usuario.email|default:"Sin correo registrado" }}</td>
                     <td>
-                        <div class="user-name">
-                            {{ usuario.username }}
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="user-email">
-                            {{ usuario.email|default:'Sin correo registrado' }}
-                        </div>
-                    </td>
-
-                    <td>
-
                         {% if usuario.perfil %}
-
-                            <span class="badge-phone">
-                                📞 {{ usuario.perfil.telefono }}
-                            </span>
-
+                            <span class="badge-gold"><i class="bi bi-telephone-fill"></i> {{ usuario.perfil.telefono }}</span>
                         {% else %}
-
-                            <span class="badge-phone badge-empty">
-                                Sin teléfono
-                            </span>
-
+                            <span class="badge-gold" style="background:rgba(255,255,255,.06); color:var(--text-tertiary);">Sin teléfono</span>
                         {% endif %}
-
                     </td>
-
                     <td>
-
                         {% if usuario.perfilemple %}
-
-                            <span class="badge-rol">
-                                🧑‍💼 Empleado
-                            </span>
-
+                            <span class="badge-gold"><i class="bi bi-person-workspace"></i> Empleado</span>
                         {% else %}
-
-                            <span class="badge-rol">
-                                👤 Usuario
-                            </span>
-
+                            <span class="badge-green"><i class="bi bi-person-fill"></i> Usuario</span>
                         {% endif %}
-
                     </td>
-
+                    <td class="muted">{{ usuario.date_joined|date:"d/m/Y" }}</td>
                     <td>
-                        {{ usuario.date_joined|date:'d/m/Y' }}
-                    </td>
-
-                    <td>
-
-                        <form method="post"
-                              action="{% url 'eliminar_usuario' usuario.id %}"
-                              style="display:inline;"
-                              onsubmit="return confirm('¿Desea eliminar a {{ usuario.username }}?');">
-
+                        <form method="post" action="{% url 'eliminar_usuario' usuario.id %}" style="display:inline;" onsubmit="return confirm('¿Desea eliminar a {{ usuario.username }}?');">
                             {% csrf_token %}
-
-                            <button type="submit" class="btn-delete">
-                                🗑️ Eliminar
+                            <button type="submit" class="btn-eliminar" style="padding:8px 12px;" title="Eliminar">
+                                <i class="bi bi-trash3-fill"></i>
                             </button>
-
                         </form>
-
                     </td>
-
                 </tr>
-
                 {% empty %}
-
                 <tr>
                     <td colspan="7">
-
-                        <div class="empty-state">
-                            <h5>No hay usuarios registrados</h5>
-                            <p>
-                                Los nuevos usuarios aparecerán automáticamente aquí.
-                            </p>
+                        <div class="estado-vacio">
+                            <i class="bi bi-people"></i>
+                            <h6 class="mt-3 mb-0">No hay usuarios registrados</h6>
+                            <p class="mb-0">Los nuevos usuarios aparecerán automáticamente aquí.</p>
                         </div>
-
                     </td>
                 </tr>
-
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
 
-</div>
-```
+    <!-- ===== Paginación ===== -->
+    {% if usuarios.paginator.num_pages > 1 %}
+    <div class="pie-productos">
+        <div class="pie-ventas">
+            {% if usuarios.has_previous %}
+                <a class="pg-link" href="?page=1{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">Primera</a>
+                <a class="pg-link" href="?page={{ usuarios.previous_page_number }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">&laquo;</a>
+            {% endif %}
+            {% for pagina in usuarios.paginator.page_range %}
+                {% if pagina == usuarios.number %}
+                    <span class="pg-link active">{{ pagina }}</span>
+                {% else %}
+                    <a class="pg-link" href="?page={{ pagina }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">{{ pagina }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if usuarios.has_next %}
+                <a class="pg-link" href="?page={{ usuarios.next_page_number }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">&raquo;</a>
+                <a class="pg-link" href="?page={{ usuarios.paginator.num_pages }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">Última</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 
 </div>
 

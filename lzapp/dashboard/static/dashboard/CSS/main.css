@@ -206,6 +206,7 @@ a{ text-decoration:none; color:inherit; }
   flex:1;
   min-width:0;
   padding: 0 32px 40px;
+  overflow-x: hidden;
 }
 
 .dash-topbar{
@@ -991,4 +992,343 @@ a{ text-decoration:none; color:inherit; }
     .tabla-productos tbody td{ padding:4px 3px; font-size:9px; }
     .img-producto{ width:33px; height:27px; }
     .acciones{ flex-direction:column; }
+}
+
+
+/*==========================================================
+   COMPONENTES COMPARTIDOS: carrusel de gráficos, filtro de
+   fechas, modal custom, mini-stats, badge numerado, spinner.
+   Usado por: Panel de Ventas, y cualquier vista futura con
+   gráficos, filtros de período o listas rankeadas.
+===========================================================*/
+
+.panel-subtitulo{
+    font-weight:500;
+    color: var(--text-tertiary);
+    font-size:11px;
+    margin-left:auto;
+}
+.contenedor-grafico{ position:relative; flex:1; min-height:0; }
+
+/* ---- Carrusel de gráficos ---- */
+.carrusel-graficos{ position:relative; }
+.carrusel-viewport{ overflow:hidden; border-radius: var(--radius-panel); }
+.carrusel-track{ display:flex; transition: transform .4s ease; }
+.carrusel-slide{ min-width:100%; box-sizing:border-box; }
+.carrusel-slide .dash-panel{
+    height:min(60vh, 430px);
+    min-height: 380px;
+    display:flex;
+    flex-direction:column;
+}
+.carrusel-flecha{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:36px; height:36px;
+    border-radius:50%;
+    border:1px solid var(--border-hair);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 24px rgba(0,0,0,.4);
+    cursor:pointer;
+    transition:.2s;
+}
+.carrusel-flecha:hover{ background: var(--gold); color:#1A1A2E; border-color: var(--gold); }
+.carrusel-flecha-izq{ left:-14px; }
+.carrusel-flecha-der{ right:-14px; }
+.carrusel-puntos{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
+.carrusel-puntos .punto{
+    width:8px; height:8px; border-radius:50%; border:none;
+    background: rgba(255,255,255,.15);
+    padding:0; cursor:pointer; transition:.2s;
+}
+.carrusel-puntos .punto.activo{ width:22px; border-radius:5px; background: var(--gold); }
+@media(max-width:576px){
+    .carrusel-flecha-izq{ left:4px; }
+    .carrusel-flecha-der{ right:4px; }
+}
+
+/* ---- Dropdown de filtro de período (custom, sin Bootstrap) ---- */
+.filtro-wrap{ position:relative; }
+.filtro-menu{
+    position:absolute;
+    top: calc(100% + 8px);
+    right:0;
+    min-width:250px;
+    padding:8px;
+    border-radius: var(--radius-panel);
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    box-shadow: 0 20px 45px rgba(0,0,0,.45);
+    z-index:60;
+    display:none;
+}
+.filtro-menu.show{ display:block; }
+.filtro-item{
+    display:flex; align-items:center; gap:8px;
+    padding:9px 10px;
+    border-radius: var(--radius-btn);
+    font-size:12.5px; font-weight:600;
+    color: var(--text-secondary);
+    cursor:pointer;
+}
+.filtro-item:hover{ background: rgba(255,255,255,.05); color: var(--text-primary); }
+.filtro-item.active{ background: var(--gold-dim); color: var(--gold); }
+.filtro-divider{ height:1px; background: var(--border-subtle); margin:6px 2px; }
+.etiqueta-periodo{
+    font-size:11px; color: var(--text-tertiary); font-weight:700;
+    text-transform:uppercase; letter-spacing:.4px;
+    display:flex; align-items:center; gap:6px; padding:4px 10px;
+}
+.rango-personalizado{ display:flex; flex-direction:column; gap:8px; padding:2px 10px 6px; }
+.rango-personalizado input[type="date"]{
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-btn);
+    padding:7px 10px; font-size:12.5px;
+    color: var(--text-primary);
+    background: var(--bg-canvas);
+    color-scheme: dark;
+}
+.rango-personalizado input[type="date"]:focus{ outline:none; border-color: var(--gold); }
+.btn-aplicar-rango{
+    border:none; border-radius: var(--radius-btn);
+    padding:8px 14px; font-size:12.5px; font-weight:700;
+    background: var(--gold); color:#1A1A2E;
+    cursor:pointer; transition:.2s;
+}
+.btn-aplicar-rango:hover{ background:#EFD48C; }
+
+/* ---- Grid de dos columnas (lista + tabla, ej. Historial) ---- */
+.historial-grid{
+    display:grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: var(--gap);
+}
+.historial-grid > section{ min-width: 0; }
+@media(max-width:991px){
+    .historial-grid{ grid-template-columns:1fr; }
+}
+
+/* ---- Badge numerado (ranking) ---- */
+.rank-badge{
+    width:24px; height:24px; min-width:24px;
+    border-radius:50%;
+    background: rgba(255,255,255,.06);
+    color: var(--gold);
+    font-size:11px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+}
+
+/* ---- Paginación custom (sin Bootstrap) ---- */
+.pie-ventas{
+    display:flex; justify-content:flex-end; align-items:center;
+    gap:6px; margin-top:14px; flex-wrap:wrap;
+}
+.pg-link{
+    min-width:30px; height:30px; padding:0 8px;
+    border-radius: var(--radius-btn);
+    border:1px solid var(--border-hair);
+    color: var(--text-secondary);
+    font-size:12px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+}
+.pg-link:hover{ border-color: rgba(255,255,255,.25); color: var(--text-primary); }
+.pg-link.active{ background: var(--gold); border-color: var(--gold); color:#1A1A2E; }
+
+/* ---- Modal custom (overlay + caja, sin Bootstrap) ---- */
+.modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background: rgba(0,0,0,.6);
+    z-index:100;
+    align-items:center; justify-content:center;
+    padding:20px;
+}
+.modal-overlay.show{ display:flex; }
+.modal-box{
+    width:100%; max-width:440px;
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-panel);
+    overflow:hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5);
+}
+.modal-box-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--border-subtle);
+}
+.modal-box-header h6{ margin:0; font-size:14.5px; font-weight:700; }
+.modal-close-btn{
+    width:30px; height:30px; border-radius:50%;
+    border:none; background: rgba(255,255,255,.06);
+    color: var(--text-secondary);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+}
+.modal-close-btn:hover{ background: rgba(255,255,255,.12); color: var(--text-primary); }
+.modal-box-body{ padding:18px 20px 20px; }
+
+/* ---- Mini stats (grid de 3 valores dentro de un modal/panel) ---- */
+.mini-stats-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:10px;
+    margin-bottom:16px;
+}
+.mini-stat{
+    background: rgba(255,255,255,.03);
+    border:1px solid var(--border-subtle);
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+}
+.mini-stat .valor{ font-size:15px; font-weight:800; }
+.mini-stat .etiqueta{ font-size:10.5px; color: var(--text-tertiary); margin-top:2px; }
+
+/* ---- Spinner de carga ---- */
+.spin{
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,.15);
+    border-top-color: var(--gold);
+    border-radius:50%;
+    display:inline-block;
+    animation: spin .7s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+
+/*==========================================================
+   FORMULARIO MODAL (usado por: crear/editar Producto,
+   Registrar empleado, y cualquier formulario futuro de alta)
+===========================================================*/
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    z-index:90;
+}
+
+.modal-formulario{
+    width:100%;
+    max-width:1000px;
+    max-height:95vh;
+    overflow-y:auto;
+    border-radius:var(--radius-panel);
+    animation:formularioAparecer .35s ease;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.header-form{
+    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
+    color:var(--text-primary);
+    padding:18px 30px;
+    border-radius:var(--radius-panel) var(--radius-panel) 0 0;
+    border-bottom:1px solid var(--border-subtle);
+}
+.header-form h2{
+    margin:0; font-size:21px; font-weight:700;
+    display:flex; align-items:center; gap:10px;
+}
+.header-form h2 i{ color:var(--gold); }
+.header-form p{ margin:5px 0 0; font-size:13px; color:var(--text-secondary); }
+
+.card-form{
+    background:var(--bg-panel);
+    padding:24px 30px;
+    border-radius:0 0 var(--radius-panel) var(--radius-panel);
+}
+
+.card-form .form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px 22px;
+}
+.card-form .form-grid p{ margin:0; display:flex; flex-direction:column; }
+
+.card-form label{
+    font-weight:600; color:var(--text-secondary);
+    margin-bottom:6px; font-size:13px;
+}
+
+.card-form input,
+.card-form select,
+.card-form textarea{
+    width:100%; height:38px;
+    border:1px solid var(--border-hair);
+    border-radius:var(--radius-btn);
+    padding:6px 12px;
+    transition:.3s;
+    font-size:13px;
+    background:rgba(255,255,255,.03);
+    color:var(--text-primary);
+}
+.card-form textarea{ height:38px; min-height:38px; max-height:38px; resize:none; }
+.card-form input:focus,
+.card-form select:focus,
+.card-form textarea:focus{
+    outline:none;
+    border-color:var(--gold);
+    background:rgba(255,255,255,.05);
+    box-shadow:0 0 0 4px var(--gold-dim);
+}
+.card-form select option{ background:var(--bg-panel); color:var(--text-primary); }
+.card-form input[type=file]{ padding:6px; height:auto; font-size:13px; color:var(--text-secondary); }
+.card-form input[type=checkbox]{ width:18px; height:18px; margin-top:4px; box-shadow:none; accent-color:var(--gold); }
+
+.card-form .errorlist{ list-style:none; margin:5px 0 0; padding:0; color:var(--red); font-size:12.5px; }
+.card-form .helptext{ font-size:12px; color:var(--text-tertiary); margin-top:5px; display:block; }
+
+.botones{
+    display:flex; justify-content:flex-end; gap:12px; margin-top:20px;
+    background:var(--bg-sidebar);
+    border:1px solid var(--border-subtle);
+    border-radius:12px;
+    padding:12px 16px;
+}
+.btn-volver{
+    background:rgba(255,255,255,.06);
+    color:var(--text-primary);
+    border:1px solid var(--border-hair);
+    padding:8px 18px; font-size:14px;
+    border-radius:var(--radius-btn);
+    text-decoration:none;
+    transition:.3s;
+}
+.btn-volver:hover{ background:rgba(255,255,255,.1); color:var(--text-primary); border-color:rgba(255,255,255,.25); transform:translateY(-2px); }
+.btn-guardar{
+    background:var(--gold); color:#1A1A2E; border:none;
+    padding:8px 18px; font-size:14px; font-weight:600;
+    border-radius:var(--radius-btn); transition:.3s;
+}
+.btn-guardar:hover{ background:#EFD48C; color:#1A1A2E; transform:translateY(-2px); box-shadow:0 10px 22px rgba(228,200,112,.25); }
+
+.modal-formulario::-webkit-scrollbar{ width:8px; }
+.modal-formulario::-webkit-scrollbar-thumb{ background:var(--gold); border-radius:20px; }
+
+@keyframes formularioAparecer{
+    from{ opacity:0; transform:translateY(-30px) scale(.95); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+@media(max-width:992px){
+    .modal-formulario{ max-width:95%; }
+    .card-form .form-grid{ grid-template-columns:1fr; }
+    .header-form{ text-align:center; }
+    .header-form h2{ font-size:20px; justify-content:center; }
+}
+@media(max-width:576px){
+    .overlay{ padding:10px; }
+    .card-form{ padding:20px; }
+    .header-form{ padding:20px; }
+    .botones{ flex-direction:column; }
+    .botones a, .botones button{ width:100%; }
 }

@@ -1,124 +1,20 @@
 {% extends "masterpage_dashboard.html" %}
-
 {% load static %}
+
+{% block page_icon %}bi-box-seam-fill{% endblock %}
+{% block page_title %}Historial de Producción{% endblock %}
+{% block page_subtitle %}Consulta todas las producciones registradas del sistema{% endblock %}
+
+{% block header_actions %}
+<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    <span class="btn-importar-texto">PDF</span>
+</a>
+{% endblock %}
 
 {% block content %}
 
 <style>
-
-/*==========================================================
-   BLOQUE UNIFICADO: encabezado + tabla + pie (paginación)
-===========================================================*/
-
-.bloque-produccion{
-    background:var(--bg-panel);
-    border:1px solid var(--border-subtle);
-    border-radius:var(--radius-panel);
-    overflow:hidden;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-}
-
-/*==========================
-        ENCABEZADO
-===========================*/
-
-.encabezado{
-    background:linear-gradient(135deg, var(--bg-sidebar), var(--bg-panel));
-    border-bottom:1px solid var(--border-subtle);
-    color:var(--text-primary);
-    padding:26px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:20px;
-}
-
-.titulo{
-    margin:0;
-    font-size:23px;
-    font-weight:700;
-    color:var(--text-primary);
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.titulo i{
-    color:var(--gold);
-    font-size:20px;
-}
-
-.subtitulo{
-    margin-top:6px;
-    color:var(--text-secondary);
-    font-size:13px;
-}
-
-/* Botón "Nueva Producción" */
-.btn-nuevo{
-    background:var(--gold);
-    color:#1A1A2E;
-    border:1px solid var(--gold);
-    padding:11px 20px;
-    border-radius:var(--radius-btn);
-    font-weight:600;
-    font-size:13.5px;
-    transition:.3s;
-}
-
-.btn-nuevo:hover{
-    background:#EFD48C;
-    color:#1A1A2E;
-    transform:translateY(-2px);
-    box-shadow:0 10px 22px rgba(228,200,112,.25);
-}
-
-/*==========================
-          TABLA
-===========================*/
-
-.table{
-    margin-bottom:0;
-}
-
-.tabla-produccion thead{
-    background:transparent;
-}
-
-.tabla-produccion thead th{
-    color:var(--text-tertiary);
-    text-transform:uppercase;
-    letter-spacing:.4px;
-    border:none;
-    border-bottom:1px solid var(--border-subtle);
-    padding:12px 8px;
-    text-align:center;
-    font-size:11px;
-    font-weight:600;
-    white-space:nowrap;
-}
-
-.tabla-produccion tbody td{
-    vertical-align:middle;
-    text-align:center;
-    padding:12px 6px;
-    font-size:13px;
-    color:var(--text-secondary);
-    border-bottom:1px solid var(--border-subtle);
-}
-
-.tabla-produccion tbody tr{
-    transition:.2s;
-}
-
-.tabla-produccion tbody tr:last-child td{
-    border-bottom:none;
-}
-
-.tabla-produccion tbody tr:hover{
-    background:rgba(255,255,255,.03);
-}
 
 .badge-cantidad{
     font-size:11.5px;
@@ -130,119 +26,32 @@
     border:none;
 }
 
-.text-muted{
-    color:var(--text-tertiary) !important;
-}
+.productos-toolbar{ justify-content:flex-end; }
+.busqueda-fila{ justify-content:flex-end; }
 
-.estado-vacio i{
-    color:var(--text-tertiary) !important;
-}
-
-.estado-vacio h5{
-    color:var(--text-secondary);
-}
-
-/*==========================================================
-   PIE DEL BLOQUE: paginación
-===========================================================*/
-
-.pie-produccion{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
-    padding:14px 20px;
-    border-top:1px solid var(--border-subtle);
-    background:var(--bg-panel);
-}
-
-.paginacion-inline{
-    margin:0;
-}
-
-.paginacion-inline .pagination{
-    margin:0;
-    flex-wrap:wrap;
-}
-
-.paginacion-inline .page-link{
-    color:var(--text-secondary);
-    background:transparent;
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-link:hover{
-    color:var(--text-primary);
-    background-color:rgba(255,255,255,.05);
-    border-color:var(--border-hair);
-}
-
-.paginacion-inline .page-item.active .page-link{
-    background-color:var(--gold);
-    border-color:var(--gold);
-    color:#1A1A2E;
-    font-weight:600;
-}
-
-/*==========================
-      RESPONSIVE
-===========================*/
-
-@media(max-width:768px){
-
-    .encabezado{
-        flex-direction:column;
-        text-align:center;
-    }
-
-    .titulo{
-        font-size:20px;
-    }
-
-    .pie-produccion{
-        justify-content:center;
-    }
-
-    .tabla-produccion thead th,
-    .tabla-produccion tbody td{
-        padding:4px 3px;
-        font-size:9px;
-    }
-}
+</style>
 
 </style>
 
 
-<div class="container-fluid contenedor-produccion">
+<div class="contenedor-productos">
 
-    <div class="bloque-produccion">
+    <div class="productos-toolbar">
+        <a href="{% url 'crear_produccion' %}" class="dash-btn dash-btn-solid">
+            <i class="bi bi-plus-circle-fill"></i> Nueva Producción
+        </a>
+    </div>
 
-        <div class="encabezado">
-            <div>
-                <h1 class="titulo">
-                    <i class="bi bi-box-seam-fill"></i>
-                    Historial de Producción
-                </h1>
-                <p class="subtitulo">
-                    Consulta todas las producciones registradas del sistema.
-                </p>
-            </div>
-            <a href="{% url 'crear_produccion' %}" class="btn btn-nuevo">
-                <i class="bi bi-plus-circle-fill"></i>
-                Nueva Producción
-            </a>
+    <div class="bloque-productos">
+
+        <div class="busqueda-fila">
             <button type="button" class="dash-btn" onclick="abrirModalImportarProduccion()">
-                <i class="bi bi-file-earmark-excel"></i>
-                Importar Excel
+                <i class="bi bi-file-earmark-excel"></i> Importar
             </button>
         </div>
 
-        <!-- table-responsive queda como red de seguridad; las columnas menos
-             esenciales (ID, Fecha, Observación) se ocultan progresivamente
-             en pantallas chicas con clases nativas de Bootstrap. -->
         <div class="table-responsive">
-            <table class="table table-hover tabla-produccion align-middle">
+            <table class="table table-hover tabla-productos align-middle">
                 <thead>
                     <tr>
                         <th class="d-none d-md-table-cell">ID</th>
@@ -290,7 +99,7 @@
         </div>
 
         <!-- ============ PIE: PAGINACIÓN ============ -->
-        <div class="pie-produccion">
+        <div class="pie-productos">
             <nav class="paginacion-inline" aria-label="Paginación de producciones">
                 <ul class="pagination pagination-sm mb-0">
                     {% if producciones.has_previous %}

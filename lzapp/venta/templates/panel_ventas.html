@@ -7,280 +7,20 @@
 {% block page_subtitle %}Ganancias, ventas y productos más vendidos{% endblock %}
 
 {% block header_actions %}
-<a href="#" class="dash-btn dash-btn-solid">
-    <i class="bi bi-file-earmark-pdf-fill"></i> Exportar PDF
+<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
+    <i class="bi bi-file-earmark-pdf-fill"></i>
+    <span class="btn-importar-texto">PDF</span>
 </a>
 {% endblock %}
 
 {% block extra_css %}
+
 <style>
-
-/*==========================================================
-   PANEL DE VENTAS — extensiones sobre main.css
-   (reutiliza variables --gold, --bg-panel, --text-*, etc.)
-===========================================================*/
-
-.ventas-toolbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom: var(--gap);
-}
-
-/* ---- Dropdown de período (custom, sin Bootstrap) ---- */
-.filtro-wrap{ position:relative; }
-
-.filtro-menu{
-    position:absolute;
-    top: calc(100% + 8px);
-    right:0;
-    min-width:250px;
-    padding:8px;
-    border-radius: var(--radius-panel);
-    background: var(--bg-panel);
-    border:1px solid var(--border-hair);
-    box-shadow: 0 20px 45px rgba(0,0,0,.45);
-    z-index:60;
-    display:none;
-}
-.filtro-menu.show{ display:block; }
-
-.filtro-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:9px 10px;
-    border-radius: var(--radius-btn);
-    font-size:12.5px;
-    font-weight:600;
-    color: var(--text-secondary);
-    cursor:pointer;
-}
-.filtro-item:hover{ background: rgba(255,255,255,.05); color: var(--text-primary); }
-.filtro-item.active{ background: var(--gold-dim); color: var(--gold); }
-
-.filtro-divider{ height:1px; background: var(--border-subtle); margin:6px 2px; }
-
-.etiqueta-periodo{
-    font-size:11px;
-    color: var(--text-tertiary);
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    padding:4px 10px;
-}
-
-.rango-personalizado{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:2px 10px 6px;
-}
-
-.rango-personalizado input[type="date"]{
-    border:1px solid var(--border-hair);
-    border-radius: var(--radius-btn);
-    padding:7px 10px;
-    font-size:12.5px;
-    color: var(--text-primary);
-    background: var(--bg-canvas);
-    color-scheme: dark;
-}
-.rango-personalizado input[type="date"]:focus{
-    outline:none;
-    border-color: var(--gold);
-}
-
-.btn-aplicar-rango{
-    border:none;
-    border-radius: var(--radius-btn);
-    padding:8px 14px;
-    font-size:12.5px;
-    font-weight:700;
-    background: var(--gold);
-    color:#1A1A2E;
-    cursor:pointer;
-    transition:.2s;
-}
-.btn-aplicar-rango:hover{ background:#EFD48C; }
-
-/*==========================
-   VISTA: RESUMEN (carrusel)
-===========================*/
-
-.carrusel-graficos{ position:relative; }
-
-.carrusel-viewport{ overflow:hidden; border-radius: var(--radius-panel); }
-
-.carrusel-track{ display:flex; transition: transform .4s ease; }
-
-.carrusel-slide{ min-width:100%; box-sizing:border-box; }
-
-.carrusel-slide .dash-panel{ height:min(54vh, 430px); display:flex; flex-direction:column; }
-
-.carrusel-flecha{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:36px; height:36px;
-    border-radius:50%;
-    border:1px solid var(--border-hair);
-    background: var(--bg-panel);
-    color: var(--text-primary);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 10px 24px rgba(0,0,0,.4);
-    cursor:pointer;
-    transition:.2s;
-}
-.carrusel-flecha:hover{ background: var(--gold); color:#1A1A2E; border-color: var(--gold); }
-.carrusel-flecha-izq{ left:-14px; }
-.carrusel-flecha-der{ right:-14px; }
-
-.carrusel-puntos{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
-
-.carrusel-puntos .punto{
-    width:8px; height:8px; border-radius:50%; border:none;
-    background: rgba(255,255,255,.15);
-    padding:0; cursor:pointer; transition:.2s;
-}
-.carrusel-puntos .punto.activo{ width:22px; border-radius:5px; background: var(--gold); }
-
-@media(max-width:576px){
-    .carrusel-flecha-izq{ left:4px; }
-    .carrusel-flecha-der{ right:4px; }
-}
-
-.panel-subtitulo{
-    font-weight:500;
-    color: var(--text-tertiary);
-    font-size:11px;
-    margin-left:auto;
-}
-
-.contenedor-grafico{ position:relative; flex:1; min-height:0; }
-
-/*==========================
-   VISTA: HISTORIAL
-===========================*/
-
-.historial-grid{
-    display:grid;
-    grid-template-columns: 1fr 1.6fr;
-    gap: var(--gap);
-}
-@media(max-width:991px){
-    .historial-grid{ grid-template-columns:1fr; }
-}
-
-.rank-badge{
-    width:24px; height:24px; min-width:24px;
-    border-radius:50%;
-    background: rgba(255,255,255,.06);
-    color: var(--gold);
-    font-size:11px; font-weight:700;
-    display:flex; align-items:center; justify-content:center;
-}
-
-.estado-vacio{ text-align:center; padding:36px 16px; color: var(--text-tertiary); }
-.estado-vacio i{ font-size:34px; opacity:.5; }
-
-/* ---- Tabla resumen diario (usa .dash-table de main.css) ---- */
 .dash-table tbody tr{ cursor:pointer; transition:.15s; }
 .dash-table tbody tr:hover{ background: rgba(255,255,255,.03); }
 
-/* ---- Paginación ---- */
-.pie-ventas{
-    display:flex; justify-content:flex-end; align-items:center;
-    gap:6px; margin-top:14px; flex-wrap:wrap;
-}
-.pg-link{
-    min-width:30px; height:30px; padding:0 8px;
-    border-radius: var(--radius-btn);
-    border:1px solid var(--border-hair);
-    color: var(--text-secondary);
-    font-size:12px; font-weight:600;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-}
-.pg-link:hover{ border-color: rgba(255,255,255,.25); color: var(--text-primary); }
-.pg-link.active{ background: var(--gold); border-color: var(--gold); color:#1A1A2E; }
-
-/*==========================
-   MODAL DE DETALLE (custom)
-===========================*/
-
-.modal-overlay{
-    display:none;
-    position:fixed; inset:0;
-    background: rgba(0,0,0,.6);
-    z-index:100;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-.modal-overlay.show{ display:flex; }
-
-.modal-box{
-    width:100%;
-    max-width:440px;
-    background: var(--bg-panel);
-    border:1px solid var(--border-hair);
-    border-radius: var(--radius-panel);
-    overflow:hidden;
-    box-shadow: 0 30px 70px rgba(0,0,0,.5);
-}
-
-.modal-box-header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 20px;
-    border-bottom:1px solid var(--border-subtle);
-}
-.modal-box-header h6{ margin:0; font-size:14.5px; font-weight:700; }
-
-.modal-close-btn{
-    width:30px; height:30px; border-radius:50%;
-    border:none; background: rgba(255,255,255,.06);
-    color: var(--text-secondary);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-}
-.modal-close-btn:hover{ background: rgba(255,255,255,.12); color: var(--text-primary); }
-
-.modal-box-body{ padding:18px 20px 20px; }
-
-.mini-stats-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:10px;
-    margin-bottom:16px;
-}
-.mini-stat{
-    background: rgba(255,255,255,.03);
-    border:1px solid var(--border-subtle);
-    border-radius:12px;
-    padding:10px;
-    text-align:center;
-}
-.mini-stat .valor{ font-size:15px; font-weight:800; }
-.mini-stat .etiqueta{ font-size:10.5px; color: var(--text-tertiary); margin-top:2px; }
-
-.spin{
-    width:16px; height:16px;
-    border:2px solid rgba(255,255,255,.15);
-    border-top-color: var(--gold);
-    border-radius:50%;
-    display:inline-block;
-    animation: spin .7s linear infinite;
-}
-@keyframes spin{ to{ transform: rotate(360deg); } }
-
 @media(max-width:768px){
-    .ventas-toolbar{ justify-content:center; }
+    .productos-toolbar{ margin-bottom: var(--gap); }
 }
 
 </style>
@@ -289,7 +29,7 @@
 {% block content %}
 
 <!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
-<div class="ventas-toolbar">
+<div class="productos-toolbar">
     <div class="tab-group" role="group" aria-label="Selector de vista">
         <div class="tab-item active" id="btnVistaResumen" onclick="cambiarVistaVentas('resumen')">
             <i class="bi bi-speedometer2"></i> Resumen
@@ -565,7 +305,7 @@ const chartIngresos = new ApexCharts(document.querySelector('#chartIngresos'), {
     stroke: { curve: 'smooth', width: 3 },
     dataLabels: { enabled: false },
     tooltip: { theme: 'dark', y: { formatter: formatoMoneda } },
-    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)' },
+    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)', padding: { bottom: 15 } },
 });
 chartIngresos.render();
 
@@ -597,7 +337,7 @@ const chartVentas = new ApexCharts(document.querySelector('#chartVentas'), {
     plotOptions: { bar: { borderRadius: 5, columnWidth: '55%' } },
     dataLabels: { enabled: false },
     tooltip: { theme: 'dark' },
-    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)' },
+    grid: { strokeDashArray: 4, borderColor: 'rgba(255,255,255,.08)', padding: { bottom: 15 } },
 });
 chartVentas.render();
 

@@ -14,6 +14,7 @@ from datetime import timedelta
 from dashboard.models import Venta, Perfil, PerfilEmple
 from .utils import enviar_email_recuperacion_async
 from .forms import (RegistroForm,LoginForm,UserUpdateForm,PerfilUpdateForm,RegistroEmpleadoForm)
+from django.core.paginator import Paginator
 
 
 def registro(request):
@@ -275,14 +276,26 @@ def Usuarios(request):
         meses_labels.append(inicio_mes.strftime('%b'))
         meses_data.append(cantidad)
 
+    # ---------- Paginación ----------
+    paginator = Paginator(usuarios_qs, 8)
+    pagina = request.GET.get('page')
+    usuarios_pagina = paginator.get_page(pagina)
+
+    # ---------- Tendencia de registros (usa meses_data ya calculado arriba) ----------
+    nuevos_este_mes = meses_data[-1] if meses_data else 0
+    nuevos_mes_anterior = meses_data[-2] if len(meses_data) > 1 else 0
+    diferencia_mes = nuevos_este_mes - nuevos_mes_anterior
+
     # ---------- Contexto ----------
     context = {
-        'usuarios': usuarios_qs,
+        'usuarios': usuarios_pagina,
         'filtro_rol': filtro_rol,
         'total_usuarios': total_usuarios,
         'total_empleados': total_empleados,
         'usuarios_con_compra': usuarios_con_compra,
         'usuarios_sin_compra': usuarios_sin_compra,
+        'nuevos_este_mes': nuevos_este_mes,
+        'diferencia_mes': diferencia_mes,
 
         # Para ApexCharts
         'meses_labels': json.dumps(meses_labels),

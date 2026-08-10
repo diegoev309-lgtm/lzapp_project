@@ -3401,7 +3401,7 @@ footer .text-center.m-0 {
 }
 
 .calificacion-widget-pub .estrella-pub:hover{
-    transform: scale(1.25);
+    transform: none; /* sin el "agrandado" que sugiere que se está calificando */
 }
 
 .calificacion-widget-pub .estrella-pub.activa{
@@ -3490,4 +3490,16 @@ footer .text-center.m-0 {
     gap: 8px;
     width: 100%;
     margin-top: 8px;
+}
+
+@keyframes calificacionExito{
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+.estrella-pub.recien-calificada{
+    animation: calificacionExito .35s ease;
+}
+.calificacion-widget-pub.exito{
+    box-shadow: 0 0 0 3px rgba(201,168,76,.35);
 }

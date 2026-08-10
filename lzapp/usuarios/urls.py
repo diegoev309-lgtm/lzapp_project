@@ -10,7 +10,8 @@ urlpatterns = [
     path('reset/', views.solicitar_reset_password, name='solicitar_reset_password'),
     path('reset/<uidb64>/<token>/', views.confirmar_reset_password, name='confirmar_reset_password'),
     path('configuracion/', views.configuracion, name='configuracion'),
-    path('Usuario',views.Usuario,name="Usuario"),
+    path('Usuario', views.Usuarios, name="Usuario"),
     path('registro-empleado/', views.registro_empleado, name='registro_empleado'),
+    path('usuarios/eliminar/<int:id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/editar/<int:id>/', views.editar_usuario, name='editar_usuario'),
 ]
-
