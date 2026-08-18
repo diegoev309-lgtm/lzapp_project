@@ -1,0 +1,30 @@
+{% if messages %}
+<div class="lz-toasts" id="lzToasts">
+    {% for message in messages %}
+    <div class="lz-toast lz-toast--{{ message.tags|default:'info' }}">
+        <i class="bi
+            {% if message.tags == 'success' %}bi-check-circle-fill
+            {% elif message.tags == 'error' or message.tags == 'danger' %}bi-x-circle-fill
+            {% elif message.tags == 'warning' %}bi-exclamation-triangle-fill
+            {% else %}bi-info-circle-fill{% endif %}"></i>
+        <span>{{ message }}</span>
+        <button type="button" class="lz-toast__cerrar" aria-label="Cerrar">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+<script>
+    (function () {
+        function cerrarToast(toast) {
+            toast.classList.add('lz-toast--saliendo');
+            setTimeout(() => toast.remove(), 300);
+        }
+        document.querySelectorAll('.lz-toast').forEach((toast) => {
+            const btn = toast.querySelector('.lz-toast__cerrar');
+            if (btn) btn.addEventListener('click', () => cerrarToast(toast));
+            setTimeout(() => cerrarToast(toast), 5000);
+        });
+    })();
+</script>
+{% endif %}

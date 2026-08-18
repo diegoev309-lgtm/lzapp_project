@@ -1,419 +1,38 @@
+{% extends "masterpage_navbar.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LzApp — Lácteos Zulianos{% endblock %}</title>
+{% load humanize %}
 
-    {% load static %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="icon" type="image/x-icon" href="{% static 'home/media/favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
-    {% load humanize %}
-</head>
-<body>
-
-    <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
-    <header>
-        <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
-            <div class="container">
-                <a class="navbar-brand" href="#">
-                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
-                    LzApp
-                </a>
-
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <i class="bi bi-list text-white fs-2"></i>
-                </button>
-
-                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                    <ul class="nav">
-                        <li class="nav-item"><a class="nav-link" href="#nosotros">Quiénes somos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-                    </ul>
-                    <div class="navbar-actions-mobile d-lg-none" id="navbarActionsMobile"></div>
-                </div>
-
-                <div class="navbar-actions-desktop d-none d-lg-flex" id="navbarActionsDesktop">
-                    {% block navbar_actions %}{% endblock %}
-                </div>
-            </div>
-        </nav>
-    </header>
+{% block title %}LzApp — Lácteos Zulianos{% endblock %}
 
 
-    {% block content %}
-    <main>
+{% block content %}
 
-        <!-- ===== CARRUSEL HERO — slide 1 (video+3D) + 2 slides de imagen ===== -->
-        <section class="hero-carrusel" id="inicio">
-
-            <div class="carrusel-track" id="carruselTrack">
-
-                <!-- ---------- SLIDE 1: HERO ORIGINAL (video + escena 3D) ---------- -->
-                <div class="carrusel-slide activo">
-                    <div class="hero">
-
-                        <video class="hero-video" autoplay loop muted playsinline>
-                            <source src="{% static 'home/media/6804173-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
-                        </video>
-
-                        <div class="hero-video-overlay"></div>
-                        <div class="hero-topfade"></div>
-
-                        <span class="hero-orb orb-1" data-depth="0.5"></span>
-                        <span class="hero-orb orb-2" data-depth="0.9"></span>
-                        <span class="hero-orb orb-3" data-depth="0.35"></span>
-                        <span class="hero-orb orb-4" data-depth="0.7"></span>
-
-                        <div class="container hero-inner">
-                            <div class="row align-items-center g-5">
-
-                                <div class="col-lg-6">
-                                    <span class="hero-eyebrow"><span class="dot"></span> Tradición venezolana en Medellín</span>
-                                    <h1 class="hero-title">
-                                        <span class="linea"><span class="palabra" style="animation-delay:.1s">Queso</span></span>
-                                        <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">Artesanal</span></span>
-                                    </h1>
-                                    <p class="hero-sub">
-                                        El auténtico sabor de nuestra tierra, hecho con recetas familiares,
-                                        sin aditivos y con la frescura de siempre. Ahora más cerca de tu mesa.
-                                    </p>
-                                    <div class="hero-actions">
-                                        <a href="#productos" class="btn-dorado">
-                                            <i class="bi bi-bag-heart"></i> Ver productos
-                                        </a>
-                                        <a href="#contacto" class="btn-outline-blanco">
-                                            <i class="bi bi-whatsapp"></i> Contáctanos
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="hero-escena" id="heroEscena">
-                                        <span class="hero-anillo"></span>
-                                        <div class="pieza3d pieza-rueda" data-depth="0.18">
-                                            <img src="{% static 'home/media/logolacz.png' %}"
-                                                alt="Logo LzApp"
-                                                style="mix-blend-mode: normal; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); width: 260px;">
-                                        </div>
-                                        <div class="pieza3d pieza-cuna" data-depth="0.5">
-                                            <img src="{% static 'home/media/hero-wedge-3d.png' %}"
-                                                 alt="Cuña de queso fresco">
-                                        </div>
-                                        <div class="pieza3d pieza-bola" data-depth="0.7">
-                                            <img src="{% static 'home/media/481d0dc0e1da87c0016c82cd07e6820bd15a40f5 (1).png' %}"
-                                                 alt="Bola de queso fresco">
-                                        </div>
-                                        <div class="pieza3d pieza-extra" data-depth="0.4">
-                                            <img src="{% static 'home/media/9646ff920fb88ac261a97674057dd2133dba55c4 (1).png' %}"
-                                                 alt="Queso telita">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="hero-scroll">
-                            <span class="mouse"><span></span></span>
-                            Desliza
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos (con quesos interactivos) ---------- -->
-                <div class="carrusel-slide">
-                    <div class="slide-imagen">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
-                        <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
-                        <!--SECCION DE QUESOS INTERACTIVOS-->
-                        <div class="quesos-interactivos"
-                            data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
-                            data-bg-mobile="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}"
-                            data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
-                            {% if premio_activo %}
-                            data-origen-premio="campana"
-                            data-tiene-premio="true"
-                            data-premio-tipo=""
-                            data-premio-producto="{{ premio_activo.producto.nombre|default:'' }}"
-                            data-premio-porcentaje="{{ premio_activo.campana.porcentaje_descuento|default:'0' }}"
-                            data-premio-precio-original="{{ premio_activo.precio_original|default:'0' }}"
-                            data-premio-precio-descuento="{{ premio_activo.precio_con_descuento|default:'0' }}"
-                            data-premio-codigo="{{ premio_activo.codigo|default:'' }}"
-                            data-premio-imagen="{% if premio_activo.producto.imagen %}{{ premio_activo.producto.imagen.url }}{% endif %}"
-                            {% elif juego_diario.estado == 'ganado' %}
-                            data-origen-premio="ruleta_diaria"
-                            data-tiene-premio="true"
-                            data-premio-tipo="{{ juego_diario.tirada.resultado }}"
-                            data-premio-producto=""
-                            data-premio-porcentaje="{% if juego_diario.tirada.resultado == 'CUPON_5' %}5{% else %}0{% endif %}"
-                            data-premio-precio-original="0"
-                            data-premio-precio-descuento="0"
-                            data-premio-codigo=""
-                            data-premio-imagen=""
-                            {% else %}
-                            data-origen-premio="ruleta_diaria"
-                            data-tiene-premio="false"
-                            data-premio-tipo=""
-                            data-premio-producto=""
-                            data-premio-porcentaje="0"
-                            data-premio-precio-original="0"
-                            data-premio-precio-descuento="0"
-                            data-premio-codigo=""
-                            data-premio-imagen=""
-                            {% endif %}
-                            data-estado-juego-diario="{{ juego_diario.estado|default:'' }}"
-                            data-url-marcar-mostrado="{% url 'marcar_premio_mostrado' %}"
-                            data-url-jugar-ruleta="{% url 'jugar_ruleta_dia' %}"
-                            data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
-
-                            <!-- Queso 1: el oscuro/tostado de la izquierda (conectado a datos reales) -->
-                            {% with p=productos_oferta.0 %}
-                            <a href="#productos" class="queso-punto"
-                                data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
-                                {% if p.descuento_vigente %}data-descuento="{{ p.descuento_vigente.porcentaje }}"{% endif %}
-                                data-peso-stock="{{ p.ratio_stock|floatformat:2 }}"
-                                data-descripcion="{{ p.descripcion|default:'Suave y cremoso, con esa fibra característica que lo distingue.' }}"
-                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
-                                data-oferta-pos="center 30%"
-                                data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%"
-                                data-clip-mobile="24.60% 23.68%, 25.56% 23.70%, 26.52% 23.77%, 27.18% 23.87%, 27.84% 23.94%, 28.95% 23.92%, 29.81% 23.89%, 30.47% 23.80%, 31.18% 23.65%, 31.99% 23.56%, 32.70% 23.44%, 33.51% 23.39%, 34.37% 23.34%, 35.18% 23.34%, 35.88% 23.32%, 37.15% 23.34%, 38.01% 23.29%, 39.02% 23.22%, 40.08% 23.17%, 41.55% 23.15%, 43.32% 23.15%, 45.30% 23.12%, 46.56% 23.12%, 48.13% 23.10%, 49.44% 23.10%, 50.30% 23.24%, 50.86% 23.41%, 51.11% 23.68%, 51.52% 23.99%, 51.87% 24.23%, 52.28% 24.54%, 52.63% 24.76%, 53.09% 25.04%, 53.44% 25.28%, 53.90% 25.50%, 54.25% 25.79%, 54.61% 26.10%, 54.91% 26.36%, 55.11% 26.58%, 55.42% 26.92%, 55.82% 27.25%, 56.02% 27.47%, 56.33% 27.71%, 56.68% 28.09%, 57.14% 28.50%, 57.69% 28.69%, 58.10% 28.91%, 58.40% 29.17%, 58.81% 29.51%, 59.21% 29.84%, 59.67% 30.23%, 60.27% 30.56%, 60.78% 30.80%, 61.23% 31.07%, 61.74% 31.48%, 62.20% 32.08%, 62.80% 32.84%, 63.41% 33.30%, 63.97% 33.88%, 64.57% 34.45%, 65.13% 34.93%, 65.74% 35.46%, 66.45% 36.04%, 67.15% 36.66%, 67.91% 37.16%, 68.62% 37.79%, 69.38% 38.58%, 70.04% 39.32%, 70.80% 40.14%, 71.05% 41.03%, 71.46% 42.11%, 71.86% 43.09%, 72.42% 44.00%, 72.72% 44.36%, 73.53% 44.72%, 74.19% 45.04%, 74.95% 45.35%, 75.20% 45.56%, 75.00% 45.88%, 74.44% 46.40%, 74.09% 46.69%, 73.53% 46.88%, 72.47% 46.93%, 71.51% 47.00%, 69.94% 47.05%, 68.52% 46.88%, 67.26% 46.91%, 65.59% 46.91%, 64.57% 46.79%, 62.55% 46.67%, 60.98% 46.74%, 59.26% 46.84%, 58.20% 46.84%, 55.87% 46.88%, 53.70% 47.03%, 51.87% 47.10%, 48.79% 47.10%, 44.49% 46.96%, 39.17% 46.96%, 37.20% 47.05%, 35.28% 47.08%, 34.82% 46.74%, 34.82% 46.52%, 35.07% 46.45%, 35.68% 46.45%, 35.83% 46.21%, 35.58% 45.78%, 35.12% 45.59%, 34.77% 45.32%, 34.77% 44.58%, 34.82% 43.50%, 34.82% 42.42%, 34.82% 41.20%, 34.92% 40.16%, 34.87% 39.54%, 34.06% 38.10%, 32.49% 35.84%, 32.14% 35.56%, 31.53% 34.74%, 30.87% 33.95%, 28.14% 29.32%, 27.18% 27.76%, 26.73% 26.77%, 26.12% 25.81%, 25.97% 25.57%, 26.32% 25.52%, 26.73% 25.43%, 26.78% 25.16%, 26.32% 25.12%, 25.92% 25.12%, 25.61% 24.97%, 25.26% 24.54%, 24.90% 24.04%">
-                                <!-- TODO (queso 1 - mobile): pega aquí las coordenadas de tu
-                                     trazador sobre la imagen VERTICAL (data-bg-mobile), en %
-                                     ABSOLUTOS de la imagen completa (no relativos a una caja
-                                     local como data-clip). Formato:
-                                     data-clip-mobile="12.0% 8.5%, 15.2% 9.1%, 18.0% 12.4%, ..." -->
-                                <span class="queso-punto-glow"></span>
-                                <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                                    <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
-                                </svg>
-                                <span class="queso-punto-borde"></span>
-                                <div class="queso-punto-flip">
-                                    <div class="queso-punto-cara queso-punto-frente">
-                                        <span class="queso-punto-ventana"></span>
-                                    </div>
-                                    <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
-                                        <div class="queso-oferta-centro">
-                                            <div class="queso-oferta-foto">
-                                                {% if p.imagen %}
-                                                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
-                                                {% else %}
-                                                    <i class="bi bi-image"></i>
-                                                {% endif %}
-                                            </div>
-                                            <div class="queso-ruleta-wrap">
-                                                <div class="queso-ruleta"></div>
-                                                <span class="ruleta-signo">%</span>
-                                            </div>
-                                            <strong class="queso-oferta-nombre">{{ p.nombre|default:"Queso Telita" }}</strong>
-                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
-                            </a>
-                            {% endwith %}
-                           <!-- Queso 2: el del medio -->
-                            <a href="#productos" class="queso-punto"
-                                data-left="55.8" data-top="15.8" data-width="23.2" data-height="55.6"
-                                data-descuento="50"
-                                data-descripcion="Fresco, suave y con la textura característica del queso venezolano."
-                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
-                                data-oferta-pos="center 30%"
-                                data-clip="5.1% 45.8%, 6.6% 43.2%, 6.6% 42.0%, 8.1% 40.5%, 11.2% 36.7%, 12.2% 34.8%, 8.1% 33.0%, 3.6% 31.4%, 1.5% 29.9%, 0.5% 26.1%, 0.0% 22.0%, 1.0% 18.9%, 3.0% 15.9%, 7.1% 9.8%, 12.2% 4.9%, 15.7% 1.9%, 18.8% 0.8%, 23.4% 0.0%, 25.9% 4.2%, 28.9% 10.6%, 31.0% 16.7%, 34.5% 25.0%, 36.0% 29.9%, 41.1% 32.2%, 46.7% 34.8%, 51.8% 37.5%, 55.8% 39.8%, 63.5% 44.3%, 71.1% 50.0%, 74.6% 53.0%, 80.2% 60.6%, 87.3% 72.7%, 90.4% 77.3%, 93.9% 87.1%, 96.4% 92.8%, 99.0% 92.4%, 100.0% 94.3%, 95.4% 99.6%, 77.2% 100.0%, 41.1% 99.6%, 35.5% 95.8%, 34.0% 90.9%, 31.5% 80.7%"
-                                data-clip-mobile="18.3% 41.7%, 19.0% 41.9%, 19.4% 42.0%, 19.8% 42.2%, 21.2% 42.8%, 21.8% 43.0%, 23.3% 43.6%, 24.2% 43.9%, 24.9% 44.2%, 25.8% 44.5%, 26.8% 44.9%, 27.6% 45.2%, 28.5% 45.4%, 29.3% 45.8%, 30.3% 46.2%, 31.5% 46.7%, 32.4% 47.1%, 32.8% 47.3%, 33.3% 47.4%, 34.1% 47.4%, 35.0% 47.3%, 36.2% 47.3%, 37.3% 47.3%, 38.1% 47.3%, 39.0% 47.3%, 40.0% 47.3%, 41.1% 47.4%, 42.2% 47.4%, 43.2% 47.5%, 44.3% 47.5%, 45.5% 47.5%, 46.5% 47.6%, 48.0% 47.7%, 48.8% 47.8%, 49.8% 47.9%, 50.7% 48.0%, 51.8% 48.2%, 52.8% 48.3%, 53.8% 48.5%, 54.5% 48.5%, 55.1% 48.5%, 55.7% 48.4%, 56.5% 48.4%, 57.1% 48.5%, 57.4% 48.8%, 57.6% 49.1%, 58.0% 49.4%, 58.4% 49.7%, 59.3% 50.0%, 60.3% 50.3%, 61.1% 50.7%, 61.8% 50.9%, 62.7% 51.3%, 63.6% 51.6%, 64.5% 52.0%, 65.4% 52.4%, 66.3% 52.7%, 67.2% 53.1%, 67.8% 53.4%, 68.8% 54.0%, 69.9% 54.6%, 70.5% 54.9%, 71.4% 55.3%, 71.8% 55.5%, 72.2% 55.5%, 72.6% 55.3%, 73.2% 55.6%, 73.5% 56.2%, 73.6% 56.6%, 73.6% 57.2%, 73.7% 57.5%, 73.1% 57.8%, 72.3% 58.0%, 71.6% 58.4%, 70.7% 58.7%, 69.5% 59.0%, 68.0% 59.4%, 66.9% 59.7%, 66.2% 60.0%, 65.4% 60.2%, 64.9% 60.3%, 64.0% 60.6%, 63.0% 61.0%, 62.2% 61.3%, 61.3% 61.6%, 60.4% 62.0%, 59.7% 62.3%, 58.5% 62.7%, 57.5% 63.1%, 56.6% 63.4%, 55.5% 63.8%, 54.7% 64.1%, 53.7% 64.4%, 52.8% 64.7%, 52.2% 64.9%, 51.4% 65.1%, 50.7% 65.5%, 49.8% 65.8%, 49.0% 66.1%, 48.1% 66.3%, 47.3% 66.4%, 46.4% 66.6%, 45.6% 66.6%, 44.8% 66.8%, 43.6% 67.0%, 42.6% 67.1%, 41.4% 67.2%, 39.7% 67.1%, 38.5% 67.0%, 37.4% 66.9%, 36.6% 66.8%, 36.2% 66.7%, 36.3% 66.5%, 36.5% 66.2%, 36.7% 65.9%, 37.0% 65.8%, 37.5% 66.0%, 38.0% 66.1%, 38.6% 66.1%, 39.1% 66.2%, 39.7% 66.1%, 40.1% 66.1%, 39.4% 65.7%, 38.4% 65.5%, 37.7% 65.1%, 37.2% 64.7%, 36.0% 63.2%, 35.1% 62.7%, 34.6% 62.2%, 33.8% 61.6%, 33.1% 61.0%, 32.4% 60.4%, 31.6% 59.7%, 30.9% 59.1%, 30.1% 58.3%, 29.2% 57.5%, 28.5% 56.8%, 28.1% 56.4%, 27.5% 56.0%, 27.2% 55.6%, 26.9% 55.0%, 26.8% 54.4%, 26.5% 54.1%, 26.5% 53.7%, 26.3% 53.2%, 26.2% 52.7%, 26.0% 51.9%, 25.4% 51.8%, 24.6% 51.9%, 23.8% 52.1%, 22.7% 52.3%, 21.7% 52.4%, 20.8% 52.6%, 19.9% 52.8%, 19.1% 52.8%, 18.7% 52.4%, 18.2% 52.1%, 17.8% 51.8%, 17.3% 51.5%, 16.9% 51.2%, 16.5% 50.6%, 16.1% 50.1%, 15.9% 49.7%, 15.7% 49.4%, 15.6% 49.0%, 15.5% 48.5%, 15.4% 47.9%, 15.2% 47.3%, 15.1% 46.5%, 15.1% 46.2%, 15.2% 45.6%, 15.2% 45.1%, 15.3% 44.6%, 15.5% 44.1%, 15.6% 43.7%, 15.7% 43.3%, 15.8% 43.0%, 17.0% 42.4%, 17.4% 42.1%, 17.9% 41.9%">
-                                <!-- TODO (queso 2 - mobile): mismas instrucciones que queso 1. -->
-                                <span class="queso-punto-glow"></span>
-                                <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                                    <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
-                                </svg>
-                                <span class="queso-punto-borde"></span>
-                                <div class="queso-punto-flip">
-                                    <div class="queso-punto-cara queso-punto-frente">
-                                        <span class="queso-punto-ventana"></span>
-                                    </div>
-                                    <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
-                                        <div class="queso-oferta-centro">
-                                            <div class="queso-oferta-foto">
-                                                <i class="bi bi-image"></i>
-                                            </div>
-                                            <div class="queso-ruleta-wrap">
-                                                <div class="queso-ruleta"></div>
-                                                <span class="ruleta-signo">%</span>
-                                            </div>
-                                            <strong class="queso-oferta-nombre">Queso Blanco</strong>
-                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
-                            </a>
-                            <!-- Queso 3: el de la derecha -->
-                            <a href="#productos" class="queso-punto"
-                                data-left="70.2" data-top="16.2" data-width="21.6" data-height="52.7"
-                                data-descuento="60"
-                                data-descripcion="Artesanal, delicado y perfecto para derretir o disfrutar solo."
-                                data-oferta-video="{% static 'home/media/brillos.mp4' %}"
-                                data-oferta-pos="center 30%"
-                                data-clip="3.3% 47.2%, 4.3% 44.4%, 9.2% 38.4%, 11.4% 34.4%, 5.4% 31.6%, 1.1% 30.0%, 0.5% 26.8%, 0.0% 24.8%, 0.0% 19.6%, 1.6% 16.4%, 3.8% 12.8%, 7.1% 9.2%, 9.8% 6.0%, 13.6% 3.6%, 16.8% 0.8%, 23.9% 0.0%, 26.1% 3.2%, 28.3% 8.4%, 37.0% 29.6%, 48.9% 35.2%, 57.1% 39.6%, 69.6% 48.4%, 77.2% 54.8%, 83.2% 58.8%, 98.4% 66.8%, 98.4% 68.8%, 91.8% 77.6%, 92.4% 82.4%, 96.2% 91.6%, 98.9% 91.2%, 100.0% 92.4%, 98.4% 96.4%, 95.1% 100.0%, 80.4% 98.8%, 40.8% 98.4%, 35.9% 95.6%, 30.4% 81.6%, 22.8% 67.6%, 15.2% 57.2%"
-                                data-clip-mobile="19.9% 62.0%, 20.5% 62.1%, 21.1% 62.3%, 22.0% 62.7%, 23.1% 63.1%, 24.2% 63.5%, 25.9% 64.1%, 26.8% 64.4%, 28.1% 64.9%, 30.0% 65.6%, 31.5% 66.1%, 32.9% 66.7%, 34.0% 67.2%, 34.8% 67.6%, 35.4% 67.5%, 36.5% 67.5%, 37.3% 67.3%, 38.3% 67.3%, 39.7% 67.2%, 41.1% 67.2%, 41.9% 67.2%, 42.8% 67.2%, 43.9% 67.1%, 44.8% 67.1%, 45.7% 66.9%, 46.7% 66.6%, 47.2% 66.5%, 47.9% 66.4%, 48.7% 66.3%, 49.8% 66.3%, 51.0% 66.3%, 52.2% 66.4%, 53.6% 66.6%, 54.7% 66.8%, 55.7% 67.0%, 57.0% 67.0%, 58.0% 67.0%, 59.0% 67.0%, 60.8% 67.0%, 62.6% 66.9%, 64.2% 66.8%, 65.9% 66.6%, 67.2% 66.6%, 67.7% 66.6%, 67.8% 67.0%, 68.2% 67.7%, 68.5% 68.3%, 68.8% 69.1%, 69.0% 69.7%, 69.4% 70.6%, 70.0% 70.9%, 71.3% 71.6%, 72.1% 72.0%, 72.9% 72.4%, 73.8% 72.9%, 74.8% 73.3%, 75.2% 73.1%, 75.5% 72.9%, 75.6% 72.4%, 75.9% 72.7%, 76.3% 73.2%, 76.4% 73.8%, 76.6% 74.4%, 76.8% 75.1%, 76.4% 75.7%, 75.3% 76.1%, 74.1% 76.5%, 73.2% 76.9%, 72.3% 77.2%, 71.3% 77.4%, 70.3% 77.9%, 69.3% 78.6%, 68.5% 79.1%, 67.7% 79.7%, 66.2% 80.4%, 64.6% 81.2%, 63.4% 81.8%, 62.3% 82.4%, 59.9% 83.5%, 58.7% 84.1%, 57.9% 84.5%, 56.9% 85.0%, 55.6% 85.6%, 54.3% 86.1%, 53.0% 86.5%, 51.4% 87.0%, 49.7% 87.5%, 47.5% 88.2%, 48.5% 88.1%, 49.1% 88.1%, 49.5% 88.4%, 49.6% 88.6%, 49.0% 88.7%, 48.1% 88.7%, 47.3% 88.9%, 46.1% 89.0%, 45.1% 88.9%, 44.2% 88.8%, 43.3% 88.7%, 43.5% 88.5%, 43.9% 88.4%, 44.5% 88.2%, 45.3% 87.9%, 44.6% 87.3%, 44.4% 86.9%, 43.8% 86.5%, 43.2% 85.8%, 42.7% 85.3%, 41.2% 84.2%, 40.4% 83.8%, 39.5% 82.9%, 38.6% 82.1%, 37.6% 81.2%, 36.9% 80.7%, 36.1% 80.1%, 35.4% 79.6%, 34.4% 78.9%, 33.4% 78.2%, 32.1% 77.3%, 31.1% 76.7%, 30.2% 76.0%, 29.6% 75.3%, 29.4% 74.7%, 29.1% 73.6%, 29.0% 72.8%, 28.5% 71.9%, 27.7% 71.7%, 26.4% 71.7%, 25.5% 71.9%, 24.1% 72.1%, 23.5% 71.9%, 22.9% 71.6%, 22.0% 71.4%, 21.2% 71.0%, 20.5% 70.6%, 19.9% 70.1%, 19.4% 69.5%, 18.9% 68.8%, 18.7% 68.1%, 18.4% 67.5%, 18.2% 66.7%, 18.0% 66.2%, 17.8% 65.5%, 17.8% 64.6%, 17.9% 63.8%, 17.9% 63.3%, 17.9% 63.1%, 18.5% 62.8%, 19.3% 62.4%, 19.6% 62.2%">
-                                <!-- TODO (queso 3 - mobile): mismas instrucciones que queso 1. -->
-                                <span class="queso-punto-glow"></span>
-                                <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                                    <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
-                                </svg>
-                                <span class="queso-punto-borde"></span>
-                                <div class="queso-punto-flip">
-                                    <div class="queso-punto-cara queso-punto-frente">
-                                        <span class="queso-punto-ventana"></span>
-                                    </div>
-                                    <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
-                                        <div class="queso-oferta-centro">
-                                            <div class="queso-oferta-foto">
-                                                <i class="bi bi-image"></i>
-                                            </div>
-                                            <div class="queso-ruleta-wrap">
-                                                <div class="queso-ruleta"></div>
-                                                <span class="ruleta-signo">%</span>
-                                            </div>
-                                            <strong class="queso-oferta-nombre">Queso de Mano</strong>
-                                            <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
-                            </a>
-
-                            <svg class="silueta-unica" id="siluetaUnica" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
-                                data-left="34.7" data-top="15.9" data-width="57.2" data-height="58.8"
-                                data-clip="10.7% 99.1%, 10.3% 98.0%, 9.9% 97.1%, 9.8% 96.4%, 10.4% 95.6%, 11.0% 94.8%, 11.0% 94.1%, 10.6% 93.2%, 9.9% 91.8%, 9.9% 88.6%, 10.2% 85.7%, 10.2% 83.5%, 10.2% 81.2%, 10.2% 78.2%, 10.3% 75.4%, 10.3% 72.9%, 10.4% 71.8%, 10.3% 71.0%, 10.2% 70.5%, 10.0% 69.8%, 10.0% 69.2%, 9.8% 68.4%, 9.6% 67.6%, 9.4% 66.3%, 9.3% 65.4%, 9.0% 64.3%, 8.9% 63.4%, 8.7% 62.0%, 8.3% 60.7%, 8.1% 59.6%, 7.6% 58.4%, 7.3% 57.3%, 7.1% 56.3%, 6.8% 55.1%, 6.6% 54.3%, 6.3% 53.3%, 6.1% 52.1%, 5.9% 51.0%, 5.7% 50.2%, 5.5% 48.9%, 5.3% 48.1%, 5.2% 47.5%, 5.1% 46.8%, 4.9% 45.9%, 4.9% 45.0%, 4.6% 44.0%, 4.2% 41.9%, 3.8% 40.1%, 3.6% 38.4%, 3.4% 37.1%, 3.0% 35.5%, 2.8% 34.2%, 2.6% 33.0%, 2.4% 31.7%, 2.2% 30.4%, 2.0% 29.4%, 1.9% 28.3%, 1.8% 27.4%, 1.7% 26.7%, 1.5% 26.2%, 1.4% 25.4%, 1.8% 25.4%, 2.2% 24.9%, 2.3% 24.4%, 2.3% 23.9%, 2.0% 23.7%, 1.6% 23.8%, 1.2% 24.0%, 1.0% 23.3%, 0.9% 22.6%, 0.8% 21.9%, 0.7% 20.9%, 0.5% 20.0%, 0.3% 18.9%, 0.0% 18.1%, 0.0% 17.5%, 0.7% 17.4%, 1.5% 17.5%, 2.5% 17.7%, 3.1% 18.2%, 5.2% 18.2%, 5.9% 18.1%, 6.5% 17.7%, 7.2% 17.5%, 7.7% 17.2%, 8.5% 17.2%, 8.8% 17.0%, 10.0% 16.9%, 11.1% 16.9%, 11.7% 17.0%, 15.3% 17.0%, 16.6% 16.9%, 16.8% 16.8%, 18.0% 16.8%, 19.5% 16.7%, 20.1% 16.9%, 21.2% 17.0%, 22.3% 17.1%, 23.8% 17.1%, 24.8% 17.4%, 25.5% 17.5%, 27.1% 17.6%, 27.5% 17.9%, 28.2% 18.5%, 28.5% 19.1%, 28.6% 19.6%, 28.9% 20.1%, 29.2% 21.0%, 29.6% 22.0%, 30.1% 23.1%, 30.5% 24.1%, 31.2% 25.4%, 31.7% 26.7%, 32.2% 27.8%, 32.4% 28.7%, 32.7% 29.6%, 32.9% 30.5%, 33.2% 31.4%, 33.7% 33.1%, 33.9% 34.2%, 34.2% 34.9%, 34.5% 35.9%, 34.7% 36.5%, 34.9% 37.2%, 35.6% 37.4%, 35.8% 37.8%, 36.1% 38.2%, 36.5% 39.1%, 36.7% 40.1%, 37.2% 40.6%, 37.6% 41.5%, 38.0% 42.5%, 38.7% 43.4%, 39.0% 42.7%, 39.0% 42.2%, 39.2% 41.7%, 39.5% 40.8%, 39.6% 39.9%, 39.8% 39.2%, 40.1% 38.1%, 40.5% 36.5%, 40.9% 35.2%, 41.2% 34.3%, 41.5% 33.3%, 41.6% 32.6%, 41.2% 31.9%, 40.9% 31.9%, 40.3% 31.4%, 39.8% 30.9%, 39.2% 30.6%, 38.5% 30.1%, 37.7% 29.5%, 37.4% 28.8%, 37.3% 27.3%, 37.4% 26.2%, 37.1% 25.4%, 36.9% 24.6%, 36.7% 23.2%, 36.8% 21.1%, 36.9% 19.7%, 37.1% 18.3%, 37.4% 17.0%, 37.8% 15.5%, 38.3% 13.7%, 38.8% 12.1%, 39.3% 10.8%, 39.8% 9.3%, 40.2% 8.1%, 40.6% 7.2%, 41.1% 6.0%, 41.8% 4.5%, 42.2% 3.9%, 42.8% 2.7%, 43.2% 1.7%, 43.4% 0.8%, 43.9% 0.8%, 44.7% 0.6%, 45.2% 0.3%, 45.9% 0.0%, 46.5% 0.0%, 46.7% 0.4%, 47.1% 1.2%, 47.2% 2.0%, 47.3% 3.0%, 47.7% 4.3%, 47.7% 5.4%, 48.0% 6.3%, 48.1% 7.4%, 48.3% 8.4%, 48.6% 9.9%, 48.7% 10.6%, 48.8% 11.4%, 49.0% 12.2%, 49.2% 12.9%, 49.4% 13.6%, 49.5% 14.5%, 49.6% 15.4%, 49.7% 16.2%, 49.8% 17.0%, 50.2% 18.3%, 50.2% 19.3%, 50.5% 20.3%, 50.6% 21.0%, 50.7% 21.9%, 50.9% 22.8%, 51.1% 23.7%, 51.2% 24.4%, 51.4% 25.7%, 51.5% 26.9%, 51.6% 27.7%, 51.8% 28.7%, 52.5% 29.2%, 53.0% 29.6%, 53.5% 30.2%, 54.0% 30.9%, 54.6% 31.4%, 55.1% 31.9%, 55.8% 32.7%, 56.3% 33.4%, 57.0% 34.3%, 57.6% 35.0%, 58.0% 35.7%, 58.5% 36.2%, 59.1% 36.8%, 59.6% 37.4%, 60.2% 38.3%, 60.8% 39.2%, 61.3% 40.1%, 61.9% 40.9%, 62.3% 41.6%, 62.7% 42.2%, 63.3% 43.4%, 63.4% 42.3%, 63.8% 41.1%, 64.0% 40.0%, 64.4% 39.0%, 64.6% 38.1%, 64.9% 37.0%, 65.3% 35.9%, 65.7% 34.2%, 66.1% 32.9%, 66.3% 32.2%, 66.5% 31.4%, 66.0% 30.8%, 65.7% 30.4%, 65.2% 30.0%, 64.7% 29.6%, 64.0% 28.9%, 63.3% 28.7%, 62.8% 28.4%, 62.5% 27.8%, 62.4% 27.0%, 62.4% 25.5%, 62.2% 24.7%, 62.0% 24.1%, 61.9% 22.8%, 61.9% 21.0%, 62.0% 20.0%, 62.1% 19.0%, 62.3% 17.7%, 62.5% 16.6%, 62.7% 15.5%, 63.1% 14.6%, 63.3% 13.5%, 63.7% 12.6%, 63.9% 11.8%, 64.2% 10.8%, 64.5% 9.9%, 65.0% 8.7%, 65.3% 7.6%, 65.7% 6.8%, 66.0% 6.1%, 66.4% 5.2%, 66.8% 4.3%, 67.3% 3.5%, 67.8% 2.7%, 68.1% 2.0%, 68.4% 1.2%, 68.8% 1.0%, 69.6% 0.9%, 70.3% 0.7%, 70.8% 0.4%, 71.4% 0.4%, 71.6% 1.1%, 71.8% 2.0%, 72.0% 2.5%, 72.1% 3.3%, 72.2% 3.8%, 72.4% 5.0%, 72.5% 6.2%, 72.8% 7.2%, 73.0% 8.3%, 73.1% 9.4%, 73.4% 10.4%, 73.5% 11.5%, 73.7% 12.4%, 73.8% 12.8%, 74.0% 13.9%, 74.1% 15.1%, 74.3% 16.1%, 74.5% 17.2%, 74.7% 18.4%, 74.9% 19.7%, 75.1% 21.1%, 75.3% 22.4%, 75.6% 23.8%, 75.8% 25.4%, 76.0% 27.0%, 76.4% 27.8%, 76.7% 28.1%, 77.5% 28.6%, 78.4% 29.7%, 79.2% 30.6%, 80.5% 32.2%, 81.8% 33.9%, 82.7% 34.9%, 83.5% 35.9%, 84.1% 36.7%, 84.7% 37.8%, 85.5% 38.9%, 86.2% 40.0%, 86.9% 41.3%, 87.3% 42.2%, 88.1% 43.3%, 89.1% 45.3%, 90.0% 47.0%, 90.8% 48.4%, 91.3% 49.5%, 91.8% 50.4%, 92.4% 51.5%, 93.2% 52.5%, 94.1% 53.7%, 95.5% 55.4%, 97.1% 57.3%, 98.2% 58.7%, 99.1% 60.0%, 99.7% 60.6%, 99.7% 61.0%, 99.5% 61.7%, 99.2% 62.9%, 98.9% 64.3%, 98.4% 66.0%, 97.9% 67.5%, 97.6% 68.9%, 97.1% 70.2%, 97.2% 71.3%, 97.3% 72.5%, 97.4% 74.3%, 97.5% 75.4%, 97.7% 77.0%, 97.9% 78.1%, 98.1% 79.5%, 98.4% 81.3%, 98.7% 82.6%, 98.9% 83.1%, 99.2% 83.1%, 99.5% 82.7%, 99.7% 82.3%, 99.9% 82.7%, 99.9% 83.5%, 100.0% 84.2%, 99.8% 85.2%, 99.6% 86.2%, 99.3% 87.4%, 98.9% 88.7%, 98.2% 90.4%, 97.3% 90.1%, 96.2% 89.9%, 95.1% 89.6%, 93.5% 89.6%, 91.8% 89.2%, 88.6% 89.0%, 85.0% 88.9%, 81.7% 88.9%, 78.5% 88.9%, 77.5% 88.9%, 77.2% 89.5%, 76.8% 91.0%, 76.3% 92.6%, 75.4% 94.8%, 73.0% 95.2%, 69.8% 95.0%, 65.9% 94.7%, 62.8% 94.5%, 59.8% 94.5%, 55.9% 94.4%, 53.8% 94.4%, 53.5% 94.5%, 53.7% 95.2%, 53.2% 96.3%, 52.5% 97.8%, 51.4% 99.0%, 49.0% 99.7%, 33.2% 99.7%, 17.9% 99.6%, 11.6% 100.0%">
-                                <polygon class="silueta-unica-linea" fill="none"></polygon>
-                            </svg>
-
-                        </div>
-
-                        <!-- Ficha única de "Oferta del día", compartida por los 3 quesos -->
-                        <div class="oferta-info-unica" id="ofertaInfoUnica">
-                            <!-- Tarjeta de descuento tipo cupón, oculta hasta el sorteo -->
-                            <div class="oferta-descuento-tarjeta" id="ofertaDescuentoTarjeta">
-                                <span class="oferta-descuento-label">Descuento especial</span>
-                                <div class="oferta-descuento-numero-wrap">
-                                    <div class="queso-ruleta" id="ofertaInfoRuleta"></div>
-                                    <span class="oferta-descuento-signo">%</span>
-                                </div>
-                                <span class="oferta-descuento-dto">DTO.</span>
-                                <div class="oferta-descuento-liston">En tu próxima compra</div>
-                            </div>
-                        </div>
-
-                        <div class="oferta-globo-wrap" id="ofertaGloboWrap">
-                            <div class="globo-fragmentos" id="globoFragmentos"></div>
-                            <div class="globo-indicador" id="globoIndicador">
-                                <i class="bi bi-hand-index-thumb"></i>
-                                Presiona para ver nuevas ofertas
-                            </div>
-                            <button type="button" class="globo-ofertas" id="botonOfertas" aria-label="Ver ofertas">
-                                <span class="globo-cuerpo">
-                                    <i class="bi bi-tag-fill"></i>
-                                    <span class="globo-numero">%</span>
-                                </span>
-                                <span class="globo-brillo"></span>
-                                <span class="globo-nudo"></span>
-                                <span class="globo-hilo"></span>
-                            </button>
-                        </div>
-
-                        <div class="oferta-shake-hint" id="ofertaShakeHint">
-                            <i class="bi bi-phone-vibrate"></i>
-                            Agita tu celular para ver ofertas
-                        </div>
-                        <button type="button" class="oferta-shake-permiso" id="ofertaShakePermiso" style="display:none;">
-                            <i class="bi bi-hand-index-thumb"></i> Toca para activar el sensor
-                        </button>
-                        <button type="button" class="oferta-shake-fallback" id="ofertaShakeFallback">
-                            <i class="bi bi-hand-index-thumb"></i> Toca aquí si no vibra tu celular
-                        </button>
-
-                        <div class="oferta-banner" id="ofertaBanner">
-                            Enciende los 3 quesos para revelar la oferta de hoy
-                        </div>
-                        <div class="boton-sortear-wrap" id="botonSortearWrap">
-                            <button type="button" class="boton-sortear" id="botonSortear">
-                                <i class="bi bi-dice-5-fill"></i> ¡Sortear la oferta del día!
-                            </button>
-                        </div>
-                        <div class="confetti-contenedor" id="confettiContenedor"></div>
-                        <div class="oferta-reveal-overlay" id="ofertaRevealOverlay">
-                            <div class="oferta-reveal-tarjeta">
-                                <div class="oferta-reveal-queso-wrap">
-                                    <img src="{% static 'home/media/fb36d63f777712b60e871eaefa443eb2bf3b3515 (1).png' %}"
-                                        alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen">
-                                    <!-- Ícono usado como placeholder cuando el premio (ruleta diaria)
-                                        no tiene producto/foto real: CUPON_5, ENVIO_GRATIS, BOLETO_DORADO,
-                                        y la variante "vuelve mañana". Oculto por defecto. -->
-                                    <i class="oferta-reveal-icono bi" id="ofertaRevealIcono" style="display:none;"></i>
-                                    <span class="oferta-reveal-badge" id="ofertaRevealBadge">-50%</span>
-                                </div>
-                                <strong class="oferta-reveal-titulo" id="ofertaRevealTitulo">¡Felicidades!</strong>
-                                <span class="oferta-reveal-subtitulo" id="ofertaRevealSubtitulo">Tienes 50% de descuento</span>
-                                <div class="oferta-reveal-precios" id="ofertaRevealPrecios">
-                                    <span class="oferta-reveal-precio-anterior" id="ofertaRevealPrecioAnterior">$12.000</span>
-                                    <span class="oferta-reveal-precio-nuevo" id="ofertaRevealPrecioNuevo">$6.000</span>
-                                    <span class="oferta-reveal-credencial">Oferta</span>
-                                </div>
-                                <!-- Nota adicional para premios de la ruleta diaria sin precio real
-                                    (ej. "se aplica automáticamente al pagar"). Oculta por defecto. -->
-                                <span class="oferta-reveal-nota" id="ofertaRevealNota" style="display:none;"></span>
-                            </div>
-                        </div>
-                        <div class="oferta-rueda-wrap" id="ofertaRuedaWrap">
-                            <div class="oferta-rueda-icono">
-                                <svg viewBox="0 0 220 220" class="rueda-svg" xmlns="http://www.w3.org/2000/svg">
-                                    <g class="rueda-llamas">
-                                        <path class="llama llama-1" d="M120,150 C108,118 132,95 120,62 C148,80 165,58 158,30 C192,58 202,102 178,132 C166,148 142,158 120,150 Z" fill="#c9301f"/>
-                                        <path class="llama llama-2" d="M130,138 C120,112 138,93 130,68 C150,82 162,64 157,44 C180,64 186,96 170,118 C160,132 144,140 130,138 Z" fill="#ff6a3d"/>
-                                        <path class="llama llama-3" d="M138,126 C132,106 143,92 137,74 C151,84 158,71 155,55 C170,68 174,92 163,108 C156,118 146,126 138,126 Z" fill="#ffb03d"/>
-                                    </g>
-                                    <circle cx="78" cy="142" r="54" fill="#0a0a0a"/>
-                                    <circle cx="78" cy="142" r="41" fill="#ffffff"/>
-                                    <circle cx="78" cy="142" r="35" fill="none" stroke="#e2402d" stroke-width="4"/>
-                                    <g stroke="#e2402d" stroke-width="5" stroke-linecap="round">
-                                        <line x1="78" y1="142" x2="78" y2="109"/>
-                                        <line x1="78" y1="142" x2="107" y2="125"/>
-                                        <line x1="78" y1="142" x2="107" y2="159"/>
-                                        <line x1="78" y1="142" x2="78" y2="175"/>
-                                        <line x1="78" y1="142" x2="49" y2="159"/>
-                                        <line x1="78" y1="142" x2="49" y2="125"/>
-                                    </g>
-                                    <circle cx="78" cy="142" r="8" fill="#e2402d"/>
-                                </svg>
-                            </div>
-                            <div class="oferta-rueda-texto">
-                                <strong class="rueda-descuento">50% de descuento hoy</strong>
-                                <span class="rueda-aviso">Ya tienes el descuento de hoy, espera hasta mañana</span>
-                            </div>
-                        </div>
-
-                        <div class="container slide-imagen-contenido">
-                            <span class="hero-eyebrow"><span class="dot"></span> Para todos los gustos</span>
+<!-- ===== CARRUSEL HERO — slide 1 (video+3D) + 2 slides de imagen ===== -->
+<section class="hero-carrusel" id="inicio">
+    <div class="carrusel-track" id="carruselTrack">
+        <!-- ---------- SLIDE 1: HERO ORIGINAL (video + escena 3D) ---------- -->
+        <div class="carrusel-slide activo">
+            <div class="hero">
+                <video class="hero-video" autoplay loop muted playsinline>
+                    <source src="{% static 'home/media/6804173-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
+                </video>
+                <div class="hero-video-overlay"></div>
+                <div class="hero-topfade"></div>
+                <span class="hero-orb orb-1" data-depth="0.5"></span>
+                <span class="hero-orb orb-2" data-depth="0.9"></span>
+                <span class="hero-orb orb-3" data-depth="0.35"></span>
+                <span class="hero-orb orb-4" data-depth="0.7"></span>
+                <div class="container hero-inner">
+                    <div class="row align-items-center g-5">
+                        <div class="col-lg-6">
+                            <span class="hero-eyebrow"><span class="dot"></span> Tradición venezolana en Medellín</span>
                             <h1 class="hero-title">
-                                <span class="linea"><span class="palabra" style="animation-delay:.1s">Variedad</span></span>
-                                <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">de Quesos</span></span>
+                                <span class="linea"><span class="palabra" style="animation-delay:.1s">Queso</span></span>
+                                <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">Artesanal</span></span>
                             </h1>
                             <p class="hero-sub">
-                                Desde el clásico queso blanco hasta el suave queso de mano y el delicado telita —
-                                tenemos la variedad que tu mesa necesita. Todos artesanales, frescos y sin aditivos.
+                                El auténtico sabor de nuestra tierra, hecho con recetas familiares,
+                                sin aditivos y con la frescura de siempre. Ahora más cerca de tu mesa.
                             </p>
                             <div class="hero-actions">
                                 <a href="#productos" class="btn-dorado">
@@ -424,630 +43,786 @@
                                 </a>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <!--FINAL QUESOS INTERACTIVOS-->
-
-                <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
-                <div class="carrusel-slide">
-                    <div class="slide-imagen">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_sc7adrsc7adrsc7a.png' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
-                        <div class="slide-imagen-overlay"></div>
-                        <div class="container slide-imagen-contenido">
-                            <div class="row align-items-center g-4">
-
-                                <!-- Texto izquierda -->
-                                <div class="col-lg-6">
-                                    <span class="hero-eyebrow"><span class="dot"></span> Ahora llevamos hasta tu puerta</span>
-                                    <h1 class="hero-title">
-                                        <span class="linea"><span class="palabra" style="animation-delay:.1s">Pedidos</span></span>
-                                        <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">a Domicilio</span></span>
-                                    </h1>
-                                    <p class="hero-sub">
-                                        Haz tu pedido y sigue en tiempo real dónde está tu queso.
-                                        Sabor venezolano fresco, directo a tu hogar en Medellín —
-                                        rápido, seguro y sin salir de casa.
-                                    </p>
-                                    <div class="hero-actions">
-                                        <a href="https://wa.me/573215450519" class="btn-dorado">
-                                            <i class="bi bi-scooter"></i> Pedir ahora
-                                        </a>
-                                        <a href="#contacto" class="btn-outline-blanco">
-                                            <i class="bi bi-map"></i> Ver cobertura
-                                        </a>
-                                    </div>
+                        <div class="col-lg-6">
+                            <div class="hero-escena" id="heroEscena">
+                                <span class="hero-anillo"></span>
+                                <div class="pieza3d pieza-rueda" data-depth="0.18">
+                                    <img src="{% static 'home/media/logolacz.png' %}"
+                                        alt="Logo LzApp"
+                                        style="mix-blend-mode: normal; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); width: 260px;">
                                 </div>
-
-                                <!-- GIF de tracking animado (SVG inline) -->
-                                <div class="col-lg-6 d-flex justify-content-center align-items-center">
-                                    <div class="tracking-widget">
-                                        <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" class="tracking-svg">
-
-                                            <!-- Tarjeta fondo -->
-                                            <rect x="10" y="10" width="320" height="240" rx="20" ry="20"
-                                                fill="rgba(2,44,99,0.75)" stroke="rgba(201,168,76,0.5)" stroke-width="1.5"/>
-
-                                            <!-- Título tarjeta -->
-                                            <text x="170" y="42" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                font-size="13" font-weight="700" fill="#f0d98a" letter-spacing="1">
-                                                SEGUIMIENTO EN VIVO
-                                            </text>
-
-                                            <!-- Línea de ruta -->
-                                            <path d="M55,155 Q120,90 200,130 Q250,155 285,140"
-                                                fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="3"
-                                                stroke-dasharray="6 4"/>
-
-                                            <!-- Ruta activa animada -->
-                                            <path id="rutaActiva" d="M55,155 Q120,90 200,130 Q250,155 285,140"
-                                                fill="none" stroke="#c9a84c" stroke-width="3"
-                                                stroke-dasharray="300" stroke-dashoffset="300">
-                                                <animate attributeName="stroke-dashoffset"
-                                                    from="300" to="0" dur="3s"
-                                                    begin="0s;reinicio.end+0.8s"
-                                                    fill="freeze" id="trazado"/>
-                                            </path>
-
-                                            <!-- Punto origen (tienda) -->
-                                            <circle cx="55" cy="155" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
-                                            <text x="55" y="159" text-anchor="middle" font-size="9" fill="#f0d98a">🏪</text>
-                                            <text x="55" y="174" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                font-size="9" fill="rgba(255,255,255,0.7)">Tienda</text>
-
-                                            <!-- Punto destino (casa) -->
-                                            <circle cx="285" cy="140" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
-                                            <text x="285" y="144" text-anchor="middle" font-size="9" fill="#f0d98a">🏠</text>
-                                            <text x="285" y="158" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                font-size="9" fill="rgba(255,255,255,0.7)">Tu casa</text>
-
-                                            <!-- Scooter animado sobre la ruta -->
-                                            <g id="scooter">
-                                                <!-- Sombra del scooter -->
-                                                <ellipse cx="0" cy="6" rx="14" ry="4" fill="rgba(0,0,0,0.25)"/>
-                                                <!-- Cuerpo del scooter -->
-                                                <rect x="-13" y="-10" width="26" height="12" rx="5" fill="#c9a84c"/>
-                                                <!-- Ruedas -->
-                                                <circle cx="-10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
-                                                <circle cx="10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
-                                                <!-- Manillar -->
-                                                <rect x="8" y="-14" width="3" height="8" rx="1.5" fill="#f0d98a"/>
-                                                <!-- Cajita de queso -->
-                                                <rect x="-8" y="-18" width="14" height="10" rx="3" fill="#083b78" stroke="#c9a84c" stroke-width="1"/>
-                                                <text x="0" y="-10" text-anchor="middle" font-size="7" fill="#f0d98a">🧀</text>
-
-                                                <animateMotion dur="3s" begin="0.2s;reinicio.end+1s" fill="freeze" rotate="auto">
-                                                    <mpath href="#rutaActiva"/>
-                                                </animateMotion>
-                                            </g>
-
-                                            <!-- Pulso en el destino -->
-                                            <circle cx="285" cy="140" r="9" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0">
-                                                <animate attributeName="r" from="9" to="22" dur="1.5s"
-                                                    begin="trazado.end" repeatCount="indefinite"/>
-                                                <animate attributeName="opacity" from="0.7" to="0" dur="1.5s"
-                                                    begin="trazado.end" repeatCount="indefinite"/>
-                                            </circle>
-
-                                            <!-- Animación de reinicio oculta -->
-                                            <animate id="reinicio" attributeName="opacity" from="1" to="1"
-                                                begin="trazado.end+2s" dur="0.01s" fill="freeze"/>
-
-                                            <!-- Pasos de estado debajo -->
-                                            <g transform="translate(0,195)">
-                                                <!-- Paso 1: Confirmado -->
-                                                <circle cx="80" cy="12" r="8" fill="#c9a84c"/>
-                                                <text x="80" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">✓</text>
-                                                <text x="80" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                    font-size="8" fill="rgba(255,255,255,0.8)">Confirmado</text>
-
-                                                <!-- Línea -->
-                                                <line x1="92" y1="12" x2="148" y2="12" stroke="#c9a84c" stroke-width="1.5" stroke-dasharray="4 3"/>
-
-                                                <!-- Paso 2: En camino -->
-                                                <circle cx="160" cy="12" r="8" fill="#c9a84c">
-                                                    <animate attributeName="fill" values="#c9a84c;#f0d98a;#c9a84c"
-                                                        dur="1.2s" repeatCount="indefinite"/>
-                                                </circle>
-                                                <text x="160" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">🛵</text>
-                                                <text x="160" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                    font-size="8" fill="rgba(255,255,255,0.8)">En camino</text>
-
-                                                <!-- Línea -->
-                                                <line x1="172" y1="12" x2="228" y2="12" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
-
-                                                <!-- Paso 3: Entregado -->
-                                                <circle cx="240" cy="12" r="8" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
-                                                <text x="240" y="16" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)">🏠</text>
-                                                <text x="240" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
-                                                    font-size="8" fill="rgba(255,255,255,0.4)">Entregado</text>
-                                            </g>
-
-                                        </svg>
-                                    </div>
+                                <div class="pieza3d pieza-cuna" data-depth="0.5">
+                                    <img src="{% static 'home/media/hero-wedge-3d.png' %}"
+                                         alt="Cuña de queso fresco">
                                 </div>
-
+                                <div class="pieza3d pieza-bola" data-depth="0.7">
+                                    <img src="{% static 'home/media/481d0dc0e1da87c0016c82cd07e6820bd15a40f5 (1).png' %}"
+                                         alt="Bola de queso fresco">
+                                </div>
+                                <div class="pieza3d pieza-extra" data-depth="0.4">
+                                    <img src="{% static 'home/media/9646ff920fb88ac261a97674057dd2133dba55c4 (1).png' %}"
+                                         alt="Queso telita">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <!-- /.carrusel-track -->
-
-            <!-- Flechas de navegación -->
-            <button class="carrusel-flecha prev" id="carruselPrev" aria-label="Diapositiva anterior">
-                <i class="bi bi-chevron-left"></i>
-            </button>
-            <button class="carrusel-flecha next" id="carruselNext" aria-label="Siguiente diapositiva">
-                <i class="bi bi-chevron-right"></i>
-            </button>
-
-            <!-- Puntos indicadores -->
-            <div class="carrusel-puntos" id="carruselPuntos">
-                <button class="carrusel-punto activo" data-slide="0" aria-label="Ir a la diapositiva 1"></button>
-                <button class="carrusel-punto" data-slide="1" aria-label="Ir a la diapositiva 2"></button>
-                <button class="carrusel-punto" data-slide="2" aria-label="Ir a la diapositiva 3"></button>
-            </div>
-
-            <!-- Indicador de swipe (solo mobile, reemplaza las flechas) -->
-            <div class="carrusel-swipe-hint" id="carruselSwipeHint">
-                <i class="bi bi-chevron-left"></i>
-                Desliza
-                <i class="bi bi-chevron-right"></i>
-            </div>
-
-            <!-- Barra de progreso del autoplay -->
-            <div class="carrusel-progreso" id="carruselProgreso"></div>
-
-            <!-- Wave de transición hacia las estadísticas -->
-            <div class="hero-wave">
-                <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                    <path d="M0,40 C360,80 1080,0 1440,40 L1440,70 L0,70 Z" fill="#022C63"/>
-                </svg>
-            </div>
-        </section>
-
-
-        <!-- ===== BANDA DE ESTADÍSTICAS ===== -->
-        <section class="seccion-stats">
-            <div class="container">
-                <div class="row justify-content-center align-items-center text-center g-0">
-                    <div class="col-6 col-md-3 reveal delay-1">
-                        <div class="stat-item">
-                            <span class="stat-numero">100%</span>
-                            <span class="stat-label">Artesanal</span>
-                        </div>
-                    </div>
-                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
-                    <div class="col-6 col-md-3 reveal delay-2">
-                        <div class="stat-item">
-                            <span class="stat-numero">0</span>
-                            <span class="stat-label">Aditivos</span>
-                        </div>
-                    </div>
-                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
-                    <div class="col-6 col-md-3 reveal delay-3">
-                        <div class="stat-item">
-                            <span class="stat-numero">+5</span>
-                            <span class="stat-label">Variedades</span>
-                        </div>
-                    </div>
-                    <div class="d-none d-md-block col-md-auto stat-divider"></div>
-                    <div class="col-6 col-md-3 reveal delay-4">
-                        <div class="stat-item">
-                            <span class="stat-numero"><i class="bi bi-heart-fill"></i></span>
-                            <span class="stat-label">Hecho con amor</span>
-                        </div>
-                    </div>
+                <div class="hero-scroll">
+                    <span class="mouse"><span></span></span>
+                    Desliza
                 </div>
             </div>
-        </section>
-
-
-        <!-- Wave de transición hacia productos -->
-        <div class="wave-divider" style="background:#022C63;">
-            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
-            </svg>
         </div>
-
-
-        <!-- ===== SECCIÓN PRODUCTOS (con buscador en vivo + productos reales) ===== -->
-        <section class="seccion-productos" id="productos">
-            <div class="container">
-                <div class="row mb-5">
-                    <div class="col-lg-6 reveal-left">
-                        <span class="section-eyebrow">Lo que ofrecemos</span>
-                        <h2 class="section-titulo">Nuestros<br>productos</h2>
-                    </div>
-                    <div class="col-lg-6 d-flex align-items-end reveal-right">
-                        <p class="section-descripcion">
-                            Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad
-                            y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás
-                            aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos
-                            de la cocina de la abuela.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Buscador de productos -->
-                <div class="buscador-wrapper"
-                     data-url-ajax="{% url 'buscar_ajax' %}"
-                     data-url-agregar-base="{% url 'carro:agregar' 1 %}"
-                     data-layout="vertical">
-                    <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
-                        <div class="buscador-input-wrapper">
-                            <input
-                                type="text"
-                                name="q"
-                                id="inputBuscador"
-                                class="buscador-input"
-                                placeholder="Buscar productos..."
-                                value="{{ query|default:'' }}"
-                                autocomplete="off"
-                            >
-                            {% if query %}
-                            <a href="?" class="buscador-limpiar" aria-label="Limpiar búsqueda">
-                                <i class="bi bi-x-lg"></i>
-                            </a>
-                            {% endif %}
-                        </div>
-                        <button type="submit" class="buscador-btn">
-                            <i class="bi bi-search"></i> <span>Buscar</span>
-                        </button>
-                    </form>
-                </div>
-
-                <p class="buscador-resultado-info" id="infoResultados" {% if not query %}style="display:none;"{% endif %}>
-                    Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
-                </p>
-
-                <div class="row g-3" id="listaProductos">
+        <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos (con quesos interactivos) ---------- -->
+        <div class="carrusel-slide">
+            <div class="slide-imagen">
+                <img src="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
+                <img src="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
+                <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
+                <!--SECCION DE QUESOS INTERACTIVOS-->
+                <div class="quesos-interactivos"
+                    data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
+                    data-bg-mobile="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}"
+                    data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
                     {% if premio_activo %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
-                            <span class="premio-cinta-mini">TU PREMIO</span>
-                            <div class="producto-img-wrapper">
-                                <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
-                                {% if premio_activo.producto.imagen %}
-                                    <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                                {% endif %}
-                            </div>
-                            <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-stars"></i> Premio de la lotería
-                                </div>
-                                <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
-                                <p class="producto-descripcion">
-                                    Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
-                                </p>
-                                <p class="precio">
-                                    $ {{ premio_activo.precio_con_descuento }}
-                                    <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
-                                </p>
-                            </div>
-                            <div class="card-footer bg-white border-0">
-                                <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
-                                    <i class="bi bi-gift-fill"></i> Reclamar premio
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    data-origen-premio="campana"
+                    data-tiene-premio="true"
+                    data-premio-tipo=""
+                    data-premio-producto="{{ premio_activo.producto.nombre|default:'' }}"
+                    data-premio-porcentaje="{{ premio_activo.campana.porcentaje_descuento|default:'0' }}"
+                    data-premio-precio-original="{{ premio_activo.precio_original|default:'0' }}"
+                    data-premio-precio-descuento="{{ premio_activo.precio_con_descuento|default:'0' }}"
+                    data-premio-codigo="{{ premio_activo.codigo|default:'' }}"
+                    data-premio-imagen="{% if premio_activo.producto.imagen %}{{ premio_activo.producto.imagen.url }}{% endif %}"
                     {% elif juego_diario.estado == 'ganado' %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
-                            <span class="premio-cinta-mini">TU PREMIO</span>
-                            <div class="producto-img-wrapper d-flex align-items-center justify-content-center" style="min-height:180px;">
-                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
-                                    <span class="badge-stock premio">-5%</span>
-                                    <i class="bi bi-ticket-perforated-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
-                                    <span class="badge-stock premio">GRATIS</span>
-                                    <i class="bi bi-truck" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
-                                    <span class="badge-stock premio">🎫</span>
-                                    <i class="bi bi-award-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% endif %}
+                    data-origen-premio="ruleta_diaria"
+                    data-tiene-premio="true"
+                    data-premio-tipo="{{ juego_diario.tirada.resultado }}"
+                    data-premio-producto=""
+                    data-premio-porcentaje="{% if juego_diario.tirada.resultado == 'CUPON_5' %}5{% else %}0{% endif %}"
+                    data-premio-precio-original="0"
+                    data-premio-precio-descuento="0"
+                    data-premio-codigo=""
+                    data-premio-imagen=""
+                    {% else %}
+                    data-origen-premio="ruleta_diaria"
+                    data-tiene-premio="false"
+                    data-premio-tipo=""
+                    data-premio-producto=""
+                    data-premio-porcentaje="0"
+                    data-premio-precio-original="0"
+                    data-premio-precio-descuento="0"
+                    data-premio-codigo=""
+                    data-premio-imagen=""
+                    {% endif %}
+                    data-estado-juego-diario="{{ juego_diario.estado|default:'' }}"
+                    data-url-marcar-mostrado="{% url 'marcar_premio_mostrado' %}"
+                    data-url-jugar-ruleta="{% url 'jugar_ruleta_dia' %}"
+                    data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
+                    <!-- Queso 1: el oscuro/tostado de la izquierda (conectado a datos reales) -->
+                    {% with p=productos_oferta.0 %}
+                    <a href="#productos" class="queso-punto"
+                        data-left="34.7" data-top="25.7" data-width="30.7" data-height="49.2"
+                        {% if p.descuento_vigente %}data-descuento="{{ p.descuento_vigente.porcentaje }}"{% endif %}
+                        data-peso-stock="{{ p.ratio_stock|floatformat:2 }}"
+                        data-descripcion="{{ p.descripcion|default:'Suave y cremoso, con esa fibra característica que lo distingue.' }}"
+                        data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                        data-oferta-pos="center 30%"
+                        data-clip="0.0% 0.9%, 1.1% 0.9%, 2.6% 0.9%, 3.5% 1.1%, 4.7% 1.1%, 5.1% 1.6%, 6.6% 1.7%, 8.8% 1.7%, 10.9% 1.7%, 11.6% 1.3%, 12.7% 1.1%, 13.5% 0.9%, 15.2% 0.5%, 16.3% 0.3%, 17.8% 0.3%, 19.6% 0.3%, 21.6% 0.0%, 22.0% 0.3%, 23.6% 0.3%, 25.2% 0.3%, 26.7% 0.3%, 29.0% 0.3%, 30.3% 0.1%, 32.1% 0.0%, 34.5% 0.0%, 37.4% 0.0%, 38.0% 0.3%, 40.4% 0.4%, 41.6% 0.4%, 43.2% 0.6%, 44.9% 0.6%, 45.6% 0.9%, 47.6% 0.9%, 48.9% 1.1%, 50.7% 1.1%, 51.3% 1.4%, 51.9% 1.8%, 52.6% 2.2%, 53.1% 2.7%, 53.3% 3.3%, 53.8% 4.0%, 54.0% 4.7%, 54.5% 5.1%, 54.7% 5.6%, 55.2% 6.6%, 55.8% 7.1%, 56.3% 7.8%, 56.7% 8.8%, 57.2% 9.1%, 57.9% 10.3%, 58.5% 11.2%, 58.9% 12.1%, 59.5% 12.5%, 59.9% 13.3%, 60.2% 13.8%, 60.4% 14.4%, 60.7% 15.2%, 61.0% 15.7%, 61.4% 16.6%, 61.5% 17.3%, 61.9% 17.6%, 62.0% 18.5%, 62.4% 18.9%, 62.8% 19.7%, 63.0% 20.4%, 63.2% 20.9%, 63.5% 21.5%, 63.9% 22.3%, 64.2% 22.8%, 64.4% 23.4%, 65.0% 24.3%, 66.0% 24.5%, 66.5% 24.7%, 67.0% 25.2%, 67.5% 26.1%, 68.3% 27.5%, 69.2% 28.8%, 70.4% 30.1%, 71.0% 30.9%, 71.7% 31.5%, 72.2% 32.0%, 72.9% 32.9%, 73.5% 33.6%, 74.0% 34.1%, 74.6% 35.2%, 74.9% 36.2%, 75.3% 37.2%, 75.6% 38.0%, 75.8% 38.8%, 76.6% 40.6%, 77.4% 42.1%, 78.1% 42.9%, 78.8% 44.1%, 79.8% 45.5%, 80.4% 47.1%, 81.1% 48.5%, 81.6% 49.3%, 82.2% 50.2%, 82.8% 51.3%, 83.2% 52.7%, 85.1% 56.1%, 85.8% 57.3%, 87.3% 59.9%, 87.9% 61.4%, 88.8% 63.7%, 89.4% 65.0%, 91.1% 68.2%, 91.5% 69.5%, 92.6% 71.0%, 92.6% 72.7%, 93.0% 75.0%, 93.6% 78.1%, 93.9% 79.5%, 94.3% 81.1%, 94.8% 83.0%, 95.1% 84.9%, 95.3% 86.8%, 95.3% 88.4%, 96.2% 89.4%, 96.4% 90.4%, 97.8% 91.2%, 98.2% 91.8%, 98.5% 92.2%, 99.1% 92.4%, 99.7% 93.2%, 100.0% 94.3%, 98.7% 95.6%, 96.7% 97.5%, 96.1% 98.2%, 94.1% 98.5%, 89.5% 99.6%, 86.4% 100.0%, 84.2% 99.6%, 79.8% 99.7%, 73.2% 99.7%, 66.3% 99.6%, 54.5% 99.6%, 49.1% 99.6%, 41.0% 99.6%, 39.0% 99.5%, 33.3% 99.4%, 26.7% 99.5%, 25.3% 99.4%, 22.4% 99.4%, 20.2% 99.3%, 19.5% 98.0%, 18.6% 96.9%, 18.2% 95.7%, 18.8% 94.6%, 19.7% 94.2%, 20.2% 93.4%, 20.4% 92.2%, 19.5% 91.4%, 19.1% 90.5%, 18.6% 90.1%, 18.4% 89.7%, 18.4% 86.7%, 18.6% 84.7%, 18.9% 80.1%, 18.9% 74.8%, 19.1% 73.6%, 19.2% 71.8%, 19.2% 69.6%, 19.2% 67.8%, 19.3% 66.5%, 19.2% 65.7%, 19.1% 64.8%, 18.7% 63.7%, 18.4% 62.5%, 18.2% 61.5%, 16.8% 56.6%, 15.9% 53.9%, 15.4% 52.6%, 14.9% 51.1%, 14.3% 50.1%, 14.0% 49.1%, 13.1% 47.2%, 12.5% 45.5%, 12.0% 44.4%, 11.5% 42.7%, 11.0% 41.1%, 9.7% 36.8%, 2.5% 10.5%, 3.4% 10.3%, 4.1% 9.9%, 4.4% 9.1%, 3.9% 8.5%, 3.0% 8.5%, 2.0% 8.6%, 1.5% 6.4%, 0.8% 3.5%, 0.0% 1.8%"
+                        data-clip-mobile="24.60% 23.68%, 25.56% 23.70%, 26.52% 23.77%, 27.18% 23.87%, 27.84% 23.94%, 28.95% 23.92%, 29.81% 23.89%, 30.47% 23.80%, 31.18% 23.65%, 31.99% 23.56%, 32.70% 23.44%, 33.51% 23.39%, 34.37% 23.34%, 35.18% 23.34%, 35.88% 23.32%, 37.15% 23.34%, 38.01% 23.29%, 39.02% 23.22%, 40.08% 23.17%, 41.55% 23.15%, 43.32% 23.15%, 45.30% 23.12%, 46.56% 23.12%, 48.13% 23.10%, 49.44% 23.10%, 50.30% 23.24%, 50.86% 23.41%, 51.11% 23.68%, 51.52% 23.99%, 51.87% 24.23%, 52.28% 24.54%, 52.63% 24.76%, 53.09% 25.04%, 53.44% 25.28%, 53.90% 25.50%, 54.25% 25.79%, 54.61% 26.10%, 54.91% 26.36%, 55.11% 26.58%, 55.42% 26.92%, 55.82% 27.25%, 56.02% 27.47%, 56.33% 27.71%, 56.68% 28.09%, 57.14% 28.50%, 57.69% 28.69%, 58.10% 28.91%, 58.40% 29.17%, 58.81% 29.51%, 59.21% 29.84%, 59.67% 30.23%, 60.27% 30.56%, 60.78% 30.80%, 61.23% 31.07%, 61.74% 31.48%, 62.20% 32.08%, 62.80% 32.84%, 63.41% 33.30%, 63.97% 33.88%, 64.57% 34.45%, 65.13% 34.93%, 65.74% 35.46%, 66.45% 36.04%, 67.15% 36.66%, 67.91% 37.16%, 68.62% 37.79%, 69.38% 38.58%, 70.04% 39.32%, 70.80% 40.14%, 71.05% 41.03%, 71.46% 42.11%, 71.86% 43.09%, 72.42% 44.00%, 72.72% 44.36%, 73.53% 44.72%, 74.19% 45.04%, 74.95% 45.35%, 75.20% 45.56%, 75.00% 45.88%, 74.44% 46.40%, 74.09% 46.69%, 73.53% 46.88%, 72.47% 46.93%, 71.51% 47.00%, 69.94% 47.05%, 68.52% 46.88%, 67.26% 46.91%, 65.59% 46.91%, 64.57% 46.79%, 62.55% 46.67%, 60.98% 46.74%, 59.26% 46.84%, 58.20% 46.84%, 55.87% 46.88%, 53.70% 47.03%, 51.87% 47.10%, 48.79% 47.10%, 44.49% 46.96%, 39.17% 46.96%, 37.20% 47.05%, 35.28% 47.08%, 34.82% 46.74%, 34.82% 46.52%, 35.07% 46.45%, 35.68% 46.45%, 35.83% 46.21%, 35.58% 45.78%, 35.12% 45.59%, 34.77% 45.32%, 34.77% 44.58%, 34.82% 43.50%, 34.82% 42.42%, 34.82% 41.20%, 34.92% 40.16%, 34.87% 39.54%, 34.06% 38.10%, 32.49% 35.84%, 32.14% 35.56%, 31.53% 34.74%, 30.87% 33.95%, 28.14% 29.32%, 27.18% 27.76%, 26.73% 26.77%, 26.12% 25.81%, 25.97% 25.57%, 26.32% 25.52%, 26.73% 25.43%, 26.78% 25.16%, 26.32% 25.12%, 25.92% 25.12%, 25.61% 24.97%, 25.26% 24.54%, 24.90% 24.04%">
+                        <!-- TODO (queso 1 - mobile): pega aquí las coordenadas de tu
+                             trazador sobre la imagen VERTICAL (data-bg-mobile), en %
+                             ABSOLUTOS de la imagen completa (no relativos a una caja
+                             local como data-clip). Formato:
+                             data-clip-mobile="12.0% 8.5%, 15.2% 9.1%, 18.0% 12.4%, ..." -->
+                        <span class="queso-punto-glow"></span>
+                        <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                            <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
+                        </svg>
+                        <span class="queso-punto-borde"></span>
+                        <div class="queso-punto-flip">
+                            <div class="queso-punto-cara queso-punto-frente">
+                                <span class="queso-punto-ventana"></span>
                             </div>
-                            <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-stars"></i> Premio de la ruleta diaria
+                            <div class="queso-punto-cara queso-punto-reverso">
+                                <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                <div class="queso-oferta-centro">
+                                    <div class="queso-oferta-foto">
+                                        {% if p.imagen %}
+                                            <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+                                        {% else %}
+                                            <i class="bi bi-image"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="queso-ruleta-wrap">
+                                        <div class="queso-ruleta"></div>
+                                        <span class="ruleta-signo">%</span>
+                                    </div>
+                                    <strong class="queso-oferta-nombre">{{ p.nombre|default:"Queso Telita" }}</strong>
+                                    <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
                                 </div>
-                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
-                                    <h5 class="titulo-producto">Cupón 5% próxima compra</h5>
-                                    <p class="producto-descripcion">
-                                        Se aplica automáticamente al total de tu carrito. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
-                                    <h5 class="titulo-producto">Envío gratis</h5>
-                                    <p class="producto-descripcion">
-                                        Se aplica automáticamente en tu próximo pedido. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
-                                    <h5 class="titulo-producto">Boleto dorado</h5>
-                                    <p class="producto-descripcion">
-                                        Quedas participando en el próximo sorteo de premios especiales. Vigente hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% endif %}
-                            </div>
-                            <div class="card-footer bg-white border-0">
-                                {% if juego_diario.tirada.reclamado %}
-                                    <button type="button" class="btn btn-carrito w-100" disabled>
-                                        <i class="bi bi-check-circle-fill"></i> Ya reclamado
-                                    </button>
-                                {% else %}
-                                    <button type="button" class="btn btn-carrito w-100 boton-reclamar-premio-dia"
-                                        data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
-                                        <i class="bi bi-gift-fill"></i> Reclamar premio
-                                    </button>
-                                {% endif %}
                             </div>
                         </div>
-                    </div>
-                    {% endif %}
-                    {% for i in productos %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical h-100">
-                            <div class="producto-img-wrapper">
-                                {% if i.stock_actual <= i.stock_minimo %}
-                                    <span class="badge-stock bajo">Stock bajo</span>
-                                {% else %}
-                                    <span class="badge-stock disponible">Disponible</span>
-                                {% endif %}
-                                {% if i.imagen %}
-                                    <img src="{{ i.imagen.url }}" class="imagen-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                                {% endif %}
+                        <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                    </a>
+                    {% endwith %}
+                   <!-- Queso 2: el del medio -->
+                    <a href="#productos" class="queso-punto"
+                        data-left="55.8" data-top="15.8" data-width="23.2" data-height="55.6"
+                        data-descuento="50"
+                        data-descripcion="Fresco, suave y con la textura característica del queso venezolano."
+                        data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                        data-oferta-pos="center 30%"
+                        data-clip="5.1% 45.8%, 6.6% 43.2%, 6.6% 42.0%, 8.1% 40.5%, 11.2% 36.7%, 12.2% 34.8%, 8.1% 33.0%, 3.6% 31.4%, 1.5% 29.9%, 0.5% 26.1%, 0.0% 22.0%, 1.0% 18.9%, 3.0% 15.9%, 7.1% 9.8%, 12.2% 4.9%, 15.7% 1.9%, 18.8% 0.8%, 23.4% 0.0%, 25.9% 4.2%, 28.9% 10.6%, 31.0% 16.7%, 34.5% 25.0%, 36.0% 29.9%, 41.1% 32.2%, 46.7% 34.8%, 51.8% 37.5%, 55.8% 39.8%, 63.5% 44.3%, 71.1% 50.0%, 74.6% 53.0%, 80.2% 60.6%, 87.3% 72.7%, 90.4% 77.3%, 93.9% 87.1%, 96.4% 92.8%, 99.0% 92.4%, 100.0% 94.3%, 95.4% 99.6%, 77.2% 100.0%, 41.1% 99.6%, 35.5% 95.8%, 34.0% 90.9%, 31.5% 80.7%"
+                        data-clip-mobile="18.3% 41.7%, 19.0% 41.9%, 19.4% 42.0%, 19.8% 42.2%, 21.2% 42.8%, 21.8% 43.0%, 23.3% 43.6%, 24.2% 43.9%, 24.9% 44.2%, 25.8% 44.5%, 26.8% 44.9%, 27.6% 45.2%, 28.5% 45.4%, 29.3% 45.8%, 30.3% 46.2%, 31.5% 46.7%, 32.4% 47.1%, 32.8% 47.3%, 33.3% 47.4%, 34.1% 47.4%, 35.0% 47.3%, 36.2% 47.3%, 37.3% 47.3%, 38.1% 47.3%, 39.0% 47.3%, 40.0% 47.3%, 41.1% 47.4%, 42.2% 47.4%, 43.2% 47.5%, 44.3% 47.5%, 45.5% 47.5%, 46.5% 47.6%, 48.0% 47.7%, 48.8% 47.8%, 49.8% 47.9%, 50.7% 48.0%, 51.8% 48.2%, 52.8% 48.3%, 53.8% 48.5%, 54.5% 48.5%, 55.1% 48.5%, 55.7% 48.4%, 56.5% 48.4%, 57.1% 48.5%, 57.4% 48.8%, 57.6% 49.1%, 58.0% 49.4%, 58.4% 49.7%, 59.3% 50.0%, 60.3% 50.3%, 61.1% 50.7%, 61.8% 50.9%, 62.7% 51.3%, 63.6% 51.6%, 64.5% 52.0%, 65.4% 52.4%, 66.3% 52.7%, 67.2% 53.1%, 67.8% 53.4%, 68.8% 54.0%, 69.9% 54.6%, 70.5% 54.9%, 71.4% 55.3%, 71.8% 55.5%, 72.2% 55.5%, 72.6% 55.3%, 73.2% 55.6%, 73.5% 56.2%, 73.6% 56.6%, 73.6% 57.2%, 73.7% 57.5%, 73.1% 57.8%, 72.3% 58.0%, 71.6% 58.4%, 70.7% 58.7%, 69.5% 59.0%, 68.0% 59.4%, 66.9% 59.7%, 66.2% 60.0%, 65.4% 60.2%, 64.9% 60.3%, 64.0% 60.6%, 63.0% 61.0%, 62.2% 61.3%, 61.3% 61.6%, 60.4% 62.0%, 59.7% 62.3%, 58.5% 62.7%, 57.5% 63.1%, 56.6% 63.4%, 55.5% 63.8%, 54.7% 64.1%, 53.7% 64.4%, 52.8% 64.7%, 52.2% 64.9%, 51.4% 65.1%, 50.7% 65.5%, 49.8% 65.8%, 49.0% 66.1%, 48.1% 66.3%, 47.3% 66.4%, 46.4% 66.6%, 45.6% 66.6%, 44.8% 66.8%, 43.6% 67.0%, 42.6% 67.1%, 41.4% 67.2%, 39.7% 67.1%, 38.5% 67.0%, 37.4% 66.9%, 36.6% 66.8%, 36.2% 66.7%, 36.3% 66.5%, 36.5% 66.2%, 36.7% 65.9%, 37.0% 65.8%, 37.5% 66.0%, 38.0% 66.1%, 38.6% 66.1%, 39.1% 66.2%, 39.7% 66.1%, 40.1% 66.1%, 39.4% 65.7%, 38.4% 65.5%, 37.7% 65.1%, 37.2% 64.7%, 36.0% 63.2%, 35.1% 62.7%, 34.6% 62.2%, 33.8% 61.6%, 33.1% 61.0%, 32.4% 60.4%, 31.6% 59.7%, 30.9% 59.1%, 30.1% 58.3%, 29.2% 57.5%, 28.5% 56.8%, 28.1% 56.4%, 27.5% 56.0%, 27.2% 55.6%, 26.9% 55.0%, 26.8% 54.4%, 26.5% 54.1%, 26.5% 53.7%, 26.3% 53.2%, 26.2% 52.7%, 26.0% 51.9%, 25.4% 51.8%, 24.6% 51.9%, 23.8% 52.1%, 22.7% 52.3%, 21.7% 52.4%, 20.8% 52.6%, 19.9% 52.8%, 19.1% 52.8%, 18.7% 52.4%, 18.2% 52.1%, 17.8% 51.8%, 17.3% 51.5%, 16.9% 51.2%, 16.5% 50.6%, 16.1% 50.1%, 15.9% 49.7%, 15.7% 49.4%, 15.6% 49.0%, 15.5% 48.5%, 15.4% 47.9%, 15.2% 47.3%, 15.1% 46.5%, 15.1% 46.2%, 15.2% 45.6%, 15.2% 45.1%, 15.3% 44.6%, 15.5% 44.1%, 15.6% 43.7%, 15.7% 43.3%, 15.8% 43.0%, 17.0% 42.4%, 17.4% 42.1%, 17.9% 41.9%">
+                        <!-- TODO (queso 2 - mobile): mismas instrucciones que queso 1. -->
+                        <span class="queso-punto-glow"></span>
+                        <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                            <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
+                        </svg>
+                        <span class="queso-punto-borde"></span>
+                        <div class="queso-punto-flip">
+                            <div class="queso-punto-cara queso-punto-frente">
+                                <span class="queso-punto-ventana"></span>
                             </div>
-                            <div class="card-body">
-                                <div class="calificacion-widget-pub {% if not request.user.is_authenticated %}anonima{% endif %}"
-                                     data-producto-id="{{ i.id }}"
-                                     data-mi-calificacion="{{ i.mi_calificacion|default:0 }}"
-                                     data-anon="{% if request.user.is_authenticated %}false{% else %}true{% endif %}">
-                                    {% for n in "12345" %}
-                                        <i class="bi bi-star estrella-pub" data-valor="{{ forloop.counter }}"></i>
-                                    {% endfor %}
+                            <div class="queso-punto-cara queso-punto-reverso">
+                                <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                <div class="queso-oferta-centro">
+                                    <div class="queso-oferta-foto">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                    <div class="queso-ruleta-wrap">
+                                        <div class="queso-ruleta"></div>
+                                        <span class="ruleta-signo">%</span>
+                                    </div>
+                                    <strong class="queso-oferta-nombre">Queso Blanco</strong>
+                                    <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
                                 </div>
-                                <h5 class="titulo-producto">{{ i.nombre }}</h5>
-                                <p class="producto-descripcion">
-                                    {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
-                                </p>
-                                <p class="precio">$ {{ i.precio }}</p>
                             </div>
-                            <div class="card-footer bg-white border-0">
-                                <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
-                                    <i class="bi bi-cart-plus"></i> Añadir al carrito
+                        </div>
+                        <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                    </a>
+                    <!-- Queso 3: el de la derecha -->
+                    <a href="#productos" class="queso-punto"
+                        data-left="70.2" data-top="16.2" data-width="21.6" data-height="52.7"
+                        data-descuento="60"
+                        data-descripcion="Artesanal, delicado y perfecto para derretir o disfrutar solo."
+                        data-oferta-video="{% static 'home/media/brillos.mp4' %}"
+                        data-oferta-pos="center 30%"
+                        data-clip="3.3% 47.2%, 4.3% 44.4%, 9.2% 38.4%, 11.4% 34.4%, 5.4% 31.6%, 1.1% 30.0%, 0.5% 26.8%, 0.0% 24.8%, 0.0% 19.6%, 1.6% 16.4%, 3.8% 12.8%, 7.1% 9.2%, 9.8% 6.0%, 13.6% 3.6%, 16.8% 0.8%, 23.9% 0.0%, 26.1% 3.2%, 28.3% 8.4%, 37.0% 29.6%, 48.9% 35.2%, 57.1% 39.6%, 69.6% 48.4%, 77.2% 54.8%, 83.2% 58.8%, 98.4% 66.8%, 98.4% 68.8%, 91.8% 77.6%, 92.4% 82.4%, 96.2% 91.6%, 98.9% 91.2%, 100.0% 92.4%, 98.4% 96.4%, 95.1% 100.0%, 80.4% 98.8%, 40.8% 98.4%, 35.9% 95.6%, 30.4% 81.6%, 22.8% 67.6%, 15.2% 57.2%"
+                        data-clip-mobile="19.9% 62.0%, 20.5% 62.1%, 21.1% 62.3%, 22.0% 62.7%, 23.1% 63.1%, 24.2% 63.5%, 25.9% 64.1%, 26.8% 64.4%, 28.1% 64.9%, 30.0% 65.6%, 31.5% 66.1%, 32.9% 66.7%, 34.0% 67.2%, 34.8% 67.6%, 35.4% 67.5%, 36.5% 67.5%, 37.3% 67.3%, 38.3% 67.3%, 39.7% 67.2%, 41.1% 67.2%, 41.9% 67.2%, 42.8% 67.2%, 43.9% 67.1%, 44.8% 67.1%, 45.7% 66.9%, 46.7% 66.6%, 47.2% 66.5%, 47.9% 66.4%, 48.7% 66.3%, 49.8% 66.3%, 51.0% 66.3%, 52.2% 66.4%, 53.6% 66.6%, 54.7% 66.8%, 55.7% 67.0%, 57.0% 67.0%, 58.0% 67.0%, 59.0% 67.0%, 60.8% 67.0%, 62.6% 66.9%, 64.2% 66.8%, 65.9% 66.6%, 67.2% 66.6%, 67.7% 66.6%, 67.8% 67.0%, 68.2% 67.7%, 68.5% 68.3%, 68.8% 69.1%, 69.0% 69.7%, 69.4% 70.6%, 70.0% 70.9%, 71.3% 71.6%, 72.1% 72.0%, 72.9% 72.4%, 73.8% 72.9%, 74.8% 73.3%, 75.2% 73.1%, 75.5% 72.9%, 75.6% 72.4%, 75.9% 72.7%, 76.3% 73.2%, 76.4% 73.8%, 76.6% 74.4%, 76.8% 75.1%, 76.4% 75.7%, 75.3% 76.1%, 74.1% 76.5%, 73.2% 76.9%, 72.3% 77.2%, 71.3% 77.4%, 70.3% 77.9%, 69.3% 78.6%, 68.5% 79.1%, 67.7% 79.7%, 66.2% 80.4%, 64.6% 81.2%, 63.4% 81.8%, 62.3% 82.4%, 59.9% 83.5%, 58.7% 84.1%, 57.9% 84.5%, 56.9% 85.0%, 55.6% 85.6%, 54.3% 86.1%, 53.0% 86.5%, 51.4% 87.0%, 49.7% 87.5%, 47.5% 88.2%, 48.5% 88.1%, 49.1% 88.1%, 49.5% 88.4%, 49.6% 88.6%, 49.0% 88.7%, 48.1% 88.7%, 47.3% 88.9%, 46.1% 89.0%, 45.1% 88.9%, 44.2% 88.8%, 43.3% 88.7%, 43.5% 88.5%, 43.9% 88.4%, 44.5% 88.2%, 45.3% 87.9%, 44.6% 87.3%, 44.4% 86.9%, 43.8% 86.5%, 43.2% 85.8%, 42.7% 85.3%, 41.2% 84.2%, 40.4% 83.8%, 39.5% 82.9%, 38.6% 82.1%, 37.6% 81.2%, 36.9% 80.7%, 36.1% 80.1%, 35.4% 79.6%, 34.4% 78.9%, 33.4% 78.2%, 32.1% 77.3%, 31.1% 76.7%, 30.2% 76.0%, 29.6% 75.3%, 29.4% 74.7%, 29.1% 73.6%, 29.0% 72.8%, 28.5% 71.9%, 27.7% 71.7%, 26.4% 71.7%, 25.5% 71.9%, 24.1% 72.1%, 23.5% 71.9%, 22.9% 71.6%, 22.0% 71.4%, 21.2% 71.0%, 20.5% 70.6%, 19.9% 70.1%, 19.4% 69.5%, 18.9% 68.8%, 18.7% 68.1%, 18.4% 67.5%, 18.2% 66.7%, 18.0% 66.2%, 17.8% 65.5%, 17.8% 64.6%, 17.9% 63.8%, 17.9% 63.3%, 17.9% 63.1%, 18.5% 62.8%, 19.3% 62.4%, 19.6% 62.2%">
+                        <!-- TODO (queso 3 - mobile): mismas instrucciones que queso 1. -->
+                        <span class="queso-punto-glow"></span>
+                        <svg class="queso-punto-contorno" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                            <polygon class="queso-punto-contorno-linea" fill="none"></polygon>
+                        </svg>
+                        <span class="queso-punto-borde"></span>
+                        <div class="queso-punto-flip">
+                            <div class="queso-punto-cara queso-punto-frente">
+                                <span class="queso-punto-ventana"></span>
+                            </div>
+                            <div class="queso-punto-cara queso-punto-reverso">
+                                <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                <div class="queso-oferta-centro">
+                                    <div class="queso-oferta-foto">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                    <div class="queso-ruleta-wrap">
+                                        <div class="queso-ruleta"></div>
+                                        <span class="ruleta-signo">%</span>
+                                    </div>
+                                    <strong class="queso-oferta-nombre">Queso de Mano</strong>
+                                    <p class="queso-sin-oferta">Sin oferta hoy,<br>prueba otro queso</p>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
+                    </a>
+                    <svg class="silueta-unica" id="siluetaUnica" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+                        data-left="34.7" data-top="15.9" data-width="57.2" data-height="58.8"
+                        data-clip="10.7% 99.1%, 10.3% 98.0%, 9.9% 97.1%, 9.8% 96.4%, 10.4% 95.6%, 11.0% 94.8%, 11.0% 94.1%, 10.6% 93.2%, 9.9% 91.8%, 9.9% 88.6%, 10.2% 85.7%, 10.2% 83.5%, 10.2% 81.2%, 10.2% 78.2%, 10.3% 75.4%, 10.3% 72.9%, 10.4% 71.8%, 10.3% 71.0%, 10.2% 70.5%, 10.0% 69.8%, 10.0% 69.2%, 9.8% 68.4%, 9.6% 67.6%, 9.4% 66.3%, 9.3% 65.4%, 9.0% 64.3%, 8.9% 63.4%, 8.7% 62.0%, 8.3% 60.7%, 8.1% 59.6%, 7.6% 58.4%, 7.3% 57.3%, 7.1% 56.3%, 6.8% 55.1%, 6.6% 54.3%, 6.3% 53.3%, 6.1% 52.1%, 5.9% 51.0%, 5.7% 50.2%, 5.5% 48.9%, 5.3% 48.1%, 5.2% 47.5%, 5.1% 46.8%, 4.9% 45.9%, 4.9% 45.0%, 4.6% 44.0%, 4.2% 41.9%, 3.8% 40.1%, 3.6% 38.4%, 3.4% 37.1%, 3.0% 35.5%, 2.8% 34.2%, 2.6% 33.0%, 2.4% 31.7%, 2.2% 30.4%, 2.0% 29.4%, 1.9% 28.3%, 1.8% 27.4%, 1.7% 26.7%, 1.5% 26.2%, 1.4% 25.4%, 1.8% 25.4%, 2.2% 24.9%, 2.3% 24.4%, 2.3% 23.9%, 2.0% 23.7%, 1.6% 23.8%, 1.2% 24.0%, 1.0% 23.3%, 0.9% 22.6%, 0.8% 21.9%, 0.7% 20.9%, 0.5% 20.0%, 0.3% 18.9%, 0.0% 18.1%, 0.0% 17.5%, 0.7% 17.4%, 1.5% 17.5%, 2.5% 17.7%, 3.1% 18.2%, 5.2% 18.2%, 5.9% 18.1%, 6.5% 17.7%, 7.2% 17.5%, 7.7% 17.2%, 8.5% 17.2%, 8.8% 17.0%, 10.0% 16.9%, 11.1% 16.9%, 11.7% 17.0%, 15.3% 17.0%, 16.6% 16.9%, 16.8% 16.8%, 18.0% 16.8%, 19.5% 16.7%, 20.1% 16.9%, 21.2% 17.0%, 22.3% 17.1%, 23.8% 17.1%, 24.8% 17.4%, 25.5% 17.5%, 27.1% 17.6%, 27.5% 17.9%, 28.2% 18.5%, 28.5% 19.1%, 28.6% 19.6%, 28.9% 20.1%, 29.2% 21.0%, 29.6% 22.0%, 30.1% 23.1%, 30.5% 24.1%, 31.2% 25.4%, 31.7% 26.7%, 32.2% 27.8%, 32.4% 28.7%, 32.7% 29.6%, 32.9% 30.5%, 33.2% 31.4%, 33.7% 33.1%, 33.9% 34.2%, 34.2% 34.9%, 34.5% 35.9%, 34.7% 36.5%, 34.9% 37.2%, 35.6% 37.4%, 35.8% 37.8%, 36.1% 38.2%, 36.5% 39.1%, 36.7% 40.1%, 37.2% 40.6%, 37.6% 41.5%, 38.0% 42.5%, 38.7% 43.4%, 39.0% 42.7%, 39.0% 42.2%, 39.2% 41.7%, 39.5% 40.8%, 39.6% 39.9%, 39.8% 39.2%, 40.1% 38.1%, 40.5% 36.5%, 40.9% 35.2%, 41.2% 34.3%, 41.5% 33.3%, 41.6% 32.6%, 41.2% 31.9%, 40.9% 31.9%, 40.3% 31.4%, 39.8% 30.9%, 39.2% 30.6%, 38.5% 30.1%, 37.7% 29.5%, 37.4% 28.8%, 37.3% 27.3%, 37.4% 26.2%, 37.1% 25.4%, 36.9% 24.6%, 36.7% 23.2%, 36.8% 21.1%, 36.9% 19.7%, 37.1% 18.3%, 37.4% 17.0%, 37.8% 15.5%, 38.3% 13.7%, 38.8% 12.1%, 39.3% 10.8%, 39.8% 9.3%, 40.2% 8.1%, 40.6% 7.2%, 41.1% 6.0%, 41.8% 4.5%, 42.2% 3.9%, 42.8% 2.7%, 43.2% 1.7%, 43.4% 0.8%, 43.9% 0.8%, 44.7% 0.6%, 45.2% 0.3%, 45.9% 0.0%, 46.5% 0.0%, 46.7% 0.4%, 47.1% 1.2%, 47.2% 2.0%, 47.3% 3.0%, 47.7% 4.3%, 47.7% 5.4%, 48.0% 6.3%, 48.1% 7.4%, 48.3% 8.4%, 48.6% 9.9%, 48.7% 10.6%, 48.8% 11.4%, 49.0% 12.2%, 49.2% 12.9%, 49.4% 13.6%, 49.5% 14.5%, 49.6% 15.4%, 49.7% 16.2%, 49.8% 17.0%, 50.2% 18.3%, 50.2% 19.3%, 50.5% 20.3%, 50.6% 21.0%, 50.7% 21.9%, 50.9% 22.8%, 51.1% 23.7%, 51.2% 24.4%, 51.4% 25.7%, 51.5% 26.9%, 51.6% 27.7%, 51.8% 28.7%, 52.5% 29.2%, 53.0% 29.6%, 53.5% 30.2%, 54.0% 30.9%, 54.6% 31.4%, 55.1% 31.9%, 55.8% 32.7%, 56.3% 33.4%, 57.0% 34.3%, 57.6% 35.0%, 58.0% 35.7%, 58.5% 36.2%, 59.1% 36.8%, 59.6% 37.4%, 60.2% 38.3%, 60.8% 39.2%, 61.3% 40.1%, 61.9% 40.9%, 62.3% 41.6%, 62.7% 42.2%, 63.3% 43.4%, 63.4% 42.3%, 63.8% 41.1%, 64.0% 40.0%, 64.4% 39.0%, 64.6% 38.1%, 64.9% 37.0%, 65.3% 35.9%, 65.7% 34.2%, 66.1% 32.9%, 66.3% 32.2%, 66.5% 31.4%, 66.0% 30.8%, 65.7% 30.4%, 65.2% 30.0%, 64.7% 29.6%, 64.0% 28.9%, 63.3% 28.7%, 62.8% 28.4%, 62.5% 27.8%, 62.4% 27.0%, 62.4% 25.5%, 62.2% 24.7%, 62.0% 24.1%, 61.9% 22.8%, 61.9% 21.0%, 62.0% 20.0%, 62.1% 19.0%, 62.3% 17.7%, 62.5% 16.6%, 62.7% 15.5%, 63.1% 14.6%, 63.3% 13.5%, 63.7% 12.6%, 63.9% 11.8%, 64.2% 10.8%, 64.5% 9.9%, 65.0% 8.7%, 65.3% 7.6%, 65.7% 6.8%, 66.0% 6.1%, 66.4% 5.2%, 66.8% 4.3%, 67.3% 3.5%, 67.8% 2.7%, 68.1% 2.0%, 68.4% 1.2%, 68.8% 1.0%, 69.6% 0.9%, 70.3% 0.7%, 70.8% 0.4%, 71.4% 0.4%, 71.6% 1.1%, 71.8% 2.0%, 72.0% 2.5%, 72.1% 3.3%, 72.2% 3.8%, 72.4% 5.0%, 72.5% 6.2%, 72.8% 7.2%, 73.0% 8.3%, 73.1% 9.4%, 73.4% 10.4%, 73.5% 11.5%, 73.7% 12.4%, 73.8% 12.8%, 74.0% 13.9%, 74.1% 15.1%, 74.3% 16.1%, 74.5% 17.2%, 74.7% 18.4%, 74.9% 19.7%, 75.1% 21.1%, 75.3% 22.4%, 75.6% 23.8%, 75.8% 25.4%, 76.0% 27.0%, 76.4% 27.8%, 76.7% 28.1%, 77.5% 28.6%, 78.4% 29.7%, 79.2% 30.6%, 80.5% 32.2%, 81.8% 33.9%, 82.7% 34.9%, 83.5% 35.9%, 84.1% 36.7%, 84.7% 37.8%, 85.5% 38.9%, 86.2% 40.0%, 86.9% 41.3%, 87.3% 42.2%, 88.1% 43.3%, 89.1% 45.3%, 90.0% 47.0%, 90.8% 48.4%, 91.3% 49.5%, 91.8% 50.4%, 92.4% 51.5%, 93.2% 52.5%, 94.1% 53.7%, 95.5% 55.4%, 97.1% 57.3%, 98.2% 58.7%, 99.1% 60.0%, 99.7% 60.6%, 99.7% 61.0%, 99.5% 61.7%, 99.2% 62.9%, 98.9% 64.3%, 98.4% 66.0%, 97.9% 67.5%, 97.6% 68.9%, 97.1% 70.2%, 97.2% 71.3%, 97.3% 72.5%, 97.4% 74.3%, 97.5% 75.4%, 97.7% 77.0%, 97.9% 78.1%, 98.1% 79.5%, 98.4% 81.3%, 98.7% 82.6%, 98.9% 83.1%, 99.2% 83.1%, 99.5% 82.7%, 99.7% 82.3%, 99.9% 82.7%, 99.9% 83.5%, 100.0% 84.2%, 99.8% 85.2%, 99.6% 86.2%, 99.3% 87.4%, 98.9% 88.7%, 98.2% 90.4%, 97.3% 90.1%, 96.2% 89.9%, 95.1% 89.6%, 93.5% 89.6%, 91.8% 89.2%, 88.6% 89.0%, 85.0% 88.9%, 81.7% 88.9%, 78.5% 88.9%, 77.5% 88.9%, 77.2% 89.5%, 76.8% 91.0%, 76.3% 92.6%, 75.4% 94.8%, 73.0% 95.2%, 69.8% 95.0%, 65.9% 94.7%, 62.8% 94.5%, 59.8% 94.5%, 55.9% 94.4%, 53.8% 94.4%, 53.5% 94.5%, 53.7% 95.2%, 53.2% 96.3%, 52.5% 97.8%, 51.4% 99.0%, 49.0% 99.7%, 33.2% 99.7%, 17.9% 99.6%, 11.6% 100.0%">
+                        <polygon class="silueta-unica-linea" fill="none"></polygon>
+                    </svg>
+                </div>
+                <!-- Ficha única de "Oferta del día", compartida por los 3 quesos -->
+                <div class="oferta-info-unica" id="ofertaInfoUnica">
+                    <!-- Tarjeta de descuento tipo cupón, oculta hasta el sorteo -->
+                    <div class="oferta-descuento-tarjeta" id="ofertaDescuentoTarjeta">
+                        <span class="oferta-descuento-label">Descuento especial</span>
+                        <div class="oferta-descuento-numero-wrap">
+                            <div class="queso-ruleta" id="ofertaInfoRuleta"></div>
+                            <span class="oferta-descuento-signo">%</span>
+                        </div>
+                        <span class="oferta-descuento-dto">DTO.</span>
+                        <div class="oferta-descuento-liston">En tu próxima compra</div>
+                    </div>
+                </div>
+                <div class="oferta-globo-wrap" id="ofertaGloboWrap">
+                    <div class="globo-fragmentos" id="globoFragmentos"></div>
+                    <div class="globo-indicador" id="globoIndicador">
+                        <i class="bi bi-hand-index-thumb"></i>
+                        Presiona para ver nuevas ofertas
+                    </div>
+                    <button type="button" class="globo-ofertas" id="botonOfertas" aria-label="Ver ofertas">
+                        <span class="globo-cuerpo">
+                            <i class="bi bi-tag-fill"></i>
+                            <span class="globo-numero">%</span>
+                        </span>
+                        <span class="globo-brillo"></span>
+                        <span class="globo-nudo"></span>
+                        <span class="globo-hilo"></span>
+                    </button>
+                </div>
+                <div class="oferta-shake-hint" id="ofertaShakeHint">
+                    <i class="bi bi-phone-vibrate"></i>
+                    Agita tu celular para ver ofertas
+                </div>
+                <button type="button" class="oferta-shake-permiso" id="ofertaShakePermiso" style="display:none;">
+                    <i class="bi bi-hand-index-thumb"></i> Toca para activar el sensor
+                </button>
+                <button type="button" class="oferta-shake-fallback" id="ofertaShakeFallback">
+                    <i class="bi bi-hand-index-thumb"></i> Toca aquí si no vibra tu celular
+                </button>
+                <div class="oferta-banner" id="ofertaBanner">
+                    Enciende los 3 quesos para revelar la oferta de hoy
+                </div>
+                <div class="boton-sortear-wrap" id="botonSortearWrap">
+                    <button type="button" class="boton-sortear" id="botonSortear">
+                        <i class="bi bi-dice-5-fill"></i> ¡Sortear la oferta del día!
+                    </button>
+                </div>
+                <div class="confetti-contenedor" id="confettiContenedor"></div>
+                <div class="oferta-reveal-overlay" id="ofertaRevealOverlay">
+                    <div class="oferta-reveal-tarjeta">
+                        <div class="oferta-reveal-queso-wrap">
+                            <img src="{% static 'home/media/fb36d63f777712b60e871eaefa443eb2bf3b3515 (1).png' %}"
+                                alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen">
+                            <!-- Ícono usado como placeholder cuando el premio (ruleta diaria)
+                                no tiene producto/foto real: CUPON_5, ENVIO_GRATIS, BOLETO_DORADO,
+                                y la variante "vuelve mañana". Oculto por defecto. -->
+                            <i class="oferta-reveal-icono bi" id="ofertaRevealIcono" style="display:none;"></i>
+                            <span class="oferta-reveal-badge" id="ofertaRevealBadge">-50%</span>
+                        </div>
+                        <strong class="oferta-reveal-titulo" id="ofertaRevealTitulo">¡Felicidades!</strong>
+                        <span class="oferta-reveal-subtitulo" id="ofertaRevealSubtitulo">Tienes 50% de descuento</span>
+                        <div class="oferta-reveal-precios" id="ofertaRevealPrecios">
+                            <span class="oferta-reveal-precio-anterior" id="ofertaRevealPrecioAnterior">$12.000</span>
+                            <span class="oferta-reveal-precio-nuevo" id="ofertaRevealPrecioNuevo">$6.000</span>
+                            <span class="oferta-reveal-credencial">Oferta</span>
+                        </div>
+                        <!-- Nota adicional para premios de la ruleta diaria sin precio real
+                            (ej. "se aplica automáticamente al pagar"). Oculta por defecto. -->
+                        <span class="oferta-reveal-nota" id="ofertaRevealNota" style="display:none;"></span>
+                    </div>
+                </div>
+                <div class="oferta-rueda-wrap" id="ofertaRuedaWrap">
+                    <div class="oferta-rueda-icono">
+                        <svg viewBox="0 0 220 220" class="rueda-svg" xmlns="http://www.w3.org/2000/svg">
+                            <g class="rueda-llamas">
+                                <path class="llama llama-1" d="M120,150 C108,118 132,95 120,62 C148,80 165,58 158,30 C192,58 202,102 178,132 C166,148 142,158 120,150 Z" fill="#c9301f"/>
+                                <path class="llama llama-2" d="M130,138 C120,112 138,93 130,68 C150,82 162,64 157,44 C180,64 186,96 170,118 C160,132 144,140 130,138 Z" fill="#ff6a3d"/>
+                                <path class="llama llama-3" d="M138,126 C132,106 143,92 137,74 C151,84 158,71 155,55 C170,68 174,92 163,108 C156,118 146,126 138,126 Z" fill="#ffb03d"/>
+                            </g>
+                            <circle cx="78" cy="142" r="54" fill="#0a0a0a"/>
+                            <circle cx="78" cy="142" r="41" fill="#ffffff"/>
+                            <circle cx="78" cy="142" r="35" fill="none" stroke="#e2402d" stroke-width="4"/>
+                            <g stroke="#e2402d" stroke-width="5" stroke-linecap="round">
+                                <line x1="78" y1="142" x2="78" y2="109"/>
+                                <line x1="78" y1="142" x2="107" y2="125"/>
+                                <line x1="78" y1="142" x2="107" y2="159"/>
+                                <line x1="78" y1="142" x2="78" y2="175"/>
+                                <line x1="78" y1="142" x2="49" y2="159"/>
+                                <line x1="78" y1="142" x2="49" y2="125"/>
+                            </g>
+                            <circle cx="78" cy="142" r="8" fill="#e2402d"/>
+                        </svg>
+                    </div>
+                    <div class="oferta-rueda-texto">
+                        <strong class="rueda-descuento">50% de descuento hoy</strong>
+                        <span class="rueda-aviso">Ya tienes el descuento de hoy, espera hasta mañana</span>
+                    </div>
+                </div>
+                <div class="container slide-imagen-contenido">
+                    <span class="hero-eyebrow"><span class="dot"></span> Para todos los gustos</span>
+                    <h1 class="hero-title">
+                        <span class="linea"><span class="palabra" style="animation-delay:.1s">Variedad</span></span>
+                        <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">de Quesos</span></span>
+                    </h1>
+                    <p class="hero-sub">
+                        Desde el clásico queso blanco hasta el suave queso de mano y el delicado telita —
+                        tenemos la variedad que tu mesa necesita. Todos artesanales, frescos y sin aditivos.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#productos" class="btn-dorado">
+                            <i class="bi bi-bag-heart"></i> Ver productos
+                        </a>
+                        <a href="#contacto" class="btn-outline-blanco">
+                            <i class="bi bi-whatsapp"></i> Contáctanos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--FINAL QUESOS INTERACTIVOS-->
+        <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
+        <div class="carrusel-slide">
+            <div class="slide-imagen">
+                <img src="{% static 'home/media/Gemini_Generated_Image_sc7adrsc7adrsc7a.png' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
+                <div class="slide-imagen-overlay"></div>
+                <div class="container slide-imagen-contenido">
+                    <div class="row align-items-center g-4">
+                        <!-- Texto izquierda -->
+                        <div class="col-lg-6">
+                            <span class="hero-eyebrow"><span class="dot"></span> Ahora llevamos hasta tu puerta</span>
+                            <h1 class="hero-title">
+                                <span class="linea"><span class="palabra" style="animation-delay:.1s">Pedidos</span></span>
+                                <span class="linea"><span class="palabra dorado" style="animation-delay:.25s">a Domicilio</span></span>
+                            </h1>
+                            <p class="hero-sub">
+                                Haz tu pedido y sigue en tiempo real dónde está tu queso.
+                                Sabor venezolano fresco, directo a tu hogar en Medellín —
+                                rápido, seguro y sin salir de casa.
+                            </p>
+                            <div class="hero-actions">
+                                <a href="https://wa.me/573215450519" class="btn-dorado">
+                                    <i class="bi bi-scooter"></i> Pedir ahora
+                                </a>
+                                <a href="#contacto" class="btn-outline-blanco">
+                                    <i class="bi bi-map"></i> Ver cobertura
                                 </a>
                             </div>
                         </div>
-                    </div>
-                    {% empty %}
-                    <div class="col-12" id="sinResultados">
-                        {% if query %}
-                        <div class="alert alert-info text-center buscador-sin-resultados">
-                            <i class="bi bi-search"></i>
-                            No encontramos productos para "<strong>{{ query }}</strong>".
-                            <a href="?">Ver todos los productos</a>
+                        <!-- GIF de tracking animado (SVG inline) -->
+                        <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                            <div class="tracking-widget">
+                                <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" class="tracking-svg">
+                                    <!-- Tarjeta fondo -->
+                                    <rect x="10" y="10" width="320" height="240" rx="20" ry="20"
+                                        fill="rgba(2,44,99,0.75)" stroke="rgba(201,168,76,0.5)" stroke-width="1.5"/>
+                                    <!-- Título tarjeta -->
+                                    <text x="170" y="42" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                        font-size="13" font-weight="700" fill="#f0d98a" letter-spacing="1">
+                                        SEGUIMIENTO EN VIVO
+                                    </text>
+                                    <!-- Línea de ruta -->
+                                    <path d="M55,155 Q120,90 200,130 Q250,155 285,140"
+                                        fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="3"
+                                        stroke-dasharray="6 4"/>
+                                    <!-- Ruta activa animada -->
+                                    <path id="rutaActiva" d="M55,155 Q120,90 200,130 Q250,155 285,140"
+                                        fill="none" stroke="#c9a84c" stroke-width="3"
+                                        stroke-dasharray="300" stroke-dashoffset="300">
+                                        <animate attributeName="stroke-dashoffset"
+                                            from="300" to="0" dur="3s"
+                                            begin="0s;reinicio.end+0.8s"
+                                            fill="freeze" id="trazado"/>
+                                    </path>
+                                    <!-- Punto origen (tienda) -->
+                                    <circle cx="55" cy="155" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
+                                    <text x="55" y="159" text-anchor="middle" font-size="9" fill="#f0d98a">🏪</text>
+                                    <text x="55" y="174" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                        font-size="9" fill="rgba(255,255,255,0.7)">Tienda</text>
+                                    <!-- Punto destino (casa) -->
+                                    <circle cx="285" cy="140" r="9" fill="#022C63" stroke="#c9a84c" stroke-width="2.5"/>
+                                    <text x="285" y="144" text-anchor="middle" font-size="9" fill="#f0d98a">🏠</text>
+                                    <text x="285" y="158" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                        font-size="9" fill="rgba(255,255,255,0.7)">Tu casa</text>
+                                    <!-- Scooter animado sobre la ruta -->
+                                    <g id="scooter">
+                                        <!-- Sombra del scooter -->
+                                        <ellipse cx="0" cy="6" rx="14" ry="4" fill="rgba(0,0,0,0.25)"/>
+                                        <!-- Cuerpo del scooter -->
+                                        <rect x="-13" y="-10" width="26" height="12" rx="5" fill="#c9a84c"/>
+                                        <!-- Ruedas -->
+                                        <circle cx="-10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
+                                        <circle cx="10" cy="3" r="4.5" fill="#022C63" stroke="#f0d98a" stroke-width="1.5"/>
+                                        <!-- Manillar -->
+                                        <rect x="8" y="-14" width="3" height="8" rx="1.5" fill="#f0d98a"/>
+                                        <!-- Cajita de queso -->
+                                        <rect x="-8" y="-18" width="14" height="10" rx="3" fill="#083b78" stroke="#c9a84c" stroke-width="1"/>
+                                        <text x="0" y="-10" text-anchor="middle" font-size="7" fill="#f0d98a">🧀</text>
+                                        <animateMotion dur="3s" begin="0.2s;reinicio.end+1s" fill="freeze" rotate="auto">
+                                            <mpath href="#rutaActiva"/>
+                                        </animateMotion>
+                                    </g>
+                                    <!-- Pulso en el destino -->
+                                    <circle cx="285" cy="140" r="9" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0">
+                                        <animate attributeName="r" from="9" to="22" dur="1.5s"
+                                            begin="trazado.end" repeatCount="indefinite"/>
+                                        <animate attributeName="opacity" from="0.7" to="0" dur="1.5s"
+                                            begin="trazado.end" repeatCount="indefinite"/>
+                                    </circle>
+                                    <!-- Animación de reinicio oculta -->
+                                    <animate id="reinicio" attributeName="opacity" from="1" to="1"
+                                        begin="trazado.end+2s" dur="0.01s" fill="freeze"/>
+                                    <!-- Pasos de estado debajo -->
+                                    <g transform="translate(0,195)">
+                                        <!-- Paso 1: Confirmado -->
+                                        <circle cx="80" cy="12" r="8" fill="#c9a84c"/>
+                                        <text x="80" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">✓</text>
+                                        <text x="80" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                            font-size="8" fill="rgba(255,255,255,0.8)">Confirmado</text>
+                                        <!-- Línea -->
+                                        <line x1="92" y1="12" x2="148" y2="12" stroke="#c9a84c" stroke-width="1.5" stroke-dasharray="4 3"/>
+                                        <!-- Paso 2: En camino -->
+                                        <circle cx="160" cy="12" r="8" fill="#c9a84c">
+                                            <animate attributeName="fill" values="#c9a84c;#f0d98a;#c9a84c"
+                                                dur="1.2s" repeatCount="indefinite"/>
+                                        </circle>
+                                        <text x="160" y="16" text-anchor="middle" font-size="8" fill="#022C63" font-weight="700">🛵</text>
+                                        <text x="160" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                            font-size="8" fill="rgba(255,255,255,0.8)">En camino</text>
+                                        <!-- Línea -->
+                                        <line x1="172" y1="12" x2="228" y2="12" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                                        <!-- Paso 3: Entregado -->
+                                        <circle cx="240" cy="12" r="8" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+                                        <text x="240" y="16" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)">🏠</text>
+                                        <text x="240" y="30" text-anchor="middle" font-family="Montserrat,sans-serif"
+                                            font-size="8" fill="rgba(255,255,255,0.4)">Entregado</text>
+                                    </g>
+                                </svg>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.carrusel-track -->
+    <!-- Flechas de navegación -->
+    <button class="carrusel-flecha prev" id="carruselPrev" aria-label="Diapositiva anterior">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <button class="carrusel-flecha next" id="carruselNext" aria-label="Siguiente diapositiva">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+    <!-- Puntos indicadores -->
+    <div class="carrusel-puntos" id="carruselPuntos">
+        <button class="carrusel-punto activo" data-slide="0" aria-label="Ir a la diapositiva 1"></button>
+        <button class="carrusel-punto" data-slide="1" aria-label="Ir a la diapositiva 2"></button>
+        <button class="carrusel-punto" data-slide="2" aria-label="Ir a la diapositiva 3"></button>
+    </div>
+    <!-- Indicador de swipe (solo mobile, reemplaza las flechas) -->
+    <div class="carrusel-swipe-hint" id="carruselSwipeHint">
+        <i class="bi bi-chevron-left"></i>
+        Desliza
+        <i class="bi bi-chevron-right"></i>
+    </div>
+    <!-- Barra de progreso del autoplay -->
+    <div class="carrusel-progreso" id="carruselProgreso"></div>
+    <!-- Wave de transición hacia las estadísticas -->
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,70 L0,70 Z" fill="#022C63"/>
+        </svg>
+    </div>
+</section>
+<!-- ===== BANDA DE ESTADÍSTICAS ===== -->
+<section class="seccion-stats">
+    <div class="container">
+        <div class="row justify-content-center align-items-center text-center g-0">
+            <div class="col-6 col-md-3 reveal delay-1">
+                <div class="stat-item">
+                    <span class="stat-numero">100%</span>
+                    <span class="stat-label">Artesanal</span>
+                </div>
+            </div>
+            <div class="d-none d-md-block col-md-auto stat-divider"></div>
+            <div class="col-6 col-md-3 reveal delay-2">
+                <div class="stat-item">
+                    <span class="stat-numero">0</span>
+                    <span class="stat-label">Aditivos</span>
+                </div>
+            </div>
+            <div class="d-none d-md-block col-md-auto stat-divider"></div>
+            <div class="col-6 col-md-3 reveal delay-3">
+                <div class="stat-item">
+                    <span class="stat-numero">+5</span>
+                    <span class="stat-label">Variedades</span>
+                </div>
+            </div>
+            <div class="d-none d-md-block col-md-auto stat-divider"></div>
+            <div class="col-6 col-md-3 reveal delay-4">
+                <div class="stat-item">
+                    <span class="stat-numero"><i class="bi bi-heart-fill"></i></span>
+                    <span class="stat-label">Hecho con amor</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Wave de transición hacia productos -->
+<div class="wave-divider" style="background:#022C63;">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
+    </svg>
+</div>
+<!-- ===== SECCIÓN PRODUCTOS (con buscador en vivo + productos reales) ===== -->
+<section class="seccion-productos" id="productos">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6 reveal-left">
+                <span class="section-eyebrow">Lo que ofrecemos</span>
+                <h2 class="section-titulo">Nuestros<br>productos</h2>
+            </div>
+            <div class="col-lg-6 d-flex align-items-end reveal-right">
+                <p class="section-descripcion">
+                    Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad
+                    y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás
+                    aditivos innecesarios, solo la frescura pura y el sabor auténtico que evoca recuerdos
+                    de la cocina de la abuela.
+                </p>
+            </div>
+        </div>
+        <!-- Buscador de productos -->
+        <div class="buscador-wrapper"
+             data-url-ajax="{% url 'buscar_ajax' %}"
+             data-url-agregar-base="{% url 'carro:agregar' 1 %}"
+             data-layout="vertical">
+            <form method="get" class="buscador-productos" role="search" id="formBuscador" autocomplete="off">
+                <div class="buscador-input-wrapper">
+                    <input
+                        type="text"
+                        name="q"
+                        id="inputBuscador"
+                        class="buscador-input"
+                        placeholder="Buscar productos..."
+                        value="{{ query|default:'' }}"
+                        autocomplete="off"
+                    >
+                    {% if query %}
+                    <a href="?" class="buscador-limpiar" aria-label="Limpiar búsqueda">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <button type="submit" class="buscador-btn">
+                    <i class="bi bi-search"></i> <span>Buscar</span>
+                </button>
+            </form>
+        </div>
+        <p class="buscador-resultado-info" id="infoResultados" {% if not query %}style="display:none;"{% endif %}>
+            Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
+        </p>
+        <div class="row g-3" id="listaProductos">
+            {% if premio_activo %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                    <span class="premio-cinta-mini">TU PREMIO</span>
+                    <div class="producto-img-wrapper">
+                        <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
+                        {% if premio_activo.producto.imagen %}
+                            <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
                         {% else %}
-                        <div class="alert alert-info text-center">No existen productos disponibles.</div>
+                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
                         {% endif %}
                     </div>
-                    {% endfor %}
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- Wave de transición -->
-        <div class="wave-divider" style="background:#f7f8fc;">
-            <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M0,20 C480,70 960,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
-            </svg>
-        </div>
-
-
-        <!-- ===== SECCIÓN QUIÉNES SOMOS ===== -->
-        <section class="seccion-nosotros" id="nosotros">
-            <div class="container">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-5 reveal-left">
-                        <div class="nosotros-imagen-wrapper">
-                            <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo">
+                    <div class="card-body">
+                        <div class="estrellas">
+                            <i class="bi bi-stars"></i> Premio de la lotería
                         </div>
-                    </div>
-                    <div class="col-lg-7 reveal-right">
-                        <span class="section-eyebrow">Nuestra historia</span>
-                        <h2 class="section-titulo">Quiénes<br>somos</h2>
-                        <p class="section-descripcion mb-4">
-                            En Lácteos Zulianos, llevamos la tradición del queso venezolano a Medellín.
-                            Somos una microempresa familiar con un solo objetivo: garantizar el sabor auténtico,
-                            la calidad y la nostalgia de nuestra tierra en cada hogar.
+                        <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
+                        <p class="producto-descripcion">
+                            Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
                         </p>
-
-                        <div class="nosotros-valor reveal delay-1">
-                            <div class="nosotros-valor-icono">
-                                <i class="bi bi-shield-check"></i>
-                            </div>
-                            <div class="nosotros-valor-texto">
-                                <strong>Calidad garantizada</strong>
-                                <p>Ingredientes frescos, proceso artesanal y sin conservantes artificiales.</p>
-                            </div>
-                        </div>
-
-                        <div class="nosotros-valor reveal delay-2">
-                            <div class="nosotros-valor-icono">
-                                <i class="bi bi-heart"></i>
-                            </div>
-                            <div class="nosotros-valor-texto">
-                                <strong>Tradición familiar</strong>
-                                <p>Recetas transmitidas de generación en generación, hechas con amor.</p>
-                            </div>
-                        </div>
-
-                        <div class="nosotros-valor reveal delay-3">
-                            <div class="nosotros-valor-icono">
-                                <i class="bi bi-geo-alt"></i>
-                            </div>
-                            <div class="nosotros-valor-texto">
-                                <strong>Medellín con sabor a Venezuela</strong>
-                                <p>Llevamos la nostalgia y el auténtico sabor zuliano a tu hogar en Colombia.</p>
-                            </div>
-                        </div>
+                        <p class="precio">
+                            $ {{ premio_activo.precio_con_descuento }}
+                            <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
+                            <i class="bi bi-gift-fill"></i> Reclamar premio
+                        </a>
                     </div>
                 </div>
             </div>
-        </section>
-
-
-        <!-- ===== BANDA CTA ===== -->
-        <section class="seccion-cta" id="contacto">
-
+            {% elif juego_diario.estado == 'ganado' %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                    <span class="premio-cinta-mini">TU PREMIO</span>
+                    <div class="producto-img-wrapper d-flex align-items-center justify-content-center" style="min-height:180px;">
+                        {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                            <span class="badge-stock premio">-5%</span>
+                            <i class="bi bi-ticket-perforated-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                        {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                            <span class="badge-stock premio">GRATIS</span>
+                            <i class="bi bi-truck" style="font-size:3.5rem;color:#c9a84c;"></i>
+                        {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                            <span class="badge-stock premio">🎫</span>
+                            <i class="bi bi-award-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="estrellas">
+                            <i class="bi bi-stars"></i> Premio de la ruleta diaria
+                        </div>
+                        {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                            <h5 class="titulo-producto">Cupón 5% próxima compra</h5>
+                            <p class="producto-descripcion">
+                                Se aplica automáticamente al total de tu carrito. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                            </p>
+                        {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                            <h5 class="titulo-producto">Envío gratis</h5>
+                            <p class="producto-descripcion">
+                                Se aplica automáticamente en tu próximo pedido. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                            </p>
+                        {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                            <h5 class="titulo-producto">Boleto dorado</h5>
+                            <p class="producto-descripcion">
+                                Quedas participando en el próximo sorteo de premios especiales. Vigente hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        {% if juego_diario.tirada.reclamado %}
+                            <button type="button" class="btn btn-carrito w-100" disabled>
+                                <i class="bi bi-check-circle-fill"></i> Ya reclamado
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-carrito w-100 boton-reclamar-premio-dia"
+                                data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
+                                <i class="bi bi-gift-fill"></i> Reclamar premio
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% for i in productos %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card producto-card producto-card--vertical h-100">
+                    <div class="producto-img-wrapper">
+                        {% if i.stock_actual <= i.stock_minimo %}
+                            <span class="badge-stock bajo">Stock bajo</span>
+                        {% else %}
+                            <span class="badge-stock disponible">Disponible</span>
+                        {% endif %}
+                        {% if i.imagen %}
+                            <img src="{{ i.imagen.url }}" class="imagen-producto">
+                        {% else %}
+                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="calificacion-widget-pub {% if not request.user.is_authenticated %}anonima{% endif %}"
+                             data-producto-id="{{ i.id }}"
+                             data-mi-calificacion="{{ i.mi_calificacion|default:0 }}"
+                             data-anon="{% if request.user.is_authenticated %}false{% else %}true{% endif %}">
+                            {% for n in "12345" %}
+                                <i class="bi bi-star estrella-pub" data-valor="{{ forloop.counter }}"></i>
+                            {% endfor %}
+                        </div>
+                        <h5 class="titulo-producto">{{ i.nombre }}</h5>
+                        <p class="producto-descripcion">
+                            {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
+                        </p>
+                        <p class="precio">$ {{ i.precio }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
+                            <i class="bi bi-cart-plus"></i> Añadir al carrito
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12" id="sinResultados">
+                {% if query %}
+                <div class="alert alert-info text-center buscador-sin-resultados">
+                    <i class="bi bi-search"></i>
+                    No encontramos productos para "<strong>{{ query }}</strong>".
+                    <a href="?">Ver todos los productos</a>
+                </div>
+                {% else %}
+                <div class="alert alert-info text-center">No existen productos disponibles.</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<!-- Wave de transición -->
+<div class="wave-divider" style="background:#f7f8fc;">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,20 C480,70 960,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
+    </svg>
+</div>
+<!-- ===== SECCIÓN QUIÉNES SOMOS ===== -->
+<section class="seccion-nosotros" id="nosotros">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5 reveal-left">
+                <div class="nosotros-imagen-wrapper">
+                    <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo">
+                </div>
+            </div>
+            <div class="col-lg-7 reveal-right">
+                <span class="section-eyebrow">Nuestra historia</span>
+                <h2 class="section-titulo">Quiénes<br>somos</h2>
+                <p class="section-descripcion mb-4">
+                    En Lácteos Zulianos, llevamos la tradición del queso venezolano a Medellín.
+                    Somos una microempresa familiar con un solo objetivo: garantizar el sabor auténtico,
+                    la calidad y la nostalgia de nuestra tierra en cada hogar.
+                </p>
+                <div class="nosotros-valor reveal delay-1">
+                    <div class="nosotros-valor-icono">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="nosotros-valor-texto">
+                        <strong>Calidad garantizada</strong>
+                        <p>Ingredientes frescos, proceso artesanal y sin conservantes artificiales.</p>
+                    </div>
+                </div>
+                <div class="nosotros-valor reveal delay-2">
+                    <div class="nosotros-valor-icono">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <div class="nosotros-valor-texto">
+                        <strong>Tradición familiar</strong>
+                        <p>Recetas transmitidas de generación en generación, hechas con amor.</p>
+                    </div>
+                </div>
+                <div class="nosotros-valor reveal delay-3">
+                    <div class="nosotros-valor-icono">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div class="nosotros-valor-texto">
+                        <strong>Medellín con sabor a Venezuela</strong>
+                        <p>Llevamos la nostalgia y el auténtico sabor zuliano a tu hogar en Colombia.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ===== BANDA CTA ===== -->
+<section class="seccion-cta" id="contacto">
     <video class="cta-video" autoplay loop muted playsinline>
         <source src="{% static 'home/media/6804175-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
     </video>
     <div class="cta-video-overlay"></div>
-
     <div class="container text-center position-relative" style="z-index:1;">
-                <div class="reveal">
-                    <h2 class="cta-titulo">¿Listo para probar el<br><span>sabor auténtico?</span></h2>
-                    <p class="cta-subtitulo mb-4">Contáctanos y lleva Lácteos Zulianos a tu mesa.</p>
-                    <div class="d-flex flex-wrap justify-content-center gap-3">
-                        <a href="https://wa.me/573215450519" class="btn-dorado">
-                            <i class="bi bi-whatsapp"></i> Escríbenos por WhatsApp
-                        </a>
-                        <a href="mailto:Medellin@zulianos.com.co" class="btn-outline-blanco">
-                            <i class="bi bi-envelope"></i> Enviar correo
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ===== FOOTER ===== -->
-        <footer>
-            <div class="container">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-4 border-md-end">
-                        <h4>Servicio al cliente</h4>
-                        <p>Líneas exclusivas</p>
-                        <p>321-545-0519 / 311-456-987</p>
-                        <p>Medellin@zulianos.com.co</p>
-                    </div>
-                    <div class="col-md-4 mb-4 border-md-end">
-                        <h4>Síguenos en redes</h4>
-                        <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
-                            <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="48" alt="WhatsApp"></a>
-                            <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="48" alt="Instagram"></a>
-                            <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="48" alt="Facebook"></a>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <h4>Términos y condiciones</h4>
-                        <p>Ubicación</p>
-                        <p>Protección de datos personales</p>
-                        <p>Aviso de privacidad</p>
-                        <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" width="45" height="40" class="d-inline-block align-text-top">
-                    </div>
-                </div>
-                <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a Lácteos Zulianos</p>
-            </div>
-        </footer>
-
-    </main>
-    {% endblock %}
-
-        <!-- ===== MENSAJES DE DJANGO (toasts) ===== -->
-        {% if messages %}
-        <div class="lz-toasts" id="lzToasts">
-            {% for message in messages %}
-            <div class="lz-toast lz-toast--{{ message.tags|default:'info' }}">
-                <i class="bi
-                    {% if message.tags == 'success' %}bi-check-circle-fill
-                    {% elif message.tags == 'error' or message.tags == 'danger' %}bi-x-circle-fill
-                    {% elif message.tags == 'warning' %}bi-exclamation-triangle-fill
-                    {% else %}bi-info-circle-fill{% endif %}"></i>
-                <span>{{ message }}</span>
-                <button type="button" class="lz-toast__cerrar" aria-label="Cerrar">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-
-        <div class="modal fade" id="modalPromoRegistro" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content promo-registro-modal">
-                    <button type="button" class="btn-close promo-registro-cerrar" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    <div class="promo-registro-cuerpo">
-                        <h4 class="promo-registro-titulo">Únete a Lácteos Zulianos</h4>
-                        <div class="promo-registro-item">
-                            <i class="bi bi-egg-fried"></i>
-                            <div>
-                                <strong>Regístrate y prueba nuestros quesos</strong>
-                                <p>Crea tu cuenta en segundos y descubre todo nuestro catálogo artesanal.</p>
-                            </div>
-                        </div>
-                        <div class="promo-registro-item">
-                            <i class="bi bi-truck"></i>
-                            <div>
-                                <strong>Nosotros te lo llevamos hasta tu casa</strong>
-                                <p>Haz tu pedido y sigue el domicilio en tiempo real, sin salir de casa.</p>
-                            </div>
-                        </div>
-                        <div class="promo-registro-item">
-                            <i class="bi bi-tag-fill"></i>
-                            <div>
-                                <strong>No te pierdas nuestros descuentos</strong>
-                                <p>Sorteos y ofertas exclusivas todos los días solo para usuarios registrados.</p>
-                            </div>
-                        </div>
-                        <a href="{% url 'registro' %}" class="btn-dorado promo-registro-btn">
-                            <i class="bi bi-person-plus-fill"></i> Regístrate ahora
-                        </a>
-                    </div>
-                </div>
+        <div class="reveal">
+            <h2 class="cta-titulo">¿Listo para probar el<br><span>sabor auténtico?</span></h2>
+            <p class="cta-subtitulo mb-4">Contáctanos y lleva Lácteos Zulianos a tu mesa.</p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="https://wa.me/573215450519" class="btn-dorado">
+                    <i class="bi bi-whatsapp"></i> Escríbenos por WhatsApp
+                </a>
+                <a href="mailto:Medellin@zulianos.com.co" class="btn-outline-blanco">
+                    <i class="bi bi-envelope"></i> Enviar correo
+                </a>
             </div>
         </div>
-        
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
 
     <script>
-        /* ---- Clonar botones de sesión hacia el menú mobile ---- */
-        (function () {
-            const origen = document.getElementById('navbarActionsDesktop');
-            const destino = document.getElementById('navbarActionsMobile');
-            if (origen && destino && origen.innerHTML.trim()) {
-                destino.innerHTML = origen.innerHTML;
-            }
-        })();
-    </script>
-
-    <script>
-        window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
-
-        /* ---- Navbar scroll effect ---- */
-        const nav = document.getElementById('mainNav');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', window.scrollY > 60);
-        });
-
-        /* ---- Altura real del navbar como variable CSS ---- */
-        function actualizarAlturaNavbar() {
-            if (!nav) return;
-            document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
-        }
-        actualizarAlturaNavbar();
-        window.addEventListener('load', actualizarAlturaNavbar);
-        window.addEventListener('resize', actualizarAlturaNavbar);
-
         /* ---- Parallax 3D con el mouse en el hero ---- */
         (function () {
             const hero = document.querySelector('#inicio .hero');
@@ -2867,6 +2642,5 @@
     })();
 })();
 </script>
-    
-</body>
-</html>
+
+{% endblock %}

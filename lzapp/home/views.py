@@ -110,7 +110,7 @@ def _estado_juego_diario(request):
         return {'estado': 'sin_premio', 'tirada': tirada}
     return {'estado': 'ganado', 'tirada': tirada}
 
-@ensure_csrf_cookie
+
 def main(request):
     premio_para_animacion = _premio_para_animacion(request)
     # Prioridad: si hay premio de campaña oficial, se muestra tal cual
@@ -126,13 +126,15 @@ def main(request):
         'juego_diario': juego_diario,
     }
     return render(request, "masterpage.html", context)
+    #return render(request, "masterpage1.html", context)
 
-@ensure_csrf_cookie
+
 def user(request):
     productos = Producto.objects.filter(disponibilidad=True)
     return render(request, "users.html", {"productos": productos})
+    #return render(request, "usuarios/usuarios.html", {"productos": productos})
 
-@ensure_csrf_cookie
+
 def client(request):
     premio_activo = _premio_activo_o_none(request)
     juego_diario = None if premio_activo else _estado_juego_diario(request)
@@ -144,7 +146,8 @@ def client(request):
         'premio_activo': premio_activo,
         'juego_diario': juego_diario,
     }
-    return render(request, "clients.html", context)
+    return render(request, "client.html", context)
+    #return render(request, "usuarios/clientes.html", context)
 
 @ensure_csrf_cookie
 def carro(request):
@@ -181,5 +184,5 @@ def carro(request):
         "pago_status": pago_status,
         "pago_payment_id": payment_id,
     }
-
     return render(request, "carrito_compras.html", context)
+    #return render(request, "carrito/carrito_compras.html", context)

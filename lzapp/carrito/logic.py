@@ -18,8 +18,9 @@ class Carro:
         if premio:
             # Reclamar premio: SIEMPRE deja 1 sola unidad con el precio
             # de descuento, sin importar si ya había cantidad acumulada.
-            # El botón "+" normal (sin premio) no debe volver a pasar
-            # por aquí para este mismo producto (ver bloque de abajo).
+            if producto.stock_actual < 1:
+                return {"ok": False, "error": f'"{producto.nombre}" está agotado.'}
+
             self.carro[producto_id] = {
                 "producto_id": producto_id,
                 "nombre": producto.nombre,
@@ -31,12 +32,22 @@ class Carro:
                 "codigo_premio": premio.codigo,
             }
             self.guardar_carro()
-            return
+            return {"ok": True}
 
         if item_existente and item_existente.get("es_premio"):
             # Ya es un premio reclamado: el "+" normal del widget no debe
             # sumarle más unidades (el descuento aplica a una sola).
-            return
+            return {"ok": False, "error": "Este producto ya está en tu carrito como premio."}
+
+        cantidad_actual = item_existente["cantidad"] if item_existente else 0
+
+        # No dejamos que la cantidad en el carrito supere el stock real,
+        # sin importar cuántas veces le den al botón "+".
+        if cantidad_actual + 1 > producto.stock_actual:
+            return {
+                "ok": False,
+                "error": f'Solo hay {producto.stock_actual} unidades disponibles de "{producto.nombre}".',
+            }
 
         if not item_existente:
             self.carro[producto_id]={
@@ -49,6 +60,7 @@ class Carro:
         else:
             item_existente["cantidad"] += 1
         self.guardar_carro()
+        return {"ok": True}
     
     def guardar_carro(self):
         self.session["carro"]=self.carro
