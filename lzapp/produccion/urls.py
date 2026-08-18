@@ -7,4 +7,5 @@ urlpatterns = [
     #path('exportar-pdf/', views.exportar_produccion_pdf, name="exportar_produccion_pdf"),
     path('importar/', views.importar_produccion, name='importar_produccion'),
     path('importadas/', views.producciones_importadas, name='producciones_importadas'),
+    path('graficos/',views.graficos_produccion,name='graficos_produccion'),
 ]

@@ -21,27 +21,44 @@
 
         </a>
 
-        <ul class="dropdown-menu dropdown-menu-end shadow">
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" style="min-width: 240px; border-radius: 14px;">
 
-            <li>
-                <span class="dropdown-item-text fw-bold">
-                    👋 Hola,
-                    {{ request.session.nombre }}
-                </span>
-            </li>
+    <li class="px-2 py-2 d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center justify-content-center rounded-circle"
+             style="width: 38px; height: 38px; background: #1a3d7c; color: #fff; font-weight: 600;">
+            {{ request.session.nombre|slice:":1"|upper }}
+        </div>
+        <div>
+            <div class="fw-bold" style="font-size: .92rem; line-height: 1.1;">
+                {{ request.session.nombre }}
+            </div>
+            <div class="text-muted" style="font-size: .75rem;">
+                👋 ¡Bienvenido de nuevo!
+            </div>
+        </div>
+    </li>
 
-            <li><hr class="dropdown-divider"></li>
+    <li><hr class="dropdown-divider my-2"></li>
 
-            <li>
-                <a class="dropdown-item text-danger"
-                   href="{% url 'logout' %}">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Cerrar sesión
-                </a>
-            </li>
+    <li>
+        <a class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2"
+           href="{% url 'configuracion' %}">
+            <i class="bi bi-person-circle" style="font-size: 1.05rem; color: #1a3d7c;"></i>
+            <span>Mi Perfil</span>
+        </a>
+    </li>
 
-        </ul>
+    <li><hr class="dropdown-divider my-2"></li>
 
+    <li>
+        <a class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2 text-danger"
+           href="{% url 'logout' %}">
+            <i class="bi bi-box-arrow-right" style="font-size: 1.05rem;"></i>
+            <span>Cerrar sesión</span>
+        </a>
+    </li>
+
+</ul>
     </li>
 
     <!-- Carrito -->

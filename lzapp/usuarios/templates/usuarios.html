@@ -15,7 +15,7 @@
 
 {% block content %}
 
-<!-- ===== Stat cards ===== -->
+<!-- ===== Stat cards: cantidad / activos / inactivos ===== -->
 <div class="dash-stats-grid">
     <div class="stat-card">
         <div class="stat-icon blue"><i class="bi bi-person-fill"></i></div>
@@ -33,6 +33,30 @@
     </div>
 
     <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-person-check-fill"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ usuarios_activos }}</div>
+            <div class="stat-label">Usuarios activos</div>
+            <div class="stat-trend up"><i class="bi bi-check-circle-fill"></i> Pueden iniciar sesión</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon gold" style="background:rgba(220,53,69,.12); color:#dc3545;">
+            <i class="bi bi-person-x-fill"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-value">{{ usuarios_inactivos }}</div>
+            <div class="stat-label">Usuarios inactivos</div>
+            {% if usuarios_inactivos > 0 %}
+                <div class="stat-trend down"><i class="bi bi-exclamation-triangle-fill"></i> Cuentas deshabilitadas</div>
+            {% else %}
+                <div class="stat-trend" style="color:var(--text-tertiary);">Ninguna cuenta inactiva</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="stat-card">
         <div class="stat-icon gold"><i class="bi bi-person-workspace"></i></div>
         <div class="stat-info">
             <div class="stat-value">{{ total_empleados }}</div>
@@ -43,6 +67,45 @@
                 <div class="stat-trend down"><i class="bi bi-exclamation-triangle-fill"></i> Aún no hay empleados registrados</div>
             {% endif %}
         </div>
+    </div>
+</div>
+
+<!-- ===== Módulo: usuarios que más han comprado ===== -->
+<div class="bloque-productos" style="margin-bottom:24px;">
+    <div style="padding:20px 20px 4px; display:flex; align-items:center; justify-content:space-between;">
+        <h6 class="mb-0"><i class="bi bi-trophy-fill" style="color:var(--gold,#d4af37);"></i> Usuarios que más han comprado</h6>
+    </div>
+    <div style="padding:4px 20px 20px; overflow-x:auto;">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Compras realizadas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comprador in top_compradores %}
+                <tr>
+                    <td class="muted">{{ forloop.counter }}</td>
+                    <td style="font-weight:600;">{{ comprador.username }}</td>
+                    <td class="muted">{{ comprador.email|default:"Sin correo registrado" }}</td>
+                    <td><span class="badge-gold"><i class="bi bi-bag-check-fill"></i> {{ comprador.total_compras }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">
+                        <div class="estado-vacio">
+                            <i class="bi bi-bag"></i>
+                            <h6 class="mt-3 mb-0">Todavía no hay compras registradas</h6>
+                            <p class="mb-0">Cuando los usuarios empiecen a comprar, aparecerán aquí.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
