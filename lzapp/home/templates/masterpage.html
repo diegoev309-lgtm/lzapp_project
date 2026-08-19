@@ -60,9 +60,10 @@
                 <div class="carrusel-slide activo">
                     <div class="hero">
 
-                        <video class="hero-video" autoplay loop muted playsinline>
-                            <source src="{% static 'home/media/6804173-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
-                        </video>
+                <video class="hero-video" autoplay loop muted playsinline>
+                    <!-- nuevo optimizado-->
+                    <source src="{% static 'home/media/6804173-Uhd4096216025Fps.mp4' %}" type="video/mp4">
+                </video>
 
                         <div class="hero-video-overlay"></div>
                         <div class="hero-topfade"></div>
@@ -201,7 +202,7 @@
                                         <span class="queso-punto-ventana"></span>
                                     </div>
                                     <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <video class="queso-oferta-video" muted loop playsinline preload="none"></video>
                                         <div class="queso-oferta-centro">
                                             <div class="queso-oferta-foto">
                                                 {% if p.imagen %}
@@ -242,7 +243,7 @@
                                         <span class="queso-punto-ventana"></span>
                                     </div>
                                     <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <video class="queso-oferta-video" muted loop playsinline preload="none"></video>
                                         <div class="queso-oferta-centro">
                                             <div class="queso-oferta-foto">
                                                 <i class="bi bi-image"></i>
@@ -278,7 +279,7 @@
                                         <span class="queso-punto-ventana"></span>
                                     </div>
                                     <div class="queso-punto-cara queso-punto-reverso">
-                                        <video class="queso-oferta-video" muted loop playsinline preload="auto"></video>
+                                        <video class="queso-oferta-video" muted loop playsinline preload="none"></video>
                                         <div class="queso-oferta-centro">
                                             <div class="queso-oferta-foto">
                                                 <i class="bi bi-image"></i>
@@ -906,13 +907,12 @@
 
         <!-- ===== BANDA CTA ===== -->
         <section class="seccion-cta" id="contacto">
-
-    <video class="cta-video" autoplay loop muted playsinline>
-        <source src="{% static 'home/media/6804175-uhd_4096_2160_25fps.mp4' %}" type="video/mp4">
-    </video>
-    <div class="cta-video-overlay"></div>
-
-    <div class="container text-center position-relative" style="z-index:1;">
+            <video class="cta-video" muted loop playsinline preload="auto"></video>
+                <!-- nuevo optimizado -->
+                <source src="{% static 'home/media/6804175-Uhd4096216025Fps.mp4' %}" type="video/mp4">
+            </video>
+            <div class="cta-video-overlay"></div>
+            <div class="container text-center position-relative" style="z-index:1;">
                 <div class="reveal">
                     <h2 class="cta-titulo">¿Listo para probar el<br><span>sabor auténtico?</span></h2>
                     <p class="cta-subtitulo mb-4">Contáctanos y lleva Lácteos Zulianos a tu mesa.</p>
@@ -1242,7 +1242,34 @@
 
         revealEls.forEach(el => observer.observe(el));
 
-    
+        /* ---- Lazy load del video CTA (30s, se carga solo al acercarse) ---- */
+        (function () {
+            const ctaVideo = document.querySelector('.cta-video');
+            if (!ctaVideo) return;
+            const obs = new IntersectionObserver((entries, o) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const webm = ctaVideo.dataset.srcWebm;
+                        const mp4 = ctaVideo.dataset.srcMp4;
+                        if (webm) {
+                            const s = document.createElement('source');
+                            s.src = webm; s.type = 'video/webm';
+                            ctaVideo.appendChild(s);
+                        }
+                        if (mp4) {
+                            const s = document.createElement('source');
+                            s.src = mp4; s.type = 'video/mp4';
+                            ctaVideo.appendChild(s);
+                        }
+                        ctaVideo.load();
+                        ctaVideo.play().catch(() => {});
+                        o.unobserve(ctaVideo);
+                    }
+                });
+            }, { rootMargin: '300px' });
+            obs.observe(ctaVideo);
+        })();
+
     </script>
 
     <script>
