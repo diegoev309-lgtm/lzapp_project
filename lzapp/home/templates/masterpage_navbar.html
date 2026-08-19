@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LzApp — Lácteos Zulianos{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static 'home/media/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+    {% load humanize %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+    {% include 'partials/toasts.html' %}
+
+    <!-- ===== NAVBAR (compartido por toda la app) ===== -->
+    <header>
+        <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
+                    LzApp
+                </a>
+
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="bi bi-list text-white fs-2"></i>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="nav">
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#nosotros">Quiénes somos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#productos">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'client' %}#contacto">Contacto</a></li>
+                    </ul>
+                    <div class="navbar-actions-mobile d-lg-none" id="navbarActionsMobile"></div>
+                </div>
+
+                <div class="navbar-actions-desktop d-none d-lg-flex" id="navbarActionsDesktop">
+                    {% block navbar_actions %}{% endblock %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    {% block pre_content %}{% endblock %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        /* ---- Clonar botones de sesión hacia el menú mobile ---- */
+        (function () {
+            const origen = document.getElementById('navbarActionsDesktop');
+            const destino = document.getElementById('navbarActionsMobile');
+            if (origen && destino && origen.innerHTML.trim()) {
+                destino.innerHTML = origen.innerHTML;
+            }
+        })();
+
+        window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
+
+        /* ---- Navbar scroll effect ---- */
+        const nav = document.getElementById('mainNav');
+        if (nav) {
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.scrollY > 60);
+            });
+
+            function actualizarAlturaNavbar() {
+                document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+            }
+            actualizarAlturaNavbar();
+            window.addEventListener('load', actualizarAlturaNavbar);
+            window.addEventListener('resize', actualizarAlturaNavbar);
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

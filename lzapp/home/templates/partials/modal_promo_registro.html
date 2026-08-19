@@ -1,0 +1,35 @@
+{% load static %}
+<div class="modal fade" id="modalPromoRegistro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content promo-registro-modal">
+            <button type="button" class="btn-close promo-registro-cerrar" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="promo-registro-cuerpo">
+                <h4 class="promo-registro-titulo">Únete a Lácteos Zulianos</h4>
+                <div class="promo-registro-item">
+                    <i class="bi bi-egg-fried"></i>
+                    <div>
+                        <strong>Regístrate y prueba nuestros quesos</strong>
+                        <p>Crea tu cuenta en segundos y descubre todo nuestro catálogo artesanal.</p>
+                    </div>
+                </div>
+                <div class="promo-registro-item">
+                    <i class="bi bi-truck"></i>
+                    <div>
+                        <strong>Nosotros te lo llevamos hasta tu casa</strong>
+                        <p>Haz tu pedido y sigue el domicilio en tiempo real, sin salir de casa.</p>
+                    </div>
+                </div>
+                <div class="promo-registro-item">
+                    <i class="bi bi-tag-fill"></i>
+                    <div>
+                        <strong>No te pierdas nuestros descuentos</strong>
+                        <p>Sorteos y ofertas exclusivas todos los días solo para usuarios registrados.</p>
+                    </div>
+                </div>
+                <a href="{% url 'registro' %}" class="btn-dorado promo-registro-btn">
+                    <i class="bi bi-person-plus-fill"></i> Regístrate ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
