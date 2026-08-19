@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'descuentos',
     'produccion',
     'venta',
+
 ]
 
 MIDDLEWARE = [
@@ -82,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_lzapp',
         'USER': 'root',
-        'PASSWORD': 'admin123',
+        'PASSWORD': 'admin1234',
         'HOST': 'localhost',
         'PORT': '3306',
     }
