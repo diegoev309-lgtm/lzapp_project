@@ -215,13 +215,13 @@ def eliminar_usuario(request, id):
     if usuario == request.user:
         messages.error(request,'No puedes eliminar tu propia cuenta.')
 
-        return redirect('usuarios')
+        return redirect('Usuario')
 
     nombre = usuario.username
     usuario.delete()
     messages.success(request,f'El usuario "{nombre}" fue eliminado correctamente.')
 
-    return redirect('usuarios')
+    return redirect('Usuario')
 
 
 # -----------------------------

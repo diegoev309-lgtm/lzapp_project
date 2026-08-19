@@ -516,6 +516,7 @@
 </aside>
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
+
 <script>
   const mp = new MercadoPago('{{ MP_PUBLIC_KEY }}', { locale: 'es-CO' });
 
@@ -532,8 +533,16 @@
         const response = await fetch("{% url 'carro:crear_preferencia_ajax' %}");
         const data = await response.json();
 
-        if (!data.id) {
-          mostrarError('No se pudo iniciar el pago. Intenta de nuevo.');
+        // Caso especial: stock insuficiente (409). Mostramos el detalle
+        // y NO seguimos con el flujo de pago.
+        if (response.status === 409) {
+          const detalle = Array.isArray(data.detalle) ? data.detalle.join('<br>') : 'Revisa las cantidades de tu carrito.';
+          mostrarError(detalle);
+          return;
+        }
+
+        if (!response.ok || !data.id) {
+          mostrarError(data.error || 'No se pudo iniciar el pago. Intenta de nuevo.');
           return;
         }
 
