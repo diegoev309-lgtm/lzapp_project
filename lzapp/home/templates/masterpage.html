@@ -1024,6 +1024,21 @@
     <script>
         window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
 
+        /* ---- Forzar recarga real si la página vuelve del bfcache ----
+           Sin esto, navegar con el botón "Atrás" del navegador puede
+           restaurar el DOM y las variables JS (incluyendo
+           LZ_USUARIO_AUTENTICADO y el estado del sorteo) tal como
+           estaban en el momento en que la página quedó congelada en
+           memoria, SIN volver a pedirle nada al servidor. Esto es lo
+           que permite que, tras cerrar sesión y volver atrás, el
+           mecanismo del globo/agitar siga "vivo" como si aún
+           estuvieras logueado. */
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
         /* ---- Navbar scroll effect ---- */
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
@@ -1660,7 +1675,38 @@
                 ruedaWrap.classList.add('visible');
             }
         }
-        
+
+        // "Ya jugaste hoy y GANASTE" (ruleta diaria): persiste el estado
+        // ganador directo desde la BD, para que sobreviva cualquier reload.
+        if (estadoJuegoDiario === 'ganado') {
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho', 'modo-ofertas');
+            quesosArr.forEach((q) => q.classList.add('encendido'));
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) {
+                    if (premioTipo === 'CUPON_5') {
+                        texto.textContent = `${premioPorcentaje}% de descuento hoy`;
+                    } else {
+                        const textos = {
+                            ENVIO_GRATIS: 'Envío gratis hoy',
+                            BOLETO_DORADO: 'Boleto dorado hoy',
+                        };
+                        texto.textContent = textos[premioTipo] || 'Premio de hoy reclamado';
+                    }
+                }
+                if (aviso) aviso.textContent = '';
+                ruedaWrap.classList.add('visible');
+            }
+        }
+
+        // Cubre TODOS los casos donde ya se jugó hoy (campaña con oferta
+        // guardada, sin_premio, o ganado): el globo no debe seguir
+        // mostrándose como si aún hubiera algo por descubrir.
+        if (sorteoHecho) {
+            boton.classList.add('reventado');
+        }
 
         function obtenerVideo(p) {
             const reverso = p.querySelector('.queso-punto-reverso');
@@ -2313,7 +2359,10 @@
 
         // Mobile simplificado: solo se enciende cada queso en orden y se
         // quedan así. Nada de flip, video, ruleta, tarjeta ni botón sortear.
-        let agitadoCompletado = false;
+        // Si ya se jugó hoy (sorteoHecho viene true desde la BD), arranca
+        // como "ya completado" para que el gesto de agitar no se vuelva
+        // a activar tras un reload.
+        let agitadoCompletado = sorteoHecho;
         let agitandoEnCurso = false;
 
         function finalizarSecuenciaAgitado() {
@@ -2405,6 +2454,11 @@
         const shakeFallback = document.getElementById('ofertaShakeFallback');
         const esMobile = window.matchMedia('(max-width: 991px)').matches;
 
+        // Si ya se jugó hoy, no tiene sentido armar listeners de agitar ni
+        // mostrar ningún aviso — los 3 quesos ya están encendidos y el
+        // modal de "ya jugaste" (rueda-wrap) es lo único que debe verse.
+        if (!sorteoHecho) {
+
         // El botón de respaldo NUNCA se muestra a la vez que el aviso de
         // "agita tu celular": solo aparece si, tras un tiempo prudente,
         // el navegador jamás disparó un evento devicemotion real (caso
@@ -2490,6 +2544,8 @@
             // Navegador sin soporte de DeviceMotionEvent en absoluto.
             mostrarSoloFallback();
         }
+
+        } // cierre del if (!sorteoHecho)
 
         wrap.querySelectorAll('.queso-punto').forEach((p) => {
             p.addEventListener('click', (e) => {
