@@ -16,8 +16,23 @@
             </p>
         </div>
 
+        <!-- <div class="aviso-completitud">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>
+                Este producto solo se mostrará en la tienda a los clientes si completas
+                <strong>imagen, descripción, stock actual, stock mínimo y precio</strong>.
+                Si guardas con alguno de estos campos vacío, el producto quedará guardado
+                pero oculto en la tienda hasta que los completes.
+            </span>
+        </div> -->
+
         <div class="card-form">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  id="form-producto"
+                  data-producto-id="{{ form.instance.pk|default_if_none:'' }}"
+                  data-url-verificar-nombre="{% url 'verificar_nombre_producto' %}"
+                  novalidate>
                 {% csrf_token %}
                 <div class="form-grid">
                     {{ form.as_p }}
@@ -30,7 +45,8 @@
                         Volver
                     </a>
                     <button type="submit"
-                            class="btn btn-guardar">
+                            class="btn btn-guardar"
+                            id="btn-guardar-producto">
                         <i class="bi bi-check-circle-fill"></i>
                         Guardar Producto
                     </button>
@@ -39,4 +55,261 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('form-producto');
+    if (!form) return;
+
+    const btnGuardar = document.getElementById('btn-guardar-producto');
+    const urlVerificarNombre = form.dataset.urlVerificarNombre;
+    const productoId = form.dataset.productoId;
+
+    const inputNombre = document.getElementById('id_nombre');
+    const inputPrecio = document.getElementById('id_precio');
+    const inputFecha = document.getElementById('id_fecha_vencimiento');
+    const inputStockActual = document.getElementById('id_stock_actual');
+    const inputStockMinimo = document.getElementById('id_stock_minimo');
+
+    const NOMBRE_VALIDO_RE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/;
+    const erroresActuales = {};
+
+    // Sugerencia de stock mínimo: por debajo de este número se considera
+    // un margen de reacción muy corto para reabastecer a tiempo.
+    const STOCK_MINIMO_SUGERIDO = 10;
+
+    function getCookie(nombre) {
+        let valor = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach((cookie) => {
+                cookie = cookie.trim();
+                if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                    valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                }
+            });
+        }
+        return valor;
+    }
+
+    function mostrarError(input, mensaje) {
+        input.classList.add('is-invalid');
+
+        let lista = input.parentElement.querySelector('.errorlist');
+        if (!lista) {
+            lista = document.createElement('ul');
+            lista.classList.add('errorlist');
+            input.insertAdjacentElement('afterend', lista);
+        }
+        lista.innerHTML = '<li>' + mensaje + '</li>';
+
+        erroresActuales[input.id] = true;
+        actualizarBotonGuardar();
+    }
+
+    function limpiarError(input) {
+        input.classList.remove('is-invalid');
+
+        const lista = input.parentElement.querySelector('.errorlist');
+        if (lista) lista.remove();
+
+        delete erroresActuales[input.id];
+        actualizarBotonGuardar();
+    }
+
+    function actualizarBotonGuardar() {
+        if (!btnGuardar) return;
+        btnGuardar.disabled = Object.keys(erroresActuales).length > 0;
+    }
+
+    // Las "sugerencias" son consejos, no bloquean el guardado (a diferencia
+    // de mostrarError/limpiarError, que sí impiden enviar el formulario).
+    function mostrarSugerencia(input, mensaje) {
+        input.classList.add('is-sugerencia');
+
+        let texto = input.parentElement.querySelector('.sugerencia-texto');
+        if (!texto) {
+            texto = document.createElement('p');
+            texto.classList.add('sugerencia-texto');
+            input.insertAdjacentElement('afterend', texto);
+        }
+        texto.textContent = mensaje;
+    }
+
+    function limpiarSugerencia(input) {
+        input.classList.remove('is-sugerencia');
+        const texto = input.parentElement.querySelector('.sugerencia-texto');
+        if (texto) texto.remove();
+    }
+
+    function validarPrecio() {
+        if (!inputPrecio) return;
+        const valor = parseFloat(inputPrecio.value);
+
+        if (inputPrecio.value.trim() === '') {
+            limpiarError(inputPrecio); // el "required" del navegador ya lo cubre
+        } else if (isNaN(valor) || valor <= 0) {
+            mostrarError(inputPrecio, 'El precio debe ser mayor a 0.');
+        } else {
+            limpiarError(inputPrecio);
+        }
+    }
+
+    function validarStockActual() {
+        if (!inputStockActual) return;
+        const valor = parseInt(inputStockActual.value, 10);
+
+        if (inputStockActual.value.trim() === '') {
+            limpiarError(inputStockActual); // el "required" del navegador ya lo cubre
+        } else if (isNaN(valor) || valor <= 0) {
+            mostrarError(inputStockActual, 'El stock actual no puede ser 0, ingresa una cantidad.');
+        } else {
+            limpiarError(inputStockActual);
+        }
+
+        validarStockMinimo(); // la sugerencia de stock mínimo depende del stock actual
+    }
+
+    function validarStockMinimo() {
+        if (!inputStockMinimo) return;
+        const valor = parseInt(inputStockMinimo.value, 10);
+
+        if (inputStockMinimo.value.trim() === '') {
+            limpiarError(inputStockMinimo); // el "required" del navegador ya lo cubre
+            limpiarSugerencia(inputStockMinimo);
+            return;
+        }
+
+        if (isNaN(valor) || valor <= 0) {
+            mostrarError(inputStockMinimo, 'El stock mínimo no puede ser 0, ingresa una cantidad.');
+            limpiarSugerencia(inputStockMinimo);
+            return;
+        }
+
+        limpiarError(inputStockMinimo);
+
+        const stockActual = inputStockActual ? parseInt(inputStockActual.value, 10) : NaN;
+
+        if (!isNaN(stockActual) && valor >= stockActual) {
+            mostrarSugerencia(
+                inputStockMinimo,
+                'Este valor es igual o mayor a tu stock actual: el producto quedará marcado ' +
+                'como "bajo stock" de inmediato. Te sugerimos un valor menor a ' + stockActual + '.'
+            );
+        } else if (valor < STOCK_MINIMO_SUGERIDO) {
+            mostrarSugerencia(
+                inputStockMinimo,
+                'Un stock mínimo tan bajo te deja poco margen para reabastecer antes de quedarte ' +
+                'sin producto. Te sugerimos un valor de al menos ' + STOCK_MINIMO_SUGERIDO + '.'
+            );
+        } else {
+            limpiarSugerencia(inputStockMinimo);
+        }
+    }
+
+    function validarFecha() {
+        if (!inputFecha || !inputFecha.value) {
+            if (inputFecha) limpiarError(inputFecha);
+            return;
+        }
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaIngresada = new Date(inputFecha.value + 'T00:00:00');
+
+        if (fechaIngresada < hoy) {
+            mostrarError(inputFecha, 'La fecha de vencimiento no puede ser una fecha pasada.');
+        } else {
+            limpiarError(inputFecha);
+        }
+    }
+
+    function validarFormatoNombre() {
+        if (!inputNombre) return true;
+        const nombre = inputNombre.value.trim();
+
+        if (nombre === '') {
+            limpiarError(inputNombre);
+            return true;
+        }
+
+        if (!NOMBRE_VALIDO_RE.test(nombre)) {
+            mostrarError(
+                inputNombre,
+                'El nombre solo puede contener letras, números y espacios (sin caracteres especiales).'
+            );
+            return false;
+        }
+
+        limpiarError(inputNombre);
+        return true;
+    }
+
+    let timeoutNombre = null;
+    function validarNombreDuplicado() {
+        if (!inputNombre || !urlVerificarNombre) return;
+
+        // Primero valida el formato; si ya está mal, no molestamos con la consulta al servidor.
+        if (!validarFormatoNombre()) return;
+
+        const nombre = inputNombre.value.trim();
+        if (nombre === '') return;
+
+        clearTimeout(timeoutNombre);
+        timeoutNombre = setTimeout(function () {
+            const params = new URLSearchParams({ nombre: nombre });
+            if (productoId) params.append('excluir_id', productoId);
+
+            fetch(urlVerificarNombre + '?' + params.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            })
+                .then((resp) => resp.json())
+                .then((data) => {
+                    if (data.existe) {
+                        mostrarError(inputNombre, 'Ya existe un producto con este nombre.');
+                    } else {
+                        limpiarError(inputNombre);
+                    }
+                })
+                .catch(() => {
+                    // Si falla la consulta, no bloqueamos al usuario;
+                    // la validación definitiva la hace igualmente el servidor al guardar.
+                });
+        }, 400); // debounce: espera a que el usuario deje de escribir
+    }
+
+    if (inputNombre) {
+        inputNombre.addEventListener('input', validarFormatoNombre);
+        inputNombre.addEventListener('input', validarNombreDuplicado);
+        inputNombre.addEventListener('blur', validarNombreDuplicado);
+    }
+
+    if (inputPrecio) {
+        inputPrecio.addEventListener('input', validarPrecio);
+    }
+
+    if (inputStockActual) {
+        inputStockActual.addEventListener('input', validarStockActual);
+    }
+
+    if (inputStockMinimo) {
+        inputStockMinimo.addEventListener('input', validarStockMinimo);
+    }
+
+    if (inputFecha) {
+        inputFecha.addEventListener('change', validarFecha);
+    }
+
+    form.addEventListener('submit', function (evento) {
+        validarFormatoNombre();
+        validarPrecio();
+        validarStockActual();
+        validarStockMinimo();
+        validarFecha();
+
+        if (Object.keys(erroresActuales).length > 0) {
+            evento.preventDefault();
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -47,6 +47,14 @@ def crear_producto(request):
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            if form.producto_incompleto:
+                messages.warning(
+                    request,
+                    'El producto se guardó, pero no se mostrará en la tienda hasta que '
+                    'completes imagen, descripción, stock actual, stock mínimo y precio.'
+                )
+            else:
+                messages.success(request, 'Producto guardado y visible en la tienda.')
             return redirect('listar_productos')
     else:
         form = ProductoForm()
@@ -66,11 +74,37 @@ def editar_producto(request, id):
 
         if form.is_valid():
             form.save()
+            if form.producto_incompleto:
+                messages.warning(
+                    request,
+                    'El producto se guardó, pero no se mostrará en la tienda hasta que '
+                    'completes imagen, descripción, stock actual, stock mínimo y precio.'
+                )
+            else:
+                messages.success(request, 'Producto guardado y visible en la tienda.')
             return redirect('listar_productos')
     else:
         form = ProductoForm(instance=producto)
 
     return render(request, 'formpt.html', {'form': form})
+
+
+def verificar_nombre_producto(request):
+    """
+    Endpoint AJAX usado por el formulario (formpt.html) para validar en
+    tiempo real, mientras el usuario escribe, si el nombre ya existe.
+    """
+    nombre = request.GET.get('nombre', '').strip()
+    excluir_id = request.GET.get('excluir_id')
+
+    if not nombre:
+        return JsonResponse({'existe': False})
+
+    productos = Producto.objects.filter(nombre__iexact=nombre)
+    if excluir_id:
+        productos = productos.exclude(pk=excluir_id)
+
+    return JsonResponse({'existe': productos.exists()})
 
 
 def eliminar_producto(request, id):

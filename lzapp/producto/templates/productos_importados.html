@@ -237,7 +237,7 @@
                 Volver al listado
             </a>
         </div>
-
+        {% csrf_token %}
         <div class="grid-productos">
             {% for i in productos %}
                 <div class="producto-card">

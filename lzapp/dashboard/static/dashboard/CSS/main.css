@@ -1286,6 +1286,36 @@ a{ text-decoration:none; color:inherit; }
 
 .card-form .errorlist{ list-style:none; margin:5px 0 0; padding:0; color:var(--red); font-size:12.5px; }
 .card-form .helptext{ font-size:12px; color:var(--text-tertiary); margin-top:5px; display:block; }
+.card-form input.is-invalid,
+.card-form select.is-invalid,
+.card-form textarea.is-invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px rgba(220,53,69,.15); }
+.btn-guardar:disabled{ opacity:.5; cursor:not-allowed; }
+
+.card-form input.is-sugerencia,
+.card-form select.is-sugerencia{ border-color:var(--gold) !important; box-shadow:0 0 0 3px var(--gold-dim); }
+.card-form .sugerencia-texto{ color:var(--gold); font-size:12.5px; margin:5px 0 0; }
+
+.aviso-completitud{
+    display:flex; gap:10px; align-items:flex-start;
+    background:var(--gold-dim); border:1px solid var(--gold);
+    color:var(--text-primary); border-radius:var(--radius-btn);
+    padding:12px 14px; font-size:13px; margin-bottom:18px;
+}
+.aviso-completitud i{ color:var(--gold); font-size:16px; margin-top:1px; }
+
+.mensajes-django{ margin-bottom:18px; }
+.alert{
+    border-radius:var(--radius-btn);
+    border:1px solid var(--border-subtle);
+    background:var(--bg-panel);
+    color:var(--text-primary);
+    padding:12px 16px;
+    font-size:13.5px;
+    margin-bottom:10px;
+}
+.alert-success{ border-color:var(--green); background:var(--green-dim); }
+.alert-warning{ border-color:var(--gold); background:var(--gold-dim); }
+.alert-error{ border-color:var(--red); background:var(--red-dim); }
 
 .botones{
     display:flex; justify-content:flex-end; gap:12px; margin-top:20px;
