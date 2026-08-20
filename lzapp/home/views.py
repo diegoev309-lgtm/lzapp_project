@@ -146,7 +146,7 @@ def client(request):
         'premio_activo': premio_activo,
         'juego_diario': juego_diario,
     }
-    return render(request, "client.html", context)
+    return render(request, "clients.html", context)
     #return render(request, "usuarios/clientes.html", context)
 
 @ensure_csrf_cookie

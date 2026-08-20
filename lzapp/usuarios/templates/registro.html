@@ -1,227 +1,296 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Registro</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+>
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
+body {
 
-    background:linear-gradient(135deg,#001F54,#0A3D91,#1565C0);
+    background: linear-gradient(
+        135deg,
+        #001F54,
+        #0A3D91,
+        #1565C0
+    );
 
-    min-height:100vh;
+    min-height: 100vh;
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    display: flex;
 
-    font-family:Arial, Helvetica, sans-serif;
+    justify-content: center;
 
-    padding:30px;
+    align-items: center;
 
-}
+    font-family: Arial, Helvetica, sans-serif;
 
-
-.registro-card{
-
-    width:850px;
-    max-width:95%;
-
-    background:#fff;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.35);
-
+    padding: 30px;
 }
 
 
-.registro-header{
+.registro-card {
 
-    background:#001F54;
+    width: 850px;
 
-    color:white;
+    max-width: 95%;
 
-    text-align:center;
+    background: #fff;
 
-    padding:30px;
+    border-radius: 20px;
 
+    overflow: hidden;
+
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .35);
 }
 
 
-.logo{
+.registro-header {
 
-    width:90px;
-    margin-bottom:15px;
+    background: #001F54;
 
+    color: white;
+
+    text-align: center;
+
+    padding: 30px;
 }
 
 
-.registro-body{
+.logo {
 
-    padding:40px;
+    width: 90px;
 
+    margin-bottom: 15px;
 }
 
 
-.form-label{
+.registro-body {
 
-    color:#001F54;
-    font-weight:bold;
-
+    padding: 40px;
 }
 
 
-.form-control{
+.form-label {
 
-    height:48px;
+    color: #001F54;
 
-    border-radius:10px;
-
-    border:2px solid #d9d9d9;
-
+    font-weight: bold;
 }
 
 
-.form-control:focus{
+.form-control {
 
-    border-color:#FFC107;
+    height: 48px;
 
-    box-shadow:0 0 0 .2rem rgba(255,193,7,.25);
+    border-radius: 10px;
 
+    border: 2px solid #d9d9d9;
+
+    transition: .2s;
 }
 
 
-.btn-registro{
+.form-control:focus {
 
-    width:100%;
+    border-color: #FFC107;
 
-    background:#FFC107;
+    box-shadow:
+        0 0 0 .2rem rgba(255, 193, 7, .25);
+}
 
-    color:#001F54;
 
-    font-weight:bold;
+/* =====================================================
+   ESTADOS DEL USUARIO
+   ===================================================== */
 
-    border:none;
+.username-valido {
 
-    border-radius:10px;
-
-    height:50px;
-
-    transition:.3s;
-
-    margin-top:10px;
+    border-color: #198754 !important;
 
 }
 
 
-.btn-registro:hover{
+.username-invalido {
 
-    background:#FFD54F;
-
-    transform:scale(1.02);
+    border-color: #dc3545 !important;
 
 }
 
 
-.login{
+.username-validando {
 
-    margin-top:20px;
-
-    text-align:center;
+    border-color: #FFC107 !important;
 
 }
 
 
-.login a{
+.username-feedback {
 
-    text-decoration:none;
+    font-size: 14px;
 
-    color:#1565C0;
+    margin-top: 6px;
 
-    font-weight:bold;
+    min-height: 21px;
 
+    font-weight: 500;
 }
 
 
-.text-danger{
+.username-feedback.error {
 
-    font-size:14px;
-
+    color: #dc3545;
 }
 
 
-/* ===== OJO DE CONTRASEÑA ===== */
+.username-feedback.success {
 
-.password-container{
-
-    position:relative;
-
+    color: #198754;
 }
 
 
-.password-container .form-control{
+.username-feedback.warning {
 
-    padding-right:50px;
-
+    color: #b58100;
 }
 
 
-.btn-eye{
+/* =====================================================
+   BOTÓN REGISTRO
+   ===================================================== */
 
-    position:absolute;
+.btn-registro {
 
-    right:12px;
+    width: 100%;
 
-    top:50%;
+    background: #FFC107;
 
-    transform:translateY(-50%);
+    color: #001F54;
 
-    border:none;
+    font-weight: bold;
 
-    background:none;
+    border: none;
 
-    cursor:pointer;
+    border-radius: 10px;
 
-    font-size:20px;
+    height: 50px;
 
-    color:#001F54;
+    transition: .3s;
 
+    margin-top: 10px;
 }
 
 
-/* ============================= */
+.btn-registro:hover {
+
+    background: #FFD54F;
+
+    transform: scale(1.02);
+}
 
 
-@media(max-width:768px){
+.btn-registro:disabled {
 
-    .registro-card{
+    opacity: .7;
 
-        width:95%;
+    cursor: not-allowed;
 
+    transform: none;
+}
+
+
+.login {
+
+    margin-top: 20px;
+
+    text-align: center;
+}
+
+
+.login a {
+
+    text-decoration: none;
+
+    color: #1565C0;
+
+    font-weight: bold;
+}
+
+
+.text-danger {
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   OJO DE CONTRASEÑA
+   ===================================================== */
+
+.password-container {
+
+    position: relative;
+}
+
+
+.password-container .form-control {
+
+    padding-right: 50px;
+}
+
+
+.btn-eye {
+
+    position: absolute;
+
+    right: 12px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: none;
+
+    background: none;
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    color: #001F54;
+}
+
+
+/* ===================================================== */
+
+@media(max-width:768px) {
+
+    .registro-card {
+
+        width: 95%;
     }
 
 }
 
-
 </style>
-
 
 </head>
 
@@ -232,279 +301,321 @@ body{
 <div class="registro-card">
 
 
-<div class="registro-header">
+    <!-- =================================================
+         HEADER
+         ================================================= -->
+
+    <div class="registro-header">
+
+        <img
+            src="{% static 'img/logo.png' %}"
+            class="logo"
+            alt="Logo"
+        >
+
+        <h2>Lácteos Zulianos</h2>
+
+        <p>Crear una nueva cuenta</p>
+
+    </div>
 
 
-<img src="{% static 'img/logo.png' %}" class="logo" alt="Logo">
+    <!-- =================================================
+         BODY
+         ================================================= -->
+
+    <div class="registro-body">
 
 
-<h2>Lácteos Zulianos</h2>
+        <form
+            method="POST"
+            id="registroForm"
+            novalidate
+        >
+
+            {% csrf_token %}
 
 
-<p>Crear una nueva cuenta</p>
+            <!-- =================================================
+                 ERRORES GENERALES
+                 ================================================= -->
+
+            {% if form.non_field_errors %}
+
+                <div class="alert alert-danger">
+
+                    {% for error in form.non_field_errors %}
+
+                        {{ error }}
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="row">
+
+
+                <!-- =================================================
+                     USUARIO
+                     ================================================= -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label
+                        class="form-label"
+                        for="{{ form.username.id_for_label }}"
+                    >
+
+                        Usuario
+
+                    </label>
+
+
+                    {{ form.username }}
+
+
+                    <!-- MENSAJE EN TIEMPO REAL -->
+
+                    <div
+                        id="username-feedback"
+                        class="username-feedback"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <!-- ERRORES DE DJANGO -->
+
+                    {% for error in form.username.errors %}
+
+                        <div class="text-danger server-username-error">
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================================
+                     CORREO
+                     ================================================= -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label
+                        class="form-label"
+                        for="{{ form.email.id_for_label }}"
+                    >
+
+                        Correo Electrónico
+
+                    </label>
+
+
+                    {{ form.email }}
+
+
+                    {% for error in form.email.errors %}
+
+                        <div class="text-danger">
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================================
+                     TELÉFONO
+                     ================================================= -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label
+                        class="form-label"
+                        for="{{ form.telefono.id_for_label }}"
+                    >
+
+                        Número de Teléfono
+
+                    </label>
+
+
+                    {{ form.telefono }}
+
+
+                    {% for error in form.telefono.errors %}
+
+                        <div class="text-danger">
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================================
+                     CONTRASEÑA
+                     ================================================= -->
+
+                <div class="col-md-6 mb-3">
+
+                    <label
+                        class="form-label"
+                        for="{{ form.password1.id_for_label }}"
+                    >
+
+                        Contraseña
+
+                    </label>
+
+
+                    <div class="password-container">
+
+
+                        {{ form.password1 }}
+
+
+                        <button
+                            type="button"
+                            class="btn-eye"
+                            onclick="mostrarPassword('id_password1', this)"
+                        >
+
+                            👁️
+
+                        </button>
+
+
+                    </div>
+
+
+                    {% for error in form.password1.errors %}
+
+                        <div class="text-danger">
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =================================================
+                     CONFIRMAR CONTRASEÑA
+                     ================================================= -->
+
+                <div class="col-12 mb-3">
+
+                    <label
+                        class="form-label"
+                        for="{{ form.password2.id_for_label }}"
+                    >
+
+                        Confirmar Contraseña
+
+                    </label>
+
+
+                    <div class="password-container">
+
+
+                        {{ form.password2 }}
+
+
+                        <button
+                            type="button"
+                            class="btn-eye"
+                            onclick="mostrarPassword('id_password2', this)"
+                        >
+
+                            👁️
+
+                        </button>
+
+
+                    </div>
+
+
+                    {% for error in form.password2.errors %}
+
+                        <div class="text-danger">
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 BOTÓN
+                 ================================================= -->
+
+            <button
+                type="submit"
+                class="btn btn-registro"
+                id="btnRegistro"
+            >
+
+                Crear Cuenta
+
+            </button>
+
+
+        </form>
+
+
+        <div class="login">
+
+            ¿Ya tienes una cuenta?
+
+            <a href="{% url 'login' %}">
+
+                Iniciar Sesión
+
+            </a>
+
+        </div>
+
+
+    </div>
 
 
 </div>
-
-
-
-<div class="registro-body">
-
-
-<form method="POST">
-
-
-{% csrf_token %}
-
-
-
-{% if form.non_field_errors %}
-
-<div class="alert alert-danger">
-
-{% for error in form.non_field_errors %}
-
-{{ error }}
-
-{% endfor %}
-
-</div>
-
-{% endif %}
-
-
-
-<div class="row">
-
-
-
-<div class="col-md-6 mb-3">
-
-
-<label class="form-label">
-
-Usuario
-
-</label>
-
-
-{{ form.username }}
-
-
-{% for error in form.username.errors %}
-
-<div class="text-danger">
-
-{{ error }}
-
-</div>
-
-{% endfor %}
-
-
-</div>
-
-
-
-
-<div class="col-md-6 mb-3">
-
-
-<label class="form-label">
-
-Correo Electrónico
-
-</label>
-
-
-{{ form.email }}
-
-
-{% for error in form.email.errors %}
-
-<div class="text-danger">
-
-{{ error }}
-
-</div>
-
-{% endfor %}
-
-
-</div>
-
-
-
-
-<div class="col-md-6 mb-3">
-
-
-<label class="form-label">
-
-Número de Teléfono
-
-</label>
-
-
-{{ form.telefono }}
-
-
-{% for error in form.telefono.errors %}
-
-<div class="text-danger">
-
-{{ error }}
-
-</div>
-
-{% endfor %}
-
-
-</div>
-
-
-
-
-
-<div class="col-md-6 mb-3">
-
-
-<label class="form-label">
-
-Contraseña
-
-</label>
-
-
-<div class="password-container">
-
-
-{{ form.password1 }}
-
-
-<button type="button" class="btn-eye" onclick="mostrarPassword('id_password1', this)">
-
-👁️
-
-</button>
-
-
-</div>
-
-
-
-{% for error in form.password1.errors %}
-
-<div class="text-danger">
-
-{{ error }}
-
-</div>
-
-{% endfor %}
-
-
-
-</div>
-
-
-
-
-
-<div class="col-12 mb-3">
-
-
-<label class="form-label">
-
-Confirmar Contraseña
-
-</label>
-
-
-<div class="password-container">
-
-
-{{ form.password2 }}
-
-
-<button type="button" class="btn-eye" onclick="mostrarPassword('id_password2', this)">
-
-👁️
-
-</button>
-
-
-</div>
-
-
-
-{% for error in form.password2.errors %}
-
-<div class="text-danger">
-
-{{ error }}
-
-</div>
-
-{% endfor %}
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-<button type="submit" class="btn btn-registro">
-
-Crear Cuenta
-
-</button>
-
-
-
-</form>
-
-
-
-
-<div class="login">
-
-
-¿Ya tienes una cuenta?
-
-
-<a href="{% url 'login' %}">
-
-Iniciar Sesión
-
-</a>
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
 
 
 <script>
 
-function mostrarPassword(id, boton){
 
-    let campo = document.getElementById(id);
+/* =========================================================
+   MOSTRAR / OCULTAR CONTRASEÑA
+   ========================================================= */
+
+function mostrarPassword(id, boton) {
+
+    const campo = document.getElementById(id);
 
 
-    if(campo.type === "password"){
+    if (campo.type === "password") {
 
         campo.type = "text";
 
@@ -512,7 +623,7 @@ function mostrarPassword(id, boton){
 
     }
 
-    else{
+    else {
 
         campo.type = "password";
 
@@ -523,8 +634,719 @@ function mostrarPassword(id, boton){
 }
 
 
-</script>
+/* =========================================================
+   VALIDACIÓN DEL USUARIO
+   ========================================================= */
 
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =================================================
+           ELEMENTOS
+           ================================================= */
+
+        const usernameInput =
+            document.getElementById("id_username");
+
+
+        const usernameFeedback =
+            document.getElementById("username-feedback");
+
+
+        const registroForm =
+            document.getElementById("registroForm");
+
+
+        const btnRegistro =
+            document.getElementById("btnRegistro");
+
+
+        /* =================================================
+           VARIABLES
+           ================================================= */
+
+        let usernameExiste = false;
+
+        let usernameValidado = false;
+
+        let ultimaConsulta = "";
+
+        let timeoutUsername = null;
+
+        let enviandoDespuesDeValidar = false;
+
+
+        /* =================================================
+           MOSTRAR MENSAJE
+           ================================================= */
+
+        function mostrarFeedback(
+            mensaje,
+            tipo
+        ) {
+
+            usernameFeedback.textContent =
+                mensaje;
+
+
+            usernameFeedback.className =
+                "username-feedback " + tipo;
+
+        }
+
+
+        /* =================================================
+           LIMPIAR ESTADO VISUAL
+           ================================================= */
+
+        function limpiarEstado() {
+
+            usernameInput.classList.remove(
+                "username-valido",
+                "username-invalido",
+                "username-validando"
+            );
+
+        }
+
+
+        /* =================================================
+           VALIDAR FORMATO
+           ================================================= */
+
+        function validarFormato(username) {
+
+
+            /*
+             * Campo vacío
+             */
+
+            if (username.length === 0) {
+
+                limpiarEstado();
+
+                usernameExiste = false;
+
+                usernameValidado = false;
+
+                ultimaConsulta = "";
+
+                usernameFeedback.textContent = "";
+
+                usernameFeedback.className =
+                    "username-feedback";
+
+                return false;
+
+            }
+
+
+            /*
+             * Mínimo 6 caracteres
+             */
+
+            if (username.length < 6) {
+
+                limpiarEstado();
+
+                usernameExiste = false;
+
+                usernameValidado = false;
+
+                usernameInput.classList.add(
+                    "username-invalido"
+                );
+
+                mostrarFeedback(
+                    "El nombre de usuario debe tener al menos 6 caracteres.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            /*
+             * Máximo 20 caracteres
+             */
+
+            if (username.length > 20) {
+
+                limpiarEstado();
+
+                usernameExiste = false;
+
+                usernameValidado = false;
+
+                usernameInput.classList.add(
+                    "username-invalido"
+                );
+
+                mostrarFeedback(
+                    "El nombre de usuario no puede tener más de 20 caracteres.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            /*
+             * Debe comenzar con letra.
+             *
+             * Permitidos:
+             *
+             * A-Z
+             * a-z
+             * 0-9
+             * _
+             */
+
+            const formatoValido =
+                /^[A-Za-z][A-Za-z0-9_]*$/;
+
+
+            if (!formatoValido.test(username)) {
+
+                limpiarEstado();
+
+                usernameExiste = false;
+
+                usernameValidado = false;
+
+                usernameInput.classList.add(
+                    "username-invalido"
+                );
+
+                mostrarFeedback(
+                    "Debe comenzar con una letra y solo puede contener letras, números y guiones bajos (_).",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            /*
+             * Debe tener al menos un número.
+             */
+
+            if (!/[0-9]/.test(username)) {
+
+                limpiarEstado();
+
+                usernameExiste = false;
+
+                usernameValidado = false;
+
+                usernameInput.classList.add(
+                    "username-invalido"
+                );
+
+                mostrarFeedback(
+                    "El nombre de usuario debe contener al menos un número.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            /*
+             * Formato correcto.
+             */
+
+            return true;
+
+        }
+
+
+        /* =================================================
+           COMPROBAR USUARIO EN DJANGO
+           ================================================= */
+
+        function comprobarUsuario(
+            username,
+            enviarDespues = false
+        ) {
+
+
+            /*
+             * Guardamos qué usuario estamos
+             * comprobando.
+             */
+
+            ultimaConsulta =
+                username;
+
+
+            usernameValidado =
+                false;
+
+
+            usernameExiste =
+                false;
+
+
+            usernameInput.classList.remove(
+                "username-invalido"
+            );
+
+
+            usernameInput.classList.add(
+                "username-validando"
+            );
+
+
+            mostrarFeedback(
+                "Comprobando disponibilidad...",
+                "warning"
+            );
+
+
+            /*
+             * URL de la vista registro.
+             */
+
+            const url =
+                window.location.pathname +
+                "?validar_username=" +
+                encodeURIComponent(username);
+
+
+            fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                }
+            )
+
+
+            .then(
+                function (response) {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Error al consultar el usuario."
+                        );
+
+                    }
+
+                    return response.json();
+
+                }
+            )
+
+
+            .then(
+                function (data) {
+
+
+                    /*
+                     * Comprobar que el usuario
+                     * todavía sea el mismo.
+                     */
+
+                    const usernameActual =
+                        usernameInput.value.trim();
+
+
+                    if (
+                        username !== usernameActual
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    usernameInput.classList.remove(
+                        "username-validando"
+                    );
+
+
+                    usernameExiste =
+                        data.existe;
+
+
+                    usernameValidado =
+                        true;
+
+
+                    /* =====================================
+                       USUARIO EXISTE
+                       ===================================== */
+
+                    if (data.existe) {
+
+
+                        usernameInput.classList.add(
+                            "username-invalido"
+                        );
+
+
+                        mostrarFeedback(
+                            "Este nombre de usuario ya está registrado.",
+                            "error"
+                        );
+
+
+                        btnRegistro.disabled =
+                            false;
+
+
+                        btnRegistro.innerText =
+                            "Crear Cuenta";
+
+
+                        enviandoDespuesDeValidar =
+                            false;
+
+
+                        return;
+
+                    }
+
+
+                    /* =====================================
+                       USUARIO DISPONIBLE
+                       ===================================== */
+
+                    usernameInput.classList.add(
+                        "username-valido"
+                    );
+
+
+                    mostrarFeedback(
+                        "✓ Nombre de usuario disponible.",
+                        "success"
+                    );
+
+
+                    /*
+                     * Si el usuario pulsó Crear Cuenta
+                     * antes de terminar la comprobación,
+                     * enviamos ahora el formulario.
+                     */
+
+                    if (
+                        enviarDespues ||
+                        enviandoDespuesDeValidar
+                    ) {
+
+
+                        btnRegistro.disabled =
+                            true;
+
+
+                        btnRegistro.innerText =
+                            "Creando cuenta...";
+
+
+                        /*
+                         * Importante:
+                         *
+                         * HTMLFormElement.prototype.submit
+                         * evita volver a ejecutar nuestro
+                         * evento "submit".
+                         */
+
+                        HTMLFormElement.prototype.submit.call(
+                            registroForm
+                        );
+
+                    }
+
+                }
+            )
+
+
+            .catch(
+                function (error) {
+
+
+                    console.error(
+                        "Error:",
+                        error
+                    );
+
+
+                    usernameValidado =
+                        false;
+
+
+                    usernameExiste =
+                        false;
+
+
+                    usernameInput.classList.remove(
+                        "username-validando"
+                    );
+
+
+                    btnRegistro.disabled =
+                        false;
+
+
+                    btnRegistro.innerText =
+                        "Crear Cuenta";
+
+
+                    enviandoDespuesDeValidar =
+                        false;
+
+
+                    mostrarFeedback(
+                        "No se pudo comprobar el usuario. Intenta nuevamente.",
+                        "error"
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CUANDO EL USUARIO ESCRIBE
+           ================================================= */
+
+        usernameInput.addEventListener(
+            "input",
+            function () {
+
+
+                const username =
+                    usernameInput.value.trim();
+
+
+                /*
+                 * Cancelar consulta pendiente.
+                 */
+
+                clearTimeout(
+                    timeoutUsername
+                );
+
+
+                /*
+                 * Reiniciar estados.
+                 */
+
+                usernameExiste =
+                    false;
+
+
+                usernameValidado =
+                    false;
+
+
+                ultimaConsulta =
+                    "";
+
+
+                enviandoDespuesDeValidar =
+                    false;
+
+
+                btnRegistro.disabled =
+                    false;
+
+
+                btnRegistro.innerText =
+                    "Crear Cuenta";
+
+
+                /*
+                 * Validación local inmediata.
+                 */
+
+                const formatoCorrecto =
+                    validarFormato(username);
+
+
+                /*
+                 * Si no cumple el formato,
+                 * no consultamos al servidor.
+                 */
+
+                if (!formatoCorrecto) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * Esperamos 400ms antes de consultar.
+                 */
+
+                timeoutUsername =
+                    setTimeout(
+                        function () {
+
+                            comprobarUsuario(
+                                username,
+                                false
+                            );
+
+                        },
+                        400
+                    );
+
+            }
+        );
+
+
+        /* =================================================
+           AL PULSAR CREAR CUENTA
+           ================================================= */
+
+        registroForm.addEventListener(
+            "submit",
+            function (event) {
+
+
+                const username =
+                    usernameInput.value.trim();
+
+
+                /*
+                 * Validar formato.
+                 */
+
+                const formatoCorrecto =
+                    validarFormato(username);
+
+
+                if (!formatoCorrecto) {
+
+                    event.preventDefault();
+
+                    usernameInput.focus();
+
+                    return;
+
+                }
+
+
+                /*
+                 * Si el usuario existe,
+                 * no permitimos enviar.
+                 */
+
+                if (usernameExiste) {
+
+                    event.preventDefault();
+
+                    usernameInput.focus();
+
+
+                    mostrarFeedback(
+                        "Este nombre de usuario ya está registrado.",
+                        "error"
+                    );
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * Si el usuario ya fue comprobado
+                 * y es el mismo que tenemos en el campo,
+                 * dejamos que Django reciba el POST.
+                 */
+
+                if (
+                    usernameValidado &&
+                    ultimaConsulta === username
+                ) {
+
+                    /*
+                     * No usamos preventDefault().
+                     *
+                     * El formulario se envía normalmente.
+                     */
+
+                    btnRegistro.disabled =
+                        true;
+
+                    btnRegistro.innerText =
+                        "Creando cuenta...";
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * Todavía no ha sido comprobado.
+                 *
+                 * Detenemos temporalmente el envío.
+                 */
+
+                event.preventDefault();
+
+
+                enviandoDespuesDeValidar =
+                    true;
+
+
+                btnRegistro.disabled =
+                    true;
+
+
+                btnRegistro.innerText =
+                    "Comprobando usuario...";
+
+
+                mostrarFeedback(
+                    "Comprobando disponibilidad...",
+                    "warning"
+                );
+
+
+                /*
+                 * Cancelar cualquier consulta
+                 * que estuviera esperando.
+                 */
+
+                clearTimeout(
+                    timeoutUsername
+                );
+
+
+                /*
+                 * Hacemos la comprobación
+                 * inmediatamente.
+                 */
+
+                comprobarUsuario(
+                    username,
+                    true
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
 
 
 </body>
