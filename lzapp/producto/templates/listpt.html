@@ -13,6 +13,14 @@
 
 {% block content %}
 
+{% if messages %}
+    <div class="mensajes-django">
+        {% for m in messages %}
+            <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <style>
 
 /* Ajustes propios de Productos sobre el bloque compartido de main.css */

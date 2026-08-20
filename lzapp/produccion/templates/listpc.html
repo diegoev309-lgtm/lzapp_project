@@ -20,7 +20,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <style>
-
 /* =========================================================
    CONTENEDOR
 ========================================================= */
@@ -28,7 +27,6 @@
 .contenedor-produccion{
     width:100%;
 }
-
 
 /* =========================================================
    BOTÓN NUEVA PRODUCCIÓN
@@ -40,7 +38,6 @@
     margin-bottom:20px;
 }
 
-
 /* =========================================================
    DASHBOARD DE GRÁFICOS
 ========================================================= */
@@ -50,190 +47,121 @@
     display:flex;
     flex-direction:column;
     gap:20px;
-
     margin-bottom:25px;
 }
-
 
 /* =========================================================
    TARJETAS DE TOTALES
 ========================================================= */
 
 .produccion-stats{
-
     display:grid;
-
     grid-template-columns:
         repeat(2,1fr);
-
     gap:20px;
 }
 
-
 .produccion-stat{
-
     background:var(--bg-panel);
-
     border:1px solid var(--border-subtle);
-
     border-radius:var(--radius-panel);
-
     padding:22px;
-
     display:flex;
-
     align-items:center;
-
     gap:18px;
-
     box-shadow:0 10px 30px rgba(0,0,0,.15);
 }
 
-
 .stat-icon{
-
     width:52px;
     height:52px;
-
     border-radius:14px;
-
     display:flex;
-
     align-items:center;
     justify-content:center;
-
     font-size:23px;
 }
 
-
 .stat-icon.gold{
-
     background:rgba(228,200,112,.12);
-
     color:var(--gold);
 }
 
-
 .stat-icon.blue{
-
     background:rgba(56,189,248,.12);
-
     color:#38BDF8;
 }
 
-
 .stat-info{
-
     display:flex;
-
     flex-direction:column;
-
     gap:4px;
 }
 
-
 .stat-value{
-
     color:var(--text-primary);
-
     font-size:24px;
-
     font-weight:700;
 }
 
-
 .stat-label{
-
     color:var(--text-secondary);
-
     font-size:13px;
 }
-
 
 /* =========================================================
    GRÁFICOS
 ========================================================= */
 
 .graficos-produccion{
-
     display:grid;
-
     grid-template-columns:
         1fr 1fr;
-
     gap:20px;
 }
 
-
 .grafico-panel{
-
     background:var(--bg-panel);
-
     border:1px solid var(--border-subtle);
-
     border-radius:var(--radius-panel);
-
     overflow:hidden;
-
     min-width:0;
 }
 
-
 .grafico-header{
-
     padding:18px 20px;
-
     border-bottom:
         1px solid var(--border-subtle);
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
     gap:15px;
 }
 
-
 .grafico-title{
-
     color:var(--text-primary);
-
     font-size:16px;
-
     font-weight:700;
-
     display:flex;
-
     align-items:center;
-
     gap:9px;
 }
 
-
 .grafico-title i{
-
     color:var(--gold);
 }
 
 
 .grafico-subtitulo{
-
     color:var(--text-tertiary);
-
     font-size:12px;
-
     text-align:right;
 }
 
 
 .contenedor-grafico{
-
     width:100%;
-
     height:350px;
-
     padding:10px;
 }
 
@@ -415,172 +343,6 @@
             Nueva Producción
 
         </a>
-
-    </div>
-
-
-    <!-- =====================================================
-         GRÁFICOS DE PRODUCCIÓN
-    ====================================================== -->
-
-    <div class="produccion-dashboard">
-
-
-        <!-- =================================================
-             TOTALES
-        ================================================== -->
-
-        <div class="produccion-stats">
-
-
-            <div class="produccion-stat">
-
-                <div class="stat-icon gold">
-
-                    <i class="bi bi-calendar-month"></i>
-
-                </div>
-
-                <div class="stat-info">
-
-                    <div class="stat-value"
-                         id="totalMes">
-
-                        0
-
-                    </div>
-
-                    <div class="stat-label">
-
-                        Unidades producidas este mes
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="produccion-stat">
-
-                <div class="stat-icon blue">
-
-                    <i class="bi bi-calendar-week"></i>
-
-                </div>
-
-                <div class="stat-info">
-
-                    <div class="stat-value"
-                         id="totalSemana">
-
-                        0
-
-                    </div>
-
-                    <div class="stat-label">
-
-                        Unidades producidas esta semana
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             GRÁFICOS
-        ================================================== -->
-
-        <div class="graficos-produccion">
-
-
-            <!-- MES -->
-
-            <section class="grafico-panel">
-
-                <div class="grafico-header">
-
-                    <div class="grafico-title">
-
-                        <i class="bi bi-graph-up"></i>
-
-                        Producción del mes
-
-                    </div>
-
-                    <div class="grafico-subtitulo">
-
-                        Producción diaria del mes actual
-
-                    </div>
-
-                </div>
-
-
-                <div class="contenedor-grafico"
-                     id="chartProduccionMes">
-
-                    <div class="estado-grafico">
-
-                        <div class="spinner-produccion"></div>
-
-                        <span>
-                            Cargando producción...
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- SEMANA -->
-
-            <section class="grafico-panel">
-
-                <div class="grafico-header">
-
-                    <div class="grafico-title">
-
-                        <i class="bi bi-bar-chart-line-fill"></i>
-
-                        Producción de la semana
-
-                    </div>
-
-                    <div class="grafico-subtitulo">
-
-                        Producción diaria de los últimos 7 días
-
-                    </div>
-
-                </div>
-
-
-                <div class="contenedor-grafico"
-                     id="chartProduccionSemana">
-
-                    <div class="estado-grafico">
-
-                        <div class="spinner-produccion"></div>
-
-                        <span>
-                            Cargando producción...
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-        </div>
 
     </div>
 
@@ -836,6 +598,171 @@
                 </ul>
 
             </nav>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         GRÁFICOS DE PRODUCCIÓN
+    ====================================================== -->
+
+    <div class="produccion-dashboard">
+
+
+        <!-- =================================================
+             TOTALES
+        ================================================== -->
+
+        <div class="produccion-stats">
+
+
+            <div class="produccion-stat">
+
+                <div class="stat-icon gold">
+
+                    <i class="bi bi-calendar-month"></i>
+
+                </div>
+
+                <div class="stat-info">
+
+                    <div class="stat-value"
+                         id="totalMes">
+
+                        0
+
+                    </div>
+
+                    <div class="stat-label">
+
+                        Unidades producidas este mes
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="produccion-stat">
+
+                <div class="stat-icon blue">
+
+                    <i class="bi bi-calendar-week"></i>
+
+                </div>
+
+                <div class="stat-info">
+
+                    <div class="stat-value"
+                         id="totalSemana">
+
+                        0
+
+                    </div>
+
+                    <div class="stat-label">
+
+                        Unidades producidas esta semana
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             GRÁFICOS
+        ================================================== -->
+
+        <div class="graficos-produccion">
+
+
+            <!-- MES -->
+
+            <section class="grafico-panel">
+
+                <div class="grafico-header">
+
+                    <div class="grafico-title">
+
+                        <i class="bi bi-graph-up"></i>
+
+                        Producción del mes
+
+                    </div>
+
+                    <div class="grafico-subtitulo">
+
+                        Producción diaria del mes actual
+
+                    </div>
+
+                </div>
+
+
+                <div class="contenedor-grafico"
+                     id="chartProduccionMes">
+
+                    <div class="estado-grafico">
+
+                        <div class="spinner-produccion"></div>
+
+                        <span>
+                            Cargando producción...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SEMANA -->
+
+            <section class="grafico-panel">
+
+                <div class="grafico-header">
+
+                    <div class="grafico-title">
+
+                        <i class="bi bi-bar-chart-line-fill"></i>
+
+                        Producción de la semana
+
+                    </div>
+
+                    <div class="grafico-subtitulo">
+
+                        Producción diaria de los últimos 7 días
+
+                    </div>
+
+                </div>
+
+
+                <div class="contenedor-grafico"
+                     id="chartProduccionSemana">
+
+                    <div class="estado-grafico">
+
+                        <div class="spinner-produccion"></div>
+
+                        <span>
+                            Cargando producción...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
 
         </div>
 
