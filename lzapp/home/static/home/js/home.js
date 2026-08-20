@@ -1,4 +1,4 @@
-        window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
+window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
 
         /* ---- Navbar scroll effect ---- */
         const nav = document.getElementById('mainNav');
@@ -541,7 +541,7 @@
                 const data = JSON.parse(raw);
                 if (!data || !data.timestamp || !data.valor) return null;
                 const segundosPasados = (Date.now() - data.timestamp) / 1000;
-                if (segundosPasados >= 1) {
+                if (segundosPasados >= 86400) {
                     localStorage.removeItem(CLAVE_OFERTA);
                     return null;
                 }
@@ -583,6 +583,48 @@
                 if (aviso) aviso.textContent = 'Hoy no salió premio, vuelve mañana por otra tirada';
                 ruedaWrap.classList.add('visible');
             }
+        }
+
+        // "Ya jugaste hoy y GANASTE" (ruleta diaria): este es el caso que
+        // faltaba. El backend ya sabe (vía TiradaDiaria en BD) que el
+        // usuario ganó hoy y manda estadoJuegoDiario === 'ganado' + el
+        // premio real en los data-premio-*. Antes esto no tenía ninguna
+        // rama de inicialización, así que al recargar la página se perdía
+        // todo: volvía a salir el globo intacto y los quesos apagados,
+        // como si nunca hubiera jugado. Con esto, el estado persiste
+        // tantos reloads como quiera, porque sale directo de la BD.
+        if (estadoJuegoDiario === 'ganado') {
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho', 'modo-ofertas');
+            quesosArr.forEach((q) => q.classList.add('encendido'));
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) {
+                    if (premioTipo === 'CUPON_5') {
+                        texto.textContent = `${premioPorcentaje}% de descuento hoy`;
+                    } else {
+                        const textos = {
+                            ENVIO_GRATIS: 'Envío gratis hoy',
+                            BOLETO_DORADO: 'Boleto dorado hoy',
+                        };
+                        texto.textContent = textos[premioTipo] || 'Premio de hoy reclamado';
+                    }
+                }
+                if (aviso) aviso.textContent = '';
+                ruedaWrap.classList.add('visible');
+            }
+        }
+
+        // En ambos casos de arriba ("sin_premio" y "ganado") el usuario ya
+        // jugó hoy: el globo no debe seguir mostrándose como si todavía
+        // hubiera algo por descubrir. Antes nunca se le agregaba la clase
+        // que lo oculta (.reventado, ver CSS), así que aunque el resto del
+        // estado ya persistiera, el globo seguía flotando ahí sin sentido.
+        // Se agrega directo (sin la animación de "vuelo") porque esto pasa
+        // en la carga de la página, no en una interacción del usuario.
+        if (sorteoHecho) {
+            boton.classList.add('reventado');
         }
         
 

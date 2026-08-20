@@ -7,8 +7,12 @@
     <title>{% block title %}LzApp — Lácteos Zulianos{% endblock %}</title>
 
     {% load static %}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="icon" type="image/x-icon" href="{% static 'home/media/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
@@ -858,7 +862,7 @@
                 <div class="row align-items-center g-5">
                     <div class="col-lg-5 reveal-left">
                         <div class="nosotros-imagen-wrapper">
-                            <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo">
+                            <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo" loading="lazy">
                         </div>
                     </div>
                     <div class="col-lg-7 reveal-right">
@@ -985,25 +989,32 @@
         <div class="modal fade" id="modalPromoRegistro" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content promo-registro-modal">
-                    <button type="button" class="btn-close promo-registro-cerrar" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="promo-registro-cerrar" data-bs-dismiss="modal" aria-label="Cerrar">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
+                    <div class="promo-registro-header">
+                        <span class="promo-registro-eyebrow"><i class="bi bi-stars"></i> Bienvenido</span>
+                        <h4 class="promo-registro-titulo">Únete a <span>Lácteos Zulianos</span></h4>
+                    </div>
+
                     <div class="promo-registro-cuerpo">
-                        <h4 class="promo-registro-titulo">Únete a Lácteos Zulianos</h4>
                         <div class="promo-registro-item">
-                            <i class="bi bi-egg-fried"></i>
+                            <span class="promo-registro-icono"><i class="bi bi-egg-fried"></i></span>
                             <div>
                                 <strong>Regístrate y prueba nuestros quesos</strong>
                                 <p>Crea tu cuenta en segundos y descubre todo nuestro catálogo artesanal.</p>
                             </div>
                         </div>
                         <div class="promo-registro-item">
-                            <i class="bi bi-truck"></i>
+                            <span class="promo-registro-icono"><i class="bi bi-truck"></i></span>
                             <div>
                                 <strong>Nosotros te lo llevamos hasta tu casa</strong>
                                 <p>Haz tu pedido y sigue el domicilio en tiempo real, sin salir de casa.</p>
                             </div>
                         </div>
                         <div class="promo-registro-item">
-                            <i class="bi bi-tag-fill"></i>
+                            <span class="promo-registro-icono"><i class="bi bi-tag-fill"></i></span>
                             <div>
                                 <strong>No te pierdas nuestros descuentos</strong>
                                 <p>Sorteos y ofertas exclusivas todos los días solo para usuarios registrados.</p>
@@ -1032,6 +1043,21 @@
 
     <script>
         window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};
+
+        /* ---- Forzar recarga real si la página vuelve del bfcache ----
+           Sin esto, navegar con el botón "Atrás" del navegador puede
+           restaurar el DOM y las variables JS (incluyendo
+           LZ_USUARIO_AUTENTICADO y el estado del sorteo) tal como
+           estaban en el momento en que la página quedó congelada en
+           memoria, SIN volver a pedirle nada al servidor. Esto es lo
+           que permite que, tras cerrar sesión y volver atrás, el
+           mecanismo del globo/agitar siga "vivo" como si aún
+           estuvieras logueado. */
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
 
         /* ---- Navbar scroll effect ---- */
         const nav = document.getElementById('mainNav');
@@ -1549,12 +1575,17 @@
                     });
                 }
             }
-            window.addEventListener('resize', actualizar);
+            let resizeTimer = null;
+            function actualizarDebounced() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(actualizar, 120);
+            }
+            window.addEventListener('resize', actualizarDebounced);
             if (imgDesktop) imgDesktop.addEventListener('load', actualizar);
             if (imgMobile) imgMobile.addEventListener('load', actualizar);
             actualizar();
             if (window.ResizeObserver) {
-                new ResizeObserver(actualizar).observe(slide);
+                new ResizeObserver(actualizarDebounced).observe(slide);
             }
         })();
     </script>
@@ -1709,7 +1740,38 @@
                 ruedaWrap.classList.add('visible');
             }
         }
-        
+
+        // "Ya jugaste hoy y GANASTE" (ruleta diaria): persiste el estado
+        // ganador directo desde la BD, para que sobreviva cualquier reload.
+        if (estadoJuegoDiario === 'ganado') {
+            sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho', 'modo-ofertas');
+            quesosArr.forEach((q) => q.classList.add('encendido'));
+            if (ruedaWrap) {
+                const texto = ruedaWrap.querySelector('.rueda-descuento');
+                const aviso = ruedaWrap.querySelector('.rueda-aviso');
+                if (texto) {
+                    if (premioTipo === 'CUPON_5') {
+                        texto.textContent = `${premioPorcentaje}% de descuento hoy`;
+                    } else {
+                        const textos = {
+                            ENVIO_GRATIS: 'Envío gratis hoy',
+                            BOLETO_DORADO: 'Boleto dorado hoy',
+                        };
+                        texto.textContent = textos[premioTipo] || 'Premio de hoy reclamado';
+                    }
+                }
+                if (aviso) aviso.textContent = '';
+                ruedaWrap.classList.add('visible');
+            }
+        }
+
+        // Cubre TODOS los casos donde ya se jugó hoy (campaña con oferta
+        // guardada, sin_premio, o ganado): el globo no debe seguir
+        // mostrándose como si aún hubiera algo por descubrir.
+        if (sorteoHecho) {
+            boton.classList.add('reventado');
+        }
 
         function obtenerVideo(p) {
             const reverso = p.querySelector('.queso-punto-reverso');
@@ -2294,6 +2356,14 @@
         }
 
         boton.addEventListener('click', () => {
+            if (!window.LZ_USUARIO_AUTENTICADO) {
+                const modalEl = document.getElementById('modalPromoRegistro');
+                if (modalEl && window.bootstrap) {
+                    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                }
+                return; // anónimo: solo advertencia, nunca arranca la animación
+            }
+
             window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
             if (sorteoHecho) return; // ya jugó hoy: nada que reventar/animar de nuevo
             if (modoActivo) {
@@ -2354,7 +2424,10 @@
 
         // Mobile simplificado: solo se enciende cada queso en orden y se
         // quedan así. Nada de flip, video, ruleta, tarjeta ni botón sortear.
-        let agitadoCompletado = false;
+        // Si ya se jugó hoy (sorteoHecho viene true desde la BD), arranca
+        // como "ya completado" para que el gesto de agitar no se vuelva
+        // a activar tras un reload.
+        let agitadoCompletado = sorteoHecho;
         let agitandoEnCurso = false;
 
         function finalizarSecuenciaAgitado() {
@@ -2420,6 +2493,14 @@
         function iniciarSecuenciaAgitado() {
             if (agitadoCompletado || agitandoEnCurso) return; // ya completado, o ya en curso
 
+            if (!window.LZ_USUARIO_AUTENTICADO) {
+                const modalEl = document.getElementById('modalPromoRegistro');
+                if (modalEl && window.bootstrap) {
+                    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                }
+                return; // anónimo: solo advertencia, nunca arranca la secuencia
+            }
+
             agitandoEnCurso = true;
             wrap.classList.add('modo-ofertas'); // necesario para que el glow/borde dorado se vean
 
@@ -2437,6 +2518,11 @@
         const shakePermiso = document.getElementById('ofertaShakePermiso');
         const shakeFallback = document.getElementById('ofertaShakeFallback');
         const esMobile = window.matchMedia('(max-width: 991px)').matches;
+
+        // Si ya se jugó hoy, no tiene sentido armar listeners de agitar ni
+        // mostrar ningún aviso — los 3 quesos ya están encendidos y el
+        // modal de "ya jugaste" (rueda-wrap) es lo único que debe verse.
+        if (!sorteoHecho) {
 
         // El botón de respaldo NUNCA se muestra a la vez que el aviso de
         // "agita tu celular": solo aparece si, tras un tiempo prudente,
@@ -2523,6 +2609,8 @@
             // Navegador sin soporte de DeviceMotionEvent en absoluto.
             mostrarSoloFallback();
         }
+
+        } // cierre del if (!sorteoHecho)
 
         wrap.querySelectorAll('.queso-punto').forEach((p) => {
             p.addEventListener('click', (e) => {

@@ -65,6 +65,54 @@ body{
 
     padding:30px;
 
+    position:relative;
+
+}
+
+
+.btn-volver{
+
+    position:absolute;
+
+    top:18px;
+
+    left:18px;
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,0.12);
+
+    border:1px solid rgba(255,255,255,0.3);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:1.1rem;
+
+    text-decoration:none;
+
+    transition:background .25s ease, transform .25s ease;
+
+}
+
+
+.btn-volver:hover{
+
+    background:#FFC107;
+
+    color:#001F54;
+
+    transform:translateX(-3px);
+
 }
 
 
@@ -216,6 +264,9 @@ body{
 
 <div class="login-header">
 
+<a href="{% url 'user' %}" class="btn-volver" aria-label="Volver al inicio">
+    <i class="bi bi-arrow-left"></i>
+</a>
 
 <img src="{% static 'img/logo.png' %}" class="logo">
 
