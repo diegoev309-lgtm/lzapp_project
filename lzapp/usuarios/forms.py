@@ -12,7 +12,8 @@ class RegistroForm(UserCreationForm):
         label="Usuario",
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingrese su usuario'
+            'placeholder': 'Ingrese su usuario',
+            'autocomplete': 'username'
         })
     )
 
@@ -20,7 +21,8 @@ class RegistroForm(UserCreationForm):
         label="Correo electrónico",
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingrese su correo'
+            'placeholder': 'Ingrese su correo',
+            'autocomplete': 'email'
         })
     )
 
@@ -29,7 +31,8 @@ class RegistroForm(UserCreationForm):
         max_length=15,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingrese su teléfono'
+            'placeholder': 'Ingrese su teléfono',
+            'autocomplete': 'tel'
         })
     )
 
@@ -37,7 +40,8 @@ class RegistroForm(UserCreationForm):
         label="Contraseña",
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingrese su contraseña'
+            'placeholder': 'Ingrese su contraseña',
+            'autocomplete': 'new-password'
         })
     )
 
@@ -45,7 +49,8 @@ class RegistroForm(UserCreationForm):
         label="Confirmar contraseña",
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Confirme su contraseña'
+            'placeholder': 'Confirme su contraseña',
+            'autocomplete': 'new-password'
         })
     )
 
@@ -91,16 +96,20 @@ class RegistroForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
+
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Ya existe una cuenta registrada con este correo electrónico.")
+            raise forms.ValidationError(
+                "Ya existe una cuenta registrada con este correo electrónico."
+            )
+
         return email
 
 
 class RegistroEmpleadoForm(RegistroForm):
     """
-    Reutiliza toda la validación de RegistroForm (usuario, email, teléfono,
-    contraseñas). La diferencia se maneja en la vista: al guardar, el
-    Perfil se crea con rol='empleado' en lugar de 'cliente'.
+    Reutiliza toda la validación de RegistroForm.
+    La diferencia se maneja en la vista:
+    al guardar, el PerfilEmple se crea con rol='empleado'.
     """
 
     class Meta(RegistroForm.Meta):
@@ -144,30 +153,55 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'username': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control'
+            }),
         }
 
     def clean_username(self):
         username = self.cleaned_data['username']
-        if User.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
-            raise forms.ValidationError("Ese nombre de usuario ya está en uso.")
+
+        if User.objects.exclude(pk=self.instance.pk).filter(
+            username=username
+        ).exists():
+            raise forms.ValidationError(
+                "Ese nombre de usuario ya está en uso."
+            )
+
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
-            raise forms.ValidationError("Ese correo ya está registrado por otro usuario.")
+
+        if User.objects.exclude(pk=self.instance.pk).filter(
+            email=email
+        ).exists():
+            raise forms.ValidationError(
+                "Ese correo ya está registrado por otro usuario."
+            )
+
         return email
 
 
 class PerfilUpdateForm(forms.ModelForm):
+
     class Meta:
         model = Perfil
         fields = ['telefono', 'direccion']
         widgets = {
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
+            'direccion': forms.TextInput(
+                attrs={'class': 'form-control'}
+            ),
         }
