@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="icon" type="image/x-icon" href="{% static 'home/media/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
     {% load humanize %}
@@ -25,7 +26,7 @@
         <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
             <div class="container">
                 <a class="navbar-brand" href="#">
-                    <img src="{% static 'home/media/logolacz.png' %}" alt="Logo Lácteos Zulianos">
+                    <img src="{% static 'home/media/logolacz.webp' %}" alt="Logo Lácteos Zulianos">
                     LzApp
                 </a>
 
@@ -66,7 +67,7 @@
 
                 <video class="hero-video" autoplay loop muted playsinline>
                     <!-- nuevo optimizado-->
-                    <source src="{% static 'home/media/6804173-Uhd4096216025Fps.mp4' %}" type="video/mp4">
+                    <source src="{% static 'home/media/video-queso-carrusel.mp4' %}" type="video/mp4">
                 </video>
 
                         <div class="hero-video-overlay"></div>
@@ -104,20 +105,20 @@
                                     <div class="hero-escena" id="heroEscena">
                                         <span class="hero-anillo"></span>
                                         <div class="pieza3d pieza-rueda" data-depth="0.18">
-                                            <img src="{% static 'home/media/logolacz.png' %}"
+                                            <img src="{% static 'home/media/logolacz.webp' %}"
                                                 alt="Logo LzApp"
                                                 style="mix-blend-mode: normal; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); width: 260px;">
                                         </div>
                                         <div class="pieza3d pieza-cuna" data-depth="0.5">
-                                            <img src="{% static 'home/media/hero-wedge-3d.png' %}"
+                                            <img src="{% static 'home/media/Cuña-de-quesofresco.webp' %}"
                                                  alt="Cuña de queso fresco">
                                         </div>
                                         <div class="pieza3d pieza-bola" data-depth="0.7">
-                                            <img src="{% static 'home/media/481d0dc0e1da87c0016c82cd07e6820bd15a40f5 (1).png' %}"
+                                            <img src="{% static 'home/media/queso-fresco.webp' %}"
                                                  alt="Bola de queso fresco">
                                         </div>
                                         <div class="pieza3d pieza-extra" data-depth="0.4">
-                                            <img src="{% static 'home/media/9646ff920fb88ac261a97674057dd2133dba55c4 (1).png' %}"
+                                            <img src="{% static 'home/media/queso-telita.webp' %}"
                                                  alt="Queso telita">
                                         </div>
                                     </div>
@@ -136,13 +137,13 @@
                 <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos (con quesos interactivos) ---------- -->
                 <div class="carrusel-slide">
                     <div class="slide-imagen">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
+                        <img src="{% static 'home/media/productos-horizontal.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
+                        <img src="{% static 'home/media/productos-vertical.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
                         <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
                         <!--SECCION DE QUESOS INTERACTIVOS-->
                         <div class="quesos-interactivos"
-                            data-bg="{% static 'home/media/Gemini_Generated_Image_usblnausblnausbl.png' %}"
-                            data-bg-mobile="{% static 'home/media/Gemini_Generated_Image_yhc487yhc487yhc4.png' %}"
+                            data-bg="{% static 'home/media/productos-horizontal.png' %}"
+                            data-bg-mobile="{% static 'home/media/productos-vertical.png' %}"
                             data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
                             {% if premio_activo %}
                             data-origen-premio="campana"
@@ -359,10 +360,11 @@
                             </button>
                         </div>
                         <div class="confetti-contenedor" id="confettiContenedor"></div>
+                        <!-- lineas de codigo que muestra el resultado de la ruleta sin loguease -->
                         <div class="oferta-reveal-overlay" id="ofertaRevealOverlay">
                             <div class="oferta-reveal-tarjeta">
                                 <div class="oferta-reveal-queso-wrap">
-                                    <img src="{% static 'home/media/fb36d63f777712b60e871eaefa443eb2bf3b3515 (1).png' %}"
+                                    <img src="{% static 'home/media/queso-prueba.png' %}"
                                         alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen">
                                     <!-- Ícono usado como placeholder cuando el premio (ruleta diaria)
                                         no tiene producto/foto real: CUPON_5, ENVIO_GRATIS, BOLETO_DORADO,
@@ -436,7 +438,7 @@
                 <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
                 <div class="carrusel-slide">
                     <div class="slide-imagen">
-                        <img src="{% static 'home/media/Gemini_Generated_Image_sc7adrsc7adrsc7a.png' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
+                        <img src="{% static 'home/media/img-carrusel-pedidos.webp' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
                         <div class="slide-imagen-overlay"></div>
                         <div class="container slide-imagen-contenido">
                             <div class="row align-items-center g-4">
@@ -660,10 +662,11 @@
         <!-- ===== SECCIÓN PRODUCTOS (con buscador en vivo + productos reales) ===== -->
         <section class="seccion-productos" id="productos">
             <div class="container">
-                <div class="row mb-5">
+                <div class="row mb-5 productos-header">
                     <div class="col-lg-6 reveal-left">
-                        <span class="section-eyebrow">Lo que ofrecemos</span>
-                        <h2 class="section-titulo">Nuestros<br>productos</h2>
+                        <span class="section-eyebrow"><span class="section-eyebrow-dot"></span>Lo que ofrecemos</span>
+                        <h2 class="section-titulo">Nuestros<br><span class="section-titulo-dorado">productos</span></h2>
+                        <span class="section-titulo-linea"></span>
                     </div>
                     <div class="col-lg-6 d-flex align-items-end reveal-right">
                         <p class="section-descripcion">
@@ -862,7 +865,7 @@
                 <div class="row align-items-center g-5">
                     <div class="col-lg-5 reveal-left">
                         <div class="nosotros-imagen-wrapper">
-                            <img src="{% static 'home/media/queso1.png' %}" alt="Nuestro equipo" loading="lazy">
+                            <img src="{% static 'home/media/img-quesos-quienes-somos.webp' %}" alt="Nuestro equipo" loading="lazy">
                         </div>
                     </div>
                     <div class="col-lg-7 reveal-right">
@@ -911,9 +914,9 @@
 
         <!-- ===== BANDA CTA ===== -->
         <section class="seccion-cta" id="contacto">
-            <video class="cta-video" muted loop playsinline preload="auto"></video>
+            <video class="cta-video" muted loop playsinline preload="auto">
                 <!-- nuevo optimizado -->
-                <source src="{% static 'home/media/6804175-Uhd4096216025Fps.mp4' %}" type="video/mp4">
+                <source src="{% static 'home/media/video-pie-pagina.mp4' %}" type="video/mp4">
             </video>
             <div class="cta-video-overlay"></div>
             <div class="container text-center position-relative" style="z-index:1;">
@@ -935,31 +938,39 @@
 
         <!-- ===== FOOTER ===== -->
         <footer>
-            <div class="container">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-4 border-md-end">
-                        <h4>Servicio al cliente</h4>
-                        <p>Líneas exclusivas</p>
-                        <p>321-545-0519 / 311-456-987</p>
-                        <p>Medellin@zulianos.com.co</p>
+            <div class="container footer-inner">
+            
+                <div class="footer-top">
+                    <!-- Bloque de contacto -->
+                    <div class="footer-contacto">
+                        <span class="footer-eyebrow">Pedidos y atención</span>
+                        <p class="footer-entrega"><i class="bi bi-truck"></i> Entregas en Medellín y área metropolitana</p>
+                        <p class="footer-correo"><i class="bi bi-envelope"></i> <a href="mailto:Medellin@zulianos.com.co">Medellin@zulianos.com.co</a></p>
                     </div>
-                    <div class="col-md-4 mb-4 border-md-end">
-                        <h4>Síguenos en redes</h4>
-                        <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
-                            <a href="#"><img src="{% static 'home/media/whatsapp.png' %}" width="48" alt="WhatsApp"></a>
-                            <a href="#"><img src="{% static 'home/media/instagram.png' %}" width="48" alt="Instagram"></a>
-                            <a href="#"><img src="{% static 'home/media/facebook.png' %}" width="48" alt="Facebook"></a>
+                
+                    <!-- Columnas secundarias -->
+                    <div class="footer-col">
+                        <h4>Síguenos</h4>
+                        <div class="footer-social">
+                            <a href="https://wa.me/573215450519" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                            <a href="#" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                         </div>
+                        <p class="footer-nota-redes">Etiquétanos en tus fotos con nuestros productos.</p>
                     </div>
-                    <div class="col-md-4 mb-4">
-                        <h4>Términos y condiciones</h4>
-                        <p>Ubicación</p>
-                        <p>Protección de datos personales</p>
-                        <p>Aviso de privacidad</p>
-                        <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" width="45" height="40" class="d-inline-block align-text-top">
+                    <div class="footer-col">
+                        <h4>Legal</h4>
+                        <ul class="footer-lista-legal">
+                            <li><a href="#">Protección de datos personales</a></li>
+                            <li><a href="#">Aviso de privacidad</a></li>
+                            <li><a href="#">Preguntas frecuentes</a></li>
+                        </ul>
                     </div>
                 </div>
-                <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+            
+                <div class="footer-bottom">
+                    <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" class="footer-sena">
+                    <p>&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+                </div>
             </div>
         </footer>
 
@@ -1040,6 +1051,7 @@
             }
         })();
     </script>
+
 
     <script>
         window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,false" }};

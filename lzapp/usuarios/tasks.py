@@ -23,7 +23,7 @@ def _enviar_email_bienvenida(usuario_id):
     )
     email.attach_alternative(html_content, "text/html")
 
-    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.png')
+    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.webp')
     try:
         with open(ruta_logo, 'rb') as f:
             logo = MIMEImage(f.read())

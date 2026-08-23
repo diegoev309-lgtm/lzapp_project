@@ -23,7 +23,7 @@ def _enviar_email_bienvenida(usuario_id):
         to=[usuario.email],
     )
     email.attach_alternative(html_content, "text/html")
-    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.png')
+    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.webp')
     try:
         with open(ruta_logo, 'rb') as f:
             logo = MIMEImage(f.read())
@@ -65,7 +65,7 @@ def _enviar_email_recuperacion(usuario_id, dominio, protocolo='https'):
     )
     email.attach_alternative(html_content, "text/html")
 
-    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.png')
+    ruta_logo = os.path.join(settings.BASE_DIR, 'usuarios', 'static', 'usuarios', 'img', 'logolacz.webp')
     try:
         with open(ruta_logo, 'rb') as f:
             logo = MIMEImage(f.read())

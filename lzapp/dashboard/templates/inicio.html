@@ -6,6 +6,88 @@
 {% block page_title %}Inicio{% endblock %}
 {% block page_subtitle %}Resumen general de ventas, producción y pedidos{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ---- Badges de estado de pedido ---- */
+    .badge-estado{
+        display:inline-flex; align-items:center; gap:5px;
+        padding:3px 10px; border-radius:var(--radius-pill);
+        font-size:11px; font-weight:700; letter-spacing:.2px;
+        white-space:nowrap;
+    }
+    .badge-estado.pendiente{  background:var(--gold-dim); color:var(--gold); }
+    .badge-estado.preparando{ background:rgba(56,189,248,.14); color:var(--blue); }
+    .badge-estado.en_camino{  background:rgba(139,92,246,.14); color:var(--purple); }
+    .badge-estado.entregado{  background:var(--green-dim); color:var(--green); }
+    .badge-estado.cancelado{  background:var(--red-dim); color:var(--red); }
+
+    /* ---- Fila de pedido en tiempo real ---- */
+    .pedido-row{
+        display:flex; align-items:center; gap:12px;
+        padding:11px 0; border-bottom:1px solid var(--border-subtle);
+    }
+    .pedido-row:last-child{ border-bottom:none; padding-bottom:0; }
+    .pedido-main{ flex:1; min-width:0; }
+    .pedido-id{ font-size:13.5px; font-weight:700; }
+    .pedido-meta{ font-size:11.5px; color:var(--text-tertiary); margin-top:2px; }
+    .pedido-repartidor{ font-size:11.5px; color:var(--text-secondary); margin-top:2px; display:flex; align-items:center; gap:5px; }
+    .pedido-incidencia{ font-size:11px; color:var(--red); margin-top:2px; display:flex; align-items:center; gap:5px; }
+    .pedido-right{ text-align:right; flex-shrink:0; }
+    .pedido-total{ font-size:13.5px; font-weight:700; margin-bottom:4px; }
+
+    .resumen-pedidos{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+    .resumen-chip{
+        flex:1; min-width:78px; text-align:center;
+        padding:8px 6px; border-radius:10px; background:rgba(255,255,255,.03);
+        border:1px solid var(--border-subtle);
+    }
+    .resumen-chip .n{ font-size:17px; font-weight:800; }
+    .resumen-chip .l{ font-size:10px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.4px; }
+
+    /* ---- Leyenda de pastel de productos ---- */
+    .legend-productos{ max-height:230px; overflow-y:auto; padding-right:4px; }
+    .legend-productos .legend-item{
+        display:flex; align-items:center; gap:8px; font-size:12.5px;
+        padding:5px 0; justify-content:space-between;
+    }
+    .legend-productos .legend-item .nombre{ display:flex; align-items:center; gap:8px; overflow:hidden; }
+    .legend-productos .legend-item .nombre span.txt{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .legend-productos .legend-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+    .legend-productos .pct{ color:var(--text-tertiary); font-weight:600; flex-shrink:0; }
+
+    /* ---- Stock: resumen numérico arriba del gráfico ---- */
+    .stock-resumen{ display:flex; gap:10px; margin-bottom:12px; }
+    .stock-chip{ flex:1; padding:10px; border-radius:10px; background:rgba(255,255,255,.03); border:1px solid var(--border-subtle); }
+    .stock-chip .v{ font-size:16px; font-weight:800; }
+    .stock-chip .l{ font-size:10.5px; color:var(--text-tertiary); }
+    .stock-chip.in .v{ color:var(--green); }
+    .stock-chip.out .v{ color:var(--red); }
+
+    /* ---- Panel de detalle diario (drill-down) ---- */
+    .detalle-dia-wrap{ display:none; margin-top:10px; border-top:1px solid var(--border-subtle); padding-top:12px; }
+    .detalle-dia-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .detalle-dia-head .titulo{ font-size:13px; font-weight:700; }
+    .detalle-dia-head button{
+        background:none; border:none; color:var(--text-tertiary); font-size:12px; cursor:pointer;
+    }
+    .detalle-dia-head button:hover{ color: var(--text-primary); }
+    .detalle-problema{
+        font-size:11.5px; color:var(--red); background:var(--red-dim);
+        border-radius:8px; padding:6px 9px; margin-top:5px;
+    }
+    .hint-click{ font-size:11px; color:var(--text-tertiary); margin-top:8px; text-align:center; }
+
+    .campana-lista{ margin-top:10px; }
+    .campana-item{
+        display:flex; align-items:center; gap:8px; font-size:12px;
+        padding:4px 0; color:var(--text-secondary);
+    }
+    .campana-item .dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .campana-item .dot.on{ background:var(--green); }
+    .campana-item .dot.off{ background:var(--text-tertiary); }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- ===== Stat cards ===== -->
@@ -14,9 +96,11 @@
         <div class="stat-card flex-1">
             <div class="stat-icon gold"><i class="bi bi-cash-stack"></i></div>
             <div class="stat-info">
-                <div class="stat-value">$186,400</div>
+                <div class="stat-value">${{ ventas_mes|floatformat:0 }}</div>
                 <div class="stat-label">Ventas del mes</div>
-                <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>12.4% vs. mes anterior</div>
+                <div class="stat-trend {% if variacion_ventas >= 0 %}up{% else %}down{% endif %}">
+                    <i class="bi {% if variacion_ventas >= 0 %}bi-arrow-up-short{% else %}bi-arrow-down-short{% endif %}"></i>{{ variacion_ventas }}% vs. mes anterior
+                </div>
             </div>
         </div>
     </div>
@@ -25,20 +109,24 @@
         <div class="stat-card flex-1">
             <div class="stat-icon blue"><i class="bi bi-truck"></i></div>
             <div class="stat-info">
-                <div class="stat-value">14</div>
-                <div class="stat-label">Pedidos pendientes</div>
-                <div class="stat-trend down"><i class="bi bi-arrow-down-short"></i>3 menos que ayer</div>
+                <div class="stat-value">{{ pedidos_semana }}</div>
+                <div class="stat-label">Pedidos esta semana</div>
+                <div class="stat-trend {% if diferencia_pedidos >= 0 %}up{% else %}down{% endif %}">
+                    <i class="bi {% if diferencia_pedidos >= 0 %}bi-arrow-up-short{% else %}bi-arrow-down-short{% endif %}"></i>{{ diferencia_pedidos|stringformat:"+d" }} vs. semana anterior
+                </div>
             </div>
         </div>
     </div>
 
     <div class="col-6 col-lg-3 d-flex">
         <div class="stat-card flex-1">
-            <div class="stat-icon green"><i class="bi bi-basket-fill"></i></div>
+            <div class="stat-icon green"><i class="bi bi-megaphone-fill"></i></div>
             <div class="stat-info">
-                <div class="stat-value">42</div>
-                <div class="stat-label">Productos activos</div>
-                <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>3 nuevos esta semana</div>
+                <div class="stat-value">{{ campanas_activas }}/{{ campanas_totales }}</div>
+                <div class="stat-label">Campañas activas</div>
+                <div class="stat-trend {% if campanas_inactivas > 0 %}down{% else %}up{% endif %}">
+                    <i class="bi bi-pause-circle"></i>{{ campanas_inactivas }} inactivas
+                </div>
             </div>
         </div>
     </div>
@@ -47,56 +135,49 @@
         <div class="stat-card flex-1">
             <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
             <div class="stat-info">
-                <div class="stat-value">328</div>
-                <div class="stat-label">Usuarios registrados</div>
-                <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i>18 nuevos</div>
+                <div class="stat-value">{{ usuarios_activos_semana }}</div>
+                <div class="stat-label">Usuarios activos (7 días)</div>
+                <div class="stat-trend up"><i class="bi bi-person-check"></i>{{ usuarios_totales }} registrados en total</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ===== Grid superior: ventas mensuales + pedidos recientes ===== -->
+<!-- ===== Grid superior: ventas mensuales + pedidos en tiempo real ===== -->
 <div class="row g-3 mb-3">
-    
+
     <div class="col-12 col-lg-8 d-flex">
         <section class="dash-panel flex-1">
             <div class="dash-panel-head">
                 <span class="dash-panel-title">Ventas mensuales</span>
+                <span class="hint-click" style="margin:0;">Haz clic en una barra para ver los días</span>
             </div>
 
-            <div id="ventasChart"></div>
+            <div id="ventasChart" style="height:260px;"><canvas id="ventasChartCanvas"></canvas></div>
+
+            <div class="detalle-dia-wrap" id="detalleDiaWrap">
+                <div class="detalle-dia-head">
+                    <span class="titulo" id="detalleDiaTitulo">Detalle del mes</span>
+                    <button type="button" id="cerrarDetalleDia"><i class="bi bi-x-lg"></i> cerrar</button>
+                </div>
+                <div id="detalleDiaChart" style="height:220px;"><canvas id="detalleDiaChartCanvas"></canvas></div>
+                <div id="detalleProblemasLista"></div>
+            </div>
         </section>
     </div>
 
     <div class="col-12 col-lg-4 d-flex">
-
         <section class="dash-panel flex-1">
             <div class="dash-panel-head">
-                <span class="dash-panel-title">Pedidos recientes</span>
+                <span class="dash-panel-title">Pedidos en tiempo real</span>
                 <a class="dash-link-arrow" href="{% url 'Pedidos' %}">
                     <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
 
-            <div class="tx-row">
-                <div class="tx-icon"><i class="bi bi-basket2-fill"></i></div>
-                <div class="tx-info"><div class="tx-name">Pedido #1024 · Queso Guayanés</div><div class="tx-date">Hoy, 10:20am</div></div>
-                <div class="tx-amount pos">$4,200</div>
-            </div>
-            <div class="tx-row">
-                <div class="tx-icon"><i class="bi bi-hourglass-split"></i></div>
-                <div class="tx-info"><div class="tx-name">Pedido #1023 · Queso Palmita</div><div class="tx-date">Hoy, 8:05am</div></div>
-                <div class="tx-amount pending">Pendiente</div>
-            </div>
-            <div class="tx-row">
-                <div class="tx-icon"><i class="bi bi-truck"></i></div>
-                <div class="tx-info"><div class="tx-name">Pedido #1021 · Queso Duro Zuliano</div><div class="tx-date">Ayer, 4:40pm</div></div>
-                <div class="tx-amount pos">$7,850</div>
-            </div>
-            <div class="tx-row">
-                <div class="tx-icon"><i class="bi bi-x-circle"></i></div>
-                <div class="tx-info"><div class="tx-name">Pedido #1019 · Cancelado</div><div class="tx-date">Ayer, 11:15am</div></div>
-                <div class="tx-amount neg">$0</div>
+            <div class="resumen-pedidos" id="resumenPedidos"></div>
+            <div id="listaPedidos" style="max-height:280px; overflow-y:auto;">
+                <div class="pedido-row"><span class="pedido-meta">Cargando pedidos…</span></div>
             </div>
         </section>
     </div>
@@ -122,7 +203,7 @@
                 </div>
                 <div class="goal-amounts">
                     <div class="label">Alcanzado / Meta</div>
-                    <div class="value">$186,400 / $250,000</div>
+                    <div class="value">${{ ventas_mes|floatformat:0 }} / $250,000</div>
                 </div>
             </div>
 
@@ -149,39 +230,37 @@
                     <div class="value">18 / 100</div>
                 </div>
             </div>
+
+            <div class="campana-lista">
+                <div class="dash-panel-title" style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:6px;">Estado de campañas</div>
+                <div id="campanaEstadoLista"><span class="pedido-meta">Cargando…</span></div>
+            </div>
         </section>
     </div>
 
     <div class="col-12 col-md-6 col-lg-4 d-flex">
-
         <section class="dash-panel flex-1">
             <div class="dash-panel-head">
-                <span class="dash-panel-title">Distribución de ventas</span>
+                <span class="dash-panel-title">Distribución de productos</span>
             </div>
-            <div class="donut-wrap">
-                <div class="donut" style="--s1:52%; --s2:80%;"></div>
-                <div class="legend">
-                    <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>Quesos duros</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:var(--purple)"></span>Quesos frescos</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Otros productos</div>
-                </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div id="pastelProductos" style="height:200px;"><canvas id="pastelProductosCanvas"></canvas></div>
+                <div class="legend-productos" id="leyendaProductos"></div>
             </div>
         </section>
     </div>
 
     <div class="col-12 col-lg-4 d-flex">
-
         <section class="dash-panel flex-1">
             <div class="dash-panel-head">
-                <span class="dash-panel-title">Stock del día</span>
+                <span class="dash-panel-title">Flujo de stock</span>
             </div>
-            <div class="limit-top">
-                <div class="amt">340 kg <span>vendidos de 500 kg disponibles</span></div>
-                <div class="limit-pct">68%</div>
+            <div class="stock-resumen">
+                <div class="stock-chip"><div class="v" id="stockTotalTxt">--</div><div class="l">Stock actual (unidades)</div></div>
+                <div class="stock-chip in"><div class="v" id="stockEntradasTxt">--</div><div class="l">Unidades producidas (14d)</div></div>
+                <div class="stock-chip out"><div class="v" id="stockSalidasTxt">--</div><div class="l">Unidades vendidas (14d)</div></div>
             </div>
-            <div class="limit-track">
-                <div class="limit-fill" style="width:68%"></div>
-            </div>
+            <div id="stockFlujoChart" style="height:190px;"><canvas id="stockFlujoChartCanvas"></canvas></div>
         </section>
     </div>
 </div>
@@ -189,50 +268,327 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('ventasChart');
-    if (!el) return;
 
-    // TODO: reemplazar por datos reales (vista/API que agregue ventas por mes)
-    const meses   = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const valores = [95,120,88,140,160,186.4,150,132,0,0,0,0]; // en miles de $
+    const css = getComputedStyle(document.documentElement);
+    const gold   = css.getPropertyValue('--gold').trim();
+    const green  = css.getPropertyValue('--green').trim();
+    const red    = css.getPropertyValue('--red').trim();
+    const blue   = css.getPropertyValue('--blue').trim();
+    const purple = css.getPropertyValue('--purple').trim();
+    const teal   = css.getPropertyValue('--teal').trim();
+    const textT  = css.getPropertyValue('--text-tertiary').trim();
+    const textS  = css.getPropertyValue('--text-secondary').trim();
+    const border = css.getPropertyValue('--border-subtle').trim();
+    const bgPanel = css.getPropertyValue('--bg-panel').trim();
+    const paletaProductos = [gold, purple, teal, blue, red, '#B9954C', '#22D3EE', '#F472B6', '#A3E635', '#FB923C'];
 
-    const gold          = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim();
-    const textTertiary  = getComputedStyle(document.documentElement).getPropertyValue('--text-tertiary').trim();
-    const borderSubtle  = getComputedStyle(document.documentElement).getPropertyValue('--border-subtle').trim();
+    // ---- Tooltip oscuro consistente con el tema, para todas las gráficas ----
+    Chart.defaults.color = textT;
+    Chart.defaults.font.family = 'Inter, sans-serif';
+    Chart.defaults.font.size = 11;
+    Chart.defaults.plugins.tooltip.backgroundColor = bgPanel;
+    Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
+    Chart.defaults.plugins.tooltip.bodyColor = textS;
+    Chart.defaults.plugins.tooltip.borderColor = border;
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.titleFont = { weight: '600' };
+    Chart.defaults.plugins.tooltip.displayColors = false;
 
-    const chart = new ApexCharts(el, {
-        chart: { type: 'bar', height: 240, toolbar: { show: false }, background: 'transparent' },
-        series: [{ name: 'Ventas', data: valores }],
-        xaxis: {
-            categories: meses,
-            labels: { style: { colors: textTertiary, fontSize: '10.5px' } },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            labels: { style: { colors: textTertiary, fontSize: '11px' }, formatter: v => '$' + v + 'k' }
-        },
-        grid: {
-            borderColor: borderSubtle,
-            strokeDashArray: 4,
-            xaxis: { lines: { show: false } }
-        },
-        colors: [gold],
-        fill: {
-            type: 'gradient',
-            gradient: { colorStops: [
-                { offset: 0, color: gold, opacity: 1 },
-                { offset: 100, color: '#B9954C', opacity: 1 }
-            ]}
-        },
-        plotOptions: { bar: { borderRadius: 6, columnWidth: '55%' } },
-        dataLabels: { enabled: false },
-        tooltip: { theme: 'dark', y: { formatter: v => '$' + (v * 1000).toLocaleString('es-CO') } }
+    const fmtMoneda = (v) => '$' + Number(v).toLocaleString('es-CO');
+
+    // ================= 1) VENTAS MENSUALES (con drill-down por día) =================
+    let chartVentas = null;
+    let mesesData = null;
+
+    function pintarVentasMensuales(data) {
+        mesesData = data;
+        const colores = data.problemas.map(p => p > 0 ? red : gold);
+        const ctx = document.getElementById('ventasChartCanvas').getContext('2d');
+
+        if (chartVentas) chartVentas.destroy();
+        chartVentas = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.meses,
+                datasets: [{
+                    data: data.ventas,
+                    backgroundColor: colores,
+                    borderRadius: 6,
+                    maxBarThickness: 38,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (evt, elements) => {
+                    if (!elements.length) return;
+                    const idx = elements[0].index;
+                    cargarDetalleDia(data.anio, idx + 1, data.meses[idx]);
+                },
+                onHover: (evt, elements) => {
+                    evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: textT } },
+                    y: {
+                        grid: { color: border },
+                        ticks: { color: textT, callback: (v) => '$' + v.toLocaleString('es-CO') },
+                    },
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (item) => {
+                                const i = item.dataIndex;
+                                return [`${fmtMoneda(item.raw)}`, `${data.pedidos[i]} pedido(s)`];
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    let chartDetalleDia = null;
+
+    function cargarDetalleDia(anio, mes, nombreMes) {
+        fetch(`/api/ventas-dia/${anio}/${mes}`)
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('detalleDiaWrap').style.display = 'block';
+                document.getElementById('detalleDiaTitulo').textContent = `Días de ${d.nombre_mes} ${d.anio}`;
+
+                const colores = d.problemas.map(p => p > 0 ? red : green);
+                const ctx = document.getElementById('detalleDiaChartCanvas').getContext('2d');
+                if (chartDetalleDia) chartDetalleDia.destroy();
+                chartDetalleDia = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: d.dias,
+                        datasets: [{
+                            data: d.ventas,
+                            backgroundColor: colores,
+                            borderRadius: 5,
+                            maxBarThickness: 22,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textT, font: { size: 9 } }, title: { display: true, text: 'Día del mes', color: textT } },
+                            y: { grid: { color: border }, ticks: { color: textT, callback: (v) => '$' + v.toLocaleString('es-CO') } },
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: (items) => `Día ${items[0].label}`,
+                                    label: (item) => {
+                                        const i = item.dataIndex;
+                                        return [`${fmtMoneda(item.raw)}`, `${d.pedidos[i]} pedido(s)`];
+                                    },
+                                },
+                            },
+                        },
+                    },
+                });
+
+                const cont = document.getElementById('detalleProblemasLista');
+                cont.innerHTML = '';
+                const dias = Object.keys(d.detalle_problemas || {});
+                if (dias.length === 0) {
+                    cont.innerHTML = '<div class="pedido-meta" style="margin-top:8px;">Sin problemas reportados este mes ✅</div>';
+                } else {
+                    dias.sort((a, b) => a - b).forEach(dia => {
+                        d.detalle_problemas[dia].forEach(inc => {
+                            const div = document.createElement('div');
+                            div.className = 'detalle-problema';
+                            div.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Día ${dia} · Pedido #${inc.pedido_id}: ${inc.texto}`;
+                            cont.appendChild(div);
+                        });
+                    });
+                }
+            });
+    }
+
+    document.getElementById('cerrarDetalleDia').addEventListener('click', () => {
+        document.getElementById('detalleDiaWrap').style.display = 'none';
     });
 
-    chart.render();
+    fetch('/api/ventas-mensuales').then(r => r.json()).then(pintarVentasMensuales);
+
+    // ================= 2) DISTRIBUCIÓN DE PRODUCTOS (pastel completo) =================
+    fetch('/api/distribucion-productos').then(r => r.json()).then(d => {
+        const total = d.valores.reduce((a, b) => a + b, 0) || 1;
+        const colores = d.etiquetas.map((_, i) => paletaProductos[i % paletaProductos.length]);
+
+        const ctx = document.getElementById('pastelProductosCanvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: d.etiquetas,
+                datasets: [{
+                    data: d.valores,
+                    backgroundColor: colores,
+                    borderColor: bgPanel,
+                    borderWidth: 2,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (item) => {
+                                const pct = ((item.raw / total) * 100).toFixed(1);
+                                return `${item.label}: ${pct}%`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const leyenda = document.getElementById('leyendaProductos');
+        leyenda.innerHTML = '';
+        d.etiquetas.forEach((nombre, i) => {
+            const pct = ((d.valores[i] / total) * 100).toFixed(1);
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `
+                <div class="nombre">
+                    <span class="legend-dot" style="background:${colores[i]}"></span>
+                    <span class="txt">${nombre}</span>
+                </div>
+                <span class="pct">${pct}%</span>`;
+            leyenda.appendChild(item);
+        });
+        if (d.modo === 'stock') {
+            const nota = document.createElement('div');
+            nota.className = 'pedido-meta';
+            nota.style.marginTop = '6px';
+            nota.textContent = 'Aún sin ventas registradas: participación calculada según stock actual.';
+            leyenda.appendChild(nota);
+        }
+    });
+
+    // ================= 3) FLUJO DE STOCK (entradas vs. salidas, barras) =================
+    fetch('/api/stock-flujo').then(r => r.json()).then(d => {
+        document.getElementById('stockTotalTxt').textContent = d.stock_total.toLocaleString('es-CO') + ' u.';
+        document.getElementById('stockEntradasTxt').textContent = '+' + d.entradas_totales.toLocaleString('es-CO') + ' u.';
+        document.getElementById('stockSalidasTxt').textContent = '-' + d.salidas_totales.toLocaleString('es-CO') + ' u.';
+
+        const ctx = document.getElementById('stockFlujoChartCanvas').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: d.dias,
+                datasets: [
+                    { label: 'Entradas', data: d.entradas, backgroundColor: green, borderRadius: 4, maxBarThickness: 16 },
+                    { label: 'Salidas', data: d.salidas.map(v => -v), backgroundColor: red, borderRadius: 4, maxBarThickness: 16 },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: textT, font: { size: 9 } }, stacked: true },
+                    y: { grid: { color: border }, ticks: { color: textT }, stacked: true },
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: textT, boxWidth: 10, boxHeight: 10, font: { size: 10 } },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (item) => `${item.dataset.label}: ${Math.abs(item.raw).toLocaleString('es-CO')} u.`,
+                        },
+                    },
+                },
+            },
+        });
+    });
+
+    // ================= 4) CAMPAÑAS (activas/inactivas) =================
+    // Reutiliza los datos ya calculados por el servidor en las tarjetas superiores;
+    // aquí solo mostramos el desglose visual simple.
+    (function pintarCampanas(){
+        const activas = {{ campanas_activas }};
+        const total = {{ campanas_totales }};
+        const cont = document.getElementById('campanaEstadoLista');
+        cont.innerHTML = '';
+        if (total === 0) {
+            cont.innerHTML = '<span class="pedido-meta">No hay campañas creadas todavía.</span>';
+            return;
+        }
+        const inactivas = total - activas;
+        const row1 = document.createElement('div');
+        row1.className = 'campana-item';
+        row1.innerHTML = `<span class="dot on"></span> ${activas} campaña(s) activa(s)`;
+        const row2 = document.createElement('div');
+        row2.className = 'campana-item';
+        row2.innerHTML = `<span class="dot off"></span> ${inactivas} campaña(s) inactiva(s)`;
+        cont.appendChild(row1);
+        cont.appendChild(row2);
+    })();
+
+    // ================= 5) PEDIDOS EN TIEMPO REAL (polling) =================
+    const iconosEstado = {
+        pendiente: 'bi-hourglass-split',
+        preparando: 'bi-box-seam',
+        en_camino: 'bi-truck',
+        entregado: 'bi-check-circle-fill',
+        cancelado: 'bi-x-circle',
+    };
+
+    function pintarPedidos(data) {
+        const resumen = document.getElementById('resumenPedidos');
+        resumen.innerHTML = `
+            <div class="resumen-chip"><div class="n">${data.resumen.pendientes}</div><div class="l">Pendientes</div></div>
+            <div class="resumen-chip"><div class="n">${data.resumen.en_camino}</div><div class="l">En camino</div></div>
+            <div class="resumen-chip"><div class="n">${data.resumen.entregados}</div><div class="l">Entregados</div></div>
+            <div class="resumen-chip"><div class="n">${data.resumen.cancelados}</div><div class="l">Cancelados</div></div>`;
+
+        const lista = document.getElementById('listaPedidos');
+        if (!data.pedidos.length) {
+            lista.innerHTML = '<div class="pedido-row"><span class="pedido-meta">Todavía no hay pedidos registrados.</span></div>';
+            return;
+        }
+        lista.innerHTML = '';
+        data.pedidos.forEach(p => {
+            const row = document.createElement('div');
+            row.className = 'pedido-row';
+            row.innerHTML = `
+                <div class="pedido-main">
+                    <div class="pedido-id">Pedido #${p.id} · ${p.cliente}</div>
+                    <div class="pedido-meta">${p.fecha} · ${p.items} artículo(s)</div>
+                    <div class="pedido-repartidor"><i class="bi bi-person-badge"></i> ${p.repartidor ? p.repartidor : 'Repartidor sin asignar'}</div>
+                    ${p.incidencia ? `<div class="pedido-incidencia"><i class="bi bi-exclamation-triangle"></i> ${p.incidencia}</div>` : ''}
+                </div>
+                <div class="pedido-right">
+                    <div class="pedido-total">$${p.total.toLocaleString('es-CO')}</div>
+                    <span class="badge-estado ${p.estado}"><i class="bi ${iconosEstado[p.estado] || 'bi-circle'}"></i> ${p.estado_display}</span>
+                </div>`;
+            lista.appendChild(row);
+        });
+    }
+
+    function cargarPedidos() {
+        fetch('/api/pedidos-tiempo-real').then(r => r.json()).then(pintarPedidos).catch(() => {});
+    }
+
+    cargarPedidos();
+    setInterval(cargarPedidos, 15000); // actualiza cada 15s para simular tiempo real
 });
 </script>
 {% endblock %}

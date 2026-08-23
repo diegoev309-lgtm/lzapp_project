@@ -119,6 +119,59 @@ class DetalleVenta(models.Model):
 
 
 # =========================================================
+# 1.1) PEDIDO — seguimiento de entrega, independiente de la Venta
+#      (una Venta es la transacción/pago; un Pedido es su reparto:
+#      estado, repartidor, incidencias, etc. Separado a propósito
+#      para poder crecer -ruta, fotos de entrega, firma, tiempos-
+#      sin tocar la tabla de ventas/pagos)
+# =========================================================
+
+class Pedido(models.Model):
+
+    class Estado(models.TextChoices):
+        PENDIENTE  = 'pendiente',  'Pendiente'
+        PREPARANDO = 'preparando', 'Preparando'
+        EN_CAMINO  = 'en_camino',  'En camino'
+        ENTREGADO  = 'entregado',  'Entregado'
+        CANCELADO  = 'cancelado',  'Cancelado'
+
+    venta = models.OneToOneField(Venta, on_delete=models.CASCADE, related_name='pedido')
+
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE)
+    repartidor = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='entregas_asignadas',
+        help_text='Empleado encargado de repartir este pedido'
+    )
+    direccion_entrega = models.CharField(max_length=255, blank=True, null=True)
+    incidencia = models.CharField(
+        max_length=255, blank=True, null=True,
+        help_text='Problema reportado en el pedido (retraso, producto dañado, cliente ausente, etc.)'
+    )
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'pedido'
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        return f'Pedido #{self.pk} (Venta #{self.venta_id}) - {self.get_estado_display()}'
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=Venta)
+def crear_pedido_automatico(sender, instance, created, **kwargs):
+    """Cada Venta nueva obtiene automáticamente su Pedido de seguimiento."""
+    if created:
+        Pedido.objects.get_or_create(venta=instance)
+
+
+# =========================================================
 # 2) CAMPAÑA DE DESCUENTO (lo que TÚ configuras/manipulas)
 # =========================================================
 

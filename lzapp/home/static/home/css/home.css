@@ -1248,49 +1248,187 @@ HERO — escena 3D animada (slide 1 del carrusel)
 
 /* ============================================================
    FOOTER
+   Firma: borde superior "goteado" en dorado (guiño a la crema de
+   la leche) + bloque de contacto asimétrico en vez de columnas
+   iguales.
    ============================================================ */
 footer {
-    background-color: #022C63;
+    position: relative;
+    background: linear-gradient(180deg, #06336e 0%, var(--azul-profundo) 55%);
     color: white;
-    padding: 40px 0 15px;
-    border-top: 3px solid rgba(201, 168, 76, 0.4);
+    padding: 0 0 28px;
+    overflow: hidden;
 }
 
-footer h4 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: var(--dorado);
+.footer-borde {
+    display: block;
+    width: 100%;
+    height: 34px;
+    margin-bottom: -1px;
+}
+
+.footer-borde path {
+    fill: var(--azul-profundo);
+    stroke: var(--dorado);
+    stroke-width: 2.5;
+}
+
+.footer-inner {
+    padding-top: 46px;
+}
+
+/* ---------- bloque superior: contacto + columnas ---------- */
+.footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    column-gap: 40px;
+    row-gap: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-contacto {
+    flex: 0 1 320px;
+}
+
+.footer-eyebrow {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
     letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--dorado);
+    margin-bottom: 16px;
 }
 
-footer p {
-    font-size: 0.92rem;
+.footer-entrega,
+.footer-correo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
     margin-bottom: 8px;
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.6;
 }
 
-.border-md-end { border-right: 1px solid rgba(255, 255, 255, 0.12); }
-
-footer a img {
-    transition: transform var(--transition), filter var(--transition);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.footer-correo a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color var(--transition);
 }
 
-footer a img:hover {
-    transform: scale(1.15) translateY(-3px);
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+.footer-correo a:hover {
+    color: var(--dorado-claro);
+    text-decoration: underline;
 }
 
-footer .col-md-4:last-child img { margin-top: 12px; opacity: 0.85; }
+/* ---------- columnas secundarias ---------- */
+.footer-col h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--dorado);
+    margin-bottom: 18px;
+}
 
-footer .text-center.m-0 {
-    margin-top: 30px !important;
-    padding-top: 20px !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+.footer-social {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.footer-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201, 168, 76, 0.5);
+    color: white;
+    font-size: 1.15rem;
+    text-decoration: none;
+    transition: background var(--transition), border-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.footer-social a:hover {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: var(--azul-profundo);
+    transform: translateY(-3px);
+}
+
+.footer-nota-redes {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 220px;
+}
+
+.footer-lista-legal {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-lista-legal a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color var(--transition);
+}
+
+.footer-lista-legal a:hover {
+    color: var(--dorado-claro);
+    text-decoration: underline;
+}
+
+/* ---------- barra inferior ---------- */
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding-top: 22px;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+}
+
+.footer-sena {
+    width: 34px;
+    height: auto;
+    opacity: 0.85;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+@media (max-width: 860px) {
+    .footer-top {
+        flex-direction: column;
+        row-gap: 36px;
+    }
+    .footer-contacto {
+        flex-basis: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .footer-eyebrow {
+        font-size: 1rem;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
 }
 
 
@@ -3744,3 +3882,4 @@ footer .text-center.m-0 {
 .lz-toast__cerrar:hover {
     color: #022C63;
 }
+
