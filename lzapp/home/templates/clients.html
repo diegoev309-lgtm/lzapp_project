@@ -7,15 +7,35 @@
 {% block navbar_actions %}
 <ul class="nav justify-content-end align-items-center gap-2">
 
+    <!-- Carrito -->
+    <li class="nav-item">
+        <a class="nav-link p-1 nav-link-icon nav-link-carrito{% if carrito_cantidad_items %} tiene-items{% endif %}" href="{% url 'carro' %}" title="Carrito de compras">
+            <i class="bi bi-basket fs-4"></i>
+            {% if carrito_cantidad_items %}
+                <span class="carrito-badge">{{ carrito_cantidad_items }}</span>
+            {% endif %}
+        </a>
+    </li>
+
+    <!-- Pedidos a domicilio -->
+    <li class="nav-item">
+        <a class="nav-link p-1 nav-link-icon"
+           href="https://wa.me/573215450519?text=Hola%2C%20quiero%20hacer%20un%20pedido%20a%20domicilio"
+           target="_blank" rel="noopener"
+           title="Pedidos a domicilio">
+            <i class="bi bi-truck fs-4"></i>
+        </a>
+    </li>
+
     <!-- Perfil -->
     <li class="nav-item dropdown">
-
-        <a class="nav-link dropdown-toggle p-1"
+        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
            href="#"
            id="perfilDropdown"
            role="button"
            data-bs-toggle="dropdown"
            aria-expanded="false">
+           
 
             <i class="bi bi-person-circle fs-4"></i>
 
@@ -55,16 +75,6 @@
            href="{% url 'logout' %}">
             <i class="bi bi-box-arrow-right" style="font-size: 1.05rem;"></i>
             <span>Cerrar sesión</span>
-        </a>
-    </li>
-
-</ul>
-    </li>
-
-    <!-- Carrito -->
-    <li class="nav-item">
-        <a class="nav-link p-1" href="{% url 'carro' %}" title="Carrito de compras">
-            <i class="bi bi-basket fs-4"></i>
         </a>
     </li>
 

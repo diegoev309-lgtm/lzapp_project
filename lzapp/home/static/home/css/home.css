@@ -128,12 +128,106 @@ body {
 
 .nav-link-cta::after { display: none; }
 
+/* ---- Botones de solo-ícono (perfil, carrito, domicilio) ----
+   Antes heredaban el padding ancho (1.2rem) y el subrayado de los
+   links de texto tipo "Productos", por eso el badge del carrito
+   quedaba lejos del ícono y en Perfil (el único dropdown-toggle) el
+   ::after de Bootstrap para la flechita chocaba con el ::after del
+   subrayado, dejando esa rayita fija que los demás no tenían. */
+.nav-link-icon {
+    padding: 0.4rem 0.55rem !important;
+}
+
+.nav-link-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 18px;
+    height: 2px;
+    margin-left: -9px;
+    vertical-align: baseline;
+    border: none;
+    background: var(--dorado);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--transition);
+}
+
+.nav-link-icon:hover::after {
+    transform: scaleX(1);
+}
+
 .nav-link-cta:hover {
     background: var(--dorado-claro) !important;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
 }
 
+/* ---- Carrito: badge de cantidad + destello periódico ---- */
+.nav-link-carrito {
+    position: relative;
+}
+
+.carrito-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    min-width: 16px;
+    height: 16px;
+    aspect-ratio: 1 / 1;
+    padding: 0 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    text-transform: none;
+    letter-spacing: normal;
+    border: 1px solid var(--azul-profundo);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+/* Cada cierto tiempo el ícono del carrito "brilla" para que quien no
+   vio el badge lo note igual. Ciclo largo (9s) con el destello
+   concentrado en un tramo corto, el resto del tiempo queda quieto.
+   Dos capas de drop-shadow (una chica y una grande) para que el
+   brillo se note expandido, no solo un halo pegado al ícono. */
+@keyframes carritoDestello {
+    0%, 78% {
+        filter: none;
+        transform: scale(1);
+    }
+    84% {
+        filter: drop-shadow(0 0 6px var(--dorado)) drop-shadow(0 0 16px var(--dorado));
+        transform: scale(1.22);
+    }
+    90% {
+        filter: drop-shadow(0 0 3px var(--dorado)) drop-shadow(0 0 8px var(--dorado));
+        transform: scale(1);
+    }
+    100% {
+        filter: none;
+        transform: scale(1);
+    }
+}
+
+.nav-link-carrito.tiene-items i.bi-basket {
+    display: inline-block;
+    animation: carritoDestello 9s ease-in-out infinite;
+}
+
+.nav-link-carrito.tiene-items i.bi-basket {
+    display: inline-block;
+    animation: carritoDestello 9s ease-in-out infinite;
+}
 
 /* ============================================================
    CARRUSEL HERO — contenedor general
@@ -1621,6 +1715,45 @@ footer {
         position: static;
         transform: none;
         margin: 0 auto 1.5rem;
+    }
+
+        /* En mobile no hay mouse: el icono de mouse no tiene sentido en un
+       celular, así que se reemplaza por una flecha (chevron) que
+       rebota hacia abajo, más acorde a un gesto táctil. El texto
+       "Desliza" se oculta acá porque ya lo dice el
+       .carrusel-swipe-hint (flechas izq/der) más abajo, y tenerlo dos
+       veces confundía. */
+    .hero-scroll-texto {
+        display: none;
+    }
+
+    .hero-scroll .mouse {
+        width: 22px;
+        height: 22px;
+        border: none;
+        padding: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        animation: scrollChevronRebote 1.6s ease-in-out infinite;
+    }
+
+    .hero-scroll .mouse span {
+        display: none;
+    }
+
+    .hero-scroll .mouse::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-right: 3px solid var(--dorado);
+        border-bottom: 3px solid var(--dorado);
+        transform: rotate(45deg);
+    }
+
+    @keyframes scrollChevronRebote {
+        0%, 100% { transform: translateY(0); opacity: 1; }
+        50%      { transform: translateY(8px); opacity: 0.4; }
     }
 
     /* FIX FULL-BLEED: el video vuelve a cubrir TODO el hero de borde

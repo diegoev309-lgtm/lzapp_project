@@ -938,7 +938,7 @@
                     <!-- Perfil -->
                     <li class="nav-item dropdown">
                     
-                        <a class="nav-link dropdown-toggle p-1"
+                        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
                            href="#"
                            id="perfilDropdown"
                            role="button"
@@ -974,7 +974,7 @@
                 
                     <!-- Carrito -->
                     <li class="nav-item">
-                        <a class="nav-link p-1" href="{% url 'carro' %}" title="Carrito de compras">
+                         <a class="nav-link p-1 nav-link-icon nav-link-carrito" href="{% url 'carro' %}" title="Carrito de compras">
                             <i class="bi bi-basket fs-4"></i>
                         </a>
                     </li>
@@ -1060,10 +1060,14 @@
                         {% endif %}
                     </div>
                     <button type="submit" class="buscador-btn">
-                        <i class="bi bi-search"></i> Buscar
+                        <i class="bi bi-search"></i> <span>Buscar</span>
                     </button>
                 </form>
             </div>
+
+            <p class="buscador-resultado-info" id="infoResultados" {% if not query %}style="display:none;"{% endif %}>
+                Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
+            </p>
 
             <div class="row g-4" id="listaProductos">
                 {% if premio_activo %}
@@ -1170,31 +1174,39 @@
 
     <!-- ===== FOOTER ===== -->
     <footer>
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-md-4 mb-4 border-md-end">
-                    <h4>Servicio al cliente</h4>
-                    <p>Líneas exclusivas</p>
-                    <p>321-545-0519 / 311-456-987</p>
-                    <p>Medellin@zulianos.com.co</p>
+        <div class="container footer-inner">
+        
+            <div class="footer-top">
+                <!-- Bloque de contacto -->
+                <div class="footer-contacto">
+                    <span class="footer-eyebrow">Pedidos y atención</span>
+                    <p class="footer-entrega"><i class="bi bi-truck"></i> Entregas en Medellín y área metropolitana</p>
+                    <p class="footer-correo"><i class="bi bi-envelope"></i> <a href="mailto:Medellin@zulianos.com.co">Medellin@zulianos.com.co</a></p>
                 </div>
-                <div class="col-md-4 mb-4 border-md-end">
-                    <h4>Síguenos en redes</h4>
-                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-3">
-                        <a href="#"><img src="{% static 'home/media/whatsapp.webp' %}" width="48" alt="WhatsApp"></a>
-                        <a href="#"><img src="{% static 'home/media/instagram.webp' %}" width="48" alt="Instagram"></a>
-                        <!-- <a href="#"><img src="{% static 'home/media/facebook.webp' %}" width="48" alt="Facebook"></a> -->
+            
+                <!-- Columnas secundarias -->
+                <div class="footer-col">
+                    <h4>Síguenos</h4>
+                    <div class="footer-social">
+                        <a href="https://wa.me/573215450519" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        <a href="#" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                     </div>
+                    <p class="footer-nota-redes">Etiquétanos en tus fotos con nuestros productos.</p>
                 </div>
-                <div class="col-md-4 mb-4">y
-                    <h4>Términos y condiciones</h4>
-                    <p>Ubicación</p>
-                    <p>Protección de datos personales</p>
-                    <p>Aviso de privacidad</p>
-                    <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" width="45" height="40" class="d-inline-block align-text-top">
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul class="footer-lista-legal">
+                        <li><a href="#">Protección de datos personales</a></li>
+                        <li><a href="#">Aviso de privacidad</a></li>
+                        <li><a href="#">Preguntas frecuentes</a></li>
+                    </ul>
                 </div>
             </div>
-            <p class="text-center m-0 py-3">&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+        
+            <div class="footer-bottom">
+                <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" class="footer-sena">
+                <p>&copy; Todos los derechos reservados a Lácteos Zulianos</p>
+            </div>
         </div>
     </footer>
 
