@@ -1,0 +1,68 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block page_icon %}bi bi-bell-fill{% endblock %}
+{% block page_title %}Notificaciones{% endblock %}
+{% block page_subtitle %}Historial completo de avisos del sistema{% endblock %}
+
+{% block content %}
+
+<div class="dash-panel">
+    <div class="notif-pagina-lista">
+        {% for n in notificaciones %}
+            <a href="{{ n.url|default:'#' }}"
+               class="notif-pagina-item tipo-{{ n.tipo }} {% if not n.leida %}no-leida{% endif %}">
+                <i class="bi {{ n.icono }}"></i>
+                <div class="notif-pagina-texto">
+                    {% if n.titulo %}<strong>{{ n.titulo }}</strong>{% endif %}
+                    <p>{{ n.mensaje }}</p>
+                    <span class="notif-pagina-fecha">{{ n.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% if not n.leida %}<span class="notif-pagina-punto"></span>{% endif %}
+            </a>
+        {% empty %}
+            <div class="dash-notif-vacio">
+                <i class="bi bi-bell-slash"></i>
+                <p>No hay notificaciones registradas todavía.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if notificaciones.paginator.num_pages > 1 %}
+        <div class="pie-productos">
+            <nav class="paginacion-inline" aria-label="Paginación de notificaciones">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if notificaciones.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notificaciones.previous_page_number }}">&laquo;</a>
+                        </li>
+                    {% endif %}
+                    {% for pagina in notificaciones.paginator.page_range %}
+                        {% if pagina == notificaciones.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ pagina }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pagina }}">{{ pagina }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if notificaciones.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notificaciones.next_page_number }}">&raquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notificaciones.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

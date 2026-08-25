@@ -654,7 +654,7 @@
         <!-- Wave de transición hacia productos -->
         <div class="wave-divider" style="background:#022C63;">
             <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,0 L0,0 Z" fill="#f7f8fc"/>
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#f7f8fc"/>
             </svg>
         </div>
 
@@ -662,13 +662,10 @@
         <!-- ===== SECCIÓN PRODUCTOS (con buscador en vivo + productos reales) ===== -->
         <section class="seccion-productos" id="productos">
             <div class="container">
-                <div class="row mb-5 productos-header">
-                    <div class="col-lg-6 reveal-left">
-                        <span class="section-eyebrow"><span class="section-eyebrow-dot"></span>Lo que ofrecemos</span>
-                        <h2 class="section-titulo">Nuestros<br><span class="section-titulo-dorado">productos</span></h2>
-                        <span class="section-titulo-linea"></span>
-                    </div>
-                    <div class="col-lg-6 d-flex align-items-end reveal-right">
+                <div class="row align-items-stretch g-5 mb-5">
+                    <div class="col-lg-6 order-2 order-lg-1 reveal-left">
+                        <span class="section-eyebrow">Lo que ofrecemos</span>
+                        <h2 class="section-titulo">Nuestros<br>productos</h2>
                         <p class="section-descripcion">
                             Cada producto que ofrecemos es el resultado de una pasión inquebrantable por la calidad
                             y el respeto por las recetas que nos han acompañado por generaciones. Aquí no encontrarás
@@ -676,8 +673,13 @@
                             de la cocina de la abuela.
                         </p>
                     </div>
+                    <div class="col-lg-6 order-1 order-lg-2 reveal-right">
+                        <div class="productos-imagen-wrapper">
+                            <img src="{% static 'home/media/queso3.png' %}" alt="Nuestros productos artesanales" loading="lazy">
+                        </div>
+                    </div>
                 </div>
-
+                
                 <!-- Buscador de productos -->
                 <div class="buscador-wrapper"
                      data-url-ajax="{% url 'buscar_ajax' %}"
@@ -709,145 +711,154 @@
                 <p class="buscador-resultado-info" id="infoResultados" {% if not query %}style="display:none;"{% endif %}>
                     Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
                 </p>
-
-                <div class="row g-3" id="listaProductos">
-                    {% if premio_activo %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
-                            <span class="premio-cinta-mini">TU PREMIO</span>
-                            <div class="producto-img-wrapper">
-                                <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
-                                {% if premio_activo.producto.imagen %}
-                                    <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                                {% endif %}
-                            </div>
-                            <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-stars"></i> Premio de la lotería
+                
+                <div class="productos-carrusel">
+                    <button type="button" class="prod-carrusel-flecha prod-carrusel-flecha--prev" id="carruselProductosPrev" aria-label="Productos anteriores">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                
+                    <div class="prod-carrusel-viewport" id="carruselProductosViewport">
+                        <div class="row g-3" id="listaProductos">
+                            {% if premio_activo %}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                                    <span class="premio-cinta-mini">TU PREMIO</span>
+                                    <div class="producto-img-wrapper">
+                                        <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
+                                        {% if premio_activo.producto.imagen %}
+                                            <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
+                                        {% else %}
+                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="estrellas">
+                                            <i class="bi bi-stars"></i> Premio de la lotería
+                                        </div>
+                                        <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
+                                        <p class="producto-descripcion">
+                                            Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
+                                        </p>
+                                        <p class="precio">
+                                            $ {{ premio_activo.precio_con_descuento }}
+                                            <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
+                                            <i class="bi bi-gift-fill"></i> Reclamar premio
+                                        </a>
+                                    </div>
                                 </div>
-                                <h5 class="titulo-producto">{{ premio_activo.producto.nombre }}</h5>
-                                <p class="producto-descripcion">
-                                    Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
-                                </p>
-                                <p class="precio">
-                                    $ {{ premio_activo.precio_con_descuento }}
-                                    <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
-                                </p>
                             </div>
-                            <div class="card-footer bg-white border-0">
-                                <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
-                                    <i class="bi bi-gift-fill"></i> Reclamar premio
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% elif juego_diario.estado == 'ganado' %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical producto-card--premio h-100">
-                            <span class="premio-cinta-mini">TU PREMIO</span>
-                            <div class="producto-img-wrapper d-flex align-items-center justify-content-center" style="min-height:180px;">
-                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
-                                    <span class="badge-stock premio">-5%</span>
-                                    <i class="bi bi-ticket-perforated-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
-                                    <span class="badge-stock premio">GRATIS</span>
-                                    <i class="bi bi-truck" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
-                                    <span class="badge-stock premio">🎫</span>
-                                    <i class="bi bi-award-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
-                                {% endif %}
-                            </div>
-                            <div class="card-body">
-                                <div class="estrellas">
-                                    <i class="bi bi-stars"></i> Premio de la ruleta diaria
+                            {% elif juego_diario.estado == 'ganado' %}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card producto-card producto-card--vertical producto-card--premio h-100">
+                                    <span class="premio-cinta-mini">TU PREMIO</span>
+                                    <div class="producto-img-wrapper d-flex align-items-center justify-content-center" style="min-height:180px;">
+                                        {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                                            <span class="badge-stock premio">-5%</span>
+                                            <i class="bi bi-ticket-perforated-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                        {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                                            <span class="badge-stock premio">GRATIS</span>
+                                            <i class="bi bi-truck" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                        {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                                            <span class="badge-stock premio">🎫</span>
+                                            <i class="bi bi-award-fill" style="font-size:3.5rem;color:#c9a84c;"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="estrellas">
+                                            <i class="bi bi-stars"></i> Premio de la ruleta diaria
+                                        </div>
+                                        {% if juego_diario.tirada.resultado == 'CUPON_5' %}
+                                            <h5 class="titulo-producto">Cupón 5% próxima compra</h5>
+                                            <p class="producto-descripcion">
+                                                Se aplica automáticamente al total de tu carrito. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                            </p>
+                                        {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
+                                            <h5 class="titulo-producto">Envío gratis</h5>
+                                            <p class="producto-descripcion">
+                                                Se aplica automáticamente en tu próximo pedido. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                            </p>
+                                        {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
+                                            <h5 class="titulo-producto">Boleto dorado</h5>
+                                            <p class="producto-descripcion">
+                                                Quedas participando en el próximo sorteo de premios especiales. Vigente hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        {% if juego_diario.tirada.reclamado %}
+                                            <button type="button" class="btn btn-carrito w-100" disabled>
+                                                <i class="bi bi-check-circle-fill"></i> Ya reclamado
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-carrito w-100 boton-reclamar-premio-dia"
+                                                data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
+                                                <i class="bi bi-gift-fill"></i> Reclamar premio
+                                            </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {% if juego_diario.tirada.resultado == 'CUPON_5' %}
-                                    <h5 class="titulo-producto">Cupón 5% próxima compra</h5>
-                                    <p class="producto-descripcion">
-                                        Se aplica automáticamente al total de tu carrito. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% elif juego_diario.tirada.resultado == 'ENVIO_GRATIS' %}
-                                    <h5 class="titulo-producto">Envío gratis</h5>
-                                    <p class="producto-descripcion">
-                                        Se aplica automáticamente en tu próximo pedido. Válido hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% elif juego_diario.tirada.resultado == 'BOLETO_DORADO' %}
-                                    <h5 class="titulo-producto">Boleto dorado</h5>
-                                    <p class="producto-descripcion">
-                                        Quedas participando en el próximo sorteo de premios especiales. Vigente hasta {{ juego_diario.tirada.fecha_expiracion|date:"d/m/Y H:i" }}.
-                                    </p>
-                                {% endif %}
                             </div>
-                            <div class="card-footer bg-white border-0">
-                                {% if juego_diario.tirada.reclamado %}
-                                    <button type="button" class="btn btn-carrito w-100" disabled>
-                                        <i class="bi bi-check-circle-fill"></i> Ya reclamado
-                                    </button>
-                                {% else %}
-                                    <button type="button" class="btn btn-carrito w-100 boton-reclamar-premio-dia"
-                                        data-url-reclamar-premio-dia="{% url 'reclamar_premio_dia' %}">
-                                        <i class="bi bi-gift-fill"></i> Reclamar premio
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% for i in productos %}
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card producto-card producto-card--vertical h-100">
-                            <div class="producto-img-wrapper">
-                                {% if i.stock_actual <= i.stock_minimo %}
-                                    <span class="badge-stock bajo">Stock bajo</span>
-                                {% else %}
-                                    <span class="badge-stock disponible">Disponible</span>
-                                {% endif %}
-                                {% if i.imagen %}
-                                    <img src="{{ i.imagen.url }}" class="imagen-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
-                                {% endif %}
-                            </div>
-                            <div class="card-body">
-                                <div class="calificacion-widget-pub {% if not request.user.is_authenticated %}anonima{% endif %}"
-                                     data-producto-id="{{ i.id }}"
-                                     data-mi-calificacion="{{ i.mi_calificacion|default:0 }}"
-                                     data-anon="{% if request.user.is_authenticated %}false{% else %}true{% endif %}">
-                                    {% for n in "12345" %}
-                                        <i class="bi bi-star estrella-pub" data-valor="{{ forloop.counter }}"></i>
-                                    {% endfor %}
+                            {% endif %}
+                            {% for i in productos %}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card producto-card producto-card--vertical h-100">
+                                    <div class="producto-img-wrapper">
+                                        {% if i.stock_actual <= i.stock_minimo %}
+                                            <span class="badge-stock bajo">Stock bajo</span>
+                                        {% endif %}
+                                        {% if i.imagen %}
+                                            <img src="{{ i.imagen.url }}" class="imagen-producto">
+                                        {% else %}
+                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="calificacion-widget-pub {% if not request.user.is_authenticated %}anonima{% endif %}"
+                                             data-producto-id="{{ i.id }}"
+                                             data-mi-calificacion="{{ i.mi_calificacion|default:0 }}"
+                                             data-anon="{% if request.user.is_authenticated %}false{% else %}true{% endif %}">
+                                            {% for n in "12345" %}
+                                                <i class="bi bi-star estrella-pub" data-valor="{{ forloop.counter }}"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <h5 class="titulo-producto">{{ i.nombre }}</h5>
+                                        <p class="producto-descripcion">
+                                            {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
+                                        </p>
+                                        <p class="precio">$ {{ i.precio }}</p>
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
+                                            <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                        </a>
+                                    </div>
                                 </div>
-                                <h5 class="titulo-producto">{{ i.nombre }}</h5>
-                                <p class="producto-descripcion">
-                                    {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
-                                </p>
-                                <p class="precio">$ {{ i.precio }}</p>
                             </div>
-                            <div class="card-footer bg-white border-0">
-                                <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
-                                    <i class="bi bi-cart-plus"></i> Añadir al carrito
-                                </a>
+                            {% empty %}
+                            <div class="col-12" id="sinResultados">
+                                {% if query %}
+                                <div class="alert alert-info text-center buscador-sin-resultados">
+                                    <i class="bi bi-search"></i>
+                                    No encontramos productos para "<strong>{{ query }}</strong>".
+                                    <a href="?">Ver todos los productos</a>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info text-center">No existen productos disponibles.</div>
+                                {% endif %}
                             </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="col-12" id="sinResultados">
-                        {% if query %}
-                        <div class="alert alert-info text-center buscador-sin-resultados">
-                            <i class="bi bi-search"></i>
-                            No encontramos productos para "<strong>{{ query }}</strong>".
-                            <a href="?">Ver todos los productos</a>
-                        </div>
-                        {% else %}
-                        <div class="alert alert-info text-center">No existen productos disponibles.</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-
-            </div>
+                            {% endfor %}
+                        </div><!-- cierra #listaProductos -->
+                    </div><!-- cierra .prod-carrusel-viewport -->
+ 
+                    <button type="button" class="prod-carrusel-flecha prod-carrusel-flecha--next" id="carruselProductosNext" aria-label="Siguientes productos">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div><!-- cierra .productos-carrusel -->
+            <div class="prod-carrusel-dots" id="carruselProductosDots"></div>      
         </section>
 
 
@@ -2711,7 +2722,7 @@
         function badgeHtml(p) {
             return p.stock_actual <= p.stock_minimo
                 ? `<span class="badge-stock bajo">Stock bajo</span>`
-                : `<span class="badge-stock disponible">Disponible</span>`;
+                : '';
         }
 
         function descripcionSegura(p) {
@@ -2812,6 +2823,7 @@
 
             window.LZ_activarWidgetsCalificacion && window.LZ_activarWidgetsCalificacion(lista);
             window.LZ_activarBloqueoCarritoAnonimo && window.LZ_activarBloqueoCarritoAnonimo(lista);
+            window.LZ_initCarruselProductos && window.LZ_initCarruselProductos()
 
         }
 
@@ -2963,6 +2975,83 @@
             });
         }
 
+        function initCarruselProductos() {
+            const lista = document.getElementById('listaProductos');
+            const viewport = document.getElementById('carruselProductosViewport');
+            const dotsWrap = document.getElementById('carruselProductosDots');
+            const prevBtn = document.getElementById('carruselProductosPrev');
+            const nextBtn = document.getElementById('carruselProductosNext');
+            if (!lista || !viewport || !dotsWrap || !prevBtn || !nextBtn) return;
+        
+            if (lista.querySelector('#sinResultados')) {
+                lista.classList.remove('prod-carrusel-track');
+                lista.style.transform = '';
+                dotsWrap.innerHTML = '';
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                return;
+            }
+        
+            const tarjetas = Array.from(lista.children).filter(function (el) {
+                return el.className.indexOf('col-') !== -1;
+            });
+            if (tarjetas.length === 0) return;
+        
+            const porSlide = 4;
+            const grupos = [];
+            for (let i = 0; i < tarjetas.length; i += porSlide) {
+                grupos.push(tarjetas.slice(i, i + porSlide));
+            }
+        
+            lista.innerHTML = '';
+            lista.classList.add('prod-carrusel-track');
+            grupos.forEach(function (grupo) {
+                const slide = document.createElement('div');
+                slide.className = 'prod-carrusel-slide';
+                grupo.forEach(function (tarjeta) {
+                    tarjeta.classList.remove('col-lg-3', 'col-md-6', 'col-12');
+                    tarjeta.classList.add('prod-carrusel-item');
+                    slide.appendChild(tarjeta);
+                });
+                lista.appendChild(slide);
+            });
+        
+            const total = grupos.length;
+            let indice = 0;
+        
+            function irA(i) {
+                indice = Math.max(0, Math.min(i, total - 1));
+                lista.style.transform = `translateX(-${indice * 100}%)`;
+                Array.from(dotsWrap.children).forEach(function (dot, idx) {
+                    dot.classList.toggle('activo', idx === indice);
+                });
+                prevBtn.disabled = indice === 0;
+                nextBtn.disabled = indice === total - 1;
+            }
+        
+            dotsWrap.innerHTML = '';
+            if (total > 1) {
+                grupos.forEach(function (_, idx) {
+                    const dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'prod-carrusel-dot';
+                    dot.setAttribute('aria-label', `Ir al grupo ${idx + 1} de productos`);
+                    dot.addEventListener('click', function () { irA(idx); });
+                    dotsWrap.appendChild(dot);
+                });
+                prevBtn.style.display = '';
+                nextBtn.style.display = '';
+            } else {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+        
+            prevBtn.onclick = function () { irA(indice - 1); };
+            nextBtn.onclick = function () { irA(indice + 1); };
+        
+            irA(0);
+        }
+
         function activarBloqueoCarritoAnonimo(root) {
             (root || document).querySelectorAll('.producto-card:not(.producto-card--premio) .btn-carrito').forEach(function(btn){
                 if (btn.dataset.bloqueoActivado) return;
@@ -2981,6 +3070,7 @@
 
         window.LZ_activarWidgetsCalificacion = activarWidgetsCalificacion;
         window.LZ_activarBloqueoCarritoAnonimo = activarBloqueoCarritoAnonimo;
+        window.LZ_initCarruselProductos = initCarruselProductos;
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function(){

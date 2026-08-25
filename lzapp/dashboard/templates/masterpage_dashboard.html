@@ -98,10 +98,52 @@
                 <div class="dash-header-actions">
                     {% block header_actions %}{% endblock %}
                 
-                    <a href="{% url 'Notificaciones' %}" class="dash-icon-btn" title="Notificaciones">
-                        <i class="bi bi-bell"></i>
-                        <span class="dot"></span>
-                    </a>
+                    <div class="dash-notif-wrap"
+                         data-url-marcar-leida="{% url 'marcar_notificacion_leida' id=0 %}"
+                         data-url-marcar-todas="{% url 'marcar_todas_leidas' %}">
+                        <button class="dash-icon-btn" id="notifMenuTrigger" type="button"
+                                title="Notificaciones" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            {% if notificaciones_no_leidas %}
+                                <span class="dot"></span>
+                            {% endif %}
+                        </button>
+
+                        <div class="dash-notif-menu" id="notifMenu">
+                            <div class="dash-notif-menu-head">
+                                <span>Notificaciones</span>
+                                {% if notificaciones_no_leidas %}
+                                    <button type="button" id="btnMarcarTodasLeidas" class="dash-notif-marcar-todas">
+                                        Marcar todas como leídas
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                            <div class="dash-notif-lista">
+                                {% for n in notificaciones_recientes %}
+                                    <a href="{{ n.url|default:'#' }}"
+                                       class="dash-notif-item tipo-{{ n.tipo }} {% if not n.leida %}no-leida{% endif %}"
+                                       data-id="{{ n.id }}">
+                                        <i class="bi {{ n.icono }}"></i>
+                                        <div class="dash-notif-item-texto">
+                                            {% if n.titulo %}<strong>{{ n.titulo }}</strong>{% endif %}
+                                            <p>{{ n.mensaje }}</p>
+                                            <span class="dash-notif-item-fecha">{{ n.fecha_creacion|timesince }} atrás</span>
+                                        </div>
+                                    </a>
+                                {% empty %}
+                                    <div class="dash-notif-vacio">
+                                        <i class="bi bi-bell-slash"></i>
+                                        <p>No tienes notificaciones por ahora.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <a href="{% url 'Notificaciones' %}" class="dash-notif-ver-todas">
+                                Ver historial completo
+                            </a>
+                        </div>
+                    </div>
                 
                     <div class="dash-user-wrap">
                         <button class="dash-avatar" id="userMenuTrigger" type="button" aria-haspopup="true" aria-expanded="false">
@@ -146,6 +188,23 @@
 
     </main>
 </div>
+
+<!-- ============ TOASTS (lado derecho, disponibles en todas las páginas) ============ -->
+{% if messages %}
+    <div class="dash-toasts" id="dashToasts">
+        {% for m in messages %}
+            <div class="dash-toast tipo-{{ m.tags }}">
+                <i class="bi
+                    {% if m.tags == 'success' %}bi-check-circle-fill
+                    {% elif m.tags == 'warning' %}bi-exclamation-triangle-fill
+                    {% elif m.tags == 'error' %}bi-x-circle-fill
+                    {% else %}bi-info-circle-fill{% endif %}"></i>
+                <span>{{ m }}</span>
+                <button type="button" class="dash-toast-cerrar" aria-label="Cerrar">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 <style>
 /* ============ Tema claro ============ */
@@ -244,6 +303,174 @@
 .dash-user-menu-item:hover{ background: rgba(255,255,255,.05); color: var(--text-primary); }
 .dash-user-menu-item.danger{ color: var(--red); }
 .dash-user-menu-item.danger:hover{ background: var(--red-dim); color: var(--red); }
+
+/* ============ Menú desplegable de notificaciones (campana) ============ */
+.dash-notif-wrap{ position: relative; }
+
+.dash-icon-btn .dot{
+    position:absolute; top:6px; right:6px;
+    width:8px; height:8px; border-radius:50%;
+    background: var(--red);
+    box-shadow: 0 0 0 2px var(--bg-sidebar);
+}
+
+.dash-notif-menu{
+    display:none;
+    position:absolute;
+    top: calc(100% + 10px);
+    right:0;
+    width:340px;
+    max-width:90vw;
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    border-radius: var(--radius-panel);
+    box-shadow: 0 20px 45px rgba(0,0,0,.45);
+    z-index:70;
+    overflow:hidden;
+}
+.dash-notif-menu.show{ display:block; }
+
+.dash-notif-menu-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px;
+    border-bottom:1px solid var(--border-subtle);
+    font-size:13.5px; font-weight:700; color: var(--text-primary);
+}
+.dash-notif-marcar-todas{
+    background:none; border:none; cursor:pointer;
+    font-size:11.5px; font-weight:600; color: var(--gold);
+    padding:0;
+}
+.dash-notif-marcar-todas:hover{ text-decoration:underline; }
+
+.dash-notif-lista{ max-height:360px; overflow-y:auto; }
+
+.dash-notif-item{
+    display:flex; gap:10px; align-items:flex-start;
+    padding:11px 14px;
+    border-bottom:1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    transition: background .15s;
+}
+.dash-notif-item:hover{ background: rgba(255,255,255,.04); }
+.dash-notif-item:last-child{ border-bottom:none; }
+
+.dash-notif-item i{ font-size:16px; margin-top:2px; flex-shrink:0; }
+.dash-notif-item.tipo-success i{ color: var(--green); }
+.dash-notif-item.tipo-warning i{ color: var(--gold); }
+.dash-notif-item.tipo-error i{ color: var(--red); }
+.dash-notif-item.tipo-info i{ color: var(--blue); }
+
+.dash-notif-item-texto strong{ display:block; font-size:12.5px; color: var(--text-primary); margin-bottom:2px; }
+.dash-notif-item-texto p{ margin:0; font-size:12.5px; line-height:1.4; color: var(--text-secondary); }
+.dash-notif-item-fecha{ display:block; margin-top:4px; font-size:11px; color: var(--text-tertiary); }
+
+.dash-notif-item.no-leida{ background: rgba(228,200,112,.06); }
+.dash-notif-item.no-leida::before{
+    content:''; position:absolute; margin-left:-14px; margin-top:6px;
+    width:6px; height:6px; border-radius:50%; background: var(--gold);
+}
+
+.dash-notif-vacio{
+    padding:30px 14px; text-align:center; color: var(--text-tertiary);
+}
+.dash-notif-vacio i{ font-size:22px; display:block; margin-bottom:8px; }
+.dash-notif-vacio p{ margin:0; font-size:12.5px; }
+
+.dash-notif-ver-todas{
+    display:block; text-align:center;
+    padding:11px 14px;
+    font-size:12.5px; font-weight:700; color: var(--gold);
+    border-top:1px solid var(--border-subtle);
+}
+.dash-notif-ver-todas:hover{ background: rgba(255,255,255,.04); }
+
+/* ============ Toasts (lado derecho, todas las páginas) ============ */
+.dash-toasts{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 340px;
+    max-width: calc(100vw - 40px);
+}
+
+.dash-toast{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--bg-panel);
+    border:1px solid var(--border-hair);
+    border-left: 4px solid var(--blue);
+    border-radius: var(--radius-btn);
+    box-shadow: 0 14px 32px rgba(0,0,0,.35);
+    padding:12px 14px;
+    color: var(--text-primary);
+    font-size:13px;
+    animation: dash-toast-entrada .25s ease-out;
+}
+.dash-toast.tipo-success{ border-left-color: var(--green); }
+.dash-toast.tipo-warning{ border-left-color: var(--gold); }
+.dash-toast.tipo-error{ border-left-color: var(--red); }
+.dash-toast.tipo-info{ border-left-color: var(--blue); }
+
+.dash-toast i{ font-size:16px; margin-top:1px; }
+.dash-toast.tipo-success i{ color: var(--green); }
+.dash-toast.tipo-warning i{ color: var(--gold); }
+.dash-toast.tipo-error i{ color: var(--red); }
+.dash-toast.tipo-info i{ color: var(--blue); }
+
+.dash-toast span{ flex:1; line-height:1.4; }
+
+.dash-toast-cerrar{
+    background:none; border:none; cursor:pointer;
+    color: var(--text-tertiary); font-size:18px; line-height:1;
+    padding:0 0 0 4px;
+}
+.dash-toast-cerrar:hover{ color: var(--text-primary); }
+
+.dash-toast.saliendo{ animation: dash-toast-salida .2s ease-in forwards; }
+
+@keyframes dash-toast-entrada{
+    from{ opacity:0; transform: translateX(16px); }
+    to{ opacity:1; transform: translateX(0); }
+}
+@keyframes dash-toast-salida{
+    from{ opacity:1; transform: translateX(0); }
+    to{ opacity:0; transform: translateX(16px); }
+}
+
+/* ============ Página de historial completo de notificaciones ============ */
+.notif-pagina-lista{ display:flex; flex-direction:column; }
+
+.notif-pagina-item{
+    position: relative;
+    display:flex; gap:14px; align-items:flex-start;
+    padding:16px 6px;
+    border-bottom:1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    transition: background .15s;
+}
+.notif-pagina-item:last-child{ border-bottom:none; }
+.notif-pagina-item:hover{ background: rgba(255,255,255,.03); }
+.notif-pagina-item.no-leida{ background: rgba(228,200,112,.05); }
+
+.notif-pagina-item i{ font-size:20px; margin-top:2px; flex-shrink:0; }
+.notif-pagina-item.tipo-success i{ color: var(--green); }
+.notif-pagina-item.tipo-warning i{ color: var(--gold); }
+.notif-pagina-item.tipo-error i{ color: var(--red); }
+.notif-pagina-item.tipo-info i{ color: var(--blue); }
+
+.notif-pagina-texto strong{ display:block; font-size:14px; color: var(--text-primary); margin-bottom:3px; }
+.notif-pagina-texto p{ margin:0; font-size:13.5px; line-height:1.5; color: var(--text-secondary); }
+.notif-pagina-fecha{ display:block; margin-top:6px; font-size:12px; color: var(--text-tertiary); }
+
+.notif-pagina-punto{
+    position:absolute; top:20px; right:6px;
+    width:8px; height:8px; border-radius:50%;
+    background: var(--gold);
+}
 </style>
 
 <script>
@@ -303,6 +530,95 @@
                 menu.classList.remove('show');
                 trigger.setAttribute('aria-expanded', 'false');
             }
+        });
+    })();
+
+    // Menú desplegable de notificaciones (campana)
+    (function () {
+        const trigger = document.getElementById('notifMenuTrigger');
+        const menu = document.getElementById('notifMenu');
+        const wrap = document.querySelector('.dash-notif-wrap');
+        if (!trigger || !menu || !wrap) return;
+
+        const urlMarcarLeidaPlantilla = wrap.dataset.urlMarcarLeida; // .../0/marcar-leida/
+        const urlMarcarTodas = wrap.dataset.urlMarcarTodas;
+
+        function getCookie(nombre) {
+            let valor = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach((cookie) => {
+                    cookie = cookie.trim();
+                    if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                        valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+                    }
+                });
+            }
+            return valor;
+        }
+
+        function peticionPost(url) {
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = menu.classList.toggle('show');
+            trigger.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && e.target !== trigger) {
+                menu.classList.remove('show');
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Al hacer clic en una notificación puntual, se marca como leída.
+        // Si no tiene enlace propio (url vacía => href="#"), no navega.
+        menu.querySelectorAll('.dash-notif-item').forEach((item) => {
+            item.addEventListener('click', (e) => {
+                const id = item.dataset.id;
+                if (item.getAttribute('href') === '#') e.preventDefault();
+                if (id && urlMarcarLeidaPlantilla) {
+                    peticionPost(urlMarcarLeidaPlantilla.replace('/0/', '/' + id + '/'));
+                }
+            });
+        });
+
+        const btnTodas = document.getElementById('btnMarcarTodasLeidas');
+        if (btnTodas) {
+            btnTodas.addEventListener('click', (e) => {
+                e.stopPropagation();
+                peticionPost(urlMarcarTodas).then(() => {
+                    // Refresca la página para reflejar el estado "leídas" en el menú.
+                    window.location.reload();
+                });
+            });
+        }
+    })();
+
+    // Toasts: se autodestruyen solos y también se pueden cerrar a mano
+    (function () {
+        const contenedor = document.getElementById('dashToasts');
+        if (!contenedor) return;
+
+        function cerrarToast(toast) {
+            toast.classList.add('saliendo');
+            setTimeout(() => toast.remove(), 200);
+        }
+
+        contenedor.querySelectorAll('.dash-toast').forEach((toast, indice) => {
+            const boton = toast.querySelector('.dash-toast-cerrar');
+            if (boton) boton.addEventListener('click', () => cerrarToast(toast));
+
+            // Se van cerrando de a uno, con un pequeño desfase entre ellos.
+            setTimeout(() => cerrarToast(toast), 5000 + indice * 400);
         });
     })();
 </script>

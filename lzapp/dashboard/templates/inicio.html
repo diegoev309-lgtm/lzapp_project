@@ -153,14 +153,14 @@
                 <span class="hint-click" style="margin:0;">Haz clic en una barra para ver los días</span>
             </div>
 
-            <div id="ventasChart" style="height:260px;"><canvas id="ventasChartCanvas"></canvas></div>
+            <div id="ventasChart" style="height:260px;"></div>
 
             <div class="detalle-dia-wrap" id="detalleDiaWrap">
                 <div class="detalle-dia-head">
                     <span class="titulo" id="detalleDiaTitulo">Detalle del mes</span>
                     <button type="button" id="cerrarDetalleDia"><i class="bi bi-x-lg"></i> cerrar</button>
                 </div>
-                <div id="detalleDiaChart" style="height:220px;"><canvas id="detalleDiaChartCanvas"></canvas></div>
+                <div id="detalleDiaChart" style="height:220px;"></div>
                 <div id="detalleProblemasLista"></div>
             </div>
         </section>
@@ -244,7 +244,7 @@
                 <span class="dash-panel-title">Distribución de productos</span>
             </div>
             <div style="display:flex; flex-direction:column; gap:12px;">
-                <div id="pastelProductos" style="height:200px;"><canvas id="pastelProductosCanvas"></canvas></div>
+                <div id="pastelProductos" style="height:200px;"></div>
                 <div class="legend-productos" id="leyendaProductos"></div>
             </div>
         </section>
@@ -260,7 +260,7 @@
                 <div class="stock-chip in"><div class="v" id="stockEntradasTxt">--</div><div class="l">Unidades producidas (14d)</div></div>
                 <div class="stock-chip out"><div class="v" id="stockSalidasTxt">--</div><div class="l">Unidades vendidas (14d)</div></div>
             </div>
-            <div id="stockFlujoChart" style="height:190px;"><canvas id="stockFlujoChartCanvas"></canvas></div>
+            <div id="stockFlujoChart" style="height:190px;"></div>
         </section>
     </div>
 </div>
@@ -268,7 +268,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -285,20 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgPanel = css.getPropertyValue('--bg-panel').trim();
     const paletaProductos = [gold, purple, teal, blue, red, '#B9954C', '#22D3EE', '#F472B6', '#A3E635', '#FB923C'];
 
-    // ---- Tooltip oscuro consistente con el tema, para todas las gráficas ----
-    Chart.defaults.color = textT;
-    Chart.defaults.font.family = 'Inter, sans-serif';
-    Chart.defaults.font.size = 11;
-    Chart.defaults.plugins.tooltip.backgroundColor = bgPanel;
-    Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
-    Chart.defaults.plugins.tooltip.bodyColor = textS;
-    Chart.defaults.plugins.tooltip.borderColor = border;
-    Chart.defaults.plugins.tooltip.borderWidth = 1;
-    Chart.defaults.plugins.tooltip.padding = 10;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.titleFont = { weight: '600' };
-    Chart.defaults.plugins.tooltip.displayColors = false;
-
     const fmtMoneda = (v) => '$' + Number(v).toLocaleString('es-CO');
 
     // ================= 1) VENTAS MENSUALES (con drill-down por día) =================
@@ -308,51 +293,42 @@ document.addEventListener('DOMContentLoaded', () => {
     function pintarVentasMensuales(data) {
         mesesData = data;
         const colores = data.problemas.map(p => p > 0 ? red : gold);
-        const ctx = document.getElementById('ventasChartCanvas').getContext('2d');
 
         if (chartVentas) chartVentas.destroy();
-        chartVentas = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.meses,
-                datasets: [{
-                    data: data.ventas,
-                    backgroundColor: colores,
-                    borderRadius: 6,
-                    maxBarThickness: 38,
-                }],
+        chartVentas = new ApexCharts(document.getElementById('ventasChart'), {
+            chart: {
+                type: 'bar', height: 260, toolbar: { show: false }, background: 'transparent',
+                events: {
+                    dataPointSelection: (event, chartContext, config) => {
+                        const idx = config.dataPointIndex;
+                        cargarDetalleDia(data.anio, idx + 1, data.meses[idx]);
+                    },
+                },
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                onClick: (evt, elements) => {
-                    if (!elements.length) return;
-                    const idx = elements[0].index;
-                    cargarDetalleDia(data.anio, idx + 1, data.meses[idx]);
-                },
-                onHover: (evt, elements) => {
-                    evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
-                },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: textT } },
-                    y: {
-                        grid: { color: border },
-                        ticks: { color: textT, callback: (v) => '$' + v.toLocaleString('es-CO') },
-                    },
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (item) => {
-                                const i = item.dataIndex;
-                                return [`${fmtMoneda(item.raw)}`, `${data.pedidos[i]} pedido(s)`];
-                            },
-                        },
-                    },
+            series: [{ name: 'Ventas', data: data.ventas }],
+            xaxis: {
+                categories: data.meses,
+                labels: { style: { colors: textT, fontSize: '10.5px' } },
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+            },
+            yaxis: { labels: { style: { colors: textT, fontSize: '11px' }, formatter: (v) => '$' + Math.round(v).toLocaleString('es-CO') } },
+            grid: { borderColor: border, strokeDashArray: 4, xaxis: { lines: { show: false } } },
+            colors: colores,
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '55%', distributed: true } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            tooltip: {
+                theme: 'dark',
+                custom: ({ dataPointIndex }) => {
+                    const i = dataPointIndex;
+                    return `<div style="padding:8px 10px; background:${bgPanel}; border:1px solid ${border}; border-radius:8px; font-size:12px;">
+                        <b>${data.meses[i]}</b><br>${fmtMoneda(data.ventas[i])}<br>${data.pedidos[i]} pedido(s)
+                    </div>`;
                 },
             },
         });
+        chartVentas.render();
     }
 
     let chartDetalleDia = null;
@@ -365,40 +341,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('detalleDiaTitulo').textContent = `Días de ${d.nombre_mes} ${d.anio}`;
 
                 const colores = d.problemas.map(p => p > 0 ? red : green);
-                const ctx = document.getElementById('detalleDiaChartCanvas').getContext('2d');
                 if (chartDetalleDia) chartDetalleDia.destroy();
-                chartDetalleDia = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: d.dias,
-                        datasets: [{
-                            data: d.ventas,
-                            backgroundColor: colores,
-                            borderRadius: 5,
-                            maxBarThickness: 22,
-                        }],
+                chartDetalleDia = new ApexCharts(document.getElementById('detalleDiaChart'), {
+                    chart: { type: 'bar', height: 220, toolbar: { show: false }, background: 'transparent' },
+                    series: [{ name: 'Ventas', data: d.ventas }],
+                    xaxis: {
+                        categories: d.dias,
+                        title: { text: 'Día del mes', style: { color: textT, fontSize: '10px' } },
+                        labels: { style: { colors: textT, fontSize: '9px' } },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false },
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: { grid: { display: false }, ticks: { color: textT, font: { size: 9 } }, title: { display: true, text: 'Día del mes', color: textT } },
-                            y: { grid: { color: border }, ticks: { color: textT, callback: (v) => '$' + v.toLocaleString('es-CO') } },
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    title: (items) => `Día ${items[0].label}`,
-                                    label: (item) => {
-                                        const i = item.dataIndex;
-                                        return [`${fmtMoneda(item.raw)}`, `${d.pedidos[i]} pedido(s)`];
-                                    },
-                                },
-                            },
+                    yaxis: { labels: { style: { colors: textT, fontSize: '10.5px' }, formatter: (v) => '$' + Math.round(v).toLocaleString('es-CO') } },
+                    grid: { borderColor: border, strokeDashArray: 4, xaxis: { lines: { show: false } } },
+                    colors: colores,
+                    plotOptions: { bar: { borderRadius: 4, columnWidth: '60%', distributed: true } },
+                    dataLabels: { enabled: false },
+                    legend: { show: false },
+                    tooltip: {
+                        theme: 'dark',
+                        custom: ({ dataPointIndex }) => {
+                            const i = dataPointIndex;
+                            return `<div style="padding:8px 10px; background:${bgPanel}; border:1px solid ${border}; border-radius:8px; font-size:12px;">
+                                <b>Día ${d.dias[i]}</b><br>${fmtMoneda(d.ventas[i])}<br>${d.pedidos[i]} pedido(s)
+                            </div>`;
                         },
                     },
                 });
+                chartDetalleDia.render();
 
                 const cont = document.getElementById('detalleProblemasLista');
                 cont.innerHTML = '';
@@ -429,34 +399,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = d.valores.reduce((a, b) => a + b, 0) || 1;
         const colores = d.etiquetas.map((_, i) => paletaProductos[i % paletaProductos.length]);
 
-        const ctx = document.getElementById('pastelProductosCanvas').getContext('2d');
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: d.etiquetas,
-                datasets: [{
-                    data: d.valores,
-                    backgroundColor: colores,
-                    borderColor: bgPanel,
-                    borderWidth: 2,
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (item) => {
-                                const pct = ((item.raw / total) * 100).toFixed(1);
-                                return `${item.label}: ${pct}%`;
-                            },
-                        },
-                    },
-                },
+        const chartPastel = new ApexCharts(document.getElementById('pastelProductos'), {
+            chart: { type: 'pie', height: 200, toolbar: { show: false }, background: 'transparent' },
+            series: d.valores,
+            labels: d.etiquetas,
+            colors: colores,
+            stroke: { colors: [bgPanel], width: 2 },
+            legend: { show: false },
+            dataLabels: { enabled: false },
+            tooltip: {
+                theme: 'dark',
+                y: { formatter: (v) => ((v / total) * 100).toFixed(1) + '%' },
             },
         });
+        chartPastel.render();
 
         const leyenda = document.getElementById('leyendaProductos');
         leyenda.innerHTML = '';
@@ -487,36 +443,30 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stockEntradasTxt').textContent = '+' + d.entradas_totales.toLocaleString('es-CO') + ' u.';
         document.getElementById('stockSalidasTxt').textContent = '-' + d.salidas_totales.toLocaleString('es-CO') + ' u.';
 
-        const ctx = document.getElementById('stockFlujoChartCanvas').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: d.dias,
-                datasets: [
-                    { label: 'Entradas', data: d.entradas, backgroundColor: green, borderRadius: 4, maxBarThickness: 16 },
-                    { label: 'Salidas', data: d.salidas.map(v => -v), backgroundColor: red, borderRadius: 4, maxBarThickness: 16 },
-                ],
+        const chartStock = new ApexCharts(document.getElementById('stockFlujoChart'), {
+            chart: { type: 'bar', height: 190, toolbar: { show: false }, background: 'transparent', stacked: true },
+            series: [
+                { name: 'Entradas', data: d.entradas },
+                { name: 'Salidas', data: d.salidas.map(v => -v) },
+            ],
+            xaxis: {
+                categories: d.dias,
+                labels: { style: { colors: textT, fontSize: '9px' } },
+                axisBorder: { show: false },
+                axisTicks: { show: false },
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: textT, font: { size: 9 } }, stacked: true },
-                    y: { grid: { color: border }, ticks: { color: textT }, stacked: true },
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: textT, boxWidth: 10, boxHeight: 10, font: { size: 10 } },
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (item) => `${item.dataset.label}: ${Math.abs(item.raw).toLocaleString('es-CO')} u.`,
-                        },
-                    },
-                },
+            yaxis: { labels: { style: { colors: textT, fontSize: '10.5px' } } },
+            grid: { borderColor: border, strokeDashArray: 4, xaxis: { lines: { show: false } } },
+            colors: [green, red],
+            plotOptions: { bar: { borderRadius: 3, columnWidth: '55%' } },
+            dataLabels: { enabled: false },
+            legend: { position: 'bottom', labels: { colors: textT }, fontSize: '11px', markers: { size: 5 } },
+            tooltip: {
+                theme: 'dark',
+                y: { formatter: (v) => Math.abs(v).toLocaleString('es-CO') + ' u.' },
             },
         });
+        chartStock.render();
     });
 
     // ================= 4) CAMPAÑAS (activas/inactivas) =================

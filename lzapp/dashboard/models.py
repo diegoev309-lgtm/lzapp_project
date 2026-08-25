@@ -171,6 +171,55 @@ def crear_pedido_automatico(sender, instance, created, **kwargs):
         Pedido.objects.get_or_create(venta=instance)
 
 
+class Notificacion(models.Model):
+    """
+    Historial de avisos para el equipo administrador (bajo stock, productos
+    guardados incompletos, etc.). Se muestran como 'toast' al momento de
+    generarse y quedan aquí guardadas para el menú desplegable de la campana.
+    """
+ 
+    TIPO_CHOICES = [
+        ('info', 'Información'),
+        ('success', 'Éxito'),
+        ('warning', 'Advertencia'),
+        ('error', 'Error'),
+    ]
+ 
+    # Si es null, se considera una notificación general para todo el
+    # equipo administrador (no asociada a un usuario en particular).
+    usuario = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True,
+        related_name='notificaciones'
+    )
+    titulo = models.CharField(max_length=120, blank=True)
+    mensaje = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='info')
+    url = models.CharField(
+        max_length=255, blank=True,
+        help_text='Enlace opcional al que lleva la notificación al hacer clic.'
+    )
+    leida = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+ 
+    class Meta:
+        db_table = 'notificacion'
+        ordering = ['-fecha_creacion']
+ 
+    def __str__(self):
+        return f'[{self.tipo}] {self.mensaje[:40]}'
+ 
+    ICONOS_POR_TIPO = {
+        'info': 'bi-info-circle-fill',
+        'success': 'bi-check-circle-fill',
+        'warning': 'bi-exclamation-triangle-fill',
+        'error': 'bi-x-circle-fill',
+    }
+ 
+    @property
+    def icono(self):
+        return self.ICONOS_POR_TIPO.get(self.tipo, 'bi-bell-fill')
+
+
 # =========================================================
 # 2) CAMPAÑA DE DESCUENTO (lo que TÚ configuras/manipulas)
 # =========================================================

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'descuentos',
     'produccion',
     'venta',
+    'notificacion',
 
 ]
 
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'carrito.context_processor.totalizar_carro',
                 "carrito.context_processor.mercadopago_public_key",
+                "notificacion.context_processor.notificaciones_admin",
             ],
         },
     },

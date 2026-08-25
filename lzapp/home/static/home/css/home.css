@@ -809,18 +809,46 @@ HERO — escena 3D animada (slide 1 del carrusel)
     max-width: 640px;
 }
 
-.producto-card {
-    background: var(--blanco);
+.productos-imagen-wrapper {
+    position: relative;
     border-radius: 16px;
     overflow: hidden;
+    height: 100%;
+    min-height: 320px;
+}
+
+.productos-imagen-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.productos-imagen-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: auto auto -16px -16px;
+    width: 60%;
+    height: 60%;
+    border: 3px solid var(--dorado);
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+.producto-card {
+    background: var(--blanco);
+    border-radius: 20px;
+    overflow: hidden;
     border: 1px solid rgba(8, 59, 120, 0.08);
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     height: 100%;
 }
 
 .producto-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 24px 60px rgba(2, 44, 99, 0.15);
+    box-shadow: 0 24px 60px rgba(2, 44, 99, 0.16);
+    border-color: rgba(201, 168, 76, 0.35);
 }
 
 .producto-descripcion {
@@ -831,16 +859,10 @@ HERO — escena 3D animada (slide 1 del carrusel)
 
 .producto-card:hover .producto-linea { width: 80px; }
 
-/* ============================================================
-   TARJETA DE PRODUCTO — piezas compartidas por HOME y CARRITO.
-   El layout general (vertical en el home, horizontal en el
-   carrito) lo define cada página en su propia sección más abajo.
-   ============================================================ */
-
 .producto-img-wrapper {
     position: relative;
     overflow: hidden;
-    background: var(--gris-claro);
+    background: radial-gradient(circle at 50% 40%, #eef3fb 0%, var(--gris-claro) 75%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -851,6 +873,11 @@ HERO — escena 3D animada (slide 1 del carrusel)
     object-fit: contain;
     object-position: center;
     border-radius: 14px;
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.producto-card:hover .imagen-producto {
+    transform: scale(1.08);
 }
 
 .badge-stock {
@@ -886,7 +913,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
 }
 
 .precio {
-    color: #111;
+    color: var(--azul-profundo);
     font-size: 1.35rem;
     font-weight: 800;
     margin: 0;
@@ -895,6 +922,17 @@ HERO — escena 3D animada (slide 1 del carrusel)
 
 .card-footer {
     padding: 0.8rem 1.5rem 1.3rem;
+    position: relative;
+}
+
+.card-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 1px;
+    background: rgba(8, 59, 120, 0.08);
 }
 
 .btn-carrito {
@@ -3075,6 +3113,102 @@ footer {
     }
     .producto-card--vertical .precio {
         font-size: 1.1rem;
+    }
+}
+
+.productos-carrusel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.prod-carrusel-viewport {
+    flex: 1;
+    overflow: hidden;
+}
+
+#listaProductos.prod-carrusel-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+}
+
+.prod-carrusel-slide {
+    flex: 0 0 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.prod-carrusel-item {
+    min-width: 0;
+}
+
+.prod-carrusel-flecha {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(8, 59, 120, 0.15);
+    background: var(--blanco);
+    color: var(--azul-principal);
+    font-size: 1.1rem;
+    transition: background var(--transition), border-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.prod-carrusel-flecha:hover:not(:disabled) {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: var(--azul-profundo);
+    transform: translateY(-2px);
+}
+
+.prod-carrusel-flecha:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.prod-carrusel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1.75rem;
+}
+
+.prod-carrusel-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(8, 59, 120, 0.18);
+    padding: 0;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.prod-carrusel-dot.activo {
+    background: var(--dorado);
+    transform: scale(1.3);
+}
+
+@media (max-width: 991px) {
+    .prod-carrusel-slide {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .prod-carrusel-flecha {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 576px) {
+    .prod-carrusel-slide {
+        grid-template-columns: 1fr;
+    }
+    .productos-carrusel {
+        gap: 8px;
     }
 }
 
