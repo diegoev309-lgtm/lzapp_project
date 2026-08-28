@@ -1,4 +1,7 @@
 {% load static %}
+{% load socialaccount %}
+{% load i18n %}
+{% get_providers as socialaccount_providers %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,233 +14,51 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<link rel="stylesheet" href="{% static 'css/.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-
-body{
-
-    background:linear-gradient(135deg,#001F54,#0A3D91,#1565C0);
-
-    min-height:100vh;
-
+.auth-divider{
     display:flex;
-    justify-content:center;
     align-items:center;
-
-    font-family:Arial, Helvetica, sans-serif;
-
-}
-
-
-.login-card{
-
-    width:430px;
-
-    background:#fff;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    box-shadow:0 15px 35px rgba(0,0,0,.35);
-
-}
-
-
-.login-header{
-
-    background:#001F54;
-
-    color:white;
-
     text-align:center;
-
-    padding:30px;
-
-    position:relative;
-
+    color:rgba(255,255,255,.55);
+    margin:1.4rem 0;
+    font-size:.82rem;
 }
-
-
-.btn-volver{
-
-    position:absolute;
-
-    top:18px;
-
-    left:18px;
-
-    width:38px;
-
-    height:38px;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,0.12);
-
-    border:1px solid rgba(255,255,255,0.3);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.1rem;
-
-    text-decoration:none;
-
-    transition:background .25s ease, transform .25s ease;
-
+.auth-divider::before,
+.auth-divider::after{
+    content:"";
+    flex:1;
+    border-bottom:1px solid rgba(255,255,255,.22);
 }
+.auth-divider:not(:empty)::before{margin-right:.75em;}
+.auth-divider:not(:empty)::after{margin-left:.75em;}
 
-
-.btn-volver:hover{
-
-    background:#FFC107;
-
-    color:#001F54;
-
-    transform:translateX(-3px);
-
-}
-
-
-.logo{
-
-    width:90px;
-
-    margin-bottom:15px;
-
-}
-
-
-.login-body{
-
-    padding:35px;
-
-}
-
-
-.form-label{
-
-    font-weight:bold;
-
-    color:#001F54;
-
-}
-
-
-.form-control{
-
-    height:48px;
-
-    border-radius:10px;
-
-    border:2px solid #dcdcdc;
-
-}
-
-
-.form-control:focus{
-
-    border-color:#FFC107;
-
-    box-shadow:0 0 0 .2rem rgba(255,193,7,.25);
-
-}
-
-
-.btn-login{
-
+.btn-google{
     width:100%;
-
-    background:#FFC107;
-
-    color:#001F54;
-
-    font-weight:bold;
-
-    border:none;
-
-    border-radius:10px;
-
-    height:48px;
-
-    transition:.3s;
-
-}
-
-
-.btn-login:hover{
-
-    background:#FFD54F;
-
-    transform:scale(1.02);
-
-}
-
-
-.register{
-
-    text-align:center;
-
-    margin-top:20px;
-
-}
-
-
-.register a{
-
+    height:52px;
+    border-radius:12px;
+    border:1.5px solid #e3e6ee;
+    background:#fafbfd;
+    color:#222;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
     text-decoration:none;
-
-    color:#1565C0;
-
-    font-weight:bold;
-
+    transition:.25s;
 }
-
-
-/* OJO CONTRASEÑA */
-
-.password-container{
-
-    position:relative;
-
+.btn-google:hover{
+    background:#fff;
+    border-color:var(--dorado);
+    color:#222;
 }
-
-
-.password-container .form-control{
-
-    padding-right:50px;
-
+.btn-google img{
+    width:20px;
+    height:20px;
 }
-
-
-.btn-eye{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    border:none;
-    background:none;
-    cursor:pointer;
-    font-size:20px;
-    color:#001F54;
-}
-
-
 </style>
-
 
 </head>
 
@@ -269,10 +90,6 @@ body{
         <span class="auth-orb o3"></span>
         <span class="auth-orb o4"></span>
 
-        <!-- QUESITOS FLOTANTES: reemplaza estos src por tus fotos
-             recortadas (PNG con fondo transparente). Los nombres y
-             la carpeta son solo un ejemplo, ajústalos a como los
-             vayas a guardar. -->
         <img src="{% static 'img/queso1.png' %}" class="auth-queso q1" alt="">
         <img src="{% static 'img/queso2.png' %}" class="auth-queso q2" alt="">
         <img src="{% static 'img/queso3.png' %}" class="auth-queso q3" alt="">
@@ -311,8 +128,6 @@ body{
     <!-- ================= PANEL DERECHO — FORMULARIO ================= -->
     <div class="auth-form-panel">
 
-        <!-- QUESITOS FLOTANTES: reemplaza estos src por tus PNG
-             recortados en silueta cuando los tengas. -->
         <img src="{% static 'img/qusi1.png' %}" class="auth-queso-form qf1" alt="">
         <img src="{% static 'img/qusi2.png' %}" class="auth-queso-form qf2" alt="">
         <img src="{% static 'img/qusi2.png' %}" class="auth-queso-form qf3" alt="">
@@ -358,21 +173,19 @@ body{
 
             </form>
 
+            {% if socialaccount_providers %}
+            <div class="auth-divider">o</div>
 
+            <a href="{% provider_login_url 'google' %}" class="btn-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Continuar con Google
+            </a>
+            {% endif %}
 
-
-<div class="register">
-
-
-¿No tienes una cuenta?
-
-
-<a href="{% url 'registro' %}">
-
-Regístrate aquí
-
-</a>
-
+            <div class="auth-registro">
+                ¿No tienes una cuenta?
+                <a href="{% url 'registro' %}">Regístrate aquí</a>
+            </div>
 
         </div>
     </div>
@@ -380,6 +193,27 @@ Regístrate aquí
 </div>
 
 <script src="{% static 'js/formularios.js' %}"></script>
+
+<!-- Respaldo: garantiza el toggle de mostrar/ocultar contraseña
+     aunque formularios.js no defina mostrarPassword() -->
+<script>
+if (typeof mostrarPassword !== 'function') {
+    function mostrarPassword(id, boton){
+        let campo = document.getElementById(id);
+        let icono = boton.querySelector("i");
+
+        if(campo.type === "password"){
+            campo.type = "text";
+            icono.classList.remove("bi-eye-slash");
+            icono.classList.add("bi-eye");
+        } else {
+            campo.type = "password";
+            icono.classList.remove("bi-eye");
+            icono.classList.add("bi-eye-slash");
+        }
+    }
+}
+</script>
 
 </body>
 </html>
