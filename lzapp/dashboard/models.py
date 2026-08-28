@@ -84,6 +84,21 @@ class Produccion(models.Model):
             self.producto.stock_actual = (self.producto.stock_actual or 0) + self.cantidad_producida
             self._sincronizar_vencimiento()
             self.producto.save(update_fields=['stock_actual', 'fecha_vencimiento'])
+            self.producto.stock_actual += self.cantidad_producida
+
+        # El "vencimiento del lote actual" que se muestra en la tienda
+        # siempre refleja el lote más próximo a vencer entre todos los
+        # lotes registrados de este producto (no simplemente el último
+        # que se cargó), para que la fecha sea útil de verdad.
+        proximo_vencimiento = (
+            Produccion.objects
+            .filter(producto=self.producto, fecha_vencimiento__isnull=False)
+            .order_by('fecha_vencimiento')
+            .values_list('fecha_vencimiento', flat=True)
+            .first()
+        )
+        self.producto.fecha_vencimiento = proximo_vencimiento
+        self.producto.save()
 
     def _sincronizar_vencimiento(self):
         """El 'próximo vencimiento' del producto es el del lote vigente
