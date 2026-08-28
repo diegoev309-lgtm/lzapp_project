@@ -352,99 +352,63 @@
     ====================================================== -->
 
     <div class="bloque-productos">
-
-
         <!-- IMPORTAR -->
 
         <div class="busqueda-fila">
-
             <button type="button"
                     class="dash-btn"
                     onclick="abrirModalImportarProduccion()">
-
                 <i class="bi bi-file-earmark-excel"></i>
-
                 Importar
-
             </button>
-
         </div>
 
 
         <!-- TABLA -->
-
         <div class="table-responsive">
-
             <table class="table table-hover tabla-productos align-middle">
 
                 <thead>
-
                     <tr>
-
-                        <th class="d-none d-md-table-cell">
-                            ID
-                        </th>
-
-                        <th>
-                            Producto
-                        </th>
-
-                        <th>
-                            Cantidad Producida
-                        </th>
-
-                        <th class="d-none d-sm-table-cell">
-                            Fecha
-                        </th>
-
-                        <th class="d-none d-lg-table-cell">
-                            Observación
-                        </th>
-
+                        <th class="d-none d-md-table-cell">ID</th>
+                        <th>Producto</th>
+                        <th>Cantidad Producida</th>
+                        <th class="d-none d-sm-table-cell">Fecha</th>
+                        <th class="d-none d-lg-table-cell">Observación</th>
                     </tr>
-
                 </thead>
-
 
                 <tbody>
 
                 {% for i in producciones %}
-
                     <tr>
-
                         <td class="d-none d-md-table-cell">
-
                             {{ i.id }}
-
                         </td>
 
-
                         <td>
-
                             <strong>
                                 {{ i.producto.nombre }}
                             </strong>
-
                         </td>
-
 
                         <td>
-
                             <span class="badge bg-success badge-cantidad">
-
                                 + {{ i.cantidad_producida }}
-
                             </span>
-
                         </td>
-
 
                         <td class="d-none d-sm-table-cell">
-
                             {{ i.fecha_produccion|date:"d/m/Y H:i" }}
-
                         </td>
 
+                        <td class="d-none d-md-table-cell">
+                            {% if i.fecha_vencimiento %}
+                                {{ i.fecha_vencimiento|date:"d/m/Y" }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td><th class="d-none d-md-table-cell">Vencimiento</th>
 
                         <td class="d-none d-lg-table-cell">
 
@@ -455,17 +419,11 @@
                             {% else %}
 
                                 <span class="text-muted">
-
                                     Sin observaciones
-
                                 </span>
-
                             {% endif %}
-
                         </td>
-
                     </tr>
-
 
                 {% empty %}
 
@@ -810,6 +768,7 @@
 
                 nombre del producto,
                 cantidad producida,
+                fechas de vencimiento
                 observación.
 
             </p>

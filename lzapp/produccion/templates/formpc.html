@@ -7,26 +7,21 @@
 {% block page_subtitle %}Registra la producción{% endblock %}
 
 {% block extra_css %}
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
 <style>
-
 /* =========================================================
    CONTENEDOR GENERAL
 ========================================================= */
-
 .produccion-container{
     width:100%;
     max-width:1200px;
     margin:0 auto;
 }
 
-
 /* =========================================================
    FORMULARIO
 ========================================================= */
-
 .form-panel{
     width:100%;
     border-radius:var(--radius-panel);
@@ -35,36 +30,26 @@
     margin-bottom:25px;
 }
 
-
 /* =========================================================
    CABECERA DEL FORMULARIO
 ========================================================= */
-
 .header-form{
     background:linear-gradient(
         135deg,
         var(--bg-sidebar),
         var(--bg-panel)
     );
-
     color:var(--text-primary);
-
     padding:22px 35px;
-
     border-bottom:1px solid var(--border-subtle);
 }
 
 .header-form h2{
     margin:0;
-
     font-size:24px;
-
     font-weight:700;
-
     display:flex;
-
     align-items:center;
-
     gap:10px;
 }
 
@@ -74,41 +59,30 @@
 
 .header-form p{
     margin-top:8px;
-
     margin-bottom:0;
-
     color:var(--text-secondary);
 }
-
 
 /* =========================================================
    TARJETA DEL FORMULARIO
 ========================================================= */
-
 .card-form{
     background:var(--bg-panel);
-
     padding:30px 35px;
 }
-
 
 /* =========================================================
    GRID DEL FORMULARIO
 ========================================================= */
-
 .form-grid{
     display:grid;
-
     grid-template-columns:repeat(2,1fr);
-
     gap:22px;
 }
 
 .form-grid .campo{
     margin:0;
-
     display:flex;
-
     flex-direction:column;
 }
 
@@ -116,201 +90,135 @@
     grid-column:1 / -1;
 }
 
-
 /* =========================================================
    LABELS
 ========================================================= */
-
 label{
     font-weight:600;
-
     color:var(--text-secondary);
-
     margin-bottom:8px;
 }
-
 
 /* =========================================================
    INPUTS
 ========================================================= */
-
 input,
 select,
 textarea{
     width:100%;
-
     height:46px;
-
     border:1px solid var(--border-hair);
-
     border-radius:10px;
-
     padding:10px 15px;
-
     transition:.3s;
-
     font-size:15px;
-
     background:rgba(255,255,255,.03);
-
     color:var(--text-primary);
 }
 
 textarea{
     height:90px;
-
     min-height:90px;
-
     resize:none;
 }
 
 input:focus,
 select:focus,
 textarea:focus{
-
     outline:none;
-
     border-color:var(--gold);
-
     background:rgba(255,255,255,.05);
-
     box-shadow:0 0 10px var(--gold-dim);
 }
 
 select option{
     background:var(--bg-panel);
-
     color:var(--text-primary);
 }
-
 
 /* =========================================================
    BOTONES
 ========================================================= */
-
 .botones{
     display:flex;
-
     justify-content:flex-end;
-
     gap:15px;
-
     margin-top:35px;
 }
 
 
 /* BOTÓN VOLVER */
-
 .btn-volver{
     background:rgba(255,255,255,.06);
-
     color:var(--text-primary);
-
     border:1px solid var(--border-hair);
-
     padding:10px 22px;
-
     border-radius:10px;
-
     text-decoration:none;
-
     transition:.3s;
 }
 
 .btn-volver:hover{
     background:rgba(255,255,255,.1);
-
     color:var(--text-primary);
-
     border-color:rgba(255,255,255,.25);
-
     transform:translateY(-2px);
 }
 
 
 /* BOTÓN GUARDAR */
-
 .btn-guardar{
-
     background:var(--gold);
-
     color:#1A1A2E;
-
     border:none;
-
     padding:10px 22px;
-
     font-weight:600;
-
     border-radius:10px;
-
     transition:.3s;
 }
 
 .btn-guardar:hover{
-
     background:#EFD48C;
-
     color:#1A1A2E;
-
     transform:translateY(-2px);
-
     box-shadow:0 10px 22px rgba(228,200,112,.25);
 }
-
 
 /* =========================================================
    ERRORES
 ========================================================= */
-
 .errorlist{
-
     list-style:none;
-
     margin:5px 0 0;
-
     padding:0;
-
     color:var(--red);
-
     font-size:13px;
 }
 
 .helptext{
-
     font-size:12.5px;
-
     color:var(--text-tertiary);
-
     margin-top:5px;
 }
-
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-
 @media(max-width:768px){
-
     .form-grid{
-
         grid-template-columns:1fr;
     }
 
     .campo-ancho{
-
         grid-column:auto;
     }
 
     .header-form{
-
         text-align:center;
     }
 
     .header-form h2{
-
         justify-content:center;
-
         font-size:21px;
     }
 
@@ -318,130 +226,92 @@ select option{
 
 
 @media(max-width:576px){
-
     .card-form{
-
         padding:20px;
     }
 
     .header-form{
-
         padding:20px;
     }
 
     .botones{
-
         flex-direction:column;
     }
 
     .botones a,
     .botones button{
-
         width:100%;
     }
 
 }
 
 </style>
-
 {% endblock %}
-
 
 {% block content %}
 
 <div class="produccion-container">
-
     <!-- =====================================================
          FORMULARIO DE PRODUCCIÓN
     ====================================================== -->
-
+    
     <div class="form-panel">
-
         <!-- =================================================
              CABECERA
         ================================================== -->
 
         <div class="header-form">
-
-            <h2>
-
-                <i class="bi bi-box-seam-fill"></i>
-
-                Registrar Producción
-
-            </h2>
-
-            <p>
-
-                Completa la información de la producción.
-
-            </p>
-
+            <h2><i class="bi bi-box-seam-fill"></i>Registrar Producción</h2>
+            <p>Completa la información de la producción.</p>
         </div>
-
 
         <!-- =================================================
              FORMULARIO
         ================================================== -->
-
         <div class="card-form">
-
             <form method="POST">
-
                 {% csrf_token %}
-
-
                 <div class="form-grid">
 
                     <!-- =====================================
                          PRODUCTO
                     ====================================== -->
-
                     <div class="campo">
-
-                        <label for="{{ form.producto.id_for_label }}">
-
-                            Producto
-
-                        </label>
-
+                        <label for="{{ form.producto.id_for_label }}">Producto</label>
                         {{ form.producto }}
 
                         {% if form.producto.errors %}
-
-                            <ul class="errorlist">
-
-                                {{ form.producto.errors }}
-
-                            </ul>
-
+                            <ul class="errorlist">{{ form.producto.errors }}</ul>
                         {% endif %}
-
                     </div>
-
 
                     <!-- =====================================
                          CANTIDAD
                     ====================================== -->
-
                     <div class="campo">
-
-                        <label for="{{ form.cantidad_producida.id_for_label }}">
-
-                            Cantidad producida
-
-                        </label>
+                        <label for="{{ form.cantidad_producida.id_for_label }}">Cantidad producida</label>
 
                         {{ form.cantidad_producida }}
 
                         {% if form.cantidad_producida.errors %}
-
                             <ul class="errorlist">
-
                                 {{ form.cantidad_producida.errors }}
-
                             </ul>
+                        {% endif %}
 
+                    </div>
+
+                    <!-- =====================================
+                         FECHA DE VENCIMIENTO
+                    ====================================== -->
+
+                    <div class="campo">
+                        <label for="{{ form.fecha_vencimiento.id_for_label }}">Fecha de vencimiento del lote</label>
+
+                        {{ form.fecha_vencimiento }}
+
+                        {% if form.fecha_vencimiento.errors %}
+                            <ul class="errorlist">{{ form.fecha_vencimiento.errors }}</ul>
                         {% endif %}
 
                     </div>
@@ -452,65 +322,39 @@ select option{
                     ====================================== -->
 
                     <div class="campo campo-ancho">
-
-                        <label for="{{ form.observacion.id_for_label }}">
-
-                            Observación
-
-                        </label>
+                        <label for="{{ form.observacion.id_for_label }}">Observación</label>
 
                         {{ form.observacion }}
 
                         {% if form.observacion.errors %}
-
-                            <ul class="errorlist">
-
-                                {{ form.observacion.errors }}
-
-                            </ul>
-
+                            <ul class="errorlist">{{ form.observacion.errors }}</ul>
                         {% endif %}
 
                     </div>
 
                 </div>
 
-
                 <!-- =================================================
                      BOTONES
                 ================================================== -->
-
                 <div class="botones">
-
-                    <a href="{% url 'listar_producciones' %}"
-
-                       class="btn btn-volver">
-
+                    <a href="{% url 'listar_producciones' %}" class="btn btn-volver">
                         <i class="bi bi-arrow-left"></i>
 
                         Volver
-
                     </a>
 
 
-                    <button type="submit"
-
-                            class="btn btn-guardar">
-
+                    <button type="submit" class="btn btn-guardar">
                         <i class="bi bi-check-circle-fill"></i>
 
                         Guardar Producción
-
                     </button>
 
                 </div>
-
             </form>
-
         </div>
-
     </div>
-
 </div>
 
 {% endblock %}
