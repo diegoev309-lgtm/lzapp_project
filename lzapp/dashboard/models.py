@@ -62,21 +62,76 @@ class Producto(models.Model):
 #tabla de produccion
 
 class Produccion(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
     cantidad_producida = models.PositiveIntegerField()
+    cantidad_disponible = models.PositiveIntegerField(default=0, editable=False)
+    fecha_vencimiento = models.DateField(help_text='Fecha de vencimiento de este lote específico.')
     fecha_produccion = models.DateTimeField(auto_now_add=True)
     observacion = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'produccion'
+        ordering = ['-fecha_produccion']
 
     def save(self, *args, **kwargs):
         nueva = self.pk is None
+        if nueva:
+            self.cantidad_disponible = self.cantidad_producida
+
         super().save(*args, **kwargs)
 
         if nueva:
-            self.producto.stock_actual += self.cantidad_producida
-            self.producto.save()
+            self.producto.stock_actual = (self.producto.stock_actual or 0) + self.cantidad_producida
+            self._sincronizar_vencimiento()
+            self.producto.save(update_fields=['stock_actual', 'fecha_vencimiento'])
+
+    def _sincronizar_vencimiento(self):
+        """El 'próximo vencimiento' del producto es el del lote vigente
+        más cercano a vencer (FEFO), calculado siempre a partir de los
+        lotes reales, nunca escrito a mano."""
+        proximo = (
+            Produccion.objects
+            .filter(producto=self.producto, cantidad_disponible__gt=0)
+            .order_by('fecha_vencimiento')
+            .values_list('fecha_vencimiento', flat=True)
+            .first()
+        )
+        self.producto.fecha_vencimiento = proximo
+
+
+def descontar_stock_fefo(producto, cantidad):
+    """Descuenta stock de los lotes más próximos a vencer primero.
+    Llama a esto donde hoy confirmes una venta (donde se crea DetalleVenta)."""
+    from django.db import transaction
+
+    with transaction.atomic():
+        lotes = (
+            Produccion.objects
+            .select_for_update()
+            .filter(producto=producto, cantidad_disponible__gt=0)
+            .order_by('fecha_vencimiento')
+        )
+        restante = cantidad
+        for lote in lotes:
+            if restante <= 0:
+                break
+            usar = min(lote.cantidad_disponible, restante)
+            lote.cantidad_disponible -= usar
+            lote.save(update_fields=['cantidad_disponible'])
+            restante -= usar
+
+        if restante > 0:
+            raise ValueError(f'Stock insuficiente para {producto.nombre}')
+
+        producto.stock_actual = max(0, (producto.stock_actual or 0) - cantidad)
+        producto.fecha_vencimiento = (
+            Produccion.objects
+            .filter(producto=producto, cantidad_disponible__gt=0)
+            .order_by('fecha_vencimiento')
+            .values_list('fecha_vencimiento', flat=True)
+            .first()
+        )
+        producto.save(update_fields=['stock_actual', 'fecha_vencimiento'])
 
 
 

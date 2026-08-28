@@ -712,14 +712,9 @@
                     Resultados para "<strong id="infoQuery">{{ query }}</strong>" — <span id="infoCantidad">{{ productos|length }}</span> producto(s) encontrado(s)
                 </p>
                 
-                <div class="productos-carrusel">
-                    <button type="button" class="prod-carrusel-flecha prod-carrusel-flecha--prev" id="carruselProductosPrev" aria-label="Productos anteriores">
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
-                
-                    <div class="prod-carrusel-viewport" id="carruselProductosViewport">
-                        <div class="row g-3" id="listaProductos">
-                            {% if premio_activo %}
+                <div class="productos-grid-wrap">
+                    <div class="row g-3" id="listaProductos">
+                        {% if premio_activo %}
                             <div class="col-lg-3 col-md-6">
                                 <div class="card producto-card producto-card--vertical producto-card--premio h-100">
                                     <span class="premio-cinta-mini">TU PREMIO</span>
@@ -851,14 +846,14 @@
                                 {% endif %}
                             </div>
                             {% endfor %}
-                        </div><!-- cierra #listaProductos -->
-                    </div><!-- cierra .prod-carrusel-viewport -->
- 
-                    <button type="button" class="prod-carrusel-flecha prod-carrusel-flecha--next" id="carruselProductosNext" aria-label="Siguientes productos">
-                        <i class="bi bi-chevron-right"></i>
+                    </div><!-- cierra #listaProductos -->
+                </div><!-- cierra .productos-grid-wrap -->
+
+                <div class="productos-cargar-mas-wrap" id="wrapCargarMasProductos">
+                    <button type="button" class="btn-cargar-mas" id="btnCargarMasProductos">
+                        Ver más productos <i class="bi bi-chevron-down"></i>
                     </button>
-                </div><!-- cierra .productos-carrusel -->
-            <div class="prod-carrusel-dots" id="carruselProductosDots"></div>      
+                </div>
         </section>
 
 
@@ -2808,7 +2803,7 @@
 
             if (productos.length === 0) {
                 lista.innerHTML = `
-                    <div class="col-12">
+                    <div class="col-12" id="sinResultados">
                         <div class="alert alert-info text-center buscador-sin-resultados">
                             <i class="bi bi-search"></i>
                             No encontramos productos para "<strong>${escapeHtml(query)}</strong>".
@@ -2816,6 +2811,7 @@
                         </div>
                     </div>
                 `;
+                window.LZ_initCargarMasProductos && window.LZ_initCargarMasProductos();
                 return;
             }
 
@@ -2823,7 +2819,7 @@
 
             window.LZ_activarWidgetsCalificacion && window.LZ_activarWidgetsCalificacion(lista);
             window.LZ_activarBloqueoCarritoAnonimo && window.LZ_activarBloqueoCarritoAnonimo(lista);
-            window.LZ_initCarruselProductos && window.LZ_initCarruselProductos()
+            window.LZ_initCargarMasProductos && window.LZ_initCargarMasProductos();
 
         }
 
@@ -2904,6 +2900,42 @@
             return valor;
         })();
 
+        function lanzarConfetiPub(origenEl) {
+            const rect = origenEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            const colores = ['#c9a84c', '#e8c874', '#083b78', '#4f8fdb', '#ffffff', '#ff6f61'];
+            const cont = document.createElement('div');
+            cont.className = 'confeti-pub-contenedor';
+            cont.style.left = cx + 'px';
+            cont.style.top = cy + 'px';
+            document.body.appendChild(cont);
+
+            const total = 22;
+            for (let i = 0; i < total; i++) {
+                const p = document.createElement('span');
+                p.className = 'confeti-pub-particula';
+
+                const angulo = Math.random() * Math.PI * 2;
+                const distancia = 55 + Math.random() * 70;
+                const x = Math.cos(angulo) * distancia;
+                const y = Math.sin(angulo) * distancia - 20; // sesgo hacia arriba
+
+                p.style.setProperty('--confeti-x', x + 'px');
+                p.style.setProperty('--confeti-y', (y + 90) + 'px'); // luego cae
+                p.style.setProperty('--confeti-r', (Math.random() * 540 - 270) + 'deg');
+                p.style.setProperty('--confeti-dur', (700 + Math.random() * 500) + 'ms');
+                p.style.setProperty('--confeti-color', colores[i % colores.length]);
+                p.style.setProperty('--confeti-w', (5 + Math.random() * 5) + 'px');
+                p.style.setProperty('--confeti-h', (7 + Math.random() * 7) + 'px');
+
+                cont.appendChild(p);
+            }
+
+            setTimeout(function () { cont.remove(); }, 1300);
+        }
+
         function activarWidgetsCalificacion(root) {
             (root || document).querySelectorAll('.calificacion-widget-pub').forEach(function(widget){
                 if (widget.dataset.activado) return;
@@ -2967,6 +2999,8 @@
                                 if (i < valor) e.classList.add('recien-calificada');
                             });
 
+                            lanzarConfetiPub(estrella);
+
                             setTimeout(function(){ widget.classList.remove('exito'); }, 600);
                         })
                         .catch(function(){ console.error('No se pudo guardar la calificación.'); });
@@ -2975,81 +3009,41 @@
             });
         }
 
-        function initCarruselProductos() {
+        function initCargarMasProductos() {
             const lista = document.getElementById('listaProductos');
-            const viewport = document.getElementById('carruselProductosViewport');
-            const dotsWrap = document.getElementById('carruselProductosDots');
-            const prevBtn = document.getElementById('carruselProductosPrev');
-            const nextBtn = document.getElementById('carruselProductosNext');
-            if (!lista || !viewport || !dotsWrap || !prevBtn || !nextBtn) return;
-        
+            const wrap = document.getElementById('wrapCargarMasProductos');
+            const btn = document.getElementById('btnCargarMasProductos');
+            if (!lista || !wrap || !btn) return;
+
             if (lista.querySelector('#sinResultados')) {
-                lista.classList.remove('prod-carrusel-track');
-                lista.style.transform = '';
-                dotsWrap.innerHTML = '';
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'none';
+                wrap.style.display = 'none';
                 return;
             }
-        
+
             const tarjetas = Array.from(lista.children).filter(function (el) {
                 return el.className.indexOf('col-') !== -1;
             });
-            if (tarjetas.length === 0) return;
-        
-            const porSlide = 4;
-            const grupos = [];
-            for (let i = 0; i < tarjetas.length; i += porSlide) {
-                grupos.push(tarjetas.slice(i, i + porSlide));
+            if (tarjetas.length === 0) {
+                wrap.style.display = 'none';
+                return;
             }
-        
-            lista.innerHTML = '';
-            lista.classList.add('prod-carrusel-track');
-            grupos.forEach(function (grupo) {
-                const slide = document.createElement('div');
-                slide.className = 'prod-carrusel-slide';
-                grupo.forEach(function (tarjeta) {
-                    tarjeta.classList.remove('col-lg-3', 'col-md-6', 'col-12');
-                    tarjeta.classList.add('prod-carrusel-item');
-                    slide.appendChild(tarjeta);
+
+            const porPagina = 8;
+            let visibles = porPagina;
+
+            function render() {
+                tarjetas.forEach(function (tarjeta, idx) {
+                    tarjeta.style.display = idx < visibles ? '' : 'none';
                 });
-                lista.appendChild(slide);
-            });
-        
-            const total = grupos.length;
-            let indice = 0;
-        
-            function irA(i) {
-                indice = Math.max(0, Math.min(i, total - 1));
-                lista.style.transform = `translateX(-${indice * 100}%)`;
-                Array.from(dotsWrap.children).forEach(function (dot, idx) {
-                    dot.classList.toggle('activo', idx === indice);
-                });
-                prevBtn.disabled = indice === 0;
-                nextBtn.disabled = indice === total - 1;
+                wrap.style.display = visibles >= tarjetas.length ? 'none' : '';
             }
-        
-            dotsWrap.innerHTML = '';
-            if (total > 1) {
-                grupos.forEach(function (_, idx) {
-                    const dot = document.createElement('button');
-                    dot.type = 'button';
-                    dot.className = 'prod-carrusel-dot';
-                    dot.setAttribute('aria-label', `Ir al grupo ${idx + 1} de productos`);
-                    dot.addEventListener('click', function () { irA(idx); });
-                    dotsWrap.appendChild(dot);
-                });
-                prevBtn.style.display = '';
-                nextBtn.style.display = '';
-            } else {
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'none';
-            }
-        
-            prevBtn.onclick = function () { irA(indice - 1); };
-            nextBtn.onclick = function () { irA(indice + 1); };
-        
-            irA(0);
+
+            btn.onclick = function () {
+                visibles += porPagina;
+                render();
+            };
+
+            render();
         }
 
         function activarBloqueoCarritoAnonimo(root) {
@@ -3070,16 +3064,18 @@
 
         window.LZ_activarWidgetsCalificacion = activarWidgetsCalificacion;
         window.LZ_activarBloqueoCarritoAnonimo = activarBloqueoCarritoAnonimo;
-        window.LZ_initCarruselProductos = initCarruselProductos;
+        window.LZ_initCargarMasProductos = initCargarMasProductos;
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function(){
                 activarWidgetsCalificacion();
                 activarBloqueoCarritoAnonimo();
+                initCargarMasProductos();
             });
         } else {
             activarWidgetsCalificacion();
             activarBloqueoCarritoAnonimo();
+            initCargarMasProductos();
         }
     })();
 })();
