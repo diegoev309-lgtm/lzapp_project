@@ -8,4 +8,5 @@ urlpatterns = [
     path('importar/', views.importar_produccion, name='importar_produccion'),
     path('importadas/', views.producciones_importadas, name='producciones_importadas'),
     path('graficos/',views.graficos_produccion,name='graficos_produccion'),
+    path('produccion/datos-productos/', views.datos_produccion_productos, name='datos_produccion_productos'),
 ]

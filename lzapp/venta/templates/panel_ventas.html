@@ -39,29 +39,6 @@
         </div>
     </div>
 
-    <div class="filtro-wrap">
-        <div class="select-chip" id="filtroTrigger" onclick="toggleFiltroMenu()">
-            <i class="bi bi-calendar3"></i>
-            {% if filtro == 'semana' %}Última semana{% elif filtro == 'rango' %}{{ desde|date:"d/m" }} - {{ hasta|date:"d/m" }}{% else %}Último mes{% endif %}
-            <i class="bi bi-chevron-down"></i>
-        </div>
-        <div class="filtro-menu" id="filtroMenu">
-            <a class="filtro-item {% if filtro == 'semana' %}active{% endif %}" href="?filtro=semana">
-                <i class="bi bi-calendar-week"></i> Última semana
-            </a>
-            <a class="filtro-item {% if filtro == 'mes' %}active{% endif %}" href="?filtro=mes">
-                <i class="bi bi-calendar-month"></i> Último mes
-            </a>
-            <div class="filtro-divider"></div>
-            <span class="etiqueta-periodo"><i class="bi bi-calendar-range"></i> Rango personalizado</span>
-            <form method="get" class="rango-personalizado">
-                <input type="hidden" name="filtro" value="rango">
-                <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
-                <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
-                <button type="submit" class="btn-aplicar-rango">Aplicar</button>
-            </form>
-        </div>
-    </div>
 </div>
 
 <!-- ============ VISTA RESUMEN: SOLO GRÁFICOS (CARRUSEL) ============ -->

@@ -47,13 +47,13 @@ def _resolver_periodo(request):
 
 
 # =========================================================
-# ALERTAS
+# RITMO DE VENTAS (compartido por alertas y proyección)
 # =========================================================
-def _calcular_alertas():
+def _ritmo_ventas_por_producto():
     hoy = timezone.now().date()
     desde_ventas = hoy - timedelta(days=VENTANA_RITMO_VENTAS - 1)
 
-    ventas_por_producto = {
+    return {
         fila['producto_id']: fila['unidades']
         for fila in (
             DetalleVenta.objects
@@ -63,6 +63,12 @@ def _calcular_alertas():
         )
     }
 
+
+# =========================================================
+# ALERTAS
+# =========================================================
+def _calcular_alertas():
+    ventas_por_producto = _ritmo_ventas_por_producto()
     productos_activos = Producto.objects.filter(disponibilidad=True)
 
     # PRODUCTOS CRÍTICOS
@@ -82,6 +88,7 @@ def _calcular_alertas():
     productos_criticos.sort(key=lambda p: p['dias_restantes'])
 
     # PRODUCTOS SIN PRODUCCIÓN
+    hoy = timezone.now().date()
     desde_produccion = hoy - timedelta(days=DIAS_SIN_PRODUCCION - 1)
     ids_con_produccion = (
         Produccion.objects
@@ -93,6 +100,41 @@ def _calcular_alertas():
     )
 
     return productos_criticos, productos_sin_produccion
+
+
+# =========================================================
+# PROYECCIÓN DE PRODUCCIÓN NECESARIA
+# =========================================================
+def _calcular_proyeccion():
+    """
+    Proyecta cuánto habría que producir la próxima semana y el próximo mes
+    para cada producto activo, a partir del ritmo de ventas de los últimos
+    30 días (mismo ritmo que usan las alertas de stock), descontando el
+    stock actual disponible.
+    """
+    ventas_por_producto = _ritmo_ventas_por_producto()
+    proyecciones = []
+
+    for producto in Producto.objects.filter(disponibilidad=True):
+        unidades_vendidas = ventas_por_producto.get(producto.id, 0)
+        ritmo_diario = unidades_vendidas / VENTANA_RITMO_VENTAS
+
+        demanda_semana = ritmo_diario * 7
+        demanda_mes = ritmo_diario * 30
+
+        necesario_semana = max(demanda_semana - producto.stock_actual, 0)
+        necesario_mes = max(demanda_mes - producto.stock_actual, 0)
+
+        proyecciones.append({
+            'producto': producto.nombre,
+            'demanda_semana': round(demanda_semana, 1),
+            'demanda_mes': round(demanda_mes, 1),
+            'necesario_semana': round(necesario_semana, 1),
+            'necesario_mes': round(necesario_mes, 1),
+        })
+
+    proyecciones.sort(key=lambda p: -p['necesario_semana'])
+    return proyecciones
 
 
 # =========================================================
@@ -216,7 +258,7 @@ def crear_produccion(request):
 
 
 # =========================================================
-# API DE GRÁFICOS DE PRODUCCIÓN
+# API DE GRÁFICOS DE PRODUCCIÓN (total mes/semana)
 # =========================================================
 def graficos_produccion(request):
     hoy = timezone.now().date()
@@ -274,6 +316,43 @@ def graficos_produccion(request):
         'valores_mes': valores_mes,
         'etiquetas_semana': etiquetas_semana,
         'valores_semana': valores_semana,
+    })
+
+
+# =========================================================
+# API: GRÁFICOS DE LOTES POR PRODUCTO + PROYECCIÓN
+# =========================================================
+def datos_produccion_productos(request):
+    hoy = timezone.now().date()
+    primer_dia_mes = hoy.replace(day=1)
+
+    productos = list(
+        Producto.objects.filter(disponibilidad=True).order_by('nombre').values('id', 'nombre')
+    )
+
+    historico = {}
+    for producto in productos:
+        lotes = (
+            Produccion.objects
+            .filter(
+                producto_id=producto['id'],
+                fecha_produccion__date__gte=primer_dia_mes,
+                fecha_produccion__date__lte=hoy,
+            )
+            .order_by('fecha_produccion')
+        )
+        historico[str(producto['id'])] = {
+            'etiquetas': [lote.fecha_produccion.strftime('%d/%m %H:%M') for lote in lotes],
+            'valores': [lote.cantidad_producida for lote in lotes],
+        }
+
+    proyecciones = _calcular_proyeccion()
+
+    return JsonResponse({
+        'ok': True,
+        'productos': productos,
+        'historico': historico,
+        'proyecciones': proyecciones,
     })
 
 
