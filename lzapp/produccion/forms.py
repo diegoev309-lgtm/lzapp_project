@@ -7,17 +7,12 @@ class ProduccionForm(forms.ModelForm):
         fields = ['producto', 'cantidad_producida', 'fecha_vencimiento', 'observacion']
         widgets = {
             'producto': forms.Select(attrs={'class': 'form-select'}),
-            'cantidad_producida': forms.NumberInput(attrs={
-                'class': 'form-control', 'min': 1,
-                'placeholder': 'Ingrese la cantidad producida'
-            }),
-            'fecha_vencimiento': forms.DateInput(attrs={
-                'class': 'form-control', 'type': 'date'
-            }),
-            'observacion': forms.Textarea(attrs={
-                'class': 'form-control', 'rows': 4,
-                'placeholder': 'Observaciones de la producción'
-            }),
+            'cantidad_producida': forms.NumberInput(
+                attrs={'class': 'form-control', 'min': 1, 'placeholder': 'Ingrese la cantidad producida'}),
+            'fecha_vencimiento': forms.DateInput(
+                attrs={'class': 'form-control', 'type': 'date'}),
+            'observacion': forms.Textarea(
+                attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Observaciones de la producción'}),
         }
 
 class ImportarProduccionForm(forms.Form):
