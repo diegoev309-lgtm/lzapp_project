@@ -163,6 +163,45 @@
     width:100%;
     height:350px;
     padding:10px;
+    position:relative;
+}
+
+.contenedor-grafico-alto{
+    height:420px;
+}
+
+.grafico-render{
+    width:100%;
+    height:100%;
+    position:absolute;   /* sin display:none */
+    inset:0;
+    padding:10px;
+    z-index:2;
+}
+
+.grafico-render.visible{
+    display:block;
+}
+
+.graficos-produccion-single{
+    grid-template-columns:1fr;
+    margin-bottom:20px;
+}
+
+.selector-producto-grafico{
+    background:var(--bg-sidebar);
+    color:var(--text-primary);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-btn);
+    padding:8px 14px;
+    font-size:13px;
+    min-width:220px;
+    cursor:pointer;
+}
+
+.selector-producto-grafico:focus{
+    outline:none;
+    border-color:var(--gold);
 }
 
 
@@ -232,6 +271,11 @@
     gap:10px;
 
     color:var(--text-tertiary);
+
+    position:absolute;
+    inset:0;
+    padding:10px;
+    text-align:center;
 }
 
 
@@ -567,81 +611,41 @@
     ====================================================== -->
 
     <div class="produccion-dashboard">
-
-
         <!-- =================================================
-             TOTALES
+             PRODUCCIÓN POR LOTES, POR PRODUCTO (con selector)
         ================================================== -->
 
-        <div class="produccion-stats">
-
-
-            <div class="produccion-stat">
-
-                <div class="stat-icon gold">
-
-                    <i class="bi bi-calendar-month"></i>
-
-                </div>
-
-                <div class="stat-info">
-
-                    <div class="stat-value"
-                         id="totalMes">
-
-                        0
-
+        <div class="graficos-produccion graficos-produccion-single">
+            <section class="grafico-panel">
+                <div class="grafico-header">
+                    <div class="grafico-title">
+                        <i class="bi bi-boxes"></i>
+                        Producción por lotes
                     </div>
 
-                    <div class="stat-label">
-
-                        Unidades producidas este mes
-
-                    </div>
-
+                    <select class="selector-producto-grafico" id="selectorProductoGrafico">
+                        <option value="">Selecciona un producto…</option>
+                    </select>
                 </div>
 
-            </div>
-
-
-            <div class="produccion-stat">
-
-                <div class="stat-icon blue">
-
-                    <i class="bi bi-calendar-week"></i>
-
-                </div>
-
-                <div class="stat-info">
-
-                    <div class="stat-value"
-                         id="totalSemana">
-
-                        0
-
+                <div class="contenedor-grafico"
+                     id="chartProduccionProducto">
+                    <div class="estado-grafico" id="estadoChartProduccionProducto">
+                        <i class="bi bi-boxes" style="font-size:22px;"></i>
+                        <span>
+                            Elige un producto arriba para ver sus lotes de producción.
+                        </span>
                     </div>
-
-                    <div class="stat-label">
-
-                        Unidades producidas esta semana
-
-                    </div>
-
+                    <div class="grafico-render" id="renderChartProduccionProducto"></div>
                 </div>
-
-            </div>
-
+            </section>
         </div>
 
-
         <!-- =================================================
-             GRÁFICOS
+             PROYECCIÓN DE PRODUCCIÓN (SEMANA / MES)
         ================================================== -->
 
-        <div class="graficos-produccion">
-
-
-            <!-- MES -->
+        <div class="graficos-produccion graficos-produccion-single">
 
             <section class="grafico-panel">
 
@@ -649,83 +653,44 @@
 
                     <div class="grafico-title">
 
-                        <i class="bi bi-graph-up"></i>
+                        <i class="bi bi-graph-up-arrow"></i>
 
-                        Producción del mes
-
-                    </div>
-
-                    <div class="grafico-subtitulo">
-
-                        Producción diaria del mes actual
-
-                    </div>
-
-                </div>
-
-
-                <div class="contenedor-grafico"
-                     id="chartProduccionMes">
-
-                    <div class="estado-grafico">
-
-                        <div class="spinner-produccion"></div>
-
-                        <span>
-                            Cargando producción...
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- SEMANA -->
-
-            <section class="grafico-panel">
-
-                <div class="grafico-header">
-
-                    <div class="grafico-title">
-
-                        <i class="bi bi-bar-chart-line-fill"></i>
-
-                        Producción de la semana
+                        Proyección de producción recomendada
 
                     </div>
 
                     <div class="grafico-subtitulo">
 
-                        Producción diaria de los últimos 7 días
+                        Estimado según el ritmo de ventas reciente
 
                     </div>
 
                 </div>
 
 
-                <div class="contenedor-grafico"
-                     id="chartProduccionSemana">
+                <div class="contenedor-grafico contenedor-grafico-alto"
+                     id="chartProyeccion">
 
-                    <div class="estado-grafico">
+                    <div class="estado-grafico" id="estadoChartProyeccion">
 
                         <div class="spinner-produccion"></div>
 
                         <span>
-                            Cargando producción...
+                            Calculando proyección...
                         </span>
 
                     </div>
 
+                    <div class="grafico-render" id="renderChartProyeccion"></div>
+
                 </div>
 
             </section>
-
 
         </div>
 
     </div>
+
 
 
     <!-- =====================================================
@@ -834,10 +799,8 @@
 
 <!-- =========================================================
      APEXCHARTS
+     (la librería ya se carga globalmente en masterpage_dashboard.html)
 ========================================================= -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.45.2/apexcharts.min.js"></script>
-
 
 <script>
 
@@ -853,445 +816,296 @@ function formatoNumero(valor){
 
 
 /* =========================================================
-   CARGAR GRÁFICOS
+   HELPERS DE ESTADO (spinner <-> gráfico renderizado)
 ========================================================= */
 
-document.addEventListener(
-    'DOMContentLoaded',
-    function(){
-
-        fetch("{% url 'graficos_produccion' %}")
-
-            .then(response => {
-
-                if(!response.ok){
-
-                    throw new Error(
-                        'Error HTTP ' +
-                        response.status
-                    );
-
-                }
-
-                return response.json();
-
-            })
-
-
-            .then(data => {
-
-                if(!data.ok){
-
-                    throw new Error(
-                        data.error ||
-                        'Error cargando producción'
-                    );
-
-                }
-
-
-                /* =========================================
-                   TOTALES
-                ========================================== */
-
-                document.getElementById(
-                    'totalMes'
-                ).textContent =
-                    formatoNumero(
-                        data.total_mes
-                    );
-
-
-                document.getElementById(
-                    'totalSemana'
-                ).textContent =
-                    formatoNumero(
-                        data.total_semana
-                    );
-
-
-                /* =========================================
-                   GRÁFICO MES
-                ========================================== */
-
-                new ApexCharts(
-
-                    document.querySelector(
-                        '#chartProduccionMes'
-                    ),
-
-                    {
-
-                        chart:{
-
-                            type:'area',
-
-                            height:'100%',
-
-                            toolbar:{
-                                show:false
-                            },
-
-                            background:'transparent'
-
-                        },
-
-
-                        theme:{
-                            mode:'dark'
-                        },
-
-
-                        series:[
-
-                            {
-
-                                name:
-                                    'Unidades producidas',
-
-                                data:
-                                    data.valores_mes
-
-                            }
-
-                        ],
-
-
-                        xaxis:{
-
-                            categories:
-                                data.etiquetas_mes,
-
-                            labels:{
-
-                                style:{
-
-                                    colors:
-                                        '#9CA3AF'
-
-                                },
-
-                                rotate:-45
-
-                            }
-
-                        },
-
-
-                        yaxis:{
-
-                            labels:{
-
-                                style:{
-
-                                    colors:
-                                        '#9CA3AF'
-
-                                },
-
-                                formatter:
-                                    function(valor){
-
-                                        return formatoNumero(
-                                            valor
-                                        );
-
-                                    }
-
-                            }
-
-                        },
-
-
-                        colors:[
-                            '#E4C870'
-                        ],
-
-
-                        stroke:{
-
-                            curve:'smooth',
-
-                            width:3
-
-                        },
-
-
-                        fill:{
-
-                            type:'gradient',
-
-                            gradient:{
-
-                                shadeIntensity:1,
-
-                                opacityFrom:.35,
-
-                                opacityTo:.05
-
-                            }
-
-                        },
-
-
-                        dataLabels:{
-
-                            enabled:false
-
-                        },
-
-
-                        markers:{
-
-                            size:4
-
-                        },
-
-
-                        tooltip:{
-
-                            theme:'dark',
-
-                            y:{
-
-                                formatter:
-                                    function(valor){
-
-                                        return formatoNumero(
-                                            valor
-                                        ) +
-                                        ' unidades';
-
-                                    }
-
-                            }
-
-                        },
-
-
-                        grid:{
-
-                            borderColor:
-                                'rgba(255,255,255,.08)',
-
-                            strokeDashArray:4
-
-                        }
-
-                    }
-
-                ).render();
-
-
-                /* =========================================
-                   GRÁFICO SEMANA
-                ========================================== */
-
-                new ApexCharts(
-
-                    document.querySelector(
-                        '#chartProduccionSemana'
-                    ),
-
-                    {
-
-                        chart:{
-
-                            type:'bar',
-
-                            height:'100%',
-
-                            toolbar:{
-                                show:false
-                            },
-
-                            background:'transparent'
-
-                        },
-
-
-                        theme:{
-                            mode:'dark'
-                        },
-
-
-                        series:[
-
-                            {
-
-                                name:
-                                    'Unidades producidas',
-
-                                data:
-                                    data.valores_semana
-
-                            }
-
-                        ],
-
-
-                        xaxis:{
-
-                            categories:
-                                data.etiquetas_semana,
-
-                            labels:{
-
-                                style:{
-
-                                    colors:
-                                        '#9CA3AF'
-
-                                }
-
-                            }
-
-                        },
-
-
-                        yaxis:{
-
-                            labels:{
-
-                                style:{
-
-                                    colors:
-                                        '#9CA3AF'
-
-                                },
-
-                                formatter:
-                                    function(valor){
-
-                                        return formatoNumero(
-                                            valor
-                                        );
-
-                                    }
-
-                            }
-
-                        },
-
-
-                        colors:[
-                            '#38BDF8'
-                        ],
-
-
-                        plotOptions:{
-
-                            bar:{
-
-                                borderRadius:5,
-
-                                columnWidth:'55%'
-
-                            }
-
-                        },
-
-
-                        dataLabels:{
-
-                            enabled:false
-
-                        },
-
-
-                        tooltip:{
-
-                            theme:'dark',
-
-                            y:{
-
-                                formatter:
-                                    function(valor){
-
-                                        return formatoNumero(
-                                            valor
-                                        ) +
-                                        ' unidades';
-
-                                    }
-
-                            }
-
-                        },
-
-
-                        grid:{
-
-                            borderColor:
-                                'rgba(255,255,255,.08)',
-
-                            strokeDashArray:4
-
-                        }
-
-                    }
-
-                ).render();
-
-            })
-
-
-            .catch(error => {
-
-                console.error(
-                    'Error:',
-                    error
-                );
-
-
-                document.getElementById(
-                    'chartProduccionMes'
-                ).innerHTML = `
-
-                    <div class="estado-grafico">
-
-                        <i class="bi bi-exclamation-triangle"
-                           style="
-                               font-size:28px;
-                               color:var(--red);
-                           "></i>
-
-                        <span>
-                            No se pudo cargar
-                            la producción.
-                        </span>
-
-                    </div>
-
-                `;
-
-
-                document.getElementById(
-                    'chartProduccionSemana'
-                ).innerHTML = `
-
-                    <div class="estado-grafico">
-
-                        <i class="bi bi-exclamation-triangle"
-                           style="
-                               font-size:28px;
-                               color:var(--red);
-                           "></i>
-
-                        <span>
-                            No se pudo cargar
-                            la producción.
-                        </span>
-
-                    </div>
-
-                `;
-
+function mostrarCargandoGrafico(idEstado, idRender){
+    const estado = document.getElementById(idEstado);
+    const render = document.getElementById(idRender);
+    if (estado) {
+        estado.style.display = 'flex';
+        estado.innerHTML = `
+            <div class="spinner-produccion"></div>
+            <span>Cargando producción...</span>
+        `;
+    }
+    if (render) render.classList.remove('visible');
+}
+
+function mostrarErrorGrafico(idEstado, idRender, mensaje){
+    const estado = document.getElementById(idEstado);
+    const render = document.getElementById(idRender);
+    if (estado) {
+        estado.style.display = 'flex';
+        estado.innerHTML = `
+            <i class="bi bi-exclamation-triangle" style="font-size:28px; color:var(--red);"></i>
+            <span>${mensaje || 'No se pudo cargar la producción.'}</span>
+        `;
+    }
+    if (render) render.classList.remove('visible');
+}
+
+function mostrarGrafico(idEstado, idRender){
+    const estado = document.getElementById(idEstado);
+    const render = document.getElementById(idRender);
+    if (estado) estado.style.display = 'none';
+    if (render) render.classList.add('visible');
+}
+
+// Registro de instancias para poder destruirlas antes de re-renderizar
+// (evita que ApexCharts vaya apilando gráficos al cambiar de producto).
+const instanciasApex = {};
+
+function renderizarApex(idRender, opciones){
+    if (instanciasApex[idRender]) {
+        instanciasApex[idRender].destroy();
+    }
+    const contenedor = document.querySelector('#' + idRender);
+    const instancia = new ApexCharts(contenedor, opciones);
+    instanciasApex[idRender] = instancia;
+    instancia.render();
+}
+
+
+/* =========================================================
+   GRÁFICOS: PRODUCCIÓN DEL MES Y DE LA SEMANA
+========================================================= */
+
+function cargarGraficosMesSemana(){
+    mostrarCargandoGrafico('estadoChartProduccionMes', 'renderChartProduccionMes');
+    mostrarCargandoGrafico('estadoChartProduccionSemana', 'renderChartProduccionSemana');
+
+    fetch("{% url 'graficos_produccion' %}")
+        .then(response => {
+            if (!response.ok) throw new Error('Error HTTP ' + response.status);
+            return response.json();
+        })
+        .then(data => {
+            if (!data.ok) throw new Error(data.error || 'Error cargando producción');
+
+            document.getElementById('totalMes').textContent = formatoNumero(data.total_mes);
+            document.getElementById('totalSemana').textContent = formatoNumero(data.total_semana);
+
+            renderizarApex('renderChartProduccionMes', {
+                chart: { type: 'area', height: '100%', toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: 'dark' },
+                series: [{ name: 'Unidades producidas', data: data.valores_mes }],
+                xaxis: {
+                    categories: data.etiquetas_mes,
+                    labels: { style: { colors: '#9CA3AF' }, rotate: -45 },
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#9CA3AF' },
+                        formatter: (valor) => formatoNumero(valor),
+                    },
+                },
+                colors: ['#E4C870'],
+                stroke: { curve: 'smooth', width: 3 },
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: .35, opacityTo: .05 } },
+                dataLabels: { enabled: false },
+                markers: { size: 4 },
+                tooltip: { theme: 'dark', y: { formatter: (valor) => formatoNumero(valor) + ' unidades' } },
+                grid: { borderColor: 'rgba(255,255,255,.08)', strokeDashArray: 4 },
+            });
+            mostrarGrafico('estadoChartProduccionMes', 'renderChartProduccionMes');
+
+            renderizarApex('renderChartProduccionSemana', {
+                chart: { type: 'bar', height: '100%', toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: 'dark' },
+                series: [{ name: 'Unidades producidas', data: data.valores_semana }],
+                xaxis: {
+                    categories: data.etiquetas_semana,
+                    labels: { style: { colors: '#9CA3AF' } },
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#9CA3AF' },
+                        formatter: (valor) => formatoNumero(valor),
+                    },
+                },
+                colors: ['#38BDF8'],
+                plotOptions: { bar: { borderRadius: 5, columnWidth: '55%' } },
+                dataLabels: { enabled: false },
+                tooltip: { theme: 'dark', y: { formatter: (valor) => formatoNumero(valor) + ' unidades' } },
+                grid: { borderColor: 'rgba(255,255,255,.08)', strokeDashArray: 4 },
+            });
+            mostrarGrafico('estadoChartProduccionSemana', 'renderChartProduccionSemana');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarErrorGrafico('estadoChartProduccionMes', 'renderChartProduccionMes');
+            mostrarErrorGrafico('estadoChartProduccionSemana', 'renderChartProduccionSemana');
+        });
+}
+
+
+/* =========================================================
+   GRÁFICO: PRODUCCIÓN POR LOTES DE UN PRODUCTO (con selector)
+========================================================= */
+
+function cargarSelectorProductos(){
+    fetch("{% url 'productos_produccion_disponibles' %}")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.ok) return;
+
+            const selector = document.getElementById('selectorProductoGrafico');
+            data.productos.forEach((producto) => {
+                const opcion = document.createElement('option');
+                opcion.value = producto.id;
+                opcion.textContent = producto.nombre;
+                selector.appendChild(opcion);
             });
 
-    }
-);
+            // Si hay al menos un producto, se muestra el primero por defecto.
+            if (data.productos.length > 0) {
+                selector.value = data.productos[0].id;
+                cargarGraficoProducto(data.productos[0].id);
+            }
+        })
+        .catch(error => console.error('Error cargando productos:', error));
+}
 
+function cargarGraficoProducto(productoId){
+    const idEstado = 'estadoChartProduccionProducto';
+    const idRender = 'renderChartProduccionProducto';
+
+    if (!productoId) {
+        mostrarErrorGrafico(idEstado, idRender, 'Elige un producto arriba para ver sus lotes de producción.');
+        const estado = document.getElementById(idEstado);
+        if (estado) estado.querySelector('i').className = 'bi bi-boxes';
+        return;
+    }
+
+    mostrarCargandoGrafico(idEstado, idRender);
+
+    fetch("{% url 'grafico_produccion_producto' %}?producto_id=" + encodeURIComponent(productoId))
+        .then(response => {
+            if (!response.ok) throw new Error('Error HTTP ' + response.status);
+            return response.json();
+        })
+        .then(data => {
+            if (!data.ok) throw new Error(data.error || 'Error cargando el producto');
+
+            if (data.total_lotes === 0) {
+                mostrarErrorGrafico(idEstado, idRender, `"${data.producto}" todavía no tiene lotes de producción registrados.`);
+                const estado = document.getElementById(idEstado);
+                if (estado) estado.querySelector('i').className = 'bi bi-inbox';
+                return;
+            }
+
+            renderizarApex(idRender, {
+                chart: { type: 'bar', height: '100%', toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: 'dark' },
+                series: [{ name: 'Unidades producidas', data: data.valores }],
+                xaxis: {
+                    categories: data.etiquetas,
+                    labels: { style: { colors: '#9CA3AF', fontSize: '11px' }, rotate: -45 },
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#9CA3AF' },
+                        formatter: (valor) => formatoNumero(valor),
+                    },
+                },
+                colors: ['#A78BFA'],
+                plotOptions: { bar: { borderRadius: 5, columnWidth: '55%' } },
+                dataLabels: { enabled: false },
+                tooltip: {
+                    theme: 'dark',
+                    y: { formatter: (valor) => formatoNumero(valor) + ' unidades' },
+                },
+                grid: { borderColor: 'rgba(255,255,255,.08)', strokeDashArray: 4 },
+            });
+            mostrarGrafico(idEstado, idRender);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarErrorGrafico(idEstado, idRender);
+        });
+}
+
+document.addEventListener('change', function(evento){
+    if (evento.target && evento.target.id === 'selectorProductoGrafico') {
+        cargarGraficoProducto(evento.target.value);
+    }
+});
+
+
+/* =========================================================
+   GRÁFICO: PROYECCIÓN DE PRODUCCIÓN (SEMANA / MES)
+========================================================= */
+
+function cargarGraficoProyeccion(){
+    const idEstado = 'estadoChartProyeccion';
+    const idRender = 'renderChartProyeccion';
+
+    mostrarCargandoGrafico(idEstado, idRender);
+
+    fetch("{% url 'grafico_proyeccion_produccion' %}")
+        .then(response => {
+            if (!response.ok) throw new Error('Error HTTP ' + response.status);
+            return response.json();
+        })
+        .then(data => {
+            if (!data.ok) throw new Error(data.error || 'Error calculando la proyección');
+
+            if (!data.etiquetas || data.etiquetas.length === 0) {
+                mostrarErrorGrafico(
+                    idEstado, idRender,
+                    'No hay suficiente historial de ventas todavía para proyectar producción.'
+                );
+                const estado = document.getElementById(idEstado);
+                if (estado) estado.querySelector('i')?.classList.replace('bi-exclamation-triangle', 'bi-graph-up-arrow');
+                return;
+            }
+
+            renderizarApex(idRender, {
+                chart: { type: 'bar', height: '100%', toolbar: { show: false }, background: 'transparent' },
+                theme: { mode: 'dark' },
+                series: [
+                    { name: 'Sugerido próxima semana', data: data.valores_semana },
+                    { name: 'Sugerido para el mes', data: data.valores_mes },
+                ],
+                xaxis: {
+                    categories: data.etiquetas,
+                    labels: { style: { colors: '#9CA3AF', fontSize: '11px' }, rotate: -45 },
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#9CA3AF' },
+                        formatter: (valor) => formatoNumero(valor),
+                    },
+                },
+                colors: ['#38BDF8', '#E4C870'],
+                plotOptions: { bar: { borderRadius: 5, columnWidth: '60%' } },
+                dataLabels: { enabled: false },
+                legend: { labels: { colors: '#9CA3AF' } },
+                tooltip: {
+                    theme: 'dark',
+                    y: { formatter: (valor) => formatoNumero(valor) + ' unidades' },
+                },
+                grid: { borderColor: 'rgba(255,255,255,.08)', strokeDashArray: 4 },
+            });
+            mostrarGrafico(idEstado, idRender);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarErrorGrafico(idEstado, idRender);
+        });
+}
+
+
+/* =========================================================
+   INICIALIZAR TODO AL CARGAR LA PÁGINA
+========================================================= */
+
+document.addEventListener('DOMContentLoaded', function(){
+    cargarGraficosMesSemana();
+    cargarSelectorProductos();
+    cargarGraficoProyeccion();
+});
 
 /* =========================================================
    MODAL IMPORTAR
@@ -1307,9 +1121,7 @@ function abrirModalImportarProduccion(){
 
 }
 
-
 function cerrarModalImportarProduccion(){
-
     document
         .getElementById(
             'modalImportarProduccionOverlay'
@@ -1318,20 +1130,16 @@ function cerrarModalImportarProduccion(){
 
 }
 
-
 function cerrarModalImportarProduccionFondo(event){
 
     if(
         event.target.id ===
         'modalImportarProduccionOverlay'
     ){
-
         cerrarModalImportarProduccion();
-
     }
 
 }
-
 
 /* =========================================================
    DRAG & DROP
@@ -1346,38 +1154,29 @@ document.addEventListener(
                 '#dropzoneImportarProduccion input[type="file"]'
             );
 
-
         const texto =
             document.getElementById(
                 'dropzoneTextoProduccion'
             );
-
 
         const dropzone =
             document.getElementById(
                 'dropzoneImportarProduccion'
             );
 
-
         if(!input) return;
-
 
         input.addEventListener(
             'change',
             function(){
-
                 if(
                     input.files.length > 0
                 ){
-
                     texto.textContent =
                         input.files[0].name;
-
                 }
-
             }
         );
-
 
         [
             'dragover',
@@ -1386,68 +1185,52 @@ document.addEventListener(
 
         ].forEach(
             evento => {
-
                 dropzone.addEventListener(
                     evento,
                     e => e.preventDefault()
                 );
-
             }
         );
-
 
         dropzone.addEventListener(
             'dragover',
             () => {
-
                 dropzone.classList.add(
                     'dragover'
                 );
-
             }
         );
-
 
         dropzone.addEventListener(
             'dragleave',
             () => {
-
                 dropzone.classList.remove(
                     'dragover'
                 );
-
             }
         );
-
 
         dropzone.addEventListener(
             'drop',
             function(e){
-
                 dropzone.classList.remove(
                     'dragover'
                 );
 
-
                 if(
                     e.dataTransfer.files.length > 0
                 ){
-
                     input.files =
                         e.dataTransfer.files;
 
                     texto.textContent =
                         e.dataTransfer.files[0].name;
-
                 }
-
             }
         );
-
     }
 );
 
 </script>
-
 
 {% endblock %}
