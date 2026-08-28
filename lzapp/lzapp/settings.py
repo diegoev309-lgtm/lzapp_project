@@ -7,6 +7,9 @@ SECRET_KEY = 'django-insecure-+95a3_wj16y$#(+rg&)urdt%pbc-dl6vx&le0oz0bw+fy&p8+y
 
 DEBUG = True
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 ALLOWED_HOSTS = ['*']
 # para la misma red
 #Usar el comando python manage.py runserver 0.0.0.0:8000 para ejecutar lo en otra pc y http://192.168.1.51:8000/
@@ -26,7 +29,7 @@ MERCADOPAGO_ACCESS_TOKEN = "APP_USR-3569434423018606-072916-47fd605aeda608e3647b
 MERCADOPAGO_PUBLIC_KEY = "APP_USR-e9497343-694d-4adc-83e6-2403bcab07c0"
 
 # URL base de tu sitio (para back_urls y notificaciones)
-SITE_URL = "https://spent-daycare-sludge.ngrok-free.dev"
+SITE_URL = " https://expand-submersed-cabdriver.ngrok-free.dev"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,10 +76,29 @@ MIDDLEWARE = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+
+        # Permitir que Google autentique
+        # una cuenta local que tenga el mismo email.
+        'EMAIL_AUTHENTICATION': True,
+
+        # Vincular automáticamente la cuenta Google
+        # con la cuenta local encontrada por email.
+        'EMAIL_AUTHENTICATION_AUTO_CONNECT': True,
     }
 }
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 ROOT_URLCONF = 'lzapp.urls'
 
@@ -143,4 +165,4 @@ EMAIL_HOST_PASSWORD = "eooiutauqloeajyn"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/' 
+LOGIN_REDIRECT_URL = '/client'
