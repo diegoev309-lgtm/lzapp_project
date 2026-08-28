@@ -1,312 +1,131 @@
+{% load static %}
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar contraseña | LzApp</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperar Contraseña</title>
 
-```
-<style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-    }
-
-    body{
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background:
-            radial-gradient(circle at top left, #1e3a8a 0%, #0f172a 45%, #020617 100%);
-    }
-
-    .reset-card{
-        width:100%;
-        max-width:520px;
-        background:#0f172a;
-        border:1px solid rgba(255,255,255,.08);
-        border-radius:30px;
-        padding:45px 40px;
-        box-shadow:
-            0 25px 70px rgba(0,0,0,.6),
-            0 0 0 1px rgba(255,255,255,.03);
-    }
-
-    .logo-box{
-        width:95px;
-        height:95px;
-        margin:0 auto 28px;
-        border-radius:24px;
-        background:#E4C870;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        box-shadow:0 12px 25px rgba(228,200,112,.25);
-    }
-
-    .logo-box svg{
-        width:52px;
-        height:52px;
-    }
-
-    .title{
-        text-align:center;
-        color:#ffffff;
-        font-size:34px;
-        font-weight:800;
-        margin-bottom:14px;
-    }
-
-    .subtitle{
-        text-align:center;
-        color:#cbd5e1;
-        font-size:15px;
-        line-height:1.7;
-        margin-bottom:32px;
-    }
-
-    .alert{
-        padding:14px 16px;
-        border-radius:14px;
-        margin-bottom:24px;
-        font-size:14px;
-        border:1px solid transparent;
-    }
-
-    .alert-success{
-        background:rgba(34,197,94,.12);
-        color:#bbf7d0;
-        border-color:rgba(34,197,94,.25);
-    }
-
-    .alert-error,
-    .alert-danger{
-        background:rgba(239,68,68,.12);
-        color:#fecaca;
-        border-color:rgba(239,68,68,.25);
-    }
-
-    .divider{
-        height:1px;
-        margin:28px 0;
-        background:linear-gradient(
-            to right,
-            transparent,
-            rgba(255,255,255,.15),
-            transparent
-        );
-    }
-
-    .form-group{
-        margin-bottom:24px;
-    }
-
-    .form-label{
-        display:block;
-        margin-bottom:10px;
-        color:#f8fafc;
-        font-weight:700;
-        font-size:15px;
-    }
-
-    .form-control{
-        width:100%;
-        padding:15px 16px;
-        border-radius:15px;
-        border:1px solid #334155;
-        background:#172554;
-        color:#ffffff;
-        font-size:15px;
-        transition:.25s ease;
-    }
-
-    .form-control::placeholder{
-        color:#94a3b8;
-    }
-
-    .form-control:focus{
-        outline:none;
-        border-color:#E4C870;
-        background:#1e3a8a;
-        box-shadow:0 0 0 4px rgba(228,200,112,.15);
-    }
-
-    .btn-submit{
-        width:100%;
-        border:none;
-        border-radius:15px;
-        padding:15px 18px;
-        background:#E4C870;
-        color:#111827;
-        font-size:16px;
-        font-weight:800;
-        cursor:pointer;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        gap:10px;
-        transition:.2s ease;
-    }
-
-    .btn-submit:hover{
-        background:#F3DA88;
-        transform:translateY(-2px);
-        box-shadow:0 14px 28px rgba(228,200,112,.22);
-    }
-
-    .btn-submit svg{
-        width:18px;
-        height:18px;
-    }
-
-    .back-link{
-        margin-top:28px;
-        text-align:center;
-    }
-
-    .back-link a{
-        color:#E4C870;
-        text-decoration:none;
-        font-weight:700;
-        transition:opacity .2s ease;
-    }
-
-    .back-link a:hover{
-        opacity:.85;
-        text-decoration:underline;
-    }
-
-    @media (max-width:576px){
-
-        .reset-card{
-            padding:36px 24px;
-            border-radius:24px;
-        }
-
-        .title{
-            font-size:28px;
-        }
-    }
-
-</style>
-```
-
+<link rel="stylesheet" href="{% static 'css/solicitar.css' %}">
 </head>
 
 <body>
 
-```
-<div class="reset-card">
+<div class="auth-shell">
 
-    <div class="logo-box">
+    <video
+        class="auth-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        webkit-playsinline="true"
+        poster="{% static 'img/fondo.jpg' %}"
+    >
+        <source src="{% static 'video/lr.mp4' %}" type="video/mp4">
+    </video>
 
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- ================= PANEL IZQUIERDO ================= -->
+    <div class="auth-marca">
 
-            <path d="M7 11V8a5 5 0 1110 0v3"
-                  stroke="#111827"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
+        <a href="{% url 'login' %}" class="auth-volver" aria-label="Volver al inicio de sesión">
+            <i class="bi bi-arrow-left"></i>
+        </a>
 
-            <rect x="5"
-                  y="11"
-                  width="14"
-                  height="10"
-                  rx="2"
-                  stroke="#111827"
-                  stroke-width="2"/>
+        <span class="auth-orb o1"></span>
+        <span class="auth-orb o2"></span>
+        <span class="auth-orb o3"></span>
+        <span class="auth-orb o4"></span>
 
-        </svg>
+        <img src="{% static 'img/queso1.png' %}" class="auth-queso q1" alt="">
+        <img src="{% static 'img/queso2.png' %}" class="auth-queso q2" alt="">
+        <img src="{% static 'img/queso3.png' %}" class="auth-queso q3" alt="">
 
-    </div>
+        <div class="auth-marca-centro">
 
-    <h1 class="title">
-        Recuperar contraseña
-    </h1>
-
-    <p class="subtitle">
-        Ingresa el correo electrónico asociado a tu cuenta y te enviaremos un enlace seguro para restablecer tu contraseña.
-    </p>
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="alert alert-{{ message.tags }}">
-
-                {{ message }}
-
+            <div class="auth-insignia">
+                <img src="{% static 'img/logo.png' %}" alt="Lácteos Zulianos">
             </div>
 
-        {% endfor %}
+            <span class="auth-eyebrow"><span class="dot"></span> Recupera el acceso</span>
 
-    {% endif %}
+            <h1>Tranquilo, <span>te ayudamos a volver</span></h1>
 
-    <div class="divider"></div>
+            <p>Ingresa el correo asociado a tu cuenta y te enviaremos un enlace para crear una nueva contraseña en minutos.</p>
 
-    <form method="post">
-
-        {% csrf_token %}
-
-        <div class="form-group">
-
-            <label for="email" class="form-label">
-
-                Correo electrónico
-
-            </label>
-
-            <input type="email"
-                   name="email"
-                   id="email"
-                   class="form-control"
-                   placeholder="ejemplo@correo.com"
-                   required>
+            <ul class="auth-marca-lista">
+                <li><i class="bi bi-check-lg"></i> Enlace de un solo uso y seguro</li>
+                <li><i class="bi bi-check-lg"></i> Válido por tiempo limitado</li>
+                <li><i class="bi bi-check-lg"></i> Tu cuenta permanece protegida</li>
+            </ul>
 
         </div>
 
-        <button type="submit" class="btn-submit">
+        <span class="auth-marca-footer">© Lácteos Zulianos — Sabor de la tierra</span>
 
-            <svg viewBox="0 0 24 24"
-                 fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-
-                <path d="M4 4h16v16H4z"
-                      stroke="#111827"
-                      stroke-width="2"/>
-
-                <path d="m4 8 8 5 8-5"
-                      stroke="#111827"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
-
+        <div class="auth-ola">
+            <svg viewBox="0 0 500 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,32 C120,60 380,4 500,32 L500,60 L0,60 Z" fill="rgba(255,255,255,0.04)"></path>
+                <path class="auth-ola-brillo" d="M0,30 C120,58 380,2 500,30"></path>
             </svg>
-
-            Enviar enlace de recuperación
-
-        </button>
-
-    </form>
-
-    <div class="back-link">
-
-        <a href="{% url 'login' %}">
-
-            ← Volver al inicio de sesión
-
-        </a>
+        </div>
 
     </div>
 
+    <!-- ================= PANEL DERECHO — FORMULARIO ================= -->
+    <div class="auth-form-panel">
+
+        <img src="{% static 'img/qusi1.png' %}" class="auth-queso-form qf1" alt="">
+        <img src="{% static 'img/qusi2.png' %}" class="auth-queso-form qf2" alt="">
+        <img src="{% static 'img/qusi2.png' %}" class="auth-queso-form qf3" alt="">
+        <img src="{% static 'img/qusi1.png' %}" class="auth-queso-form qf4" alt="">
+
+        <div class="auth-form-wrap">
+
+            <span class="auth-form-eyebrow">Recuperar acceso</span>
+            <h2>Recuperar Contraseña</h2>
+            <p class="auth-form-sub">Escribe tu correo electrónico y te enviaremos las instrucciones para restablecerla.</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="auth-mensaje-exito">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="campo-flotante">
+                    <label for="email">Correo Electrónico</label>
+                    <div class="campo-control-wrap">
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               class="form-control"
+                               placeholder="ejemplo@correo.com"
+                               required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">Enviar Enlace</button>
+
+            </form>
+
+            <div class="auth-registro">
+                ¿Ya la recordaste? <a href="{% url 'login' %}">Volver a Iniciar Sesión</a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
-```
+
+<script src="{% static 'js/formularios.js' %}"></script>
 
 </body>
 </html>

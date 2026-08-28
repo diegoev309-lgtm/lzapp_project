@@ -7,190 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - LzApp</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    <style>
-        :root {
-            --navy-1: #0a1c4e;
-            --navy-2: #16307a;
-            --gold: #f5b400;
-            --gold-hover: #d99e00;
-            --gris-fondo: #eef1f8;
-        }
-
-        body {
-            min-height: 100vh;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #0a1440, #1b3e8f 60%, #2b63c9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2.5rem 1rem;
-        }
-
-        .perfil-wrapper {
-            width: 100%;
-            max-width: 760px;
-            background: #fff;
-            border-radius: 22px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-        }
-
-        .perfil-header {
-            background: linear-gradient(135deg, var(--navy-1), var(--navy-2));
-            color: #fff;
-            text-align: center;
-            padding: 2.2rem 2rem 4rem 2rem;
-            position: relative;
-        }
-
-        .perfil-header .btn-volver {
-            position: absolute;
-            top: 1.2rem;
-            left: 1.2rem;
-            background-color: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 10px;
-            font-size: .85rem;
-            padding: .4rem 1rem;
-            transition: background-color .2s ease;
-        }
-
-        .perfil-header .btn-volver:hover {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #fff;
-        }
-
-        .avatar-circulo {
-            width: 78px;
-            height: 78px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.1rem;
-            margin: 0 auto .9rem auto;
-        }
-        .avatar-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-        .perfil-header h3 {
-            font-weight: 700;
-            margin-bottom: .25rem;
-        }
-
-        .perfil-header p {
-            opacity: .8;
-            margin-bottom: 0;
-            font-size: .92rem;
-        }
-
-        .perfil-card {
-            background: #fff;
-            border-radius: 22px 22px 0 0;
-            padding: 2.5rem 2.5rem 2rem 2.5rem;
-            margin-top: -2.2rem;
-            position: relative;
-        }
-
-        .seccion-titulo {
-            color: var(--navy-1);
-            font-weight: 700;
-            font-size: 1.02rem;
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            margin-bottom: .9rem;
-            letter-spacing: .2px;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: var(--navy-1);
-            font-size: .85rem;
-            margin-bottom: .35rem;
-        }
-
-        .form-control {
-            border-radius: 10px;
-            border: 1px solid #dbe1ea;
-            padding: .65rem 1rem;
-            background-color: #fafbfd;
-        }
-
-        .form-control:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 .2rem rgba(245, 180, 0, 0.18);
-            background-color: #fffdf5;
-        }
-
-        .btn-dorado {
-            background-color: var(--gold);
-            color: #1a1a1a;
-            border: none;
-            border-radius: 10px;
-            padding: .7rem 1.6rem;
-            font-weight: 700;
-            transition: background-color .2s ease;
-        }
-
-        .btn-dorado:hover {
-            background-color: var(--gold-hover);
-            color: #1a1a1a;
-        }
-
-        .btn-cancelar {
-            border-radius: 10px;
-            padding: .7rem 1.6rem;
-            font-weight: 600;
-        }
-
-        .alert {
-            border-radius: 10px;
-            font-size: .95rem;
-        }
-
-        .errorlist {
-            list-style: none;
-            padding-left: 0;
-            margin-top: .3rem;
-            color: #dc3545;
-            font-size: .85rem;
-        }
-
-        .footer-nota {
-            text-align: center;
-            color: #8a93a6;
-            font-size: .8rem;
-            padding-bottom: 1.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/config.css' %}">
 </head>
 
 <body>
+
+<!-- orbes flotantes de fondo -->
+<span class="perfil-orb po1"></span>
+<span class="perfil-orb po2"></span>
+<span class="perfil-orb po3"></span>
+<span class="perfil-orb po4"></span>
+
 <div class="perfil-wrapper">
 
     <div class="perfil-header">
-        <a href="{% url 'client' %}" class="btn btn-volver">
+
+        <img src="{% static 'img/queso1.png' %}" class="perfil-queso pq1" alt="">
+        <img src="{% static 'img/queso2.png' %}" class="perfil-queso pq2" alt="">
+        <img src="{% static 'img/queso3.png' %}" class="perfil-queso pq3" alt="">
+
+        <a href="{% url 'client' %}" class="btn-volver">
             <i class="bi bi-arrow-left"></i>
             Volver al menú
         </a>
 
+        <span class="perfil-eyebrow"><span class="dot"></span> Mi cuenta</span>
+
         <div class="avatar-circulo">
-    <img src="{% static 'img/logo.png' %}" alt="Lácteos Zulianos" class="avatar-logo">
-</div>
+            <img src="{% static 'img/logo.png' %}" alt="Lácteos Zulianos" class="avatar-logo">
+        </div>
 
         <h3>Configuración de mi cuenta</h3>
         <p>Actualiza tus datos personales y de contacto</p>
+
+        <div class="perfil-ola">
+            <svg viewBox="0 0 500 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,28 C140,0 360,56 500,28 L500,60 L0,60 Z" fill="rgba(255,255,255,0.04)"></path>
+                <path class="perfil-ola-brillo" d="M0,30 C140,2 360,58 500,30"></path>
+            </svg>
+        </div>
+
     </div>
 
     <div class="perfil-card">
@@ -252,7 +113,7 @@
 
             </div>
 
-            <div class="seccion-titulo">
+            <div class="seccion-titulo titulo-contacto">
                 <i class="bi bi-geo-alt"></i>
                 Información de contacto
             </div>
@@ -279,7 +140,7 @@
                     Guardar cambios
                 </button>
 
-                <a href="{% url 'client' %}" class="btn btn-outline-secondary btn-cancelar">
+                <a href="{% url 'client' %}" class="btn btn-cancelar btn-outline-secondary">
                     Cancelar
                 </a>
             </div>

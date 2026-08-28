@@ -1,0 +1,583 @@
+:root{
+    --azul-profundo:#022C63;
+    --azul-principal:#083b78;
+    --azul-medio:#1a5fa8;
+    --azul-claro:#e8f0fb;
+    --dorado:#c9a84c;
+    --dorado-claro:#f0d98a;
+    --blanco:#ffffff;
+    --gris-texto:#5b6472;
+    --transition:.4s cubic-bezier(.25,.8,.25,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html,body{height:100%;}
+
+body{
+    font-family:'Montserrat',sans-serif;
+    background:var(--azul-profundo);
+    color:#222;
+    overflow-x:hidden;
+}
+
+/* ============================================================
+   LAYOUT — pantalla partida
+   ============================================================ */
+.auth-shell{
+    min-height:100vh;
+    min-height:100svh;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+}
+
+/* ------------------------------------------------------------
+   PANEL IZQUIERDO — identidad de marca
+   ------------------------------------------------------------ */
+.auth-marca{
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:44px 56px;
+    background:transparent;
+    isolation:isolate;
+}
+
+/* ---- VIDEO DE FONDO ----
+   Se coloca detrás de todo (z-index:0). object-fit:cover +
+   object-position:center hacen que se recorte igual en cualquier
+   pantalla, igual que el hero-video de la home, así que no hace
+   falta un video distinto para mobile. */
+.auth-video{
+    position:fixed;
+    top:50%;
+    left:50%;
+    width:100vw;
+    height:100vh;
+    min-width:100vw;
+    min-height:100vh;
+    object-fit:cover;
+    object-position:center;
+    transform:translate(-50%,-50%) scale(1.02);
+    z-index:0;
+    pointer-events:none;
+}
+
+/* Degradado navy + dorado — capa semitransparente ENCIMA del video.
+   Se bajó bastante la opacidad para que el video se note; el
+   text-shadow en los textos (más abajo) se encarga de mantener la
+   legibilidad aunque el fondo sea más claro/variado. */
+.auth-marca::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+        radial-gradient(circle at 18% 12%, rgba(201,168,76,.1) 0%, transparent 45%),
+        linear-gradient(150deg, rgba(2,25,64,.35) 0%, rgba(2,44,99,.3) 45%, rgba(10,61,145,.22) 80%, rgba(21,101,192,.16) 130%);
+    mix-blend-mode:soft-light;
+    pointer-events:none;
+}
+.auth-marca::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+        linear-gradient(to top, rgba(0,10,30,.4) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,10,30,.3) 100%);
+    mix-blend-mode:soft-light;
+    pointer-events:none;
+}
+.auth-volver{
+    position:relative;
+    width:42px;height:42px;
+    border-radius:50%;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.28);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.05rem;
+    text-decoration:none;
+    transition:background var(--transition),transform var(--transition),color var(--transition);
+    z-index:5;
+}
+.auth-volver:hover{
+    background:var(--dorado);
+    border-color:var(--dorado);
+    color:var(--azul-profundo);
+    transform:translateX(-3px);
+}
+
+/* orbes flotantes, mismo lenguaje que el hero de home */
+.auth-orb{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(2px);
+    opacity:.55;
+    pointer-events:none;
+    z-index:2;
+}
+.auth-orb.o1{width:16px;height:16px;top:16%;left:72%;background:var(--dorado-claro);
+    box-shadow:0 0 26px 6px rgba(240,217,138,.55);animation:flotar 7s ease-in-out infinite;}
+.auth-orb.o2{width:10px;height:10px;top:62%;left:84%;background:#fff;
+    box-shadow:0 0 18px 5px rgba(255,255,255,.45);animation:flotar 9s ease-in-out infinite 1s;}
+.auth-orb.o3{width:20px;height:20px;top:74%;left:14%;background:var(--dorado);
+    box-shadow:0 0 30px 8px rgba(201,168,76,.5);animation:flotar 11s ease-in-out infinite .4s;}
+.auth-orb.o4{width:8px;height:8px;top:30%;left:8%;background:var(--dorado-claro);
+    box-shadow:0 0 16px 4px rgba(240,217,138,.5);animation:flotar 8s ease-in-out infinite 2s;}
+
+@keyframes flotar{0%,100%{transform:translateY(0);}50%{transform:translateY(-24px);}}
+
+/* ------------------------------------------------------------
+   QUESITOS FLOTANTES — fotos recortadas (PNG con fondo transparente)
+   que tú vas a colocar. Van del lado derecho del panel, lejos del
+   texto, con la misma sensación de las piezas 3D del hero de la
+   home (flotan suave, con sombra, y se ocultan en mobile). */
+.auth-queso{
+    position:absolute;
+    z-index:2;
+    display:block;
+    pointer-events:none;
+    filter:drop-shadow(0 16px 28px rgba(0,0,0,.45));
+}
+.auth-queso img{
+    width:100%;
+    display:block;
+}
+.auth-queso.q1{
+    width:120px;
+    top:10%;
+    right:10%;
+    animation:flotarQueso1 7s ease-in-out infinite;
+}
+.auth-queso.q2{
+    width:95px;
+    bottom:20%;
+    right:6%;
+    animation:flotarQueso2 8.5s ease-in-out infinite 1s;
+}
+.auth-queso.q3{
+    width:70px;
+    top:48%;
+    right:22%;
+    animation:flotarQueso3 6.5s ease-in-out infinite .5s;
+}
+
+@keyframes flotarQueso1{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-16px) rotate(2deg);}}
+@keyframes flotarQueso2{0%,100%{transform:translateY(0) rotate(3deg);}50%{transform:translateY(14px) rotate(-4deg);}}
+@keyframes flotarQueso3{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-10px) rotate(3deg);}}
+
+/* insignia del logo: aro giratorio + brillo, como una rueda de queso */
+.auth-marca-centro{
+    position:relative;
+    z-index:4;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    max-width:420px;
+}
+
+.auth-insignia{
+    position:relative;
+    width:118px;height:118px;
+    margin-bottom:34px;
+}
+.auth-insignia::before{
+    content:'';
+    position:absolute;inset:-10px;
+    border-radius:50%;
+    border:1.5px dashed rgba(201,168,76,.45);
+    animation:girarLento 22s linear infinite;
+}
+.auth-insignia img{
+    width:100%;height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.45));
+    position:relative;z-index:2;
+    animation:respirar 5s ease-in-out infinite;
+}
+@keyframes girarLento{to{transform:rotate(360deg);}}
+@keyframes respirar{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+.auth-eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:.74rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--dorado-claro);
+    margin-bottom:1.1rem;
+    padding:.4rem 1rem .4rem .4rem;
+    border:1px solid rgba(201,168,76,.35);
+    border-radius:50px;
+    background:rgba(201,168,76,.08);
+}
+.auth-eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--dorado);
+    box-shadow:0 0 0 0 rgba(201,168,76,.7);
+    animation:pulsoDot 2.4s ease-out infinite;
+}
+@keyframes pulsoDot{0%{box-shadow:0 0 0 0 rgba(201,168,76,.7);}70%{box-shadow:0 0 0 10px rgba(201,168,76,0);}100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}}
+
+.auth-marca h1{
+    font-size:clamp(2.1rem,3vw,2.7rem);
+    font-weight:800;
+    letter-spacing:-1px;
+    color:#fff;
+    line-height:1.12;
+    margin-bottom:1rem;
+    text-shadow:0 4px 18px rgba(0,15,40,.55);
+}
+.auth-marca h1 span{
+    display:block;
+    background:linear-gradient(120deg,var(--dorado) 0%,var(--dorado-claro) 50%,var(--dorado) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.auth-marca p{
+    font-size:1rem;
+    font-weight:300;
+    line-height:1.7;
+    color:rgba(255,255,255,.85);
+    max-width:360px;
+    text-shadow:0 2px 10px rgba(0,15,40,.5);
+}
+
+.auth-marca-lista{
+    list-style:none;
+    margin-top:1.9rem;
+    display:flex;
+    flex-direction:column;
+    gap:.8rem;
+}
+.auth-marca-lista li{
+    display:flex;align-items:center;gap:12px;
+    font-size:.88rem;
+    color:rgba(255,255,255,.85);
+}
+.auth-marca-lista i{
+    color:var(--azul-profundo);
+    background:var(--dorado);
+    width:26px;height:26px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.72rem;
+    flex-shrink:0;
+}
+
+/* ola de leche — firma visual, curva inferior del panel */
+.auth-ola{
+    position:absolute;
+    left:0;bottom:-1px;
+    width:100%;
+    z-index:3;
+    line-height:0;
+    pointer-events:none;
+}
+.auth-ola svg{display:block;width:100%;height:auto;}
+.auth-ola-brillo{
+    stroke:var(--dorado-claro);
+    stroke-width:2;
+    fill:none;
+    opacity:.55;
+    stroke-dasharray:6 10;
+    animation:deslizarOla 5s linear infinite;
+}
+@keyframes deslizarOla{to{stroke-dashoffset:-160;}}
+
+.auth-marca-footer{
+    position:relative;z-index:4;
+    font-size:.76rem;
+    color:rgba(255,255,255,.45);
+    letter-spacing:.03em;
+}
+
+/* ------------------------------------------------------------
+   PANEL DERECHO — formulario
+   ------------------------------------------------------------ */
+.auth-form-panel{
+    background:
+        linear-gradient(160deg, rgba(2,44,99,.42) 0%, rgba(8,59,120,.34) 50%, rgba(21,101,192,.26) 100%);
+    backdrop-filter:blur(20px) saturate(115%);
+    -webkit-backdrop-filter:blur(20px) saturate(115%);
+    box-shadow:-30px 0 60px rgba(0,15,40,.35), inset 0 1px 0 rgba(255,255,255,.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 32px;
+    position:relative;
+    z-index:2;
+}
+
+.auth-form-wrap{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:400px;
+}
+
+/* QUESITOS FLOTANTES DEL PANEL DERECHO — en las esquinas, como
+   marcaste con las estrellas. Reemplaza los src por tus PNG
+   recortados (fondo transparente) cuando los tengas listos. */
+.auth-queso-form{
+    position:absolute;
+    z-index:1;
+    display:block;
+    pointer-events:none;
+    filter:drop-shadow(0 14px 24px rgba(0,0,0,.4));
+}
+.auth-queso-form img{
+    width:100%;
+    display:block;
+}
+.auth-queso-form.qf1{
+    width:90px;
+    top:6%;
+    left:6%;
+    animation:flotarQueso1 7s ease-in-out infinite;
+}
+.auth-queso-form.qf2{
+    width:100px;
+    top:16%;
+    right:6%;
+    animation:flotarQueso3 8s ease-in-out infinite .6s;
+}
+.auth-queso-form.qf3{
+    width:85px;
+    bottom:20%;
+    left:8%;
+    animation:flotarQueso2 8.5s ease-in-out infinite 1.2s;
+}
+.auth-queso-form.qf4{
+    width:95px;
+    bottom:7%;
+    right:7%;
+    animation:flotarQueso1 7.5s ease-in-out infinite .3s;
+}
+
+@keyframes flotarQueso1{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-16px) rotate(2deg);}}
+@keyframes flotarQueso2{0%,100%{transform:translateY(0) rotate(3deg);}50%{transform:translateY(14px) rotate(-4deg);}}
+@keyframes flotarQueso3{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-10px) rotate(3deg);}}
+
+.auth-form-eyebrow{
+    font-size:.76rem;
+    font-weight:700;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--dorado);
+    margin-bottom:.6rem;
+    display:block;
+}
+
+.auth-form-wrap h2{
+    font-size:1.9rem;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-.5px;
+    margin-bottom:.5rem;
+    text-shadow:0 2px 12px rgba(0,15,40,.4);
+}
+
+.auth-form-sub{
+    font-size:.92rem;
+    color:rgba(255,255,255,.78);
+    margin-bottom:2.1rem;
+}
+
+/* campos flotantes */
+.campo-flotante{
+    position:relative;
+    margin-bottom:1.4rem;
+}
+
+.campo-flotante label{
+    display:block;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.03em;
+    color:#fff;
+    margin-bottom:.45rem;
+}
+
+.campo-flotante .campo-control-wrap{
+    position:relative;
+}
+
+.campo-flotante input,
+.campo-flotante .form-control{
+    width:100%;
+    height:52px;
+    border-radius:12px;
+    border:1.5px solid #e3e6ee;
+    background:#fafbfd;
+    padding:0 1.1rem;
+    font-size:.95rem;
+    font-family:'Montserrat',sans-serif;
+    color:var(--azul-profundo);
+    transition:border-color var(--transition),box-shadow var(--transition),background var(--transition);
+}
+
+.campo-flotante input:focus,
+.campo-flotante .form-control:focus{
+    outline:none;
+    border-color:var(--dorado);
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(201,168,76,.16);
+}
+
+.campo-flotante.password .form-control{padding-right:3rem;}
+
+.campo-icono-eye{
+    position:absolute;
+    right:14px;top:50%;
+    transform:translateY(-50%);
+    border:none;background:none;
+    cursor:pointer;
+    font-size:1.15rem;
+    color:#9aa3b2;
+    transition:color var(--transition);
+    display:flex;
+}
+.campo-icono-eye:hover{color:var(--dorado);}
+
+.auth-extra{
+    display:flex;
+    justify-content:flex-end;
+    margin:-.5rem 0 1.6rem;
+}
+.auth-extra a{
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--dorado-claro);
+    text-decoration:none;
+    transition:color var(--transition);
+}
+.auth-extra a:hover{color:var(--dorado);text-decoration:underline;}
+
+.btn-auth{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(120deg,var(--dorado),var(--dorado-claro));
+    color:var(--azul-profundo);
+    font-weight:800;
+    font-size:.98rem;
+    letter-spacing:.02em;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    transition:transform var(--transition),box-shadow var(--transition);
+}
+.btn-auth:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 28px rgba(201,168,76,.4);
+}
+.btn-auth::after{
+    content:'';
+    position:absolute;top:0;left:-60%;
+    width:40%;height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.6),transparent);
+    transform:skewX(-20deg);
+    animation:brilloBtn 3.2s ease-in-out infinite;
+}
+@keyframes brilloBtn{0%{left:-60%;}55%{left:130%;}100%{left:130%;}}
+
+.auth-divider{
+    display:flex;align-items:center;gap:14px;
+    margin:1.8rem 0 1.5rem;
+    color:rgba(255,255,255,.55);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+.auth-divider::before,.auth-divider::after{
+    content:'';flex:1;height:1px;background:rgba(255,255,255,.22);
+}
+
+.auth-registro{
+    text-align:center;
+    font-size:.9rem;
+    color:rgba(255,255,255,.75);
+}
+.auth-registro a{
+    color:var(--dorado-claro);
+    font-weight:700;
+    text-decoration:none;
+    position:relative;
+}
+.auth-registro a::after{
+    content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+    background:var(--dorado);transform:scaleX(0);transform-origin:right;
+    transition:transform var(--transition);
+}
+.auth-registro a:hover::after{transform:scaleX(1);transform-origin:left;}
+
+.auth-errores{
+    background:#fdecec;
+    border:1px solid #f4b9b9;
+    color:#b3261e;
+    border-radius:10px;
+    padding:.75rem 1rem;
+    font-size:.85rem;
+    margin-bottom:1.3rem;
+}
+
+/* entrada suave del formulario */
+.auth-form-wrap > *{
+    opacity:0;
+    transform:translateY(14px);
+    animation:entrarForm .6s ease forwards;
+}
+.auth-form-wrap > *:nth-child(1){animation-delay:.05s;}
+.auth-form-wrap > *:nth-child(2){animation-delay:.1s;}
+.auth-form-wrap > *:nth-child(3){animation-delay:.15s;}
+.auth-form-wrap > *:nth-child(4){animation-delay:.2s;}
+@keyframes entrarForm{to{opacity:1;transform:translateY(0);}}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:991px){
+    .auth-shell{grid-template-columns:1fr;}
+    .auth-marca{
+        min-height:320px;
+        padding:28px 28px 56px;
+    }
+    .auth-queso{display:none;}
+    .auth-queso-form{display:none;}
+    /* En pantallas chicas el texto queda directamente sobre el
+       video sin tanto espacio alrededor, así que oscurecemos un
+       poco más el degradado para que el título dorado y el texto
+       blanco sigan leyéndose bien en cualquier video de fondo. */
+    .auth-marca::before{
+        background:
+            radial-gradient(circle at 18% 12%, rgba(201,168,76,.16) 0%, transparent 45%),
+            linear-gradient(160deg, rgba(0,31,84,.62) 0%, rgba(2,44,99,.56) 45%, rgba(10,61,145,.48) 100%);
+    }
+    .auth-marca-centro{
+        align-items:center;
+        text-align:center;
+        margin:0 auto;
+    }
+    .auth-insignia{width:78px;height:78px;margin-bottom:18px;}
+    .auth-marca h1{font-size:1.7rem;}
+    .auth-marca p, .auth-marca-lista{display:none;}
+    .auth-eyebrow{margin-left:auto;margin-right:auto;}
+    .auth-marca-footer{display:none;}
+    .auth-volver{position:absolute;top:20px;left:20px;}
+    .auth-form-panel{padding:36px 24px 48px;}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .auth-orb,.auth-insignia::before,.auth-insignia img,
+    .auth-eyebrow .dot,.btn-auth::after,.auth-ola-brillo,
+    .auth-queso,
+    .auth-form-wrap > *{animation:none !important;opacity:1 !important;transform:none !important;}
+    /* El video se oculta (formularios.js además lo pausa) y queda
+       el color/gradiente de respaldo, para no forzar movimiento a
+       quien lo desactivó en su sistema. */
+    .auth-video{display:none;}
+}

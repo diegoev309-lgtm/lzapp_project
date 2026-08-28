@@ -1,0 +1,378 @@
+:root{
+    --azul-profundo:#022C63;
+    --azul-principal:#083b78;
+    --azul-medio:#1a5fa8;
+    --azul-claro:#e8f0fb;
+    --dorado:#c9a84c;
+    --dorado-claro:#f0d98a;
+    --blanco:#ffffff;
+    --gris-texto:#5b6472;
+    --transition:.4s cubic-bezier(.25,.8,.25,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html,body{height:100%;}
+
+body{
+    font-family:'Montserrat',sans-serif;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 85% 10%, rgba(201,168,76,.12) 0%, transparent 42%),
+        linear-gradient(150deg, var(--azul-profundo) 0%, var(--azul-principal) 55%, var(--azul-medio) 130%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:2.5rem 1rem;
+    overflow-x:hidden;
+}
+
+/* ============================================================
+   ORBES FLOTANTES DE FONDO — trayectoria distinta a la plantilla
+   ============================================================ */
+.perfil-orb{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(2px);
+    opacity:.5;
+    pointer-events:none;
+    z-index:0;
+}
+.perfil-orb.po1{width:14px;height:14px;top:12%;left:10%;background:var(--dorado-claro);
+    box-shadow:0 0 24px 6px rgba(240,217,138,.5);animation:derivar 10s ease-in-out infinite;}
+.perfil-orb.po2{width:9px;height:9px;top:78%;left:88%;background:#fff;
+    box-shadow:0 0 16px 4px rgba(255,255,255,.4);animation:derivar 8s ease-in-out infinite 1.4s;}
+.perfil-orb.po3{width:18px;height:18px;top:85%;left:6%;background:var(--dorado);
+    box-shadow:0 0 28px 7px rgba(201,168,76,.45);animation:derivar 12s ease-in-out infinite .7s;}
+.perfil-orb.po4{width:11px;height:11px;top:8%;left:92%;background:var(--dorado-claro);
+    box-shadow:0 0 18px 5px rgba(240,217,138,.45);animation:derivar 9.5s ease-in-out infinite 2.2s;}
+
+@keyframes derivar{
+    0%,100%{transform:translate(0,0);}
+    33%{transform:translate(10px,-18px);}
+    66%{transform:translate(-8px,10px);}
+}
+
+/* ============================================================
+   TARJETA PRINCIPAL
+   ============================================================ */
+.perfil-wrapper{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:760px;
+    background:var(--blanco);
+    border-radius:26px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:
+        0 35px 80px rgba(0,8,26,.55),
+        0 0 0 1px rgba(255,255,255,.04),
+        0 -1px 0 rgba(255,255,255,.25) inset;
+    opacity:0;
+    transform:translateY(18px);
+    animation:entrarTarjeta .55s ease forwards;
+}
+@keyframes entrarTarjeta{to{opacity:1;transform:translateY(0);}}
+
+/* ------------------------------------------------------------
+   CABECERA
+   ------------------------------------------------------------ */
+.perfil-header{
+    position:relative;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(201,168,76,.16) 0%, transparent 45%),
+        linear-gradient(140deg, var(--azul-profundo) 0%, var(--azul-principal) 60%, var(--azul-medio) 130%);
+    color:#fff;
+    text-align:center;
+    padding:2.1rem 2rem 3.6rem 2rem;
+    overflow:hidden;
+    isolation:isolate;
+}
+.perfil-header::before{
+    content:'';
+    position:absolute;inset:0;
+    z-index:0;
+    background:
+        radial-gradient(circle at 85% 85%, rgba(201,168,76,.12) 0%, transparent 40%),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 0%, transparent 30%);
+    mix-blend-mode:soft-light;
+    pointer-events:none;
+}
+.perfil-header::after{
+    content:'';
+    position:absolute;inset:0;
+    z-index:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.08) 0%, transparent 55%);
+    pointer-events:none;
+}
+
+.perfil-header .btn-volver{
+    position:absolute;
+    top:1.25rem;
+    left:1.25rem;
+    z-index:5;
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    background:rgba(255,255,255,.1);
+    color:#fff;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:50px;
+    font-size:.8rem;
+    font-weight:600;
+    padding:.45rem 1.05rem;
+    text-decoration:none;
+    transition:background var(--transition),transform var(--transition),color var(--transition);
+}
+.perfil-header .btn-volver:hover{
+    background:var(--dorado);
+    border-color:var(--dorado);
+    color:var(--azul-profundo);
+    transform:translateX(-3px);
+}
+
+/* quesitos flotantes en la cabecera — posiciones distintas al login */
+.perfil-queso{
+    position:absolute;
+    z-index:2;
+    display:block;
+    pointer-events:none;
+    opacity:.95;
+    filter:drop-shadow(0 12px 22px rgba(0,0,0,.45));
+}
+.perfil-queso img{width:100%;display:block;}
+.perfil-queso.pq1{width:58px;top:12%;right:6%;animation:balanceo1 7.5s ease-in-out infinite;}
+.perfil-queso.pq2{width:46px;top:60%;right:16%;animation:balanceo2 6.5s ease-in-out infinite .6s;}
+.perfil-queso.pq3{width:42px;bottom:10%;left:7%;animation:balanceo3 8s ease-in-out infinite 1.1s;}
+
+@keyframes balanceo1{0%,100%{transform:translateY(0) rotate(3deg);}50%{transform:translateY(-12px) rotate(-3deg);}}
+@keyframes balanceo2{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(10px) rotate(4deg);}}
+@keyframes balanceo3{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-9px) rotate(-2deg);}}
+
+.perfil-eyebrow{
+    position:relative;
+    z-index:2;
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dorado-claro);
+    margin-bottom:.9rem;
+    padding:.35rem .95rem .35rem .4rem;
+    border:1px solid rgba(201,168,76,.35);
+    border-radius:50px;
+    background:rgba(201,168,76,.08);
+}
+.perfil-eyebrow .dot{
+    width:6px;height:6px;border-radius:50%;background:var(--dorado);
+    animation:pulsoDot 2.4s ease-out infinite;
+}
+@keyframes pulsoDot{0%{box-shadow:0 0 0 0 rgba(201,168,76,.7);}70%{box-shadow:0 0 0 9px rgba(201,168,76,0);}100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}}
+
+.avatar-circulo{
+    position:relative;
+    z-index:2;
+    width:82px;
+    height:82px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    border:2px solid rgba(255,255,255,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2.1rem;
+    margin:0 auto .95rem auto;
+    animation:respirar 5s ease-in-out infinite;
+}
+.avatar-circulo::before{
+    content:'';
+    position:absolute;inset:-9px;
+    border-radius:50%;
+    border:1.5px dashed rgba(201,168,76,.5);
+    animation:girarLento 20s linear infinite;
+}
+@keyframes girarLento{to{transform:rotate(360deg);}}
+.avatar-logo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+}
+@keyframes respirar{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+.perfil-header h3{
+    position:relative;z-index:2;
+    font-weight:800;
+    letter-spacing:-.5px;
+    margin-bottom:.3rem;
+    text-shadow:0 2px 12px rgba(0,15,40,.45);
+}
+
+.perfil-header p{
+    position:relative;z-index:2;
+    opacity:.82;
+    margin-bottom:0;
+    font-size:.9rem;
+}
+
+/* ola invertida en la base de la cabecera — distinta a la del login */
+.perfil-ola{
+    position:absolute;
+    left:0;bottom:-1px;
+    width:100%;
+    z-index:1;
+    line-height:0;
+    pointer-events:none;
+}
+.perfil-ola svg{display:block;width:100%;height:auto;}
+.perfil-ola-brillo{
+    stroke:var(--dorado-claro);
+    stroke-width:2;
+    fill:none;
+    opacity:.5;
+    stroke-dasharray:5 9;
+    animation:deslizarOla 6s linear infinite reverse;
+}
+@keyframes deslizarOla{to{stroke-dashoffset:-160;}}
+
+/* ------------------------------------------------------------
+   CUERPO DE LA TARJETA
+   ------------------------------------------------------------ */
+.perfil-card{
+    background:var(--blanco);
+    border-radius:26px 26px 0 0;
+    padding:2.2rem 2.5rem 2rem 2.5rem;
+    margin-top:-1.8rem;
+    position:relative;
+    z-index:2;
+    box-shadow:0 -18px 30px -20px rgba(0,10,30,.25);
+}
+
+.seccion-titulo{
+    color:var(--azul-profundo);
+    font-weight:800;
+    font-size:1rem;
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    margin-bottom:1rem;
+    letter-spacing:.02em;
+    opacity:0;
+    transform:translateX(-10px);
+    animation:entrarSeccion .5s ease forwards;
+}
+.seccion-titulo i{
+    width:28px;height:28px;
+    border-radius:50%;
+    background:var(--dorado);
+    color:var(--azul-profundo);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;
+    flex-shrink:0;
+}
+.seccion-titulo.titulo-contacto{animation-delay:.15s;}
+@keyframes entrarSeccion{to{opacity:1;transform:translateX(0);}}
+
+.form-label{
+    font-weight:700;
+    color:var(--azul-profundo);
+    font-size:.82rem;
+    margin-bottom:.4rem;
+}
+
+.form-control{
+    border-radius:12px;
+    border:1.5px solid #e3e6ee;
+    padding:.68rem 1.05rem;
+    background:#fafbfd;
+    font-family:'Montserrat',sans-serif;
+    color:var(--azul-profundo);
+    transition:border-color var(--transition),box-shadow var(--transition),background var(--transition);
+}
+
+.form-control:focus{
+    outline:none;
+    border-color:var(--dorado);
+    box-shadow:0 0 0 4px rgba(201,168,76,.16);
+    background:#fff;
+}
+
+.btn-dorado{
+    background:linear-gradient(120deg,var(--dorado),var(--dorado-claro));
+    color:var(--azul-profundo);
+    border:none;
+    border-radius:12px;
+    padding:.72rem 1.7rem;
+    font-weight:800;
+    position:relative;
+    overflow:hidden;
+    transition:transform var(--transition),box-shadow var(--transition);
+}
+.btn-dorado:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 26px rgba(201,168,76,.4);
+    color:var(--azul-profundo);
+}
+.btn-dorado::after{
+    content:'';
+    position:absolute;top:0;left:-60%;
+    width:40%;height:100%;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.6),transparent);
+    transform:skewX(-20deg);
+    animation:brilloBtn 3.4s ease-in-out infinite;
+}
+@keyframes brilloBtn{0%{left:-60%;}55%{left:130%;}100%{left:130%;}}
+
+.btn-cancelar{
+    border-radius:12px;
+    padding:.72rem 1.7rem;
+    font-weight:700;
+    border:1.5px solid #dbe1ea;
+    color:var(--gris-texto);
+    transition:border-color var(--transition),color var(--transition),transform var(--transition);
+}
+.btn-cancelar:hover{
+    border-color:var(--azul-medio);
+    color:var(--azul-profundo);
+    transform:translateY(-2px);
+}
+
+.alert{
+    border-radius:12px;
+    font-size:.92rem;
+    border:none;
+}
+.alert-success{background:#eafaf0;color:#1e7a44;}
+.alert-danger,.alert-error{background:#fdecec;color:#b3261e;}
+.alert-warning{background:#fff8e6;color:#8a6100;}
+.alert-info{background:var(--azul-claro);color:var(--azul-principal);}
+
+.errorlist{
+    list-style:none;
+    padding-left:0;
+    margin-top:.3rem;
+    color:#dc3545;
+    font-size:.85rem;
+}
+
+.footer-nota{
+    text-align:center;
+    color:#8a93a6;
+    font-size:.78rem;
+    padding-bottom:1.5rem;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:576px){
+    .perfil-header{padding:2rem 1.4rem 4.6rem 1.4rem;}
+    .perfil-card{padding:2rem 1.5rem 1.6rem 1.5rem;}
+    .perfil-queso{display:none;}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .perfil-orb,.perfil-queso,.perfil-eyebrow .dot,.avatar-circulo,
+    .btn-dorado::after,.perfil-ola-brillo,.perfil-wrapper,.seccion-titulo{
+        animation:none !important;opacity:1 !important;transform:none !important;
+    }
+}
