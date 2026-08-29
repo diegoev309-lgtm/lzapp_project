@@ -16,26 +16,30 @@
             </p>
         </div>
 
-        <!-- <div class="aviso-completitud">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span>
-                Este producto solo se mostrará en la tienda a los clientes si completas
-                <strong>imagen, descripción, stock actual, stock mínimo y precio</strong>.
-                Si guardas con alguno de estos campos vacío, el producto quedará guardado
-                pero oculto en la tienda hasta que los completes.
-            </span>
-        </div> -->
-
         <div class="card-form">
             <form method="POST"
                   enctype="multipart/form-data"
                   id="form-producto"
                   data-producto-id="{{ form.instance.pk|default_if_none:'' }}"
                   data-url-verificar-nombre="{% url 'verificar_nombre_producto' %}"
+                  data-tiene-imagen="{% if form.instance.imagen %}1{% else %}0{% endif %}"
                   novalidate>
                 {% csrf_token %}
-                <div class="form-grid">
-                    {{ form.as_p }}
+
+                <div class="form-con-aviso">
+                    <div class="form-grid">
+                        {{ form.as_p }}
+                    </div>
+                
+                    <aside class="aviso-completitud" id="avisoCompletitud">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span>
+                            No podrás guardar este producto hasta completar
+                            <strong>imagen, descripción, stock actual, stock mínimo y precio</strong>.
+                            Mientras falte alguno, el botón "Guardar" y el interruptor "Disponible"
+                            quedarán bloqueados.
+                        </span>
+                    </aside>
                 </div>
 
                 <div class="botones">
@@ -70,6 +74,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputFecha = document.getElementById('id_fecha_vencimiento');
     const inputStockActual = document.getElementById('id_stock_actual');
     const inputStockMinimo = document.getElementById('id_stock_minimo');
+    const inputImagen = document.getElementById('id_imagen');
+    const inputDescripcion = document.getElementById('id_descripcion');
+    const inputDisponibilidad = document.getElementById('id_disponibilidad');
+    const avisoCompletitud = document.getElementById('avisoCompletitud');
+    const teniaImagenAlCargar = form.dataset.tieneImagen === '1';
+
+    function productoEstaCompleto() {
+        const imagenOk = (inputImagen && inputImagen.files.length > 0) || teniaImagenAlCargar;
+        const descripcionOk = inputDescripcion && inputDescripcion.value.trim() !== '';
+        const precioOk = inputPrecio && inputPrecio.value.trim() !== '' && parseFloat(inputPrecio.value) > 0;
+        const stockActualOk = inputStockActual && inputStockActual.value.trim() !== '' && parseInt(inputStockActual.value, 10) > 0;
+        const stockMinimoOk = inputStockMinimo && inputStockMinimo.value.trim() !== '' && parseInt(inputStockMinimo.value, 10) > 0;
+
+        return Boolean(imagenOk && descripcionOk && precioOk && stockActualOk && stockMinimoOk);
+    }
+
+    function actualizarEstadoCompletitud() {
+        const completo = productoEstaCompleto();
+
+        if (avisoCompletitud) {
+            avisoCompletitud.style.display = completo ? 'none' : 'flex';
+        }
+        if (inputDisponibilidad) {
+            inputDisponibilidad.disabled = !completo;
+            if (!completo) inputDisponibilidad.checked = false;
+        }
+
+        actualizarBotonGuardar();
+    }
+
+    [inputImagen, inputDescripcion, inputPrecio, inputStockActual, inputStockMinimo].forEach((input) => {
+        if (input) input.addEventListener('input', actualizarEstadoCompletitud);
+    });
+    if (inputImagen) inputImagen.addEventListener('change', actualizarEstadoCompletitud);
+
+    actualizarEstadoCompletitud();
 
     const NOMBRE_VALIDO_RE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/;
     const erroresActuales = {};
@@ -118,7 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function actualizarBotonGuardar() {
         if (!btnGuardar) return;
-        btnGuardar.disabled = Object.keys(erroresActuales).length > 0;
+        const hayErrores = Object.keys(erroresActuales).length > 0;
+        const incompleto = typeof productoEstaCompleto === 'function' ? !productoEstaCompleto() : false;
+        btnGuardar.disabled = hayErrores || incompleto;
     }
 
     // Las "sugerencias" son consejos, no bloquean el guardado (a diferencia
@@ -147,8 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (inputPrecio.value.trim() === '') {
             limpiarError(inputPrecio); // el "required" del navegador ya lo cubre
-        } else if (isNaN(valor) || valor <= 0) {
-            mostrarError(inputPrecio, 'El precio debe ser mayor a 0.');
+        } else if (isNaN(valor) || valor < 4000) {
+            mostrarError(inputPrecio, 'El precio mínimo permitido es $4.000,00.');
         } else {
             limpiarError(inputPrecio);
         }
@@ -284,7 +326,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (inputPrecio) {
-        inputPrecio.addEventListener('input', validarPrecio);
+        inputPrecio.addEventListener('blur', function () {
+            const valor = parseFloat(inputPrecio.value);
+            if (!isNaN(valor)) {
+                inputPrecio.value = valor.toFixed(2);
+            }
+        });
     }
 
     if (inputStockActual) {
@@ -306,7 +353,9 @@ document.addEventListener('DOMContentLoaded', function () {
         validarStockMinimo();
         validarFecha();
 
-        if (Object.keys(erroresActuales).length > 0) {
+        const incompleto = typeof productoEstaCompleto === 'function' ? !productoEstaCompleto() : false;
+
+        if (Object.keys(erroresActuales).length > 0 || incompleto) {
             evento.preventDefault();
         }
     });

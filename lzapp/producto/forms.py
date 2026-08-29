@@ -1,17 +1,14 @@
-import re
 from datetime import date
 from django import forms
 from dashboard.models import Producto
 
+import re
+import hashlib
+
 # Solo letras (con tildes/ñ), números y espacios.
 NOMBRE_VALIDO_RE = re.compile(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$')
 
-
 class ProductoForm(forms.ModelForm):
-    # Se actualiza en clean(); la vista lo usa para avisarle al usuario
-    # si el producto quedó oculto en la tienda por falta de datos.
-    producto_incompleto = False
-
     class Meta:
         model = Producto
         fields = '__all__'
@@ -46,11 +43,17 @@ class ProductoForm(forms.ModelForm):
 
     def clean_precio(self):
         precio = self.cleaned_data.get('precio')
+        if precio is None:
+            return precio
 
-        if precio is not None and precio <= 0:
+        if precio <= 0:
             raise forms.ValidationError('El precio debe ser mayor a 0.')
 
-        return precio
+        if precio < Decimal('4000.00'):
+            raise forms.ValidationError('El precio mínimo permitido es $4.000,00.')
+
+        # Si vino sin decimales (ej. 5000), se normaliza a 5000.00
+        return precio.quantize(Decimal('0.01'))
 
     def clean_stock_actual(self):
         stock_actual = self.cleaned_data.get('stock_actual')
@@ -78,28 +81,53 @@ class ProductoForm(forms.ModelForm):
 
         return fecha_vencimiento
 
+    def clean_imagen(self):
+        imagen = self.cleaned_data.get('imagen')
+
+        # Solo se valida cuando se sube una imagen NUEVA en esta petición.
+        # Si el campo no viene en self.files, es porque no se tocó (edición
+        # sin cambiar foto) o simplemente no se subió ninguna — en ambos
+        # casos no hay nada que comparar, así que nunca choca con productos
+        # sin foto.
+        if 'imagen' not in self.files:
+            return imagen
+
+        imagen.seek(0)
+        nuevo_hash = hashlib.md5(imagen.read()).hexdigest()
+        imagen.seek(0)
+
+        duplicado = Producto.objects.filter(imagen_hash=nuevo_hash)
+        if self.instance.pk:
+            duplicado = duplicado.exclude(pk=self.instance.pk)
+
+        existente = duplicado.first()
+        if existente:
+            raise forms.ValidationError(
+                f'Esta imagen ya se está usando en el producto "{existente.nombre}". Sube una foto distinta.'
+            )
+
+        return imagen
+
     def clean(self):
         cleaned_data = super().clean()
 
-        # Campos que deben estar completos para que el producto se
-        # muestre en la tienda a los clientes.
         imagen = cleaned_data.get('imagen')
         descripcion = cleaned_data.get('descripcion')
         stock_actual = cleaned_data.get('stock_actual')
         stock_minimo = cleaned_data.get('stock_minimo')
         precio = cleaned_data.get('precio')
 
-        campos_completos = bool(imagen) and bool(descripcion) and bool(stock_actual) \
-            and bool(stock_minimo) and bool(precio)
+        if not producto_esta_completo(imagen, descripcion, stock_actual, stock_minimo, precio):
+            faltantes = []
+            if not imagen: faltantes.append('imagen')
+            if not descripcion: faltantes.append('descripción')
+            if not stock_actual: faltantes.append('stock actual')
+            if not stock_minimo: faltantes.append('stock mínimo')
+            if not precio: faltantes.append('precio')
 
-        # Guardamos el resultado para que la vista pueda avisarle al
-        # usuario por qué el producto no quedó visible en la tienda.
-        self.producto_incompleto = not campos_completos
-
-        if not campos_completos:
-            # No importa lo que haya marcado el checkbox de "disponibilidad":
-            # un producto incompleto nunca debe mostrarse en la tienda.
-            cleaned_data['disponibilidad'] = False
+            raise forms.ValidationError(
+                'No se puede guardar: completa estos campos primero: ' + ', '.join(faltantes) + '.'
+            )
 
         return cleaned_data
 

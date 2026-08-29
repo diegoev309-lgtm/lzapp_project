@@ -278,6 +278,12 @@
                                         <span class="d-none d-lg-inline">No Disponible</span>
                                     </span>
                                 {% endif %}
+                                {% if i.incompleto %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                        <span class="d-none d-lg-inline">Incompleto</span>
+                                    </span>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="acciones">

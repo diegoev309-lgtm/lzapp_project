@@ -12,6 +12,7 @@
   --bg-sidebar:    #16161F;
   --border-subtle: rgba(255,255,255,.06);
   --border-hair:   rgba(255,255,255,.08);
+  color-scheme: dark;
 
   --gold:          #E4C870;
   --gold-dim:      rgba(228,200,112,.14);
@@ -34,6 +35,32 @@
   --gap: 18px;
   --pad-panel: 22px;
   --sidebar-w: 80px;
+}
+
+/* ==========================================================================
+   MODO CLARO — se activa con <html data-theme="light">
+   ========================================================================== */
+[data-theme="light"]{
+  color-scheme: light;
+
+  --bg-app:        #EDEBF2;
+  --bg-canvas:     #F3F1F6;
+  --bg-panel:      #FBFAFD;
+  --bg-sidebar:    #F7F6FA;
+  --border-subtle: rgba(15,15,23,.06);
+  --border-hair:   rgba(15,15,23,.10);
+
+  --gold:          #C9A227;
+  --gold-dim:      rgba(201,162,39,.12);
+
+  --text-primary:   #1A1A24;
+  --text-secondary: #5B5B68;
+  --text-tertiary:  #8A8A96;
+}
+
+html.tema-transicion,
+html.tema-transicion *{
+    transition: background-color .35s ease, color .35s ease, border-color .35s ease, box-shadow .35s ease !important;
 }
 
 *{ box-sizing: border-box; }
@@ -692,6 +719,7 @@ a{ text-decoration:none; color:inherit; }
     border-radius:var(--radius-panel);
     overflow:hidden;
     box-shadow:0 12px 30px rgba(0,0,0,.35);
+    margin-bottom:28px;
 }
 
 /* ---- Toolbar superior: pestañas de vista + botón "Nuevo" ---- */
@@ -1301,6 +1329,24 @@ a{ text-decoration:none; color:inherit; }
     color:var(--text-primary); border-radius:var(--radius-btn);
     padding:12px 14px; font-size:13px; margin-bottom:18px;
 }
+
+.form-con-aviso{
+    display:grid;
+    grid-template-columns: 1fr 260px;
+    gap:22px;
+    align-items:start;
+}
+.form-con-aviso .aviso-completitud{
+    flex-direction:column;
+    margin-bottom:0;
+    position:sticky;
+    top:20px;
+}
+@media(max-width:900px){
+    .form-con-aviso{ grid-template-columns: 1fr; }
+    .form-con-aviso .aviso-completitud{ position:static; }
+}
+
 .aviso-completitud i{ color:var(--gold); font-size:16px; margin-top:1px; }
 
 .mensajes-django{ margin-bottom:18px; }
@@ -1361,4 +1407,117 @@ a{ text-decoration:none; color:inherit; }
     .header-form{ padding:20px; }
     .botones{ flex-direction:column; }
     .botones a, .botones button{ width:100%; }
+}
+
+/* ==========================================================================
+   AGREGAR AL FINAL DE static/dashboard/CSS/main.css
+   ========================================================================== */
+
+/*==========================================================
+   PANELES DE GRÁFICO INDIVIDUALES (con selector)
+   Distinto del carrusel de Panel de Ventas: cada panel va
+   suelto, con su propio encabezado + selector + estado de
+   carga/error. Usado por: Producción, y cualquier vista
+   futura con gráficos independientes.
+===========================================================*/
+
+.grafico-panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-panel);
+    overflow:hidden;
+    min-width:0;
+}
+
+.grafico-header{
+    padding:18px 20px;
+    border-bottom:1px solid var(--border-subtle);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.grafico-title{
+    color:var(--text-primary);
+    font-size:16px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+.grafico-title i{ color:var(--gold); }
+
+.selector-producto-grafico{
+    background:var(--bg-sidebar);
+    color:var(--text-primary);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-btn);
+    padding:8px 14px;
+    font-size:13px;
+    min-width:220px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    transition:.2s;
+}
+.selector-producto-grafico:hover{
+    border-color: rgba(255,255,255,.22);
+    background: rgba(255,255,255,.03);
+}
+.selector-producto-grafico:focus{ outline:none; border-color:var(--gold); }
+
+/* Modificador de altura para .contenedor-grafico cuando va
+   suelto dentro de .grafico-panel (fuera del carrusel, que ya
+   resuelve su propia altura vía .dash-panel) */
+.grafico-panel .contenedor-grafico{ height:350px; padding:10px; }
+.grafico-panel .contenedor-grafico.alto{ height:420px; }
+
+.grafico-render{
+    width:100%; height:100%;
+    position:absolute; inset:0;
+    padding:10px; z-index:2;
+    display:none;
+}
+.grafico-render.visible{ display:block; }
+
+.estado-grafico{
+    height:100%;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px;
+    color:var(--text-tertiary);
+    position:absolute; inset:0; padding:10px;
+    text-align:center;
+}
+
+.spinner-grande{
+    width:28px; height:28px;
+    border:3px solid rgba(255,255,255,.1);
+    border-top-color:var(--gold);
+    border-radius:50%;
+    animation:girar-grande .9s linear infinite;
+}
+@keyframes girar-grande{ to{ transform:rotate(360deg); } }
+
+/* Apila varios .grafico-panel en columna, con espacio entre ellos */
+.produccion-dashboard{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+@media(max-width:576px){
+    .grafico-header .filtro-menu{
+        left:0;
+        right:auto;
+        min-width:0;
+        width:100%;
+    }
+}
+
+@media(max-width:576px){
+    .grafico-panel .contenedor-grafico{ height:300px; }
 }

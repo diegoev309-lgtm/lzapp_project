@@ -6,7 +6,7 @@ from django.db.models import Avg, Count
 
 import random
 import string
-
+import hashlib
 
 #tabla auth_user con telefono
 
@@ -40,9 +40,10 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_actual = models.PositiveIntegerField(default=0, null=True)
-    stock_minimo = models.PositiveIntegerField(default=15, null=True)
+    imagen_hash = models.CharField(max_length=32, blank=True, null=True, db_index=True, editable=False)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    stock_actual = models.PositiveIntegerField(default=0, null=True, blank=True)
+    stock_minimo = models.PositiveIntegerField(default=15, null=True, blank=True)
     disponibilidad = models.BooleanField(default=True, null=True)
     fecha_vencimiento = models.DateField(
         null=True, blank=True,
@@ -57,6 +58,18 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def save(self, *args, **kwargs):
+        if self.imagen and hasattr(self.imagen, 'file'):
+            try:
+                self.imagen.seek(0)
+                self.imagen_hash = hashlib.md5(self.imagen.read()).hexdigest()
+                self.imagen.seek(0)
+            except (ValueError, FileNotFoundError):
+                pass
+        elif not self.imagen:
+            self.imagen_hash = None
+        super().save(*args, **kwargs)
 
 
 #tabla de produccion

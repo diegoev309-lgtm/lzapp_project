@@ -177,12 +177,18 @@ def _construir_contexto_periodo(desde, hasta):
 # =========================================================
 def listar_producciones(request):
     filtro, desde, hasta = _resolver_periodo(request)
+    query = request.GET.get('q', '').strip()
+
     producciones_periodo = (
         Produccion.objects
         .filter(fecha_produccion__date__gte=desde, fecha_produccion__date__lte=hasta)
         .select_related('producto')
         .order_by('-fecha_produccion')
     )
+
+    if query:
+        producciones_periodo = producciones_periodo.filter(producto__nombre__icontains=query)
+
     paginator = Paginator(producciones_periodo, 6)
     producciones = paginator.get_page(request.GET.get('page'))
     productos_criticos, productos_sin_produccion = _calcular_alertas()
@@ -193,11 +199,12 @@ def listar_producciones(request):
         'filtro': filtro,
         'desde': desde,
         'hasta': hasta,
+        'query': query,
         'productos_criticos': productos_criticos,
         'productos_sin_produccion': productos_sin_produccion,
         'formulario': formulario,
-        **_construir_contexto_periodo(desde, hasta),
     }
+
     return render(request, 'listpc.html', contexto)
 
 

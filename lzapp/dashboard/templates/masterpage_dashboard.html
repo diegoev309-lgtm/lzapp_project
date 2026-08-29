@@ -507,9 +507,15 @@
         toggleBtn.addEventListener('click', () => {
             const actual = document.documentElement.getAttribute('data-theme') || 'dark';
             const nuevo = actual === 'dark' ? 'light' : 'dark';
+        
+            document.documentElement.classList.add('tema-transicion');
             document.documentElement.setAttribute('data-theme', nuevo);
             localStorage.setItem('lzapp-theme', nuevo);
             pintarIcono(nuevo);
+        
+            window.setTimeout(() => {
+                document.documentElement.classList.remove('tema-transicion');
+            }, 400);
         });
     })();
 

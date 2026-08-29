@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import F, Q, Avg, Count, OuterRef, Subquery, Value
+from django.db.models import F, Q, Avg, Count, OuterRef, Subquery, Value, Case, When, BooleanField
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.urls import reverse
@@ -19,10 +19,23 @@ def listar_productos(request):
             producto=OuterRef('pk'), usuario=request.user
         ).values('puntaje')[:1]
 
+    condicion_incompleto = (
+        Q(imagen='') | Q(imagen__isnull=True) |
+        Q(descripcion__isnull=True) | Q(descripcion='') |
+        Q(stock_actual__isnull=True) | Q(stock_actual=0) |
+        Q(stock_minimo__isnull=True) | Q(stock_minimo=0) |
+        Q(precio__isnull=True)
+    )
+
     lista_producto = Producto.objects.annotate(
         promedio_calificacion=Avg('calificaciones__puntaje'),
         total_calificaciones=Count('calificaciones', distinct=True),
         mi_calificacion=Subquery(mi_calificacion_sub) if mi_calificacion_sub is not None else Value(None),
+        incompleto=Case(
+            When(condicion_incompleto, then=Value(True)),
+            default=Value(False),
+            output_field=BooleanField(),
+        ),
     ).order_by('nombre')
 
     if query:
@@ -49,23 +62,13 @@ def crear_producto(request):
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             producto = form.save()
-            if form.producto_incompleto:
-                notificar(
-                    request,
-                    f'"{producto.nombre}" se guardó, pero no se mostrará en la tienda hasta que '
-                    'completes imagen, descripción, stock actual, stock mínimo y precio.',
-                    tipo='warning',
-                    titulo='Producto incompleto',
-                    url=reverse('editar_producto', args=[producto.id]),
-                )
-            else:
-                notificar(
-                    request,
-                    f'"{producto.nombre}" se guardó y ya está visible en la tienda.',
-                    tipo='success',
-                    titulo='Producto creado',
-                    url=reverse('editar_producto', args=[producto.id]),
-                )
+            notificar(
+                request,
+                f'"{producto.nombre}" se guardó y ya está visible en la tienda.',
+                tipo='success',
+                titulo='Producto creado',
+                url=reverse('editar_producto', args=[producto.id]),
+            )
             return redirect('listar_productos')
     else:
         form = ProductoForm()
@@ -85,23 +88,13 @@ def editar_producto(request, id):
 
         if form.is_valid():
             producto = form.save()
-            if form.producto_incompleto:
-                notificar(
-                    request,
-                    f'"{producto.nombre}" se guardó, pero no se mostrará en la tienda hasta que '
-                    'completes imagen, descripción, stock actual, stock mínimo y precio.',
-                    tipo='warning',
-                    titulo='Producto incompleto',
-                    url=reverse('editar_producto', args=[producto.id]),
-                )
-            else:
-                notificar(
-                    request,
-                    f'"{producto.nombre}" se actualizó y está visible en la tienda.',
-                    tipo='success',
-                    titulo='Producto actualizado',
-                    url=reverse('editar_producto', args=[producto.id]),
-                )
+            notificar(
+                request,
+                f'"{producto.nombre}" se actualizó y está visible en la tienda.',
+                tipo='success',
+                titulo='Producto actualizado',
+                url=reverse('editar_producto', args=[producto.id]),
+            )
             return redirect('listar_productos')
     else:
         form = ProductoForm(instance=producto)
