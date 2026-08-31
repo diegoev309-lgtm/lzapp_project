@@ -1,5 +1,6 @@
 from pedido.services import obtener_repartidor_mas_cercano
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from datetime import timedelta
 from django.utils import timezone
@@ -632,3 +633,41 @@ class TiradaDiaria(models.Model):
 
     def esta_vigente(self):
         return timezone.now() <= self.fecha_expiracion
+
+
+# =========================================================
+# #Configuración de premios de la ruleta diaria (dashboard)
+# =========================================================
+
+class PremioRuletaDiaria(models.Model):
+    #"""
+    #Activa/desactiva y ajusta el peso (%) de los premios de la ruleta
+    #diaria que SÍ son configurables desde el dashboard: envío gratis y
+    #boleto dorado. CUPON_5 (el descuento de siempre) y SIGUE_INTENTANDO
+    #("no ganaste") quedan fijos en services.py: no son premios que tenga
+    #sentido apagar desde aquí.
+    #"""
+
+    class Codigo(models.TextChoices):
+        ENVIO_GRATIS = 'ENVIO_GRATIS', 'Envío gratis'
+        BOLETO_DORADO = 'BOLETO_DORADO', 'Boleto dorado'
+
+    codigo = models.CharField(max_length=20, choices=Codigo.choices, unique=True)
+    peso = models.PositiveSmallIntegerField(
+        default=10,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text='Peso relativo en el sorteo diario (mismo estilo que el % de las campañas).'
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text='Apágalo para sacarlo del sorteo de hoy en adelante, sin perder la configuración.'
+    )
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'premio_ruleta_diaria'
+        ordering = ['codigo']
+
+    def __str__(self):
+        estado = 'activo' if self.activo else 'inactivo'
+        return f'{self.get_codigo_display()} ({self.peso}%, {estado})'

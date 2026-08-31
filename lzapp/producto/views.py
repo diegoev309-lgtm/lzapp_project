@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import F, Q, Avg, Count, OuterRef, Subquery, Value, Case, When, BooleanField
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,8 +9,10 @@ from openpyxl import load_workbook
 from dashboard.models import Producto, Calificacion
 from notificacion.utils import notificar
 from producto.forms import ProductoForm, ImportarProductosForm
+from seguridad.decorators import vista_dashboard
 
 
+@vista_dashboard
 def listar_productos(request):
     query = request.GET.get('q', '').strip()
 
@@ -57,6 +60,7 @@ def listar_productos(request):
     })
 
 
+@vista_dashboard
 def crear_producto(request):
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
@@ -76,6 +80,7 @@ def crear_producto(request):
     return render(request, 'formpt.html', {'form': form})
 
 
+@vista_dashboard
 def editar_producto(request, id):
     producto = get_object_or_404(Producto, id=id)
 
@@ -102,6 +107,7 @@ def editar_producto(request, id):
     return render(request, 'formpt.html', {'form': form})
 
 
+@vista_dashboard
 def verificar_nombre_producto(request):
     """
     Endpoint AJAX usado por el formulario (formpt.html) para validar en
@@ -120,6 +126,7 @@ def verificar_nombre_producto(request):
     return JsonResponse({'existe': productos.exists()})
 
 
+@vista_dashboard
 def eliminar_producto(request, id):
     producto = get_object_or_404(Producto, id=id)
 
@@ -130,6 +137,7 @@ def eliminar_producto(request, id):
     return render(request, "deletept.html", {"producto": producto})
 
 
+@login_required
 def calificar_producto(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     puntaje = request.POST.get('puntaje')
@@ -151,6 +159,7 @@ def calificar_producto(request, producto_id):
     })
 
 
+@vista_dashboard
 def importar_productos(request):
     if request.method == 'POST':
         formulario = ImportarProductosForm(request.POST, request.FILES)
@@ -209,6 +218,7 @@ def importar_productos(request):
     return render(request, 'listpt.html', {'formulario': formulario})
 
 
+@vista_dashboard
 def productos_importados(request):
     ids = request.session.get('productos_importados_ids', [])
     productos = Producto.objects.filter(id__in=ids).order_by('-fecha_registro')

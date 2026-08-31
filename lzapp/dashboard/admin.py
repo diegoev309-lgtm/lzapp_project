@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (
     Perfil, PerfilEmple, Producto, Produccion,
     Venta, DetalleVenta, Pedido, CampanaDescuento, DescuentoAsignado,
-    Calificacion, TiradaDiaria,
+    Calificacion, TiradaDiaria, PremioRuletaDiaria,
 )
 
 
@@ -63,6 +63,13 @@ class CampanaDescuentoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'frecuencia', 'activo', 'fecha_inicio', 'fecha_fin')
     list_filter = ('activo', 'frecuencia')
     filter_horizontal = ('productos',)
+
+
+@admin.register(PremioRuletaDiaria)
+class PremioRuletaDiariaAdmin(admin.ModelAdmin):
+    list_display = ('codigo', 'peso', 'activo', 'fecha_actualizacion')
+    list_filter = ('activo',)
+    list_editable = ('peso', 'activo')
 
 
 admin.site.register(Perfil)

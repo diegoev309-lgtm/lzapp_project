@@ -8,7 +8,8 @@ from weasyprint import HTML
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 
-from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado, TiradaDiaria
+from dashboard.models import Producto, CampanaDescuento, DescuentoAsignado, TiradaDiaria, PremioRuletaDiaria
+from seguridad.decorators import vista_dashboard
 from .forms import CampanaDescuentoForm
 from .services import (
     previsualizar_campana, obtener_badges_vencimiento_productos,
@@ -16,8 +17,7 @@ from .services import (
 )
 
 
-#@login_required
-#@permission_required('descuentos.view_campanadescuento', raise_exception=True)
+@vista_dashboard
 def panel_descuentos(request):
     query = request.GET.get('q', '').strip()
 
@@ -60,15 +60,17 @@ def panel_descuentos(request):
         else:
             c.preview_clientes = 0
 
+    premios_ruleta = PremioRuletaDiaria.objects.all().order_by('codigo')
+
     return render(request, 'listdes.html', {
         'productos': productos,
         'campanas': campanas,
+        'premios_ruleta': premios_ruleta,
         'query': query,
     })
 
 
-#@login_required
-#@permission_required('descuentos.add_campanadescuento', raise_exception=True)
+@vista_dashboard
 def crear_campana_descuento(request):
     if request.method == 'POST':
         form = CampanaDescuentoForm(request.POST)
@@ -85,8 +87,7 @@ def crear_campana_descuento(request):
     })
 
 
-#@login_required
-#@permission_required('descuentos.change_campanadescuento', raise_exception=True)
+@vista_dashboard
 def editar_campana_descuento(request, pk):
     campana = get_object_or_404(CampanaDescuento, pk=pk)
     if request.method == 'POST':
@@ -105,8 +106,7 @@ def editar_campana_descuento(request, pk):
     })
 
 
-#@login_required
-#@permission_required('descuentos.delete_campanadescuento', raise_exception=True)
+@vista_dashboard
 def eliminar_campana_descuento(request, pk):
     campana = get_object_or_404(CampanaDescuento, pk=pk)
     if request.method == 'POST':
@@ -116,8 +116,7 @@ def eliminar_campana_descuento(request, pk):
     return render(request, 'deletedes.html', {'campana': campana})
 
 
-#@login_required
-#@permission_required('descuentos.change_campanadescuento', raise_exception=True)
+@vista_dashboard
 def toggle_campana_descuento(request, pk):
     """Activa/desactiva la campaña con un solo clic (botón del panel)."""
     campana = get_object_or_404(CampanaDescuento, pk=pk)
@@ -129,8 +128,38 @@ def toggle_campana_descuento(request, pk):
     return redirect('panel_descuentos')
 
 
-#@login_required
-#@permission_required('descuentos.view_campanadescuento', raise_exception=True)
+@vista_dashboard
+def actualizar_premio_ruleta(request, pk):
+    """
+    Guarda peso (%) y activo/inactivo de un premio configurable de la
+    ruleta diaria (envío gratis o boleto dorado), desde la pestaña
+    "Ruleta diaria" del panel de descuentos. jugar_ruleta_del_dia lee
+    esta tabla en cada sorteo (sin caché), así que el cambio se refleja
+    de inmediato en la próxima tirada de la landing.
+    """
+    premio = get_object_or_404(PremioRuletaDiaria, pk=pk)
+    if request.method == 'POST':
+        peso_raw = request.POST.get('peso', '').strip()
+        try:
+            peso = int(peso_raw)
+        except (TypeError, ValueError):
+            messages.error(request, 'El peso debe ser un número entero.')
+            return redirect('panel_descuentos')
+
+        if not 0 <= peso <= 100:
+            messages.error(request, 'El peso debe estar entre 0 y 100.')
+            return redirect('panel_descuentos')
+
+        premio.peso = peso
+        premio.activo = request.POST.get('activo') == 'on'
+        premio.save(update_fields=['peso', 'activo', 'fecha_actualizacion'])
+
+        estado = 'activado' if premio.activo else 'desactivado'
+        messages.success(request, f'{premio.get_codigo_display()} {estado} (peso {peso}%).')
+    return redirect('panel_descuentos')
+
+
+@vista_dashboard
 def previsualizar_producto(request, pk):
     """
     Endpoint JSON (consumido por fetch() desde el modal del panel):
@@ -171,6 +200,7 @@ def marcar_premio_mostrado(request):
     return JsonResponse({'ok': True, 'actualizado': bool(actualizados)})
 
 
+@vista_dashboard
 def generar_pdf_descuentos(request):
     campanas = (
         CampanaDescuento.objects

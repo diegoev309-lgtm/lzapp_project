@@ -8,11 +8,13 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento
+from seguridad.decorators import vista_dashboard
 
 MESES_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
             'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
 
+@vista_dashboard
 def dview(request):
     return redirect('Inicio_dash')
 
@@ -21,6 +23,7 @@ def dview(request):
 # VISTAS DE PÁGINA
 # =========================================================
 
+@vista_dashboard
 def Inicio(request):
     hoy = timezone.now()
 
@@ -75,6 +78,7 @@ def Inicio(request):
 # API (JSON) — alimentan los gráficos Plotly de Inicio
 # =========================================================
 
+@vista_dashboard
 def api_ventas_mensuales(request):
     """Ventas reales agrupadas por mes para el año pedido (para el gráfico Plotly principal)."""
     hoy = timezone.now()
@@ -104,6 +108,7 @@ def api_ventas_mensuales(request):
     return JsonResponse(data)
 
 
+@vista_dashboard
 def api_ventas_dia(request, anio, mes):
     """Detalle día a día de un mes: ventas, N° de pedidos y problemas/incidencias reportadas."""
     dias_en_mes = calendar.monthrange(int(anio), int(mes))[1]
@@ -141,6 +146,7 @@ def api_ventas_dia(request, anio, mes):
     return JsonResponse(data)
 
 
+@vista_dashboard
 def api_distribucion_productos(request):
     """Participación (%) de cada producto del catálogo, según ingresos reales por ventas."""
     ingresos = (DetalleVenta.objects
@@ -170,6 +176,7 @@ def api_distribucion_productos(request):
     return JsonResponse({'etiquetas': etiquetas, 'valores': valores, 'unidades': unidades, 'modo': modo})
 
 
+@vista_dashboard
 def api_stock_flujo(request):
     """Entradas (producción) vs. salidas (ventas) de stock, día a día, de los últimos 14 días."""
     dias_atras = int(request.GET.get('dias', 14))
@@ -206,6 +213,7 @@ def api_stock_flujo(request):
     return JsonResponse(data)
 
 
+@vista_dashboard
 def api_pedidos_tiempo_real(request):
     """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega."""
     pedidos = (Pedido.objects

@@ -6,7 +6,9 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 from dashboard.models import Pedido, PerfilEmple, Notificacion
 from pedido.services import obtener_distancia_km
+from seguridad.decorators import vista_dashboard
 
+@vista_dashboard
 def Pedidos(request):
     return render(request, 'pedidos.html')
 
@@ -79,6 +81,7 @@ def actualizar_ubicacion_repartidor(request):
 
     return JsonResponse({'ok': True})
 
+@vista_dashboard
 def api_pedidos_tiempo_real(request):
     """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega."""
     pedidos = (Pedido.objects

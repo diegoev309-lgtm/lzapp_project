@@ -35,7 +35,7 @@ MERCADOPAGO_ACCESS_TOKEN = "APP_USR-3569434423018606-072916-47fd605aeda608e3647b
 MERCADOPAGO_PUBLIC_KEY = "APP_USR-e9497343-694d-4adc-83e6-2403bcab07c0"
 
 # URL base de tu sitio (para back_urls y notificaciones)
-SITE_URL = " https://expand-submersed-cabdriver.ngrok-free.dev"
+SITE_URL = "https://surgery-reputable-exceeding.ngrok-free.dev"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'produccion',
     'venta',
     'notificacion',
+    'seguridad',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -79,6 +80,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Al final: necesita request.user (AuthenticationMiddleware) y
+    # request._messages (MessageMiddleware) ya listos.
+    'seguridad.middleware.SeguridadSesionMiddleware',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -121,6 +125,7 @@ TEMPLATES = [
                 'carrito.context_processor.totalizar_carro',
                 "carrito.context_processor.mercadopago_public_key",
                 "notificacion.context_processor.notificaciones_admin",
+                "seguridad.context_processors.configuracion_seguridad",
             ],
         },
     },
@@ -172,3 +177,6 @@ EMAIL_HOST_PASSWORD = "eooiutauqloeajyn"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/client'
+# Sin esto, cualquier @login_required sin login_url explícito caía en el
+# /accounts/login/ de allauth en vez del login real del proyecto.
+LOGIN_URL = 'login'

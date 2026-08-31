@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}LzApp — Lácteos Zulianos{% endblock %}</title>
+    <script>
+        // Si el navegador restaura esta página desde el back-forward cache
+        // (flechas atrás/adelante) en vez de pedirla de nuevo al servidor,
+        // los data-* de sesión/juego diario quedan congelados con el estado
+        // de cuando se renderizó. Forzamos una recarga real para que el
+        // servidor vuelva a evaluar la sesión actual (logueado o no).
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 
     {% load static %}
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>

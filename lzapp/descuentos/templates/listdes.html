@@ -140,6 +140,40 @@
 .producto-card-acciones-editar .btn{ padding:5px 8px; font-size:11px; }
 
 /*==========================================================
+   TARJETA DE PREMIO DE LA RULETA DIARIA
+===========================================================*/
+
+.switch-activo{ position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; }
+.switch-activo input{ opacity:0; width:0; height:0; position:absolute; }
+.switch-slider{
+    position:absolute; inset:0; cursor:pointer;
+    background:rgba(255,255,255,.12);
+    border-radius:22px;
+    transition:.3s;
+}
+.switch-slider::before{
+    content:""; position:absolute; height:16px; width:16px; left:3px; bottom:3px;
+    background:#fff; border-radius:50%; transition:.3s;
+}
+.switch-activo input:checked + .switch-slider{ background:var(--green); }
+.switch-activo input:checked + .switch-slider::before{ transform:translateX(18px); }
+
+.campo-peso{ margin:12px 0 4px; }
+.campo-peso label{ font-size:11.5px; color:var(--text-secondary); display:block; margin-bottom:4px; }
+.campo-peso-input{ display:flex; align-items:center; gap:6px; }
+.campo-peso-input input[type=number]{
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border-subtle);
+    color:var(--text-primary);
+    border-radius:8px;
+    padding:6px 10px;
+    width:90px;
+    font-size:13px;
+}
+.campo-peso-input span{ color:var(--text-secondary); font-size:13px; }
+.premio-ruleta-nota{ display:block; margin-top:6px; font-size:10.5px; line-height:1.4; color:var(--text-tertiary); }
+
+/*==========================================================
    MENSAJES (django messages) COMO TOAST
 ===========================================================*/
 
@@ -229,6 +263,9 @@
         </div>
         <div class="tab-item" id="btnVistaReglas" onclick="cambiarVistaDescuentos('campanas')">
             <i class="bi bi-gear-fill"></i> Campañas
+        </div>
+        <div class="tab-item" id="btnVistaRuleta" onclick="cambiarVistaDescuentos('ruleta')">
+            <i class="bi bi-dice-5-fill"></i> Ruleta diaria
         </div>
     </div>
 
@@ -407,6 +444,55 @@
                 {% endfor %}
             </div>
 
+            <!-- ============ VISTA: RULETA DIARIA ============ -->
+            <div id="vistaRuletaDescuento" class="grid-productos vista-oculta">
+                {% for premio in premios_ruleta %}
+                    <div class="producto-card premio-ruleta-card" data-activo="{% if premio.activo %}true{% else %}false{% endif %}">
+                        <form method="post" action="{% url 'actualizar_premio_ruleta' premio.id %}">
+                            {% csrf_token %}
+                            <div class="producto-card-top">
+                                <h3 class="producto-card-nombre">
+                                    {% if premio.codigo == 'ENVIO_GRATIS' %}
+                                        <i class="bi bi-truck"></i>
+                                    {% else %}
+                                        <i class="bi bi-award-fill"></i>
+                                    {% endif %}
+                                    {{ premio.get_codigo_display }}
+                                </h3>
+                                <label class="switch-activo" title="{% if premio.activo %}Clic para desactivar{% else %}Clic para activar{% endif %}">
+                                    <input type="checkbox" name="activo" {% if premio.activo %}checked{% endif %}>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="producto-card-linea"></div>
+
+                            <div class="campo-peso">
+                                <label for="peso-{{ premio.id }}">Peso en el sorteo diario</label>
+                                <div class="campo-peso-input">
+                                    <input type="number" id="peso-{{ premio.id }}" name="peso" min="0" max="100" value="{{ premio.peso }}">
+                                    <span>%</span>
+                                </div>
+                                <small class="premio-ruleta-nota">
+                                    De cada 100 tiradas, aproximadamente {{ premio.peso }} caen en este premio mientras esté activo.
+                                    Si lo desactivas, se saca del sorteo (su % no se reparte entre los demás).
+                                </small>
+                            </div>
+
+                            <div class="producto-card-acciones" style="margin-top:10px;">
+                                <button type="submit" class="dash-btn dash-btn-solid">
+                                    <i class="bi bi-check-lg"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                {% empty %}
+                    <div class="estado-vacio">
+                        <i class="bi bi-dice-5 display-4 text-secondary"></i>
+                        <h5 class="mt-3">No hay premios configurables todavía.</h5>
+                    </div>
+                {% endfor %}
+            </div>
+
             <!-- ============ PIE: PAGINACIÓN ============ -->
             <div class="pie-productos">
 
@@ -566,39 +652,43 @@ function verPrevisualizacion(productoId, nombreProducto){
     });
 }
 
-/* ---- Selector de vista: Productos / Campañas ---- */
+/* ---- Selector de vista: Productos / Campañas / Ruleta diaria ---- */
 function cambiarVistaDescuentos(vista){
     const vp = document.getElementById('vistaProductosDescuento');
     const vr = document.getElementById('vistaReglasDescuento');
+    const vrul = document.getElementById('vistaRuletaDescuento');
     const bp = document.getElementById('btnVistaProductos');
     const br = document.getElementById('btnVistaReglas');
+    const brul = document.getElementById('btnVistaRuleta');
     const paginacionProductos = document.querySelector('.paginacion-productos');
     const paginacionCampanas = document.querySelector('.paginacion-campanas');
 
-    if(!vp || !vr || !bp || !br) return;
+    if(!vp || !vr || !vrul || !bp || !br || !brul) return;
+
+    [vp, vr, vrul].forEach((el) => el.classList.add('vista-oculta'));
+    [bp, br, brul].forEach((el) => el.classList.remove('active'));
+    if(paginacionProductos) paginacionProductos.classList.add('vista-oculta');
+    if(paginacionCampanas) paginacionCampanas.classList.add('vista-oculta');
 
     if(vista === 'campanas'){
-        vp.classList.add('vista-oculta');
         vr.classList.remove('vista-oculta');
         br.classList.add('active');
-        bp.classList.remove('active');
-        if(paginacionProductos) paginacionProductos.classList.add('vista-oculta');
         if(paginacionCampanas) paginacionCampanas.classList.remove('vista-oculta');
+    } else if(vista === 'ruleta'){
+        vrul.classList.remove('vista-oculta');
+        brul.classList.add('active');
     } else {
-        vr.classList.add('vista-oculta');
         vp.classList.remove('vista-oculta');
         bp.classList.add('active');
-        br.classList.remove('active');
         if(paginacionProductos) paginacionProductos.classList.remove('vista-oculta');
-        if(paginacionCampanas) paginacionCampanas.classList.add('vista-oculta');
     }
     localStorage.setItem('vistaDescuentos', vista);
 }
 
 function aplicarVistaDescuentosGuardada(){
     const guardada = localStorage.getItem('vistaDescuentos');
-    if(guardada === 'campanas'){
-        cambiarVistaDescuentos('campanas');
+    if(guardada === 'campanas' || guardada === 'ruleta'){
+        cambiarVistaDescuentos(guardada);
     }
 }
 

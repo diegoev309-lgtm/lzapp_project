@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
-from dashboard.models import CampanaDescuento, DescuentoAsignado, DetalleVenta, Producto, TiradaDiaria
+from dashboard.models import CampanaDescuento, DescuentoAsignado, DetalleVenta, Producto, TiradaDiaria, PremioRuletaDiaria
 
 # =========================================================
 # 0) SUGERENCIA DE VENCIMIENTO (solo visual, para el modal
@@ -289,16 +289,33 @@ def obtener_producto_ids_con_premio_activo(usuario):
 # 4) JUEGO DIARIO ("Ruleta del día") — PARTE 2
 # =========================================================
 
-# Tabla FIJA de premios: hardcodeada a propósito (no es configurable
-# desde el dashboard, a diferencia de CampanaDescuento). (código, peso%).
-TABLA_PREMIOS_RULETA_DIARIA = [
-    (TiradaDiaria.Resultado.SIGUE_INTENTANDO, 65),
-    (TiradaDiaria.Resultado.CUPON_5, 15),
-    (TiradaDiaria.Resultado.ENVIO_GRATIS, 12),
-    (TiradaDiaria.Resultado.BOLETO_DORADO, 8),
-]
+# Pesos FIJOS de los dos resultados que NO se gestionan desde el
+# dashboard: SIGUE_INTENTANDO (no ganar no es un "premio" que activar o
+# desactivar) y CUPON_5 (el descuento de siempre). Envío gratis y boleto
+# dorado sí son configurables: ver PremioRuletaDiaria en dashboard/models.py.
+PESO_FIJO_SIGUE_INTENTANDO = 65
+PESO_FIJO_CUPON_5 = 15
 
 DIAS_VALIDEZ_PREMIO_RULETA = 7  # misma vigencia que dias_validez_premio por defecto en DescuentoAsignado
+
+
+def obtener_pesos_ruleta_diaria():
+    #"""
+    #Arma la tabla (código, peso) del sorteo de HOY: los dos fijos de
+    #arriba más los premios de PremioRuletaDiaria que estén activos, con
+    #el peso que tengan configurado en ESTE momento. Se recalcula en cada
+    #llamada (sin caché), así que un cambio hecho desde el dashboard
+    #aplica de inmediato al próximo sorteo, sin reiniciar nada.
+    #"""
+    tabla = [
+        (TiradaDiaria.Resultado.SIGUE_INTENTANDO, PESO_FIJO_SIGUE_INTENTANDO),
+        (TiradaDiaria.Resultado.CUPON_5, PESO_FIJO_CUPON_5),
+    ]
+    tabla += [
+        (premio.codigo, premio.peso)
+        for premio in PremioRuletaDiaria.objects.filter(activo=True)
+    ]
+    return tabla
 
 
 def _asegurar_session_key(request):
@@ -342,8 +359,9 @@ def jugar_ruleta_del_dia(request):
     if tirada_existente:
         return tirada_existente, False
 
-    codigos = [codigo for codigo, _peso in TABLA_PREMIOS_RULETA_DIARIA]
-    pesos = [peso for _codigo, peso in TABLA_PREMIOS_RULETA_DIARIA]
+    tabla_premios = obtener_pesos_ruleta_diaria()
+    codigos = [codigo for codigo, _peso in tabla_premios]
+    pesos = [peso for _codigo, peso in tabla_premios]
     resultado = random.choices(codigos, weights=pesos, k=1)[0]
 
     datos = {

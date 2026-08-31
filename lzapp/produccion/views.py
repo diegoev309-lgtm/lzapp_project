@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 from dashboard.models import Produccion, Producto, DetalleVenta
 from produccion.forms import ProduccionForm
 from .forms import ImportarProduccionForm
+from seguridad.decorators import vista_dashboard
 
 
 UMBRAL_DIAS_STOCK = 7
@@ -175,6 +176,7 @@ def _construir_contexto_periodo(desde, hasta):
 # =========================================================
 # LISTAR PRODUCCIONES
 # =========================================================
+@vista_dashboard
 def listar_producciones(request):
     filtro, desde, hasta = _resolver_periodo(request)
     query = request.GET.get('q', '').strip()
@@ -211,6 +213,7 @@ def listar_producciones(request):
 # =========================================================
 # CREAR PRODUCCIÓN
 # =========================================================
+@vista_dashboard
 def crear_produccion(request):
     if request.method == 'POST':
         form = ProduccionForm(request.POST)
@@ -225,6 +228,7 @@ def crear_produccion(request):
 # =========================================================
 # API DE GRÁFICOS DE PRODUCCIÓN
 # =========================================================
+@vista_dashboard
 def graficos_produccion(request):
     hoy = timezone.now().date()
 
@@ -288,6 +292,7 @@ def graficos_produccion(request):
 # LISTA DE PRODUCTOS CON PRODUCCIÓN REGISTRADA
 # (alimenta el selector del gráfico "producción por lotes")
 # =========================================================
+@vista_dashboard
 def productos_produccion_disponibles(request):
     productos = (
         Producto.objects
@@ -302,6 +307,7 @@ def productos_produccion_disponibles(request):
 # =========================================================
 # GRÁFICO DE LOTES DE PRODUCCIÓN DE UN PRODUCTO ESPECÍFICO
 # =========================================================
+@vista_dashboard
 def grafico_produccion_producto(request):
     producto_id = request.GET.get('producto_id')
 
@@ -344,6 +350,7 @@ def grafico_produccion_producto(request):
 # VENTANA_RITMO_VENTAS días: cuánto habría que producir para
 # cubrir la demanda esperada sin quedar por debajo del stock
 # actual. Es una estimación, no una promesa exacta.
+@vista_dashboard
 def grafico_proyeccion_produccion(request):
     hoy = timezone.now().date()
     desde_ventas = hoy - timedelta(days=VENTANA_RITMO_VENTAS - 1)
@@ -392,6 +399,7 @@ def grafico_proyeccion_produccion(request):
 # =========================================================
 # IMPORTAR PRODUCCIÓN
 # =========================================================
+@vista_dashboard
 def importar_produccion(request):
     if request.method == 'POST':
         formulario = ImportarProduccionForm(request.POST, request.FILES)
@@ -495,6 +503,7 @@ def importar_produccion(request):
 # =========================================================
 # PRODUCCIONES IMPORTADAS
 # =========================================================
+@vista_dashboard
 def producciones_importadas(request):
     ids = request.session.get('producciones_importadas_ids', [])
     producciones = (

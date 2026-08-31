@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from dashboard.models import DetalleVenta, Venta
+from seguridad.decorators import vista_dashboard
 
 POR_PAGINA_VENTAS = 3
 TOP_PRODUCTOS_CANTIDAD = 5
@@ -189,6 +190,7 @@ def construir_contexto_ganancias(request):
     }
 
 
+@vista_dashboard
 def panel_ventas(request):
     contexto = construir_contexto_ganancias(request)
 
@@ -198,6 +200,7 @@ def panel_ventas(request):
     return render(request, 'panel_ventas.html', contexto)
 
 
+@vista_dashboard
 def detalle_dia_ventas(request):
     """
     Endpoint JSON: al hacer clic en un punto del gráfico o en una fila

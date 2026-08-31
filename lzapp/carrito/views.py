@@ -11,6 +11,7 @@ from decimal import Decimal
 from django.db import transaction
 from django.db.models import F
 from .logic import Carro
+from .utils import enviar_email_compra
 from dashboard.models import Producto, DescuentoAsignado, Venta, DetalleVenta
 from django.conf import settings
 from django.shortcuts import redirect
@@ -279,6 +280,12 @@ def webhook_mercadopago(request):
 
                         venta.total = total_venta
                         venta.save(update_fields=["total"])
+
+                    # Fuera del "with": recién aquí el commit ya quedó
+                    # confirmado en la base. Envío síncrono a propósito
+                    # (ver nota en carrito/utils.py) -- MP no tiene a nadie
+                    # esperando esta respuesta en pantalla.
+                    enviar_email_compra(venta.id)
 
             # Marca cada premio usado como YA UTILIZADO
             if codigos_premio:

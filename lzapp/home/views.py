@@ -1,12 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q, Avg, Count, OuterRef, Subquery, Value, IntegerField
 from django.templatetags.static import static
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
-from dashboard.models import Producto, Calificacion,TiradaDiaria
+from django.views.decorators.cache import never_cache
+from dashboard.models import Producto, Calificacion, TiradaDiaria, PerfilEmple
 from carrito.logic import limpiar_premios_invalidos_del_carrito, premio_ya_en_carrito
 from descuentos.services import obtener_premio_activo_para_home, obtener_producto_ids_con_premio_activo
+
+
+def _redirigir_segun_rol(usuario):
+    """
+    Misma lógica de destino que usuarios.views.iniciar_sesion: evita que un
+    usuario ya autenticado (staff, empleado o cliente) pueda "aterrizar" en
+    el home de visitantes solo porque llegó ahí navegando con las flechas
+    del navegador en vez de por un login real.
+    """
+    if usuario.is_staff or usuario.is_superuser:
+        return redirect('Inicio_dash')
+    if PerfilEmple.objects.filter(empleado=usuario, rol='empleado').exists():
+        return redirect('mis_entregas')
+    return redirect('client')
 
 
 
@@ -111,6 +126,7 @@ def _estado_juego_diario(request):
     return {'estado': 'ganado', 'tirada': tirada}
 
 
+@never_cache
 def main(request):
     premio_para_animacion = _premio_para_animacion(request)
     # Prioridad: si hay premio de campaña oficial, se muestra tal cual
@@ -129,13 +145,24 @@ def main(request):
     #return render(request, "masterpage1.html", context)
 
 
+@never_cache
 def user(request):
+    if request.user.is_authenticated:
+        # Si la cuenta sigue activa (no se cerró sesión con el botón del
+        # perfil) no debe verse el home de visitantes solo por haber
+        # llegado aquí con las flechas atrás/adelante del navegador.
+        return _redirigir_segun_rol(request.user)
     productos = Producto.objects.filter(disponibilidad=True)
     return render(request, "users.html", {"productos": productos})
     #return render(request, "usuarios/usuarios.html", {"productos": productos})
 
 
+@never_cache
 def client(request):
+    if not request.user.is_authenticated:
+        # Simétrico al caso anterior: si la sesión ya terminó (logout, o
+        # expiró) no debe quedar visible el home de cliente autenticado.
+        return redirect('user')
     premio_activo = _premio_activo_o_none(request)
     juego_diario = None if premio_activo else _estado_juego_diario(request)
     ids_con_premio = obtener_producto_ids_con_premio_activo(request.user) if request.user.is_authenticated else set()
@@ -149,6 +176,7 @@ def client(request):
     return render(request, "clients.html", context)
     #return render(request, "usuarios/clientes.html", context)
 
+@never_cache
 @ensure_csrf_cookie
 def carro(request):
     limpiar_premios_invalidos_del_carrito(request)

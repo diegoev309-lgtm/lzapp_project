@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -6,6 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
 from dashboard.models import Notificacion
+from seguridad.decorators import vista_dashboard
 
 
 def _notificaciones_del_usuario(request):
@@ -13,7 +13,7 @@ def _notificaciones_del_usuario(request):
     return Q(usuario__isnull=True) | Q(usuario=request.user)
 
 
-@login_required
+@vista_dashboard
 def listar_notificaciones(request):
     """Historial completo de notificaciones (lo que se ve al hacer clic en
     'Ver todas' desde el desplegable de la campana)."""
@@ -30,7 +30,7 @@ def listar_notificaciones(request):
     })
 
 
-@login_required
+@vista_dashboard
 @require_POST
 def marcar_notificacion_leida(request, id):
     """AJAX: marca una notificación puntual como leída al hacer clic sobre
@@ -49,7 +49,7 @@ def marcar_notificacion_leida(request, id):
     return JsonResponse({'ok': True})
 
 
-@login_required
+@vista_dashboard
 @require_POST
 def marcar_todas_leidas(request):
     """AJAX: botón 'marcar todas como leídas' del desplegable de la campana."""

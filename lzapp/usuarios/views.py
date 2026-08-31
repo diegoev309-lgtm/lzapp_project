@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
+from seguridad.decorators import vista_dashboard
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -16,7 +18,7 @@ from datetime import timedelta
 
 from dashboard.models import Venta, Perfil, PerfilEmple
 
-from .utils import enviar_email_recuperacion_async
+from .utils import enviar_email_recuperacion, enviar_email_bienvenida
 
 from .forms import (
     RegistroForm,
@@ -73,6 +75,8 @@ def registro(request):
                 longitud=request.POST.get('cliente_longitud') or None,
             )
 
+            enviar_email_bienvenida(usuario.id)
+
             messages.success(
                 request,
                 "Usuario registrado correctamente. Ya puedes iniciar sesión."
@@ -102,6 +106,7 @@ def registro(request):
 # INICIAR SESIÓN
 # =========================================================
 
+@never_cache
 def iniciar_sesion(request):
 
     if request.method == "POST":
@@ -165,6 +170,7 @@ def cerrar_sesion(request):
 # INICIO
 # =========================================================
 
+@never_cache
 @login_required
 def inicio(request):
 
@@ -178,6 +184,7 @@ def inicio(request):
 # CONFIGURACIÓN
 # =========================================================
 
+@never_cache
 @login_required
 def configuracion(request):
 
@@ -267,7 +274,7 @@ def solicitar_reset_password(request):
             # Tomamos el primer usuario encontrado
             usuario = usuarios.first()
 
-            enviar_email_recuperacion_async(
+            enviar_email_recuperacion(
                 usuario.id,
                 dominio=request.get_host(),
                 protocolo='https' if request.is_secure() else 'http'
@@ -369,6 +376,7 @@ def confirmar_reset_password(
 # PANEL USUARIO DEL DASHBOARD
 # =========================================================
 
+@vista_dashboard
 def Usuario(request):
 
     return render(
@@ -381,6 +389,7 @@ def Usuario(request):
 # REGISTRO DE EMPLEADOS
 # =========================================================
 
+@vista_dashboard
 def registro_empleado(request):
 
     if request.method == 'POST':
@@ -421,7 +430,7 @@ def registro_empleado(request):
 # LISTA DE USUARIOS
 # =========================================================
 
-@login_required
+@vista_dashboard
 def lista_usuarios(request):
 
     usuarios = User.objects.select_related(
@@ -450,7 +459,7 @@ def lista_usuarios(request):
 # EDITAR USUARIO
 # =========================================================
 
-@login_required
+@vista_dashboard
 def editar_usuario(
     request,
     id
@@ -491,7 +500,7 @@ def editar_usuario(
 # ELIMINAR USUARIO
 # =========================================================
 
-@login_required
+@vista_dashboard
 @require_POST
 def eliminar_usuario(
     request,
@@ -556,7 +565,7 @@ def _top_compradores(
 # LISTADO DE USUARIOS
 # =========================================================
 
-@login_required
+@vista_dashboard
 def Usuarios(request):
 
     usuarios_qs = (
@@ -735,7 +744,7 @@ def Usuarios(request):
 # API DE ESTADÍSTICAS DE USUARIOS
 # =========================================================
 
-@login_required
+@vista_dashboard
 def api_estadisticas_usuarios(request):
 
     """
