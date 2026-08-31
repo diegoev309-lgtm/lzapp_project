@@ -5,7 +5,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.utils import timezone
 
-from .models import SesionActiva
+from dashboard.models import SesionActiva
 from .utils import obtener_configuracion, obtener_ip_cliente
 
 

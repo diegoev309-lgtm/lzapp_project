@@ -1,4 +1,4 @@
-from .models import ConfiguracionSeguridad
+from dashboard.models import ConfiguracionSeguridad
 
 
 def obtener_ip_cliente(request):

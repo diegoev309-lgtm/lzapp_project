@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ConfiguracionSeguridad, SesionActiva
+from dashboard.models import ConfiguracionSeguridad, SesionActiva
 
 
 @admin.register(ConfiguracionSeguridad)

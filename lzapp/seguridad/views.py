@@ -3,9 +3,8 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-
 from .decorators import vista_dashboard
-from .models import SesionActiva
+from dashboard.models import SesionActiva
 from .utils import describir_dispositivo, obtener_configuracion
 
 
