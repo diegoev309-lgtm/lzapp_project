@@ -164,3 +164,62 @@
     background: var(--dorado-claro, #f0d98a);
     transform: translateY(-2px);
 }
+
+.ubicacion-buscador-wrap{
+    position: relative;
+    margin-bottom: 12px;
+}
+.ubicacion-buscador-wrap i{
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-texto, #9aa0ab);
+}
+.ubicacion-buscador-wrap input{
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border-radius: 12px;
+    border: 1.5px solid var(--azul-claro, #e8f0fb);
+    font-size: 0.88rem;
+}
+.ubicacion-buscador-wrap input:focus{
+    outline: none;
+    border-color: var(--dorado, #c9a84c);
+}
+.ubicacion-sugerencias{
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--blanco, #fff);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    margin-top: 4px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+.ubicacion-sugerencias.activo{ display: block; }
+.ubicacion-sugerencia-item{
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.ubicacion-sugerencia-item:hover{ background: var(--gris-claro, #f7f8fc); }
+.ubicacion-sugerencia-item i{ margin-top: 2px; color: var(--azul-medio, #1a5fa8); flex-shrink: 0; }
+.ubicacion-sugerencia-vacia{ padding: 12px; text-align: center; color: var(--gris-texto, #9aa0ab); font-size: 0.82rem; }
+
+/* El mapa ahora es Leaflet real, ya no el placeholder gris */
+.ubicacion-mapa-box{
+    padding: 0;
+    overflow: hidden;
+    display: block;
+}
+.leaflet-container{ height: 100%; width: 100%; border-radius: 16px; }
