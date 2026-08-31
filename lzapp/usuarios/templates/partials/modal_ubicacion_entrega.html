@@ -1,13 +1,12 @@
 {% load static %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="{% static 'css/ubicacion_modal.css' %}">
 
-<!-- Botón disparador: se coloca donde quieras dentro del <form> -->
 <button type="button" class="btn-ubicacion-trigger" id="btnAbrirUbicacion" data-bs-toggle="modal" data-bs-target="#modalUbicacionEntrega">
     <i class="bi bi-geo-alt-fill"></i>
     <span id="textoUbicacionTrigger">Agregar ubicación de entrega</span>
 </button>
 
-<!-- Campos ocultos: viajan con el formulario que envuelve este partial -->
 <input type="hidden" name="cliente_latitud" id="cliente_latitud">
 <input type="hidden" name="cliente_longitud" id="cliente_longitud">
 
@@ -26,10 +25,13 @@
 
             <div class="ubicacion-modal-cuerpo">
 
-                <div id="mapa-ubicacion" class="ubicacion-mapa-box">
-                    <i class="bi bi-map"></i>
-                    <span id="mapa-placeholder">El mapa se activará muy pronto</span>
+                <div class="ubicacion-buscador-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="buscador-direccion" placeholder="Escribe tu dirección..." autocomplete="off">
+                    <div id="sugerenciasDireccion" class="ubicacion-sugerencias"></div>
                 </div>
+
+                <div id="mapa-ubicacion" class="ubicacion-mapa-box"></div>
 
                 <button type="button" class="ubicacion-gps-btn" id="btn-usar-gps">
                     <i class="bi bi-crosshair"></i> Usar mi ubicación actual
@@ -45,4 +47,5 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{% static 'js/ubicacion_gps.js' %}"></script>

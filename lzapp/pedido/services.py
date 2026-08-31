@@ -1,20 +1,14 @@
 """
-Cálculo de distancia/tiempo entre dos coordenadas.
+Cálculo de distancia/tiempo entre dos coordenadas, usando OSRM
+(Open Source Routing Machine) — servicio gratuito basado en
+OpenStreetMap, sin necesidad de API key.
 
-Hoy usa la fórmula de Haversine (línea recta) porque no tenemos el API
-key de Google Maps. Cuando lo consigamos, solo hay que:
-
-  1. Poner GOOGLE_MAPS_API_KEY en el .env
-  2. Cambiar USAR_DISTANCE_MATRIX = True en settings.py
-
-Nada más se toca — cualquier parte del proyecto que necesite distancia
-(auto-asignación de repartidor, cálculo de ruta al crear un pedido,
-etc.) siempre debe llamar a obtener_distancia_km(), nunca directamente
-a Haversine o a Google.
+Si el servidor demo de OSRM falla o no responde (es un servicio
+público compartido, sin garantía de disponibilidad 24/7), caemos
+automáticamente a Haversine (línea recta) para no romper el flujo.
 """
 import math
 import requests
-from django.conf import settings
 
 
 def _distancia_haversine_km(lat1, lon1, lat2, lon2):
@@ -26,49 +20,36 @@ def _distancia_haversine_km(lat1, lon1, lat2, lon2):
     return R * 2 * math.asin(math.sqrt(a))
 
 
-def _distancia_google_distance_matrix(lat1, lon1, lat2, lon2):
-    """Distancia y tiempo REALES por carretera, vía Google Distance Matrix API."""
-    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-    params = {
-        "origins": f"{lat1},{lon1}",
-        "destinations": f"{lat2},{lon2}",
-        "key": settings.GOOGLE_MAPS_API_KEY,
-        "language": "es",
-        "units": "metric",
-    }
+def _distancia_osrm(lat1, lon1, lat2, lon2):
+    """OSRM espera las coordenadas en orden lon,lat (al revés de lo normal)."""
+    url = f"https://router.project-osrm.org/route/v1/driving/{lon1},{lat1};{lon2},{lat2}"
     try:
-        respuesta = requests.get(url, params=params, timeout=5).json()
-        elemento = respuesta["rows"][0]["elements"][0]
-        if elemento["status"] != "OK":
-            raise ValueError("Google no pudo calcular la ruta")
+        respuesta = requests.get(url, params={"overview": "false"}, timeout=6).json()
+        if respuesta.get("code") != "Ok":
+            raise ValueError("OSRM no pudo calcular la ruta")
 
-        distancia_km = elemento["distance"]["value"] / 1000
-        tiempo_min = round(elemento["duration"]["value"] / 60)
+        ruta = respuesta["routes"][0]
+        distancia_km = ruta["distance"] / 1000
+        tiempo_min = round(ruta["duration"] / 60)
         return distancia_km, tiempo_min
 
     except Exception:
-        # Si Google falla (sin señal, timeout, dirección inválida, etc.)
-        # no tronamos el flujo — caemos de vuelta a Haversine.
         return _distancia_haversine_km(lat1, lon1, lat2, lon2), None
 
 
 def obtener_distancia_km(lat1, lon1, lat2, lon2):
     """
-    Punto único de entrada para calcular distancia.
-    Devuelve (distancia_km, tiempo_estimado_min).
-    tiempo_estimado_min viene en None mientras se use Haversine, porque
-    esa fórmula solo calcula distancia en línea recta, no tiempo real.
+    Punto único de entrada para calcular distancia. Devuelve (distancia_km, tiempo_estimado_min).
+    Cualquier parte del proyecto que necesite distancia debe llamar aquí,
+    nunca directo a Haversine u OSRM.
     """
-    if getattr(settings, "USAR_DISTANCE_MATRIX", False) and settings.GOOGLE_MAPS_API_KEY:
-        return _distancia_google_distance_matrix(lat1, lon1, lat2, lon2)
-
-    return _distancia_haversine_km(lat1, lon1, lat2, lon2), None
+    return _distancia_osrm(lat1, lon1, lat2, lon2)
 
 
 def obtener_repartidor_mas_cercano(cliente_lat, cliente_lng, candidatos):
     """
     candidatos: queryset/lista de PerfilEmple con repartidor_latitud/longitud ya cargados.
-    Devuelve (perfil_emple_mas_cercano, distancia_km, tiempo_min) o (None, None, None) si no hay candidatos.
+    Devuelve (perfil_emple_mas_cercano, distancia_km, tiempo_min) o (None, None, None).
     """
     mejor = None
     mejor_distancia = None
