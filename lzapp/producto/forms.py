@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from django import forms
 from dashboard.models import Producto
 
@@ -8,15 +9,56 @@ import hashlib
 # Solo letras (con tildes/ñ), números y espacios.
 NOMBRE_VALIDO_RE = re.compile(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$')
 
+# El precio se ingresa como pesos enteros (sin decimales): los centavos
+# se asignan automáticamente en .00 (ver clean_precio). max_digits=8 en
+# el modelo = hasta 6 dígitos enteros + 2 decimales.
+PRECIO_MAX_DIGITOS_ENTEROS = 6
+PRECIO_MAXIMO = 10 ** PRECIO_MAX_DIGITOS_ENTEROS - 1  # 999999
+
+
+def producto_esta_completo(imagen, descripcion, stock_actual, stock_minimo, precio):
+    """
+    Un producto solo se puede guardar como completo (y por lo tanto
+    marcarse disponible) si tiene imagen, descripción, stock actual,
+    stock mínimo y precio.
+    """
+    return bool(imagen and descripcion and stock_actual and stock_minimo and precio)
+
+
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = '__all__'
         widgets = {
-            # Se agrega explícitamente para que el navegador muestre un
-            # selector de fecha nativo en vez de un simple input de texto.
             'fecha_vencimiento': forms.DateInput(attrs={'type': 'date'}),
+            'precio': forms.NumberInput(attrs={
+                'step': '1',
+                'min': '4000',
+                'max': str(PRECIO_MAXIMO),
+                'maxlength': str(PRECIO_MAX_DIGITOS_ENTEROS),
+                'inputmode': 'numeric',
+                'placeholder': 'Ej: 20000',
+            }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['precio'].help_text = (
+            f'Solo pesos enteros (máx. {PRECIO_MAX_DIGITOS_ENTEROS} dígitos, '
+            f'hasta ${PRECIO_MAXIMO:,}'.replace(',', '.') + '). '
+            'Los centavos (,00) se agregan automáticamente. Moneda: COP.'
+        )
+
+        # El stock y la fecha de vencimiento ya no se editan a mano una
+        # vez creado el producto: se calculan a partir de los lotes de
+        # producción. Se ocultan al editar, pero se siguen enviando (con
+        # su valor actual) para que el guardado no falle.
+        if self.instance and self.instance.pk:
+            for campo in ('stock_actual', 'stock_minimo', 'fecha_vencimiento'):
+                self.fields[campo].widget = forms.HiddenInput()
+                self.fields[campo].label = ''
+                self.fields[campo].help_text = ''
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre', '').strip()
@@ -30,8 +72,6 @@ class ProductoForm(forms.ModelForm):
                 '(sin caracteres especiales como @, #, %, etc.).'
             )
 
-        # Evita nombres duplicados (comparación insensible a mayúsculas).
-        # Se excluye el propio producto cuando se está editando.
         duplicado = Producto.objects.filter(nombre__iexact=nombre)
         if self.instance.pk:
             duplicado = duplicado.exclude(pk=self.instance.pk)
@@ -52,8 +92,17 @@ class ProductoForm(forms.ModelForm):
         if precio < Decimal('4000.00'):
             raise forms.ValidationError('El precio mínimo permitido es $4.000,00.')
 
-        # Si vino sin decimales (ej. 5000), se normaliza a 5000.00
-        return precio.quantize(Decimal('0.01'))
+        # Los decimales no se escriben a mano: se descarta cualquier
+        # centavo que haya llegado y se asignan siempre en .00.
+        pesos_enteros = int(precio)
+
+        if pesos_enteros > PRECIO_MAXIMO:
+            raise forms.ValidationError(
+                f'El precio no puede tener más de {PRECIO_MAX_DIGITOS_ENTEROS} dígitos '
+                f'(máximo ${PRECIO_MAXIMO:,}'.replace(',', '.') + ').'
+            )
+
+        return Decimal(pesos_enteros).quantize(Decimal('0.01'))
 
     def clean_stock_actual(self):
         stock_actual = self.cleaned_data.get('stock_actual')
@@ -84,11 +133,6 @@ class ProductoForm(forms.ModelForm):
     def clean_imagen(self):
         imagen = self.cleaned_data.get('imagen')
 
-        # Solo se valida cuando se sube una imagen NUEVA en esta petición.
-        # Si el campo no viene en self.files, es porque no se tocó (edición
-        # sin cambiar foto) o simplemente no se subió ninguna — en ambos
-        # casos no hay nada que comparar, así que nunca choca con productos
-        # sin foto.
         if 'imagen' not in self.files:
             return imagen
 

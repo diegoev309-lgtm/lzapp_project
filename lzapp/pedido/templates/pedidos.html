@@ -1,0 +1,308 @@
+{% extends "masterpage_dashboard.html" %}
+
+{% load static %}
+
+{% block page_icon %}bi bi-truck{% endblock %}
+{% block page_title %}Pedidos{% endblock %}
+{% block page_subtitle %}Gestión y seguimiento de entregas en tiempo real{% endblock %}
+
+{% block content %}
+
+<style>
+    .pedidos-stats{
+        display:grid;
+        grid-template-columns:repeat(4, 1fr);
+        gap:12px;
+        padding:15px 15px 0;
+    }
+    .pedido-stat-card{
+        background:var(--bg-panel);
+        border-radius:14px;
+        padding:14px 16px;
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+    .pedido-stat-card i{ font-size:20px; }
+    .pedido-stat-valor{ font-size:20px; font-weight:800; color:var(--text-primary); line-height:1; }
+    .pedido-stat-etiqueta{ font-size:11px; color:var(--text-tertiary); margin-top:2px; }
+
+    .badge-estado{
+        font-size:11px;
+        font-weight:700;
+        padding:4px 10px;
+        border-radius:var(--radius-pill);
+        white-space:nowrap;
+    }
+    .badge-estado.pendiente{  background:rgba(228,200,112,.14); color:var(--gold); }
+    .badge-estado.preparando{ background:rgba(56,189,248,.14);  color:var(--blue); }
+    .badge-estado.en_camino{  background:rgba(139,92,246,.14);  color:var(--purple); }
+    .badge-estado.entregado{  background:rgba(74,222,128,.14);  color:var(--green); }
+    .badge-estado.cancelado{  background:rgba(239,68,68,.14);   color:var(--red); }
+
+    .pedidos-mapa-placeholder{
+        margin:15px;
+        padding:40px 20px;
+        text-align:center;
+        background:var(--bg-panel);
+        border-radius:14px;
+        color:var(--text-tertiary);
+    }
+    .pedidos-mapa-placeholder i{ font-size:34px; color:var(--text-tertiary); margin-bottom:8px; display:block; }
+
+    .pedidos-mapa-lista{ margin:0 15px 15px; display:flex; flex-direction:column; gap:8px; }
+    .pedido-en-vivo-item{
+        background:var(--bg-panel);
+        border-radius:12px;
+        padding:12px 14px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+    .pedido-en-vivo-info{ display:flex; flex-direction:column; gap:2px; }
+    .pedido-en-vivo-cliente{ font-weight:700; color:var(--text-primary); font-size:13px; }
+    .pedido-en-vivo-detalle{ font-size:11.5px; color:var(--text-tertiary); }
+</style>
+
+<div class="pedidos-stats" id="pedidosStats">
+    <div class="pedido-stat-card">
+        <i class="bi bi-hourglass-split" style="color:var(--gold);"></i>
+        <div><div class="pedido-stat-valor" id="statPendientes">-</div><div class="pedido-stat-etiqueta">Pendientes</div></div>
+    </div>
+    <div class="pedido-stat-card">
+        <i class="bi bi-truck" style="color:var(--purple);"></i>
+        <div><div class="pedido-stat-valor" id="statEnCamino">-</div><div class="pedido-stat-etiqueta">En camino</div></div>
+    </div>
+    <div class="pedido-stat-card">
+        <i class="bi bi-check-circle-fill" style="color:var(--green);"></i>
+        <div><div class="pedido-stat-valor" id="statEntregados">-</div><div class="pedido-stat-etiqueta">Entregados</div></div>
+    </div>
+    <div class="pedido-stat-card">
+        <i class="bi bi-x-circle-fill" style="color:var(--red);"></i>
+        <div><div class="pedido-stat-valor" id="statCancelados">-</div><div class="pedido-stat-etiqueta">Cancelados</div></div>
+    </div>
+</div>
+
+<div class="productos-toolbar">
+    <div class="tab-group" role="group" aria-label="Selector de vista">
+        <div class="tab-item active" id="btnVistaLista" onclick="cambiarVistaPedidos('lista')">
+            <i class="bi bi-list-ul"></i> Lista
+        </div>
+        <div class="tab-item" id="btnVistaMapa" onclick="cambiarVistaPedidos('mapa')">
+            <i class="bi bi-geo-alt-fill"></i> Mapa en vivo
+        </div>
+    </div>
+</div>
+
+<div class="contenedor-productos">
+    <div class="bloque-productos">
+
+        <div class="busqueda-fila">
+            <div class="campo-busqueda">
+                <i class="bi bi-search"></i>
+                <input type="text" id="inputBuscarPedido" class="input-busqueda"
+                       placeholder="Buscar por cliente o # de pedido..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- ============ VISTA: LISTA ============ -->
+        <div id="vistaListaPedidos" class="table-responsive">
+            <table class="table table-hover tabla-productos align-middle">
+                <thead>
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th class="d-none d-sm-table-cell">Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Cambiar</th>
+                        <th class="d-none d-md-table-cell">Repartidor</th>
+                        <th class="d-none d-lg-table-cell">Distancia / Tiempo</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTablaPedidos">
+                    <tr>
+                        <td colspan="8" class="estado-vacio">
+                            <i class="bi bi-arrow-repeat display-4 text-secondary"></i>
+                            <h5 class="mt-3">Cargando pedidos...</h5>
+                        </td>
+                        <td><span class="badge-estado ${p.estado}">${p.estado_display}</span></td>
+                        <td>
+                            <select class="selector-estado" data-pedido-id="${p.pedido_id}" onchange="cambiarEstadoPedido(this)">
+                                <option value="pendiente"  ${p.estado === 'pendiente'  ? 'selected' : ''}>Pendiente</option>
+                                <option value="preparando" ${p.estado === 'preparando' ? 'selected' : ''}>Preparando</option>
+                                <option value="en_camino"  ${p.estado === 'en_camino'  ? 'selected' : ''}>En camino</option>
+                                <option value="entregado"  ${p.estado === 'entregado'  ? 'selected' : ''}>Entregado</option>
+                                <option value="cancelado"  ${p.estado === 'cancelado'  ? 'selected' : ''}>Cancelado</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ============ VISTA: MAPA EN VIVO ============ -->
+        <div id="vistaMapaPedidos" class="vista-oculta">
+            <div class="pedidos-mapa-placeholder">
+                <i class="bi bi-map"></i>
+                El mapa interactivo (📍 cliente · 🚚 repartidor · 🏭 empresa) se activará cuando esté lista la Google Maps API.
+                Mientras tanto, aquí están los pedidos en camino con su ubicación registrada:
+            </div>
+            <div class="pedidos-mapa-lista" id="listaPedidosEnCamino"></div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function cambiarVistaPedidos(vista) {
+    const lista = document.getElementById('vistaListaPedidos');
+    const mapa = document.getElementById('vistaMapaPedidos');
+    const btnLista = document.getElementById('btnVistaLista');
+    const btnMapa = document.getElementById('btnVistaMapa');
+
+    if (vista === 'lista') {
+        lista.classList.remove('vista-oculta');
+        mapa.classList.add('vista-oculta');
+        btnLista.classList.add('active');
+        btnMapa.classList.remove('active');
+    } else {
+        lista.classList.add('vista-oculta');
+        mapa.classList.remove('vista-oculta');
+        btnMapa.classList.add('active');
+        btnLista.classList.remove('active');
+    }
+}
+
+let pedidosActuales = [];
+
+async function cargarPedidosTiempoReal() {
+    try {
+        const response = await fetch("{% url 'pedido_tiempo' %}");
+        const data = await response.json();
+
+        pedidosActuales = data.pedidos;
+
+        document.getElementById('statPendientes').textContent = data.resumen.pendientes;
+        document.getElementById('statEnCamino').textContent = data.resumen.en_camino;
+        document.getElementById('statEntregados').textContent = data.resumen.entregados;
+        document.getElementById('statCancelados').textContent = data.resumen.cancelados;
+
+        renderizarTabla(pedidosActuales);
+        renderizarMapaLista(pedidosActuales);
+
+    } catch (error) {
+        console.error('Error cargando pedidos:', error);
+    }
+}
+
+function renderizarTabla(pedidos) {
+    const cuerpo = document.getElementById('cuerpoTablaPedidos');
+
+    const filtro = document.getElementById('inputBuscarPedido').value.trim().toLowerCase();
+    const filtrados = pedidos.filter(p =>
+        !filtro || p.cliente.toLowerCase().includes(filtro) || String(p.pedido_id).includes(filtro)
+    );
+
+    if (filtrados.length === 0) {
+        cuerpo.innerHTML = `
+            <tr>
+                <td colspan="7" class="estado-vacio">
+                    <i class="bi bi-inbox display-4 text-secondary"></i>
+                    <h5 class="mt-3">No hay pedidos que coincidan.</h5>
+                </td>
+            </tr>`;
+        return;
+    }
+
+    cuerpo.innerHTML = filtrados.map(p => `
+        <tr>
+            <td>#${p.pedido_id}</td>
+            <td>${p.cliente}</td>
+            <td class="d-none d-sm-table-cell">${p.fecha}</td>
+            <td class="precio">$ ${p.total.toLocaleString('es-CO')}</td>
+            <td><span class="badge-estado ${p.estado}">${p.estado_display}</span></td>
+            <td class="d-none d-md-table-cell">${p.repartidor || '<span class="text-secondary">Sin asignar</span>'}</td>
+            <td class="d-none d-lg-table-cell">
+                ${p.distancia_km ? p.distancia_km + ' km · ' + p.tiempo_estimado_min + ' min' : '<span class="text-secondary">—</span>'}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderizarMapaLista(pedidos) {
+    const contenedor = document.getElementById('listaPedidosEnCamino');
+    const enCamino = pedidos.filter(p => p.estado === 'en_camino' && p.cliente_latitud && p.cliente_longitud);
+
+    if (enCamino.length === 0) {
+        contenedor.innerHTML = '<p class="text-secondary text-center mt-2">No hay pedidos en camino en este momento.</p>';
+        return;
+    }
+
+    contenedor.innerHTML = enCamino.map(p => `
+        <div class="pedido-en-vivo-item">
+            <div class="pedido-en-vivo-info">
+                <span class="pedido-en-vivo-cliente">#${p.pedido_id} — ${p.cliente}</span>
+                <span class="pedido-en-vivo-detalle">
+                    📍 ${p.cliente_latitud.toFixed(5)}, ${p.cliente_longitud.toFixed(5)}
+                    ${p.repartidor_latitud ? ' · 🚚 ' + p.repartidor_latitud.toFixed(5) + ', ' + p.repartidor_longitud.toFixed(5) : ' · 🚚 sin reportar ubicación'}
+                </span>
+            </div>
+            <span class="badge-estado en_camino">${p.distancia_km ? p.distancia_km + ' km restantes' : 'En camino'}</span>
+        </div>
+    `).join('');
+}
+
+document.getElementById('inputBuscarPedido').addEventListener('input', () => renderizarTabla(pedidosActuales));
+
+cargarPedidosTiempoReal();
+setInterval(cargarPedidosTiempoReal, 10000);
+
+function getCookie(nombre) {
+    let valor = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach((cookie) => {
+            cookie = cookie.trim();
+            if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+            }
+        });
+    }
+    return valor;
+}
+
+async function cambiarEstadoPedido(select) {
+    const pedidoId = select.dataset.pedidoId;
+    const nuevoEstado = select.value;
+
+    select.disabled = true;
+    try {
+        const url = `{% url 'actualizar_estado_pedido' 0 %}`.replace('0', pedidoId);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `estado=${nuevoEstado}`,
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.error || 'No se pudo actualizar el estado.');
+            return;
+        }
+
+        cargarPedidosTiempoReal();  // refresca la tabla con el repartidor recién asignado, si aplica
+
+    } finally {
+        select.disabled = false;
+    }
+}
+</script>
+{% endblock %}

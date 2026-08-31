@@ -1,5 +1,6 @@
 {% load static %}
-{% load humanize %}
+{% load producto_extras %}
+
 <style>
   :root {
     --azul-profundo: #022C63;
@@ -463,10 +464,10 @@
         <span class="carrito-item__cantidad">
           Cantidad: {{ j.cantidad }} ·
           {% if j.es_premio %}
-            <s>$ {{ j.precio_original|floatformat:0|intcomma }}</s>
-            <strong>$ {{ j.precio|floatformat:0|intcomma }}</strong> c/u
+            <s>$ {{ j.precio_original|cop }} COP</s>
+            <strong>$ {{ j.precio|cop }} COP</strong> c/u
           {% else %}
-            $ {{ j.precio|floatformat:0|intcomma }} c/u
+            $ {{ j.precio|cop }} COP c/u
           {% endif %}
         </span>
       </div>
@@ -484,11 +485,13 @@
   <div class="carrito-widget__footer">
     <div class="carrito-widget__total">
       <span>Total:</span>
-      <strong>$ {{ totalizar_carro|floatformat:0|intcomma }}</strong>
+      <strong>$ {{ totalizar_carro|cop }} COP</strong>
     </div>
     <div class="carrito-widget__acciones">
 
       <div class="carrito-pago">
+        {% include "partials/modal_ubicacion_entrega.html" %}
+
         <button type="button" id="btn-iniciar-pago" class="btn-pagar-mp">
           Pagar con mercado pago
         </button>
@@ -518,6 +521,13 @@
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 
 <script>
+  {% if perfil_latitud and perfil_longitud %}
+    document.getElementById('cliente_latitud').value = "{{ perfil_latitud }}";
+    document.getElementById('cliente_longitud').value = "{{ perfil_longitud }}";
+    document.getElementById('textoUbicacionTrigger').textContent = 'Ubicación de entrega guardada';
+    document.getElementById('btnAbrirUbicacion').classList.add('ubicacion-lista');
+  {% endif %}
+
   const mp = new MercadoPago('{{ MP_PUBLIC_KEY }}', { locale: 'es-CO' });
 
   const btnPago = document.getElementById('btn-iniciar-pago');
@@ -526,11 +536,21 @@
 
   if (btnPago) {
     btnPago.addEventListener('click', async function () {
+
+      const lat = document.getElementById('cliente_latitud').value;
+      const lng = document.getElementById('cliente_longitud').value;
+
+      if (!lat || !lng) {
+        mostrarError('Antes de pagar, confirma tu ubicación de entrega arriba.');
+        return;
+      }
+
       btnPago.disabled = true;
       btnPago.textContent = 'Preparando el pago...';
 
       try {
-        const response = await fetch("{% url 'carro:crear_preferencia_ajax' %}");
+        const url = "{% url 'carro:crear_preferencia_ajax' %}?lat=" + encodeURIComponent(lat) + "&lng=" + encodeURIComponent(lng);
+        const response = await fetch(url);
         const data = await response.json();
 
         // Caso especial: stock insuficiente (409). Mostramos el detalle

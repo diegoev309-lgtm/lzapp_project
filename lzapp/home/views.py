@@ -176,6 +176,12 @@ def carro(request):
     premio_activo = _premio_activo_o_none(request, solo_mostrados=True)
     juego_diario = None if premio_activo else _estado_juego_diario(request)
 
+    from dashboard.models import Perfil
+    
+    perfil_cliente = None
+    if request.user.is_authenticated:
+        perfil_cliente = Perfil.objects.filter(usuario=request.user).first()
+
     context = {
         "productos": productos,
         "query": query,
@@ -183,6 +189,8 @@ def carro(request):
         'juego_diario': juego_diario,
         "pago_status": pago_status,
         "pago_payment_id": payment_id,
+        "perfil_latitud": perfil_cliente.latitud if perfil_cliente else None,
+        "perfil_longitud": perfil_cliente.longitud if perfil_cliente else None,
     }
     return render(request, "carrito_compras.html", context)
     #return render(request, "carrito/carrito_compras.html", context)

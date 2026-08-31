@@ -1,0 +1,48 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/ubicacion_modal.css' %}">
+
+<!-- Botón disparador: se coloca donde quieras dentro del <form> -->
+<button type="button" class="btn-ubicacion-trigger" id="btnAbrirUbicacion" data-bs-toggle="modal" data-bs-target="#modalUbicacionEntrega">
+    <i class="bi bi-geo-alt-fill"></i>
+    <span id="textoUbicacionTrigger">Agregar ubicación de entrega</span>
+</button>
+
+<!-- Campos ocultos: viajan con el formulario que envuelve este partial -->
+<input type="hidden" name="cliente_latitud" id="cliente_latitud">
+<input type="hidden" name="cliente_longitud" id="cliente_longitud">
+
+<div class="modal fade" id="modalUbicacionEntrega" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ubicacion-modal">
+
+            <button type="button" class="ubicacion-modal-cerrar" data-bs-dismiss="modal" aria-label="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+            <div class="ubicacion-modal-header">
+                <span class="ubicacion-modal-eyebrow"><i class="bi bi-truck"></i> Entrega a domicilio</span>
+                <h4 class="ubicacion-modal-titulo">¿A dónde te lo llevamos?</h4>
+            </div>
+
+            <div class="ubicacion-modal-cuerpo">
+
+                <div id="mapa-ubicacion" class="ubicacion-mapa-box">
+                    <i class="bi bi-map"></i>
+                    <span id="mapa-placeholder">El mapa se activará muy pronto</span>
+                </div>
+
+                <button type="button" class="ubicacion-gps-btn" id="btn-usar-gps">
+                    <i class="bi bi-crosshair"></i> Usar mi ubicación actual
+                </button>
+                <span id="estado-ubicacion" class="ubicacion-estado-texto"></span>
+
+                <button type="button" class="ubicacion-confirmar-btn" id="btnConfirmarUbicacion" data-bs-dismiss="modal" disabled>
+                    Confirmar ubicación
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/ubicacion_gps.js' %}"></script>

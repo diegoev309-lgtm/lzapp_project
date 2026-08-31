@@ -125,11 +125,10 @@
                     {{ perfil_form.telefono }}
                     {{ perfil_form.telefono.errors }}
                 </div>
-
+                
                 <div class="col-md-6">
-                    <label class="form-label">Dirección</label>
-                    {{ perfil_form.direccion }}
-                    {{ perfil_form.direccion.errors }}
+                    <label class="form-label">Ubicación en el mapa</label>
+                    {% include "partials/modal_ubicacion_entrega.html" %}
                 </div>
 
             </div>

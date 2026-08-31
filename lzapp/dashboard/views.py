@@ -71,19 +71,6 @@ def Inicio(request):
     }
     return render(request, "inicio.html", contexto)
 
-
-def Ventas(request):
-    return render(request, "ventas.html")
-
-
-def Pedidos(request):
-    return render(request, "pedidos.html")
-
-
-def Notificaciones(request):
-    return render(request, "notificaciones.html")
-
-
 # =========================================================
 # API (JSON) — alimentan los gráficos Plotly de Inicio
 # =========================================================

@@ -1,8 +1,9 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
 
-{% block content %}
+{% load producto_extras %}
 
+{% block content %}
 
 <div class="overlay">
     <div class="modal-formulario">
@@ -34,8 +35,15 @@
                     <aside class="aviso-completitud" id="avisoCompletitud">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                         <span>
-                            No podrás guardar este producto hasta completar
-                            <strong>imagen, descripción, stock actual, stock mínimo y precio</strong>.
+                            {% if form.instance.pk %}
+                                No podrás guardar este producto hasta completar
+                                <strong>imagen, descripción y precio</strong>.
+                                El stock y la fecha de vencimiento ya no se editan aquí: se calculan
+                                automáticamente a partir de los lotes de producción.
+                            {% else %}
+                                No podrás guardar este producto hasta completar
+                                <strong>imagen, descripción, stock actual, stock mínimo y precio</strong>.
+                            {% endif %}
                             Mientras falte alguno, el botón "Guardar" y el interruptor "Disponible"
                             quedarán bloqueados.
                         </span>
@@ -183,14 +191,18 @@ document.addEventListener('DOMContentLoaded', function () {
         if (texto) texto.remove();
     }
 
+    const PRECIO_MAXIMO = 999999; // 6 dígitos; los decimales se asignan solos (.00)
+
     function validarPrecio() {
         if (!inputPrecio) return;
-        const valor = parseFloat(inputPrecio.value);
+        const valor = parseInt(inputPrecio.value, 10);
 
         if (inputPrecio.value.trim() === '') {
             limpiarError(inputPrecio); // el "required" del navegador ya lo cubre
         } else if (isNaN(valor) || valor < 4000) {
             mostrarError(inputPrecio, 'El precio mínimo permitido es $4.000,00.');
+        } else if (valor > PRECIO_MAXIMO) {
+            mostrarError(inputPrecio, 'El precio no puede tener más de 6 dígitos (máximo $999.999).');
         } else {
             limpiarError(inputPrecio);
         }
@@ -326,11 +338,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (inputPrecio) {
-        inputPrecio.addEventListener('blur', function () {
-            const valor = parseFloat(inputPrecio.value);
-            if (!isNaN(valor)) {
-                inputPrecio.value = valor.toFixed(2);
-            }
+        // Solo pesos enteros: se descarta cualquier decimal escrito y se
+        // corta a 6 dígitos a medida que se escribe. Los centavos (,00)
+        // los asigna el backend automáticamente al guardar.
+        inputPrecio.addEventListener('input', function () {
+            let digitos = inputPrecio.value.replace(/[^0-9]/g, '').slice(0, 6);
+            inputPrecio.value = digitos;
+            validarPrecio();
         });
     }
 

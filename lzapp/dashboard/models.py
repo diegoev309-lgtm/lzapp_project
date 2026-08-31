@@ -1,3 +1,4 @@
+from pedido.services import obtener_repartidor_mas_cercano
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import timedelta
@@ -8,18 +9,26 @@ import random
 import string
 import hashlib
 
-#tabla auth_user con telefono
+# =========================================================
+# #Tabla de usuarios
+# =========================================================
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User,on_delete=models.CASCADE)
     telefono = models.CharField(max_length=15)
-    direccion = models.CharField(max_length=255, blank=True, null=True) 
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     class Meta:
         db_table = 'perfil'
 
     def __str__(self):
         return self.usuario.username
+
+# =========================================================
+# #Tabla de empleados
+# =========================================================
 
 class PerfilEmple(models.Model):
     empleado = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -32,16 +41,21 @@ class PerfilEmple(models.Model):
         ],
         default='cliente'
     )
+    repartidor_latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    repartidor_longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    disponible = models.BooleanField(default=True, help_text='Si puede recibir nuevas entregas asignadas')
+    ubicacion_actualizada = models.DateTimeField(null=True, blank=True)
 
-
-#tabla de productos
+# =========================================================
+# #Tabla de producto
+# =========================================================
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     imagen_hash = models.CharField(max_length=32, blank=True, null=True, db_index=True, editable=False)
-    precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     stock_actual = models.PositiveIntegerField(default=0, null=True, blank=True)
     stock_minimo = models.PositiveIntegerField(default=15, null=True, blank=True)
     disponibilidad = models.BooleanField(default=True, null=True)
@@ -71,8 +85,9 @@ class Producto(models.Model):
             self.imagen_hash = None
         super().save(*args, **kwargs)
 
-
-#tabla de produccion
+# =========================================================
+# #Tabla de produccion
+# =========================================================
 
 class Produccion(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
@@ -127,6 +142,7 @@ class Produccion(models.Model):
         self.producto.fecha_vencimiento = proximo
 
 
+
 def descontar_stock_fefo(producto, cantidad):
     """Descuenta stock de los lotes más próximos a vencer primero.
     Llama a esto donde hoy confirmes una venta (donde se crea DetalleVenta)."""
@@ -161,11 +177,8 @@ def descontar_stock_fefo(producto, cantidad):
         )
         producto.save(update_fields=['stock_actual', 'fecha_vencimiento'])
 
-
-
 # =========================================================
-# 1) HISTORIAL DE VENTAS (no existía, lo necesitamos como
-#    base para saber qué compró y qué NO compró cada cliente)
+# #Tabla de ventas
 # =========================================================
 
 class Venta(models.Model):
@@ -181,6 +194,9 @@ class Venta(models.Model):
     def __str__(self):
         return f'Venta #{self.pk} - {self.usuario.username}'
 
+# =========================================================
+# #Tabla de detalles para las ventas
+# =========================================================
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
@@ -200,13 +216,8 @@ class DetalleVenta(models.Model):
     def __str__(self):
         return f'{self.producto.nombre} x{self.cantidad}'
 
-
 # =========================================================
-# 1.1) PEDIDO — seguimiento de entrega, independiente de la Venta
-#      (una Venta es la transacción/pago; un Pedido es su reparto:
-#      estado, repartidor, incidencias, etc. Separado a propósito
-#      para poder crecer -ruta, fotos de entrega, firma, tiempos-
-#      sin tocar la tabla de ventas/pagos)
+# #Tabla de pedidos
 # =========================================================
 
 class Pedido(models.Model):
@@ -227,11 +238,22 @@ class Pedido(models.Model):
         help_text='Empleado encargado de repartir este pedido'
     )
     direccion_entrega = models.CharField(max_length=255, blank=True, null=True)
+    cliente_latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    cliente_longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    distancia_km = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    tiempo_estimado_min = models.PositiveIntegerField(null=True, blank=True)
+    ruta_polyline = models.TextField(
+        null=True, blank=True,
+        help_text='Ruta codificada que devuelve Directions API, para no recalcularla cada vez'
+    )
     incidencia = models.CharField(
         max_length=255, blank=True, null=True,
         help_text='Problema reportado en el pedido (retraso, producto dañado, cliente ausente, etc.)'
     )
-
+    notificado_proximidad = models.BooleanField(
+        default=False, 
+        help_text='Evita mandar la notificación de "está cerca" más de una vez'
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -242,17 +264,103 @@ class Pedido(models.Model):
     def __str__(self):
         return f'Pedido #{self.pk} (Venta #{self.venta_id}) - {self.get_estado_display()}'
 
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 
 @receiver(post_save, sender=Venta)
 def crear_pedido_automatico(sender, instance, created, **kwargs):
     """Cada Venta nueva obtiene automáticamente su Pedido de seguimiento."""
     if created:
         Pedido.objects.get_or_create(venta=instance)
+        from django.utils import timezone
+from datetime import timedelta
+from pedido.services import obtener_repartidor_mas_cercano
 
+
+@receiver(post_save, sender=Pedido)
+def asignar_repartidor_automatico(sender, instance, created, **kwargs):
+    """Cuando el pedido pasa a 'preparando' y aún no tiene repartidor,
+    busca automáticamente al disponible más cercano al cliente."""
+    if instance.estado != Pedido.Estado.PREPARANDO or instance.repartidor_id:
+        return
+    if not instance.cliente_latitud or not instance.cliente_longitud:
+        return
+
+    limite = timezone.now() - timedelta(minutes=15)
+    candidatos = PerfilEmple.objects.filter(
+        rol='empleado',
+        disponible=True,
+        ubicacion_actualizada__gte=limite,
+        repartidor_latitud__isnull=False,
+        repartidor_longitud__isnull=False,
+    ).select_related('empleado')
+
+    mejor, distancia_km, tiempo_min = obtener_repartidor_mas_cercano(
+        instance.cliente_latitud, instance.cliente_longitud, candidatos
+    )
+
+    if mejor:
+        instance.repartidor = mejor.empleado
+        instance.distancia_km = round(distancia_km, 2) if distancia_km else None
+        if tiempo_min:
+            instance.tiempo_estimado_min = tiempo_min
+        instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min'])
+
+# =========================================================
+# #Tabla de pedidos con un hostorial
+# =========================================================
+
+class HistorialEstadoPedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='historial')
+    estado = models.CharField(max_length=20, choices=Pedido.Estado.choices)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'historial_estado_pedido'
+        ordering = ['fecha']
+
+    def __str__(self):
+        return f'Pedido #{self.pedido_id} -> {self.get_estado_display()} ({self.fecha:%d/%m %H:%M})'
+
+
+@receiver(post_save, sender=Pedido)
+def registrar_historial_estado(sender, instance, created, **kwargs):
+    """Cada vez que el pedido se crea o cambia de estado, queda una fila
+    en el historial — es lo que alimenta el timeline de seguimiento."""
+    ultimo = instance.historial.order_by('-fecha').first()
+    if created or not ultimo or ultimo.estado != instance.estado:
+        HistorialEstadoPedido.objects.create(pedido=instance, estado=instance.estado)
+
+MENSAJES_ESTADO_CLIENTE = {
+    Pedido.Estado.PREPARANDO: ('Tu pedido está en preparación 👨‍🍳', 'info'),
+    Pedido.Estado.EN_CAMINO:  ('¡Tu pedido salió para entrega! 🚚', 'info'),
+    Pedido.Estado.ENTREGADO:  ('Tu pedido fue entregado ✅', 'success'),
+    Pedido.Estado.CANCELADO:  ('Tu pedido fue cancelado', 'warning'),
+}
+
+@receiver(post_save, sender=HistorialEstadoPedido)
+def notificar_cliente_cambio_estado(sender, instance, created, **kwargs):
+    """Cada fila nueva del historial (o sea, cada cambio real de estado)
+    genera una notificación para el cliente dueño del pedido."""
+    if not created:
+        return
+
+    datos = MENSAJES_ESTADO_CLIENTE.get(instance.estado)
+    if not datos:
+        return
+
+    mensaje, tipo = datos
+    Notificacion.objects.create(
+        usuario=instance.pedido.venta.usuario,
+        titulo='Actualización de tu pedido',
+        mensaje=f'{mensaje} — Pedido #{instance.pedido_id}',
+        tipo=tipo,
+        url='/carro',  # o la url de "mis pedidos" cuando exista
+    )
+
+# =========================================================
+# #Tabla de notificaciones
+# =========================================================
 
 class Notificacion(models.Model):
     """
@@ -302,9 +410,8 @@ class Notificacion(models.Model):
     def icono(self):
         return self.ICONOS_POR_TIPO.get(self.tipo, 'bi-bell-fill')
 
-
 # =========================================================
-# 2) CAMPAÑA DE DESCUENTO (lo que TÚ configuras/manipulas)
+# #Tabla de Campañas descuentos
 # =========================================================
 
 class CampanaDescuento(models.Model):
@@ -405,6 +512,9 @@ class CampanaDescuento(models.Model):
 def generar_codigo():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+# =========================================================
+# #Tabla de campañas para asignar los descuentos
+# =========================================================
 
 class DescuentoAsignado(models.Model):
     campana = models.ForeignKey(CampanaDescuento, on_delete=models.CASCADE, related_name='asignaciones')
@@ -444,6 +554,9 @@ class DescuentoAsignado(models.Model):
         self.fecha_uso = timezone.now()
         self.save(update_fields=['usado', 'fecha_uso'])
 
+# =========================================================
+# #Tabla de calificacion de productos
+# =========================================================
 
 class Calificacion(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='calificaciones')
@@ -463,9 +576,8 @@ class Calificacion(models.Model):
     def __str__(self):
         return f'{self.usuario.username} -> {self.producto.nombre}: {self.puntaje}★'
 
-
 # =========================================================
-# JUEGO DIARIO ("Ruleta del día") 
+# #Tabla de tirada diaria 
 # =========================================================
 
 class TiradaDiaria(models.Model):

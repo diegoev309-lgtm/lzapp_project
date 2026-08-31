@@ -1,0 +1,177 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+{% block page_icon %}bi bi-geo-alt-fill{% endblock %}
+{% block page_title %}Mis Entregas{% endblock %}
+{% block page_subtitle %}Comparte tu ubicación mientras estás en ruta{% endblock %}
+
+{% block content %}
+
+<style>
+.ubicacion-panel{
+    margin:15px;
+    background:var(--bg-panel);
+    border-radius:16px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+.ubicacion-panel-estado{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    color:var(--text-secondary);
+}
+.ubicacion-panel-punto{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--text-tertiary);
+    flex-shrink:0;
+}
+.ubicacion-panel-punto.activo{
+    background:var(--green);
+    box-shadow:0 0 0 4px rgba(74,222,128,.18);
+}
+.btn-compartir-ubicacion{
+    width:100%;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:var(--gold);
+    color:#1A1A2E;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    transition:.2s;
+}
+.btn-compartir-ubicacion.compartiendo{
+    background:var(--green);
+    color:#0F2E1C;
+}
+.btn-compartir-ubicacion:disabled{
+    background:rgba(255,255,255,.06);
+    color:var(--text-tertiary);
+    cursor:not-allowed;
+}
+
+.entregas-lista{ margin:0 15px 15px; display:flex; flex-direction:column; gap:10px; }
+.entrega-item{
+    background:var(--bg-panel);
+    border-radius:14px;
+    padding:14px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+.entrega-cliente{ font-weight:700; color:var(--text-primary); font-size:14px; }
+.entrega-direccion{ font-size:12px; color:var(--text-tertiary); margin-top:2px; }
+</style>
+
+<div class="ubicacion-panel">
+    <div class="ubicacion-panel-estado">
+        <span class="ubicacion-panel-punto" id="puntoEstado"></span>
+        <span id="textoEstadoUbicacion">Ubicación no compartida</span>
+    </div>
+
+    <button type="button" class="btn-compartir-ubicacion" id="btnCompartirUbicacion"
+            {% if not pedidos_activos %}disabled{% endif %}>
+        {% if pedidos_activos %}
+            <i class="bi bi-broadcast"></i> Empezar a compartir mi ubicación
+        {% else %}
+            No tienes entregas activas asignadas
+        {% endif %}
+    </button>
+</div>
+
+{% if pedidos_activos %}
+<div class="entregas-lista">
+    {% for p in pedidos_activos %}
+    <div class="entrega-item">
+        <div>
+            <div class="entrega-cliente">#{{ p.id }} — {{ p.venta.usuario.get_full_name|default:p.venta.usuario.username }}</div>
+            <div class="entrega-direccion">{{ p.direccion_entrega|default:"Sin dirección registrada" }}</div>
+        </div>
+        <span class="badge-estado {{ p.estado }}">{{ p.get_estado_display }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(nombre) {
+    let valor = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach((cookie) => {
+            cookie = cookie.trim();
+            if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+            }
+        });
+    }
+    return valor;
+}
+
+const btn = document.getElementById('btnCompartirUbicacion');
+const punto = document.getElementById('puntoEstado');
+const texto = document.getElementById('textoEstadoUbicacion');
+let watchId = null;
+
+if (btn && !btn.disabled) {
+    btn.addEventListener('click', function () {
+        if (watchId === null) {
+            iniciarCompartir();
+        } else {
+            detenerCompartir();
+        }
+    });
+}
+
+function iniciarCompartir() {
+    if (!navigator.geolocation) {
+        texto.textContent = 'Tu navegador no soporta geolocalización.';
+        return;
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+        function (posicion) {
+            enviarUbicacion(posicion.coords.latitude, posicion.coords.longitude);
+            punto.classList.add('activo');
+            texto.textContent = 'Compartiendo ubicación en vivo';
+        },
+        function (error) {
+            texto.textContent = 'No se pudo obtener tu ubicación.';
+        },
+        { enableHighAccuracy: true, maximumAge: 10000 }
+    );
+
+    btn.classList.add('compartiendo');
+    btn.innerHTML = '<i class="bi bi-stop-circle"></i> Dejar de compartir';
+}
+
+function detenerCompartir() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+    btn.classList.remove('compartiendo');
+    btn.innerHTML = '<i class="bi bi-broadcast"></i> Empezar a compartir mi ubicación';
+    punto.classList.remove('activo');
+    texto.textContent = 'Ubicación no compartida';
+}
+
+function enviarUbicacion(lat, lng) {
+    fetch("{% url 'actualizar_ubicacion_repartidor' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `latitud=${lat}&longitud=${lng}`,
+    });
+}
+</script>
+{% endblock %}

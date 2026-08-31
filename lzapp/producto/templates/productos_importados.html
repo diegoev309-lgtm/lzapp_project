@@ -252,7 +252,7 @@
                         <h3 class="producto-card-nombre">{{ i.nombre }}</h3>
                         <div class="producto-card-linea"></div>
                         <div class="producto-card-precio-fila">
-                            <span class="producto-card-precio">$ {{ i.precio }}</span>
+                            <span class="producto-card-precio">$ {{ i.precio|cop }} COP</span>
                             <span class="producto-card-stock">
                                 <i class="bi bi-boxes"></i> {{ i.stock_actual }}
                             </span>

@@ -10,7 +10,8 @@ SECRET_KEY = 'django-insecure-+95a3_wj16y$#(+rg&)urdt%pbc-dl6vx&le0oz0bw+fy&p8+y
 DEBUG = True
 
 # settings.py
-GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+GOOGLE_MAPS_API_KEY = ''
+USAR_DISTANCE_MATRIX = False   # cambiar a True cuando GOOGLE_MAPS_API_KEY esté activo
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'carrito',
     'dashboard',
     'producto',
+    'pedido',
     'descuentos',
     'produccion',
     'venta',

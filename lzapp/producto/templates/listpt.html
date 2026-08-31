@@ -1,5 +1,6 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
+{% load producto_extras %}
 {% block page_icon %}bi bi-basket-fill{% endblock %}
 {% block page_title %}Productos{% endblock %}
 {% block page_subtitle %}Administra todos los productos registrados del sistema{% endblock %}
@@ -251,7 +252,7 @@
                                 <strong>{{ i.nombre }}</strong>
                             </td>
                             <td class="precio">
-                                $ {{ i.precio }}
+                                $ {{ i.precio|cop }} COP
                             </td>
                             <td class="d-none d-md-table-cell">
                                 <strong>{{ i.stock_actual }}</strong>
@@ -349,7 +350,7 @@
                             </div>
 
                             <div class="producto-card-precio-fila">
-                                <span class="producto-card-precio">$ {{ i.precio }}</span>
+                                <span class="producto-card-precio">$ {{ i.precio|cop }} COP</span>
                                 <span class="producto-card-stock">
                                     <i class="bi bi-boxes"></i> {{ i.stock_actual }}
                                 </span>

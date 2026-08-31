@@ -1,10 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-import re
-
 from dashboard.models import Perfil
 
+import re
 
 class RegistroForm(UserCreationForm):
 

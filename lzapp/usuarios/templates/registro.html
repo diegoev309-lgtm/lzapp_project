@@ -134,8 +134,9 @@
                         {% endfor %}
                     </div>
 
-                    <!-- vacío para mantener el grid parejo en desktop -->
-                    <div class="campo-flotante"></div>
+                    <div class="campo-flotante">
+                        {% include "partials/modal_ubicacion_entrega.html" %}
+                    </div>
 
                     <!-- CONTRASEÑA -->
                     <div class="campo-flotante password">
@@ -180,6 +181,7 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/formularios.js' %}"></script>
 
 </body>

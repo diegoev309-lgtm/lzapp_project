@@ -1,11 +1,9 @@
-from django.urls import path,include
+from django.urls import path
 from . import views
 
 urlpatterns = [
     path('dview',views.dview,name="dview"),
     path('Inicio',views.Inicio,name="Inicio_dash"),
-    path('Pedidos',views.Pedidos,name="Pedidos"),
-    path('Notificaciones',views.Notificaciones,name="Notificaciones"),
 
     # ---- API JSON para los gráficos Plotly de Inicio ----
     path('api/ventas-mensuales', views.api_ventas_mensuales, name="api_ventas_mensuales"),

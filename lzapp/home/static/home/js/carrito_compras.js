@@ -78,7 +78,7 @@ document.querySelectorAll('.favorito').forEach(btn => {
                                     </div>
                                     <div class="precio-fila">
                                         <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
-                                        <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                                        <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                                     </div>
                                     <p class="producto-descripcion"><strong>Descripcion:</strong></p>
                                     <p class="producto-descripcion">${descripcion}</p>

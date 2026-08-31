@@ -68,7 +68,9 @@ def registro(request):
 
             Perfil.objects.create(
                 usuario=usuario,
-                telefono=form.cleaned_data['telefono']
+                telefono=form.cleaned_data['telefono'],
+                latitud=request.POST.get('cliente_latitud') or None,
+                longitud=request.POST.get('cliente_longitud') or None,
             )
 
             messages.success(
@@ -110,28 +112,23 @@ def iniciar_sesion(request):
         )
 
         if form.is_valid():
-
             usuario = form.get_user()
-
-            login(
-                request,
-                usuario
-            )
-
-            messages.success(
-                request,
-                f"Bienvenido, {usuario.username}."
-            )
+            login(request,usuario)
+            messages.success(request,f"Bienvenido, {usuario.username}.")
 
             # Si es administrador
             if usuario.is_staff or usuario.is_superuser:
                 return redirect('Inicio_dash')
 
+            # Si es empleado (repartidor, etc.)
+            es_empleado = PerfilEmple.objects.filter(empleado=usuario, rol='empleado').exists()
+            if es_empleado:
+                return redirect('mis_entregas')
+
             # Si es un usuario normal
             return redirect('client')
 
         else:
-
             messages.error(
                 request,
                 "Usuario o contraseña incorrectos."
@@ -205,6 +202,13 @@ def configuracion(request):
 
             user_form.save()
             perfil_form.save()
+
+            lat = request.POST.get('cliente_latitud')
+            lng = request.POST.get('cliente_longitud')
+            if lat and lng:
+                perfil.latitud = lat
+                perfil.longitud = lng
+                perfil.save(update_fields=['latitud', 'longitud'])
 
             messages.success(
                 request,
@@ -400,7 +404,7 @@ def registro_empleado(request):
                 'Empleado registrado correctamente.'
             )
 
-            return redirect('usuarios')
+            return redirect('Usuario')
 
     else:
 

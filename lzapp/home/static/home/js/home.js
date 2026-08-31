@@ -1302,7 +1302,7 @@ window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,fal
                                 ${estrellasHtml(p)}
                                 <div class="precio-fila">
                                     <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
-                                    <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                                    <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                                 </div>
                                 <p class="producto-descripcion"><strong>Descripcion:</strong></p>
                                 <p class="producto-descripcion">${descripcionSegura(p)}</p>
@@ -1332,7 +1332,7 @@ window.LZ_USUARIO_AUTENTICADO = {{ request.user.is_authenticated|yesno:"true,fal
                             ${estrellasHtml(p)}
                             <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
                             <p class="producto-descripcion">${descripcionSegura(p)}</p>
-                            <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                            <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                         </div>
                         <div class="card-footer bg-white border-0">
                             <a href="${urlAgregar(p.id)}" class="btn btn-carrito w-100">

@@ -1,0 +1,166 @@
+/* ============================================================
+   BOTÓN DISPARADOR — combina con .btn-dorado del sitio
+   ============================================================ */
+.btn-ubicacion-trigger{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--azul-claro, #e8f0fb);
+    color: var(--azul-profundo, #022C63);
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0.85rem 1.2rem;
+    border-radius: 14px;
+    border: 1.5px dashed var(--azul-medio, #1a5fa8);
+    cursor: pointer;
+    transition: var(--transition, .4s cubic-bezier(.25,.8,.25,1));
+}
+.btn-ubicacion-trigger:hover{
+    background: var(--dorado-claro, #f0d98a);
+    border-color: var(--dorado, #c9a84c);
+    color: var(--azul-profundo, #022C63);
+    transform: translateY(-2px);
+}
+.btn-ubicacion-trigger.ubicacion-lista{
+    background: var(--azul-profundo, #022C63);
+    border-style: solid;
+    border-color: var(--dorado, #c9a84c);
+    color: var(--blanco, #fff);
+}
+.btn-ubicacion-trigger i{ font-size: 1.1rem; }
+
+/* ============================================================
+   MODAL — mismo lenguaje visual que .promo-registro-modal
+   ============================================================ */
+.ubicacion-modal{
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--blanco, #fff);
+    box-shadow: 0 30px 80px rgba(2, 44, 99, 0.35);
+    animation: ubicacionModalPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes ubicacionModalPop{
+    from{ transform: scale(0.9) translateY(20px); opacity: 0; }
+    to  { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.ubicacion-modal-cerrar{
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff !important;
+    color: #e2402d !important;
+    font-size: 1rem;
+    transition: var(--transition, .4s cubic-bezier(.25,.8,.25,1));
+}
+.ubicacion-modal-cerrar:hover{
+    color: #ff5c4d !important;
+    transform: rotate(90deg);
+}
+
+.ubicacion-modal-header{
+    position: relative;
+    padding: 2.2rem 2rem 2.8rem;
+    background:
+        radial-gradient(circle at 85% -10%, rgba(201,168,76,0.35) 0%, transparent 55%),
+        linear-gradient(135deg, var(--azul-profundo, #022C63), var(--azul-principal, #083b78));
+    text-align: center;
+}
+.ubicacion-modal-eyebrow{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--dorado-claro, #f0d98a);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.ubicacion-modal-titulo{
+    color: var(--blanco, #fff);
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.ubicacion-modal-cuerpo{
+    padding: 1.8rem 2rem 2.2rem;
+    text-align: center;
+}
+
+.ubicacion-mapa-box{
+    height: 220px;
+    width: 100%;
+    border-radius: 16px;
+    background: var(--gris-claro, #f7f8fc);
+    border: 1.5px dashed var(--azul-claro, #e8f0fb);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--gris-texto, #5b6472);
+    margin-bottom: 1.2rem;
+}
+.ubicacion-mapa-box i{ font-size: 2rem; color: var(--azul-medio, #1a5fa8); }
+
+.ubicacion-gps-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--dorado, #c9a84c);
+    color: var(--azul-profundo, #022C63);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition, .4s cubic-bezier(.25,.8,.25,1));
+}
+.ubicacion-gps-btn:hover{
+    background: var(--dorado-claro, #f0d98a);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(201, 168, 76, 0.4);
+}
+
+.ubicacion-estado-texto{
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--gris-texto, #5b6472);
+}
+.ubicacion-estado-texto.text-success{ color: #1a8f4f; font-weight: 600; }
+.ubicacion-estado-texto.text-danger{ color: #e2402d; font-weight: 600; }
+
+.ubicacion-confirmar-btn{
+    width: 100%;
+    margin-top: 1.2rem;
+    background: var(--dorado, #c9a84c);
+    color: var(--azul-profundo, #022C63);
+    font-weight: 700;
+    padding: 0.85rem;
+    border-radius: 50px;
+    border: none;
+    transition: var(--transition, .4s cubic-bezier(.25,.8,.25,1));
+}
+.ubicacion-confirmar-btn:disabled{
+    background: var(--gris-claro, #f7f8fc);
+    color: var(--gris-texto, #5b6472);
+    cursor: not-allowed;
+}
+.ubicacion-confirmar-btn:not(:disabled):hover{
+    background: var(--dorado-claro, #f0d98a);
+    transform: translateY(-2px);
+}

@@ -39,45 +39,57 @@
         </div>
 
         <nav class="dash-nav">
+            {% if request.user.is_staff or request.user.is_superuser %}
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Inicio_dash' %}active{% endif %}"
                href="{% url 'Inicio_dash' %}">
                <i class="bi bi-house-door-fill"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_productos' %}active{% endif %}"
                href="{% url 'listar_productos' %}">
                <i class="bi bi-basket-fill"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_descuentos' %}active{% endif %}"
                href="{% url 'panel_descuentos' %}">
                <i class="bi bi-tags-fill"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'listar_producciones' %}active{% endif %}"
                href="{% url 'listar_producciones' %}">
                <i class="bi bi-box-seam-fill"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'panel_ventas' %}active{% endif %}"
                href="{% url 'panel_ventas' %}">
                <i class="bi bi-cash-stack"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Pedidos' %}active{% endif %}"
                href="{% url 'Pedidos' %}">
                <i class="bi bi-truck"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Usuario' %}active{% endif %}"
                href="{% url 'Usuario' %}">
                <i class="bi bi-people-fill"></i>
             </a>
-
+        
             <a class="dash-nav-item {% if request.resolver_match.url_name == 'Notificaciones' %}active{% endif %}"
                href="{% url 'Notificaciones' %}">
                <i class="bi bi-bell-fill"></i>
             </a>
+        
+            {% endif %}
+        
+            {% if request.user.perfilemple.rol == 'empleado' %}
+            <a class="dash-nav-item {% if request.resolver_match.url_name == 'mis_entregas' %}active{% endif %}"
+               href="{% url 'mis_entregas' %}">
+               <i class="bi bi-geo-alt-fill"></i>
+            </a>
+            {% endif %}
+        
         </nav>
 
         <button class="dash-toggle" id="themeToggle" title="Cambiar modo" type="button">

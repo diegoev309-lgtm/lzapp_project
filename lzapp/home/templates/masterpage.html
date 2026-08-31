@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
+    {% load producto_extras %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -375,8 +375,8 @@
                                 <strong class="oferta-reveal-titulo" id="ofertaRevealTitulo">¡Felicidades!</strong>
                                 <span class="oferta-reveal-subtitulo" id="ofertaRevealSubtitulo">Tienes 50% de descuento</span>
                                 <div class="oferta-reveal-precios" id="ofertaRevealPrecios">
-                                    <span class="oferta-reveal-precio-anterior" id="ofertaRevealPrecioAnterior">$12.000</span>
-                                    <span class="oferta-reveal-precio-nuevo" id="ofertaRevealPrecioNuevo">$6.000</span>
+                                    <span class="oferta-reveal-precio-anterior" id="ofertaRevealPrecioAnterior">$12.000,00 COP</span>
+                                    <span class="oferta-reveal-precio-nuevo" id="ofertaRevealPrecioNuevo">$6.000,00 COP</span>
                                     <span class="oferta-reveal-credencial">Oferta</span>
                                 </div>
                                 <!-- Nota adicional para premios de la ruleta diaria sin precio real
@@ -735,8 +735,8 @@
                                             Válido hasta {{ premio_activo.fecha_expiracion|date:"d/m/Y H:i" }} · Código {{ premio_activo.codigo }}
                                         </p>
                                         <p class="precio">
-                                            $ {{ premio_activo.precio_con_descuento }}
-                                            <span class="precio-tachado">$ {{ premio_activo.precio_original }}</span>
+                                            $ {{ premio_activo.precio_con_descuento|cop }} COP
+                                            <span class="precio-tachado">$ {{ premio_activo.precio_original|cop }} COP</span>
                                         </p>
                                     </div>
                                     <div class="card-footer bg-white border-0">
@@ -824,7 +824,7 @@
                                         <p class="producto-descripcion">
                                             {{ i.descripcion|default:"Producto elaborado con los más altos estándares de calidad, fresco y natural." }}
                                         </p>
-                                        <p class="precio">$ {{ i.precio }}</p>
+                                        <p class="precio">$ {{ i.precio|cop }} COP</p>
                                     </div>
                                     <div class="card-footer bg-white border-0">
                                         <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
@@ -1884,7 +1884,8 @@
             });
         }
         function formatearPrecio(valor) {
-            return '$' + Math.round(valor).toLocaleString('es-CO');
+            const numero = Math.round((Number(valor) || 0) * 100) / 100;
+            return '$' + numero.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' COP';
         }
 
         function iniciarSorteo() {
@@ -2739,7 +2740,7 @@
                                 ${estrellasHtml(p)}
                                 <div class="precio-fila">
                                     <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
-                                    <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                                      <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                                 </div>
                                 <p class="producto-descripcion"><strong>Descripcion:</strong></p>
                                 <p class="producto-descripcion">${descripcionSegura(p)}</p>
@@ -2769,7 +2770,7 @@
                             ${estrellasHtml(p)}
                             <h5 class="titulo-producto">${escapeHtml(p.nombre)}</h5>
                             <p class="producto-descripcion">${descripcionSegura(p)}</p>
-                            <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO')}</p>
+                            <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                         </div>
                         <div class="card-footer bg-white border-0">
                             <a href="${urlAgregar(p.id)}" class="btn btn-carrito w-100">
