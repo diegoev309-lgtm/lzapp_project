@@ -7,7 +7,6 @@ from .decorators import vista_dashboard
 from dashboard.models import SesionActiva
 from .utils import describir_dispositivo, obtener_configuracion
 
-
 @vista_dashboard
 def panel_seguridad(request):
     #"""
@@ -43,7 +42,6 @@ def panel_seguridad(request):
         'dispositivos': dispositivos,
     })
 
-
 @vista_dashboard
 @require_POST
 def guardar_configuracion_seguridad(request):
@@ -68,7 +66,6 @@ def guardar_configuracion_seguridad(request):
 
     messages.success(request, 'Configuración de seguridad actualizada.')
     return redirect('panel_seguridad')
-
 
 @vista_dashboard
 @require_POST

@@ -8,6 +8,8 @@ from dashboard.models import Pedido, PerfilEmple, Notificacion
 from pedido.services import obtener_distancia_km
 from seguridad.decorators import vista_dashboard
 
+import requests
+
 @vista_dashboard
 def Pedidos(request):
     return render(request, 'pedidos.html')
@@ -146,3 +148,73 @@ def actualizar_estado_pedido(request, pedido_id):
         'ok': True,
         'repartidor': (pedido.repartidor.get_full_name() or pedido.repartidor.username) if pedido.repartidor else None,
     })
+
+NOMINATIM_HEADERS = {
+    "User-Agent": "LzApp/1.0 (contacto@lacteoszulianos.com)"  # Nominatim exige un User-Agent identificable
+}
+
+def buscar_direccion(request):
+    """
+    Autocompletado de direcciones (geocodificación directa).
+    GET /usuarios/buscar-direccion/?q=carrera+70+medellin
+    """
+    query = request.GET.get("q", "").strip()
+
+    if len(query) < 4:
+        return JsonResponse({"resultados": []})
+
+    try:
+        resp = requests.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={
+                "q": query,
+                "format": "json",
+                "addressdetails": 1,
+                "limit": 5,
+                "countrycodes": "co",  # restringe a Colombia; quita esta línea si algún día haces envíos internacionales
+            },
+            headers=NOMINATIM_HEADERS,
+            timeout=5,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.RequestException:
+        return JsonResponse({"resultados": [], "error": "No se pudo consultar el servicio de direcciones"}, status=502)
+
+    resultados = [
+        {
+            "direccion": item["display_name"],
+            "lat": float(item["lat"]),
+            "lon": float(item["lon"]),
+        }
+        for item in data
+    ]
+    return JsonResponse({"resultados": resultados})
+
+
+def direccion_desde_coordenadas(request):
+    """
+    Geocodificación inversa: convierte lat/lon (ya capturados por GPS) en una
+    dirección legible para que el usuario la confirme.
+    GET /usuarios/direccion-desde-coordenadas/?lat=6.2442&lon=-75.5812
+    """
+    lat = request.GET.get("lat")
+    lon = request.GET.get("lon")
+
+    if not lat or not lon:
+        return JsonResponse({"error": "Faltan coordenadas"}, status=400)
+
+    try:
+        resp = requests.get(
+            "https://nominatim.openstreetmap.org/reverse",
+            params={"lat": lat, "lon": lon, "format": "json", "addressdetails": 1},
+            headers=NOMINATIM_HEADERS,
+            timeout=5,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.RequestException:
+        return JsonResponse({"error": "No se pudo consultar el servicio de direcciones"}, status=502)
+
+    direccion = data.get("display_name", "Dirección no encontrada")
+    return JsonResponse({"direccion": direccion})

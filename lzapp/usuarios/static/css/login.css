@@ -470,6 +470,7 @@ body{
     overflow:hidden;
     cursor:pointer;
     transition:transform var(--transition),box-shadow var(--transition);
+    margin-bottom: 1.2rem; /* separa el botón del texto de abajo */
 }
 .btn-auth:hover{
     transform:translateY(-2px);
@@ -498,6 +499,7 @@ body{
 }
 
 .auth-registro{
+    margin-top:1rem;
     text-align:center;
     font-size:.9rem;
     color:rgba(255,255,255,.75);

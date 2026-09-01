@@ -1,23 +1,20 @@
-import calendar
 from datetime import timedelta
-
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
-
 from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento
 from seguridad.decorators import vista_dashboard
+
+import calendar
 
 MESES_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
             'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-
 @vista_dashboard
 def dview(request):
     return redirect('Inicio_dash')
-
 
 # =========================================================
 # VISTAS DE PÁGINA

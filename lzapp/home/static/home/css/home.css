@@ -26,10 +26,6 @@
 
 html {
     scroll-behavior: smooth;
-    /* FIX: evita que cualquier elemento que se pase por unos px de ancho
-       (p. ej. el carrito fijo) empuje el documento y genere scroll
-       horizontal — eso era lo que recortaba visualmente toda la página. */
-    overflow-x: hidden;
 }
 
 body {

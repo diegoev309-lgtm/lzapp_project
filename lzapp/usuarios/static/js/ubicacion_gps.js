@@ -51,11 +51,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function fijarUbicacion(lat, lng) {
+    let temporizadorReversa = null;
+
+    function fijarUbicacion(lat, lng, mensajeInicial) {
         document.getElementById('cliente_latitud').value = lat;
         document.getElementById('cliente_longitud').value = lng;
-        mostrarEstado('Ubicación seleccionada en el mapa', 'text-success');
+        mostrarEstado(mensajeInicial || 'Ubicación seleccionada, buscando dirección...', 'text-success');
         btnConfirmar.disabled = false;
+
+        // Al arrastrar el marcador se dispara muchas veces seguidas; esperamos
+        // a que el usuario suelte y deje de mover el mapa antes de consultar
+        // Nominatim, para no saturar el servidor gratuito (máx. 1 petición/seg).
+        clearTimeout(temporizadorReversa);
+        temporizadorReversa = setTimeout(() => geocodificarInversa(lat, lng, mensajeInicial), 600);
+    }
+
+    async function geocodificarInversa(lat, lng, prefijo) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es`;
+            const respuesta = await fetch(url);
+            const resultado = await respuesta.json();
+
+            const direccion = resultado.display_name;
+            if (direccion) {
+                const texto = prefijo ? `${prefijo} — ${direccion}` : direccion;
+                mostrarEstado(texto, 'text-success');
+            }
+        } catch (error) {
+            // Si Nominatim falla, no es crítico: las coordenadas ya quedaron
+            // guardadas en los inputs ocultos, solo no mostramos la dirección legible.
+            console.error('Error en geocodificación inversa:', error);
+        }
     }
 
     // ---------- GPS ----------
@@ -79,8 +105,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     marcador.setLatLng([lat, lng]);
                 }
 
-                fijarUbicacion(lat, lng);
-                mostrarEstado(`Ubicación capturada (precisión: ${Math.round(posicion.coords.accuracy)}m)`, 'text-success');
+                const precision = `Ubicación capturada (precisión: ${Math.round(posicion.coords.accuracy)}m)`;
+                fijarUbicacion(lat, lng, precision);
             },
             function (error) {
                 let mensaje = 'No se pudo obtener tu ubicación.';
