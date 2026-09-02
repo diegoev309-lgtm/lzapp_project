@@ -413,30 +413,46 @@ def importar_produccion(request):
 
             hoja = libro.active
             ids_nuevos = []
-            omitidos = 0
-            no_encontrados = []
-            fechas_invalidas = []
+            filas_omitidas = []  # [(num_fila, ['producto no encontrado: "X"', ...]), ...]
 
-            for fila in hoja.iter_rows(min_row=2, values_only=True):
-                if not fila or not fila[0]:
+            for num_fila, fila in enumerate(hoja.iter_rows(min_row=2, values_only=True), start=2):
+                if not fila or not any(fila):
                     continue
 
-                nombre_producto = str(fila[0]).strip()
+                nombre_producto_raw = fila[0] if len(fila) > 0 else None
                 cantidad = fila[1] if len(fila) > 1 else None
                 observacion = fila[2] if len(fila) > 2 else None
                 fecha_venc_raw = fila[3] if len(fila) > 3 else None
 
-                if not cantidad or cantidad <= 0:
-                    omitidos += 1
-                    continue
+                nombre_producto = str(nombre_producto_raw).strip() if nombre_producto_raw else ''
 
-                if not fecha_venc_raw:
-                    fechas_invalidas.append(nombre_producto)
-                    continue
+                # --- Se validan TODOS los campos obligatorios de la fila antes
+                # de omitirla, para poder decir exactamente qué falta ---
+                problemas = []
+                producto = None
+
+                if not nombre_producto:
+                    problemas.append('falta el nombre del producto')
+                else:
+                    try:
+                        producto = Producto.objects.get(nombre__iexact=nombre_producto)
+                    except Producto.DoesNotExist:
+                        problemas.append(f'producto "{nombre_producto}" no existe')
+
+                if cantidad is None or str(cantidad).strip() == '':
+                    problemas.append('falta la cantidad producida')
+                else:
+                    try:
+                        if float(cantidad) <= 0:
+                            problemas.append('la cantidad debe ser mayor a 0')
+                    except (TypeError, ValueError):
+                        problemas.append('la cantidad no es un número válido')
 
                 # --- parseo seguro de la fecha de vencimiento ---
                 fecha_venc = None
-                if isinstance(fecha_venc_raw, datetime):
+                if not fecha_venc_raw:
+                    problemas.append('falta la fecha de vencimiento')
+                elif isinstance(fecha_venc_raw, datetime):
                     fecha_venc = fecha_venc_raw.date()
                 elif hasattr(fecha_venc_raw, 'year'):
                     fecha_venc = fecha_venc_raw
@@ -448,16 +464,12 @@ def importar_produccion(request):
                             break
                         except ValueError:
                             continue
-
-                if not fecha_venc:
-                    fechas_invalidas.append(nombre_producto)
-                    continue
+                    if not fecha_venc:
+                        problemas.append('la fecha de vencimiento no tiene un formato válido')
                 # --- fin parseo ---
 
-                try:
-                    producto = Producto.objects.get(nombre__iexact=nombre_producto)
-                except Producto.DoesNotExist:
-                    no_encontrados.append(nombre_producto)
+                if problemas:
+                    filas_omitidas.append((num_fila, problemas))
                     continue
 
                 produccion = Produccion.objects.create(
@@ -470,27 +482,21 @@ def importar_produccion(request):
 
             request.session['producciones_importadas_ids'] = ids_nuevos
 
-            if no_encontrados:
-                messages.warning(
-                    request,
-                    'No se encontraron estos productos, se omitieron sus '
-                    f'filas: {", ".join(no_encontrados)}'
-                )
-            if fechas_invalidas:
-                messages.warning(
-                    request,
-                    'Estas filas se omitieron por no tener una fecha de '
-                    f'vencimiento válida: {", ".join(fechas_invalidas)}'
-                )
-            if omitidos:
-                messages.warning(
-                    request,
-                    f'{omitidos} filas se omitieron por no tener una cantidad válida.'
-                )
             if ids_nuevos:
                 messages.success(
                     request,
                     f'Se registraron {len(ids_nuevos)} producciones correctamente.'
+                )
+            else:
+                messages.error(request, 'No se registró ninguna producción. Revisa el archivo.')
+
+            if filas_omitidas:
+                detalle = '; '.join(
+                    f'fila {n} ({", ".join(problemas)})' for n, problemas in filas_omitidas
+                )
+                messages.warning(
+                    request,
+                    f'{len(filas_omitidas)} fila(s) se omitieron: {detalle}.'
                 )
 
             return redirect('producciones_importadas')

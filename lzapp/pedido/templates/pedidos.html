@@ -6,6 +6,10 @@
 {% block page_title %}Pedidos{% endblock %}
 {% block page_subtitle %}Gestión y seguimiento de entregas en tiempo real{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+
 {% block content %}
 
 <style>
@@ -40,7 +44,22 @@
     .badge-estado.entregado{  background:rgba(74,222,128,.14);  color:var(--green); }
     .badge-estado.cancelado{  background:rgba(239,68,68,.14);   color:var(--red); }
 
-    .pedidos-mapa-placeholder{
+    .pedidos-mapa-box{
+        margin:15px;
+        height:420px;
+        border-radius:14px;
+        overflow:hidden;
+    }
+    .pedidos-mapa-leyenda{
+        margin:0 15px 15px;
+        display:flex;
+        gap:16px;
+        flex-wrap:wrap;
+        font-size:12px;
+        color:var(--text-tertiary);
+    }
+    .pedidos-mapa-leyenda span{ display:flex; align-items:center; gap:4px; }
+    .pedidos-mapa-vacio{
         margin:15px;
         padding:40px 20px;
         text-align:center;
@@ -48,7 +67,6 @@
         border-radius:14px;
         color:var(--text-tertiary);
     }
-    .pedidos-mapa-placeholder i{ font-size:34px; color:var(--text-tertiary); margin-bottom:8px; display:block; }
 
     .pedidos-mapa-lista{ margin:0 15px 15px; display:flex; flex-direction:column; gap:8px; }
     .pedido-en-vivo-item{
@@ -145,12 +163,15 @@
 
         <!-- ============ VISTA: MAPA EN VIVO ============ -->
         <div id="vistaMapaPedidos" class="vista-oculta">
-            <div class="pedidos-mapa-placeholder">
-                <i class="bi bi-map"></i>
-                El mapa interactivo (📍 cliente · 🚚 repartidor · 🏭 empresa) se activará cuando esté lista la Google Maps API.
-                Mientras tanto, aquí están los pedidos en camino con su ubicación registrada:
+            <div class="pedidos-mapa-leyenda">
+                <span>📍 Cliente</span>
+                <span>🚚 Repartidor</span>
             </div>
-            <div class="pedidos-mapa-lista" id="listaPedidosEnCamino"></div>
+            <div id="mapaEnVivo" class="pedidos-mapa-box"></div>
+            <div id="mapaEnVivoVacio" class="pedidos-mapa-vacio" style="display:none;">
+                <i class="bi bi-map"></i>
+                No hay pedidos en camino con ubicación registrada en este momento.
+            </div>
         </div>
 
     </div>
@@ -159,7 +180,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+let mapaEnVivo, capaMarcadores, mapaEnVivoInicializado = false;
+const CENTRO_MAPA_DEFECTO = [6.2442, -75.5812]; // Medellín
+
 function cambiarVistaPedidos(vista) {
     const lista = document.getElementById('vistaListaPedidos');
     const mapa = document.getElementById('vistaMapaPedidos');
@@ -176,6 +201,20 @@ function cambiarVistaPedidos(vista) {
         mapa.classList.remove('vista-oculta');
         btnMapa.classList.add('active');
         btnLista.classList.remove('active');
+
+        // Leaflet necesita que su contenedor sea visible para medir bien el
+        // tamaño, así que lo inicializamos justo cuando se muestra por primera vez.
+        if (!mapaEnVivoInicializado) {
+            mapaEnVivo = L.map('mapaEnVivo').setView(CENTRO_MAPA_DEFECTO, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19,
+            }).addTo(mapaEnVivo);
+            capaMarcadores = L.layerGroup().addTo(mapaEnVivo);
+            mapaEnVivoInicializado = true;
+        }
+        mapaEnVivo.invalidateSize();
+        actualizarMapaEnVivo(pedidosActuales);
     }
 }
 
@@ -194,7 +233,7 @@ async function cargarPedidosTiempoReal() {
         document.getElementById('statCancelados').textContent = data.resumen.cancelados;
 
         renderizarTabla(pedidosActuales);
-        renderizarMapaLista(pedidosActuales);
+        actualizarMapaEnVivo(pedidosActuales);
 
     } catch (error) {
         console.error('Error cargando pedidos:', error);
@@ -235,27 +274,85 @@ function renderizarTabla(pedidos) {
     `).join('');
 }
 
-function renderizarMapaLista(pedidos) {
-    const contenedor = document.getElementById('listaPedidosEnCamino');
+function actualizarMapaEnVivo(pedidos) {
+    if (!mapaEnVivoInicializado) return; // el mapa aún no se ha abierto ni inicializado
+
     const enCamino = pedidos.filter(p => p.estado === 'en_camino' && p.cliente_latitud && p.cliente_longitud);
+    const vacio = document.getElementById('mapaEnVivoVacio');
+
+    capaMarcadores.clearLayers();
 
     if (enCamino.length === 0) {
-        contenedor.innerHTML = '<p class="text-secondary text-center mt-2">No hay pedidos en camino en este momento.</p>';
+        vacio.style.display = 'block';
         return;
     }
+    vacio.style.display = 'none';
 
-    contenedor.innerHTML = enCamino.map(p => `
-        <div class="pedido-en-vivo-item">
-            <div class="pedido-en-vivo-info">
-                <span class="pedido-en-vivo-cliente">#${p.pedido_id} — ${p.cliente}</span>
-                <span class="pedido-en-vivo-detalle">
-                    📍 ${p.cliente_latitud.toFixed(5)}, ${p.cliente_longitud.toFixed(5)}
-                    ${p.repartidor_latitud ? ' · 🚚 ' + p.repartidor_latitud.toFixed(5) + ', ' + p.repartidor_longitud.toFixed(5) : ' · 🚚 sin reportar ubicación'}
-                </span>
-            </div>
-            <span class="badge-estado en_camino">${p.distancia_km ? p.distancia_km + ' km restantes' : 'En camino'}</span>
-        </div>
-    `).join('');
+    const puntos = [];
+
+    enCamino.forEach(p => {
+        const marcadorCliente = L.marker([p.cliente_latitud, p.cliente_longitud], {
+            icon: iconoEmoji('📍'),
+        }).bindPopup(`<b>#${p.pedido_id} — ${p.cliente}</b><br>Destino de entrega`);
+        capaMarcadores.addLayer(marcadorCliente);
+        puntos.push([p.cliente_latitud, p.cliente_longitud]);
+
+        if (p.repartidor_latitud && p.repartidor_longitud) {
+            const detalle = p.distancia_km ? `${p.distancia_km} km · ${p.tiempo_estimado_min ?? '—'} min restantes` : 'En camino';
+            const marcadorRepartidor = L.marker([p.repartidor_latitud, p.repartidor_longitud], {
+                icon: iconoEmoji('🚚'),
+            }).bindPopup(`<b>${p.repartidor || 'Repartidor'}</b><br>${detalle}`);
+            capaMarcadores.addLayer(marcadorRepartidor);
+            puntos.push([p.repartidor_latitud, p.repartidor_longitud]);
+        }
+
+        if (p.ruta_polyline) {
+            const trazado = decodificarPolyline(p.ruta_polyline);
+            L.polyline(trazado, { color: '#8b5cf6', weight: 4, opacity: 0.7 }).addTo(capaMarcadores);
+        }
+    });
+
+    if (puntos.length > 0) {
+        mapaEnVivo.fitBounds(puntos, { padding: [40, 40], maxZoom: 15 });
+    }
+}
+
+function iconoEmoji(emoji) {
+    return L.divIcon({
+        html: `<span style="font-size:22px; line-height:1;">${emoji}</span>`,
+        className: '',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+    });
+}
+
+// Decodifica el formato "polyline" estándar (el mismo que usa OSRM y Google
+// Directions) a una lista de [lat, lng] que Leaflet puede dibujar.
+function decodificarPolyline(codificada) {
+    let index = 0, lat = 0, lng = 0;
+    const coordenadas = [];
+
+    while (index < codificada.length) {
+        let shift = 0, resultado = 0, byte;
+        do {
+            byte = codificada.charCodeAt(index++) - 63;
+            resultado |= (byte & 0x1f) << shift;
+            shift += 5;
+        } while (byte >= 0x20);
+        lat += (resultado & 1) ? ~(resultado >> 1) : (resultado >> 1);
+
+        shift = 0;
+        resultado = 0;
+        do {
+            byte = codificada.charCodeAt(index++) - 63;
+            resultado |= (byte & 0x1f) << shift;
+            shift += 5;
+        } while (byte >= 0x20);
+        lng += (resultado & 1) ? ~(resultado >> 1) : (resultado >> 1);
+
+        coordenadas.push([lat / 1e5, lng / 1e5]);
+    }
+    return coordenadas;
 }
 
 document.getElementById('inputBuscarPedido').addEventListener('input', () => renderizarTabla(pedidosActuales));

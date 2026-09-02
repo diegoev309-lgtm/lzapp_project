@@ -52,7 +52,25 @@
     transition:transform .6s ease;
 }
 .producto-card:hover .producto-card-imagen{ transform:scale(1.08); }
-.producto-card-estado{ position:absolute; top:8px; right:8px; z-index:2; }
+.producto-card-estado{ position:absolute; top:8px; right:8px; z-index:2; display:flex; flex-direction:column; gap:4px; align-items:flex-end; }
+
+/* Selector de estado, al lado del buscador */
+.select-estado-producto{
+    flex:0 0 auto;
+    width:auto;
+    max-width:170px;
+    padding:11px 34px 11px 14px;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238a8a99'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4h-7z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:14px;
+}
+@media(max-width:576px){
+    .select-estado-producto{ max-width:none; flex:1 1 100%; }
+}
 .producto-card-body{
     padding:14px 16px 16px;
     display:flex;
@@ -214,6 +232,12 @@
                 <i class="bi bi-search"></i>
                 <input type="text" name="q" id="inputBuscarProducto" class="input-busqueda" placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
             </div>
+            <select name="estado" id="selectEstadoProducto" class="input-busqueda select-estado-producto">
+                <option value="todos" {% if estado == 'todos' %}selected{% endif %}>Todos los estados</option>
+                <option value="disponible" {% if estado == 'disponible' %}selected{% endif %}>Disponibles</option>
+                <option value="no_disponible" {% if estado == 'no_disponible' %}selected{% endif %}>No disponibles</option>
+                <option value="incompleto" {% if estado == 'incompleto' %}selected{% endif %}>Incompletos</option>
+            </select>
         </form>
 
         <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
@@ -335,6 +359,11 @@
                                         <i class="bi bi-x-circle-fill"></i> No disp.
                                     </span>
                                 {% endif %}
+                                {% if i.incompleto %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> Incompleto
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="producto-card-body">
@@ -386,10 +415,10 @@
                     <ul class="pagination pagination-sm mb-0">
                         {% if productos.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">Primera</a>
+                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">Primera</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo;</a>
+                                <a class="page-link" href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">&laquo;</a>
                             </li>
                         {% endif %}
                         {% for pagina in productos.paginator.page_range %}
@@ -399,16 +428,16 @@
                                 </li>
                             {% else %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ pagina }}{% if query %}&q={{ query }}{% endif %}">{{ pagina }}</a>
+                                    <a class="page-link" href="?page={{ pagina }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">{{ pagina }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
                         {% if productos.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a>
+                                <a class="page-link" href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">&raquo;</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Última</a>
+                                <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">Última</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -432,7 +461,21 @@
         </div>
 
         <p class="modal-importar-subtitulo">
-            Sube un archivo <strong>.xlsx</strong> con las columnas: nombre, descripción, precio, stock actual, stock mínimo, disponibilidad.
+            Sube un archivo <strong>.xlsx</strong> con las columnas en este orden:
+        </p>
+        <ul class="modal-importar-columnas">
+            <li><strong>nombre</strong> <span class="badge-obligatorio">obligatorio</span></li>
+            <li>descripción <span class="badge-opcional">opcional</span></li>
+            <li><strong>precio</strong> <span class="badge-obligatorio">obligatorio</span></li>
+            <li>stock actual <span class="badge-opcional">opcional</span></li>
+            <li>stock mínimo <span class="badge-opcional">opcional</span></li>
+            <li>disponibilidad (Sí/No) <span class="badge-opcional">opcional</span></li>
+        </ul>
+        <p class="modal-importar-nota">
+            <i class="bi bi-info-circle"></i>
+            Las filas sin nombre o precio se omiten. Los productos que importes sin
+            descripción, stock o imagen quedan marcados como <strong>Incompletos</strong>
+            en el listado para que los completes después.
         </p>
 
         <form method="post" enctype="multipart/form-data" action="{% url 'importar_productos' %}" class="modal-importar-form">
@@ -507,6 +550,7 @@
     (function () {
         const form = document.getElementById('formBuscarProducto');
         const input = document.getElementById('inputBuscarProducto');
+        const selectEstado = document.getElementById('selectEstadoProducto');
         const contenedor = document.getElementById('contenedorListaProductos');
         if (!form || !input || !contenedor) return;
 
@@ -538,8 +582,14 @@
         }
 
         function buscar(query) {
-            const url = query
-                ? `${window.location.pathname}?q=${encodeURIComponent(query)}`
+            const params = new URLSearchParams();
+            if (query) params.set('q', query);
+            const estado = selectEstado ? selectEstado.value : 'todos';
+            if (estado && estado !== 'todos') params.set('estado', estado);
+
+            const cadena = params.toString();
+            const url = cadena
+                ? `${window.location.pathname}?${cadena}`
                 : window.location.pathname;
             actualizarDesdeUrl(url);
         }
@@ -555,6 +605,12 @@
             clearTimeout(timer);
             buscar(input.value.trim());
         });
+
+        if (selectEstado) {
+            selectEstado.addEventListener('change', () => {
+                buscar(input.value.trim());
+            });
+        }
 
         // La paginación (Primera, «, números, », Última) también pasa
         // por el mismo camino de fetch(), sin recargar la página.

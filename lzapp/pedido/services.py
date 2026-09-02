@@ -46,6 +46,38 @@ def obtener_distancia_km(lat1, lon1, lat2, lon2):
     return _distancia_osrm(lat1, lon1, lat2, lon2)
 
 
+def _ruta_completa_osrm(lat1, lon1, lat2, lon2):
+    """Igual que _distancia_osrm, pero además pide la geometría de la ruta
+    (polyline codificada) para poder dibujarla en el mapa."""
+    url = f"https://router.project-osrm.org/route/v1/driving/{lon1},{lat1};{lon2},{lat2}"
+    try:
+        respuesta = requests.get(
+            url, params={"overview": "full", "geometries": "polyline"}, timeout=6
+        ).json()
+        if respuesta.get("code") != "Ok":
+            raise ValueError("OSRM no pudo calcular la ruta")
+
+        ruta = respuesta["routes"][0]
+        distancia_km = ruta["distance"] / 1000
+        tiempo_min = round(ruta["duration"] / 60)
+        polyline = ruta["geometry"]
+        return distancia_km, tiempo_min, polyline
+
+    except Exception:
+        return _distancia_haversine_km(lat1, lon1, lat2, lon2), None, None
+
+
+def obtener_ruta_completa(lat1, lon1, lat2, lon2):
+    """
+    Como obtener_distancia_km, pero además devuelve la polyline codificada
+    de la ruta, para dibujarla en el mapa. Úsala solo cuando vayas a
+    *guardar* la ruta (ej. al asignar repartidor a un pedido) — no en cada
+    ping de GPS del repartidor, porque pedir la geometría completa es más
+    pesado para el servidor demo de OSRM que solo pedir distancia/tiempo.
+    """
+    return _ruta_completa_osrm(lat1, lon1, lat2, lon2)
+
+
 def obtener_repartidor_mas_cercano(cliente_lat, cliente_lng, candidatos):
     """
     candidatos: queryset/lista de PerfilEmple con repartidor_latitud/longitud ya cargados.

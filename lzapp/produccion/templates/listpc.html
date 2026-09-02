@@ -240,13 +240,19 @@
             </div>
 
             <p class="modal-importar-subtitulo">
-                Sube un archivo <strong>.xlsx</strong>
-                con las columnas:
-
-                nombre del producto,
-                cantidad producida,
-                fechas de vencimiento
-                observación.
+                Sube un archivo <strong>.xlsx</strong> con las columnas en este orden:
+            </p>
+            <ul class="modal-importar-columnas">
+                <li><strong>nombre del producto</strong> <span class="badge-obligatorio">obligatorio</span></li>
+                <li><strong>cantidad producida</strong> <span class="badge-obligatorio">obligatorio</span></li>
+                <li>observación <span class="badge-opcional">opcional</span></li>
+                <li><strong>fecha de vencimiento</strong> <span class="badge-obligatorio">obligatorio</span></li>
+            </ul>
+            <p class="modal-importar-nota">
+                <i class="bi bi-info-circle"></i>
+                El nombre del producto debe existir ya en tu catálogo. Las filas con
+                producto inexistente, cantidad inválida o fecha inválida se omiten y
+                te decimos exactamente en qué fila y por qué.
             </p>
 
             <form method="post" enctype="multipart/form-data" action="{% url 'importar_produccion' %}" class="modal-importar-form">

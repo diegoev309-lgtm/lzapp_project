@@ -275,7 +275,7 @@ def crear_pedido_automatico(sender, instance, created, **kwargs):
         Pedido.objects.get_or_create(venta=instance)
         from django.utils import timezone
 from datetime import timedelta
-from pedido.services import obtener_repartidor_mas_cercano
+from pedido.services import obtener_repartidor_mas_cercano, obtener_ruta_completa
 
 
 @receiver(post_save, sender=Pedido)
@@ -305,7 +305,17 @@ def asignar_repartidor_automatico(sender, instance, created, **kwargs):
         instance.distancia_km = round(distancia_km, 2) if distancia_km else None
         if tiempo_min:
             instance.tiempo_estimado_min = tiempo_min
-        instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min'])
+
+        # Pedimos la geometría de la ruta solo para el repartidor ya elegido
+        # (una petición extra a OSRM, pero ocurre una sola vez por asignación,
+        # no en cada ping de GPS).
+        _, _, polyline = obtener_ruta_completa(
+            instance.cliente_latitud, instance.cliente_longitud,
+            mejor.repartidor_latitud, mejor.repartidor_longitud,
+        )
+        instance.ruta_polyline = polyline
+
+        instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min', 'ruta_polyline'])
 
 # =========================================================
 # #Tabla de pedidos con un hostorial

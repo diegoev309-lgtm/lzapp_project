@@ -660,8 +660,59 @@ a{ text-decoration:none; color:inherit; }
 
 .modal-importar-subtitulo{
   font-size:12.5px; color: var(--text-secondary);
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   line-height:1.5;
+}
+
+/* Lista de columnas requeridas/opcionales dentro de los modales de importación */
+.modal-importar-columnas{
+    list-style:none;
+    padding:0;
+    margin:0 0 14px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.modal-importar-columnas li{
+    font-size:13px;
+    color:var(--text-secondary);
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.badge-obligatorio, .badge-opcional{
+    font-size:10.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:2px 8px;
+    border-radius:20px;
+}
+.badge-obligatorio{
+    background:rgba(228,200,112,.15);
+    color:var(--gold);
+    border:1px solid rgba(228,200,112,.35);
+}
+.badge-opcional{
+    background:rgba(255,255,255,.06);
+    color:var(--text-tertiary);
+    border:1px solid var(--border-hair);
+}
+.modal-importar-nota{
+    font-size:12.5px;
+    color:var(--text-tertiary);
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border-subtle);
+    border-radius:10px;
+    padding:10px 12px;
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-bottom:16px;
+}
+.modal-importar-nota i{
+    color:var(--gold);
+    margin-top:2px;
 }
 
 .modal-importar-dropzone{

@@ -15,6 +15,9 @@ from seguridad.decorators import vista_dashboard
 @vista_dashboard
 def listar_productos(request):
     query = request.GET.get('q', '').strip()
+    estado = request.GET.get('estado', 'todos').strip().lower()
+    if estado not in ('todos', 'disponible', 'no_disponible', 'incompleto'):
+        estado = 'todos'
 
     mi_calificacion_sub = None
     if request.user.is_authenticated:
@@ -44,6 +47,13 @@ def listar_productos(request):
     if query:
         lista_producto = lista_producto.filter(nombre__icontains=query)
 
+    if estado == 'disponible':
+        lista_producto = lista_producto.filter(disponibilidad=True)
+    elif estado == 'no_disponible':
+        lista_producto = lista_producto.filter(disponibilidad=False)
+    elif estado == 'incompleto':
+        lista_producto = lista_producto.filter(incompleto=True)
+
     productos_bajo_stock = Producto.objects.filter(stock_actual__lt=F('stock_minimo'))
 
     paginator = Paginator(lista_producto, 5)
@@ -56,6 +66,7 @@ def listar_productos(request):
         "productos": productos,
         "productos_bajo_stock": productos_bajo_stock,
         "query": query,
+        "estado": estado,
         "formulario": formulario,
     })
 
@@ -173,29 +184,42 @@ def importar_productos(request):
 
             hoja = libro.active
             ids_nuevos = []
-            omitidos = 0
+            incompletos = 0
+            filas_omitidas = []  # [(num_fila, ['nombre', 'precio']), ...]
 
-            for fila in hoja.iter_rows(min_row=2, values_only=True):
-                if not fila or not fila[0]:
+            for num_fila, fila in enumerate(hoja.iter_rows(min_row=2, values_only=True), start=2):
+                if not fila or not any(fila):
                     continue
 
-                nombre = fila[0]
+                nombre = fila[0] if len(fila) > 0 else None
                 descripcion = fila[1] if len(fila) > 1 else None
                 precio = fila[2] if len(fila) > 2 else None
-                stock_actual = fila[3] if len(fila) > 3 else 0
-                stock_minimo = fila[4] if len(fila) > 4 else 15
+                stock_actual = fila[3] if len(fila) > 3 else None
+                stock_minimo = fila[4] if len(fila) > 4 else None
                 disponibilidad = fila[5] if len(fila) > 5 else True
 
-                if precio is None:
-                    omitidos += 1
+                # --- Campos OBLIGATORIOS: sin estos no se puede crear el producto ---
+                faltantes = []
+                if not (nombre and str(nombre).strip()):
+                    faltantes.append('nombre')
+                if precio is None or str(precio).strip() == '':
+                    faltantes.append('precio')
+
+                if faltantes:
+                    filas_omitidas.append((num_fila, faltantes))
                     continue
 
                 # Por si en el Excel viene "Sí"/"No" en vez de True/False
                 if isinstance(disponibilidad, str):
                     disponibilidad = disponibilidad.strip().lower() in ('si', 'sí', 'true', '1', 'x')
 
+                # --- Campos OPCIONALES: si faltan, el producto queda "incompleto"
+                # (además de que la imagen siempre debe cargarse a mano luego) ---
+                if not (descripcion and str(descripcion).strip()) or not stock_actual or not stock_minimo:
+                    incompletos += 1
+
                 producto = Producto.objects.create(
-                    nombre=nombre,
+                    nombre=str(nombre).strip(),
                     descripcion=descripcion,
                     precio=precio,
                     stock_actual=stock_actual or 0,
@@ -206,10 +230,26 @@ def importar_productos(request):
 
             request.session['productos_importados_ids'] = ids_nuevos
 
-            if omitidos:
-                messages.warning(request, f'Se importaron {len(ids_nuevos)} productos. {omitidos} filas se omitieron por no tener precio.')
+            if ids_nuevos:
+                resumen = f'Se importaron {len(ids_nuevos)} productos.'
+                if incompletos:
+                    resumen += (
+                        f' {incompletos} quedaron marcados como "Incompletos" '
+                        '(les falta imagen, descripción o stock) — puedes filtrarlos '
+                        'en el listado para completarlos.'
+                    )
+                messages.success(request, resumen)
             else:
-                messages.success(request, f'Se importaron {len(ids_nuevos)} productos correctamente.')
+                messages.error(request, 'No se importó ningún producto. Revisa el archivo.')
+
+            if filas_omitidas:
+                detalle = '; '.join(
+                    f'fila {n} (falta {" y ".join(campos)})' for n, campos in filas_omitidas
+                )
+                messages.warning(
+                    request,
+                    f'{len(filas_omitidas)} fila(s) se omitieron por campos obligatorios vacíos: {detalle}.'
+                )
 
             return redirect('productos_importados')
     else:
@@ -221,5 +261,21 @@ def importar_productos(request):
 @vista_dashboard
 def productos_importados(request):
     ids = request.session.get('productos_importados_ids', [])
-    productos = Producto.objects.filter(id__in=ids).order_by('-fecha_registro')
+
+    condicion_incompleto = (
+        Q(imagen='') | Q(imagen__isnull=True) |
+        Q(descripcion__isnull=True) | Q(descripcion='') |
+        Q(stock_actual__isnull=True) | Q(stock_actual=0) |
+        Q(stock_minimo__isnull=True) | Q(stock_minimo=0) |
+        Q(precio__isnull=True)
+    )
+
+    productos = Producto.objects.filter(id__in=ids).annotate(
+        incompleto=Case(
+            When(condicion_incompleto, then=Value(True)),
+            default=Value(False),
+            output_field=BooleanField(),
+        ),
+    ).order_by('-fecha_registro')
+
     return render(request, 'productos_importados.html', {'productos': productos})
