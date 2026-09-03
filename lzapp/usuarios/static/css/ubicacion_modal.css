@@ -146,17 +146,92 @@
     background: var(--dorado-claro, #f0d98a);
 }
 
+/* ---- Mapa a pantalla completa (botón de expandir) ---- */
 #modalUbicacionEntrega.mapa-expandido .modal-dialog{
-    max-width: 700px;
+    max-width: 100vw;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
 }
 #modalUbicacionEntrega.mapa-expandido .ubicacion-modal{
-    max-height: 92vh;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
     display: flex;
     flex-direction: column;
 }
+#modalUbicacionEntrega.mapa-expandido .ubicacion-modal-header{
+    flex-shrink: 0;
+    padding: 1.1rem 3.5rem 1.4rem 2rem;
+}
 #modalUbicacionEntrega.mapa-expandido .ubicacion-modal-cuerpo{
     flex: 1;
-    overflow-y: auto;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-mapa-wrap{
+    height: 100%;
+    margin-bottom: 0;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-mapa-box.leaflet-container.mapa-grande{
+    height: 100%;
+    border-radius: 0;
+}
+
+/* Controles (GPS + dirección + confirmar) flotando centrados abajo,
+   sobre el mapa a pantalla completa. En estado normal es solo un
+   contenedor sin estilo propio (los hijos ya traían su CSS). */
+.ubicacion-controles-inferiores{ position: relative; }
+
+#modalUbicacionEntrega.mapa-expandido .ubicacion-controles-inferiores{
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+    max-width: 92vw;
+    background: #fff;
+    padding: 8px 10px 8px 8px;
+    border-radius: 50px;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.28);
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-gps-btn{
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-gps-btn-texto{
+    display: none;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-estado-texto{
+    display: block;
+    margin-top: 0;
+    max-width: 46vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-estado-texto:empty{
+    display: none;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-confirmar-btn{
+    width: auto;
+    margin-top: 0;
+    padding: 0.7rem 1.3rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-confirmar-btn:disabled{
+    display: none;
 }
 
 .ubicacion-gps-btn{

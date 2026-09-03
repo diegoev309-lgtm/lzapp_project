@@ -301,6 +301,75 @@ body {
 }
 .notif-ver-todas:hover { background: var(--gris-claro); }
 
+/* ---- Perfil (avatar) en el navbar del cliente ---- */
+.perfil-dropdown-menu {
+    width: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 10px !important;
+}
+
+.perfil-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 14px;
+    background: linear-gradient(135deg, var(--azul-profundo) 0%, var(--azul-principal, #083b78) 100%);
+}
+
+.perfil-menu-avatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.perfil-menu-info { min-width: 0; }
+.perfil-menu-info strong {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--blanco);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.perfil-menu-info span {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--dorado-claro);
+    margin-top: 1px;
+}
+
+.perfil-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    font-size: 0.86rem;
+    color: var(--azul-profundo);
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.perfil-menu-item i { font-size: 1rem; color: var(--azul-medio, #1a5fa8); flex-shrink: 0; }
+.perfil-menu-item:hover { background: var(--gris-claro); color: var(--azul-profundo); }
+
+.perfil-menu-divisor {
+    height: 1px;
+    background: var(--gris-claro);
+    margin: 4px 0;
+}
+
+.perfil-menu-item-peligro { color: #e2402d; }
+.perfil-menu-item-peligro i { color: #e2402d; }
+.perfil-menu-item-peligro:hover { background: rgba(226, 64, 45, 0.08); color: #e2402d; }
+
 /* ============================================================
    CARRUSEL HERO — contenedor general
    ============================================================ */

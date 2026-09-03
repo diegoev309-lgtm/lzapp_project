@@ -32,14 +32,16 @@
                     <div id="mapa-ubicacion" class="ubicacion-mapa-box"></div>
                 </div>
 
-                <button type="button" class="ubicacion-gps-btn" id="btn-usar-gps">
-                    <i class="bi bi-crosshair"></i> Usar mi ubicación actual
-                </button>
-                <span id="estado-ubicacion" class="ubicacion-estado-texto"></span>
+                <div class="ubicacion-controles-inferiores" id="ubicacion-controles-inferiores">
+                    <button type="button" class="ubicacion-gps-btn" id="btn-usar-gps" title="Usar mi ubicación actual">
+                        <i class="bi bi-crosshair"></i> <span class="ubicacion-gps-btn-texto">Usar mi ubicación actual</span>
+                    </button>
+                    <span id="estado-ubicacion" class="ubicacion-estado-texto"></span>
 
-                <button type="button" class="ubicacion-confirmar-btn" id="btnConfirmarUbicacion" data-bs-dismiss="modal" disabled>
-                    Confirmar ubicación
-                </button>
+                    <button type="button" class="ubicacion-confirmar-btn" id="btnConfirmarUbicacion" data-bs-dismiss="modal" disabled>
+                        Confirmar ubicación
+                    </button>
+                </div>
 
             </div>
         </div>

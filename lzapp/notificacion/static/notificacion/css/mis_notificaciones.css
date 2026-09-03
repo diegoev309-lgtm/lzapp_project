@@ -1,0 +1,131 @@
+/* ============================================================
+   MIS NOTIFICACIONES — estilo propio, sobre la base visual de
+   config.css (perfil-wrapper / perfil-header / perfil-card), pero
+   con su propia cabecera (icono de campana) y lista de avisos.
+   ============================================================ */
+
+.avatar-circulo i{
+    font-size: 1.8rem;
+    color: var(--dorado-claro);
+}
+
+.mn-card{
+    padding-top: 1.8rem;
+}
+
+.mn-card-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+
+.mn-sin-margen{ margin-bottom: 0 !important; }
+
+.mn-marcar-todas{
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--dorado);
+    padding: 0;
+}
+.mn-marcar-todas:hover{ text-decoration: underline; }
+
+.mn-lista{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mn-item{
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: var(--gris-claro, #f7f8fc);
+    border: 1.5px solid transparent;
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    transition: var(--transition, .3s ease), border-color .3s ease;
+}
+.mn-item:hover{
+    border-color: var(--azul-claro, #e8f0fb);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(2, 44, 99, 0.08);
+}
+
+.mn-item.no-leida{
+    background: rgba(201, 168, 76, 0.09);
+}
+
+.mn-item-icono{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(2, 44, 99, 0.1);
+    font-size: 1.05rem;
+}
+.mn-item.tipo-success .mn-item-icono i{ color: #1a8f4f; }
+.mn-item.tipo-warning .mn-item-icono i{ color: var(--dorado); }
+.mn-item.tipo-error .mn-item-icono i{ color: #e2402d; }
+.mn-item.tipo-info .mn-item-icono i{ color: #1a5fa8; }
+
+.mn-item-texto{ flex: 1; min-width: 0; }
+.mn-item-texto strong{
+    display: block;
+    font-size: 0.92rem;
+    color: var(--azul-profundo);
+    margin-bottom: 2px;
+}
+.mn-item-texto p{
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: var(--gris-texto);
+}
+.mn-item-fecha{
+    display: block;
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #9aa0ab;
+}
+
+.mn-item-punto{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dorado);
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.mn-vacio{
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    color: var(--gris-texto);
+}
+.mn-vacio i{ font-size: 2.4rem; color: var(--azul-claro); display: block; margin-bottom: 12px; }
+.mn-vacio p{ margin: 0 0 4px; font-weight: 700; color: var(--azul-profundo); }
+.mn-vacio span{ font-size: 0.85rem; }
+
+.mn-paginacion{ margin-top: 1.6rem; }
+.mn-paginacion .page-link{
+    color: var(--azul-profundo);
+    border-color: var(--azul-claro, #e8f0fb);
+}
+.mn-paginacion .page-item.active .page-link{
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: var(--azul-profundo);
+}

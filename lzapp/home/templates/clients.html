@@ -16,12 +16,9 @@
         </a>
     </li>
 
-    <!-- Pedidos a domicilio -->
+    <!-- Pedidos a domicilio: seguimiento en vivo del pedido activo -->
     <li class="nav-item">
-        <a class="nav-link p-1 nav-link-icon"
-           href="https://wa.me/13175075543?text=Hola%2C%20quiero%20hacer%20un%20pedido%20a%20domicilio"
-           target="_blank" rel="noopener"
-           title="Pedidos a domicilio">
+        <a class="nav-link p-1 nav-link-icon" href="{% url 'mi_pedido_seguimiento' %}" title="Seguimiento de mi pedido">
             <i class="bi bi-truck fs-4"></i>
         </a>
     </li>
@@ -43,8 +40,8 @@
 
         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 notif-dropdown-menu"
             aria-labelledby="notifDropdown"
-            data-url-marcar-leida="{% url 'marcar_notificacion_leida' id=0 %}"
-            data-url-marcar-todas="{% url 'marcar_todas_leidas' %}">
+            data-url-marcar-leida="{% url 'marcar_notificacion_leida_cliente' id=0 %}"
+            data-url-marcar-todas="{% url 'marcar_todas_leidas_cliente' %}">
 
             <li class="notif-menu-head">
                 <span>Notificaciones</span>
@@ -76,7 +73,7 @@
             </li>
 
             <li>
-                <a href="{% url 'Notificaciones' %}" class="notif-ver-todas">Ver historial completo</a>
+                <a href="{% url 'mis_notificaciones' %}" class="notif-ver-todas">Ver historial completo</a>
             </li>
         </ul>
     </li>
@@ -88,48 +85,52 @@
            id="perfilDropdown"
            role="button"
            data-bs-toggle="dropdown"
-           aria-expanded="false">
-           
-
+           aria-expanded="false"
+           title="Mi cuenta">
             <i class="bi bi-person-circle fs-4"></i>
-
         </a>
 
-        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" style="min-width: 240px; border-radius: 14px;">
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 perfil-dropdown-menu" aria-labelledby="perfilDropdown">
 
-    <li class="px-2 py-2 d-flex align-items-center gap-2">
-        <div class="d-flex align-items-center justify-content-center rounded-circle"
-             style="width: 38px; height: 38px; background: #1a3d7c; color: #fff; font-weight: 600;">
-            {{ request.session.nombre|slice:":1"|upper }}
-        </div>
-        <div>
-            <div class="fw-bold" style="font-size: .92rem; line-height: 1.1;">
-                {{ request.session.nombre }}
-            </div>
-            <div class="text-muted" style="font-size: .75rem;">
-                👋 ¡Bienvenido de nuevo!
-            </div>
-        </div>
-    </li>
+            <li class="perfil-menu-head">
+                <div class="perfil-menu-avatar">{{ request.session.nombre|slice:":1"|upper }}</div>
+                <div class="perfil-menu-info">
+                    <strong>{{ request.session.nombre }}</strong>
+                    <span>👋 ¡Bienvenido de nuevo!</span>
+                </div>
+            </li>
 
-    <li><hr class="dropdown-divider my-2"></li>
+            <li>
+                <a class="perfil-menu-item" href="{% url 'configuracion' %}">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Mi Perfil</span>
+                </a>
+            </li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2"
-           href="{% url 'configuracion' %}">
-            <i class="bi bi-person-circle" style="font-size: 1.05rem; color: #1a3d7c;"></i>
-            <span>Mi Perfil</span>
-        </a>
-    </li>
+            <li>
+                <a class="perfil-menu-item" href="{% url 'carro' %}">
+                    <i class="bi bi-basket"></i>
+                    <span>Mi carrito</span>
+                </a>
+            </li>
 
-    <li><hr class="dropdown-divider my-2"></li>
+            <li>
+                <a class="perfil-menu-item" href="{% url 'mis_notificaciones' %}">
+                    <i class="bi bi-bell"></i>
+                    <span>Notificaciones</span>
+                </a>
+            </li>
 
-    <li>
-        <a class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2 text-danger"
-           href="{% url 'logout' %}">
-            <i class="bi bi-box-arrow-right" style="font-size: 1.05rem;"></i>
-            <span>Cerrar sesión</span>
-        </a>
+            <li class="perfil-menu-divisor"></li>
+
+            <li>
+                <a class="perfil-menu-item perfil-menu-item-peligro" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar sesión</span>
+                </a>
+            </li>
+
+        </ul>
     </li>
 
 </ul>

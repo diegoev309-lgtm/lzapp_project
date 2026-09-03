@@ -4,9 +4,30 @@
 {% block page_title %}Mis Entregas{% endblock %}
 {% block page_subtitle %}Comparte tu ubicación mientras estás en ruta{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+{% endblock %}
+
 {% block content %}
 
 <style>
+.mapa-entregas-box{
+    margin:15px;
+    height:320px;
+    border-radius:16px;
+    overflow:hidden;
+}
+.mapa-entregas-vacio{
+    display:none;
+    margin:15px;
+    padding:2.2rem 1rem;
+    text-align:center;
+    color:var(--text-tertiary);
+    background:var(--bg-panel);
+    border-radius:16px;
+}
+.mapa-entregas-vacio i{ font-size:2rem; display:block; margin-bottom:10px; }
+.mapa-entregas-vacio p{ margin:0; font-size:13px; }
 .ubicacion-panel{
     margin:15px;
     background:var(--bg-panel);
@@ -85,6 +106,14 @@
 </div>
 
 {% if pedidos_activos %}
+<div id="mapaEntregas" class="mapa-entregas-box"></div>
+<div id="mapaEntregasVacio" class="mapa-entregas-vacio">
+    <i class="bi bi-geo-alt"></i>
+    <p>Todavía no hay coordenadas de entrega para mostrar en el mapa.</p>
+</div>
+{% endif %}
+
+{% if pedidos_activos %}
 <div class="entregas-lista">
     {% for p in pedidos_activos %}
     <div class="entrega-item">
@@ -101,6 +130,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 function getCookie(nombre) {
     let valor = null;
@@ -172,6 +202,118 @@ function enviarUbicacion(lat, lng) {
         },
         body: `latitud=${lat}&longitud=${lng}`,
     });
+    moverMarcadorPropio(lat, lng);
+}
+
+// ---------------------------------------------------------------
+// Mapa en vivo: a dónde tengo que llevar cada pedido activo, más mi
+// propia posición mientras comparto ubicación.
+// ---------------------------------------------------------------
+const cajaMapaEntregas = document.getElementById('mapaEntregas');
+let mapaEntregas, capaEntregas, marcadorPropio = null;
+
+if (cajaMapaEntregas) {
+    mapaEntregas = L.map('mapaEntregas').setView([6.2442, -75.5812], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+    }).addTo(mapaEntregas);
+    capaEntregas = L.layerGroup().addTo(mapaEntregas);
+}
+
+function iconoEmojiEntregas(emoji) {
+    return L.divIcon({
+        html: `<span style="font-size:24px; line-height:1;">${emoji}</span>`,
+        className: '',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+    });
+}
+
+function moverMarcadorPropio(lat, lng) {
+    if (!mapaEntregas) return;
+    if (!marcadorPropio) {
+        marcadorPropio = L.marker([lat, lng], { icon: iconoEmojiEntregas('🛵') })
+            .bindPopup('Mi ubicación')
+            .addTo(mapaEntregas);
+    } else {
+        marcadorPropio.setLatLng([lat, lng]);
+    }
+}
+
+// Decodifica el formato "polyline" estándar (el mismo que usa OSRM).
+function decodificarPolylineEntregas(codificada) {
+    let index = 0, lat = 0, lng = 0;
+    const coordenadas = [];
+    while (index < codificada.length) {
+        let shift = 0, resultado = 0, byte;
+        do {
+            byte = codificada.charCodeAt(index++) - 63;
+            resultado |= (byte & 0x1f) << shift;
+            shift += 5;
+        } while (byte >= 0x20);
+        lat += (resultado & 1) ? ~(resultado >> 1) : (resultado >> 1);
+
+        shift = 0;
+        resultado = 0;
+        do {
+            byte = codificada.charCodeAt(index++) - 63;
+            resultado |= (byte & 0x1f) << shift;
+            shift += 5;
+        } while (byte >= 0x20);
+        lng += (resultado & 1) ? ~(resultado >> 1) : (resultado >> 1);
+
+        coordenadas.push([lat / 1e5, lng / 1e5]);
+    }
+    return coordenadas;
+}
+
+async function cargarMapaEntregas() {
+    if (!mapaEntregas) return;
+    try {
+        const respuesta = await fetch("{% url 'mis_entregas_tiempo_real' %}");
+        const datos = await respuesta.json();
+        const pedidos = (datos.pedidos || []).filter(p => p.cliente_latitud && p.cliente_longitud);
+
+        const vacio = document.getElementById('mapaEntregasVacio');
+        capaEntregas.clearLayers();
+
+        if (pedidos.length === 0) {
+            cajaMapaEntregas.style.display = 'none';
+            vacio.style.display = 'block';
+            return;
+        }
+        cajaMapaEntregas.style.display = 'block';
+        vacio.style.display = 'none';
+
+        const puntos = [];
+        pedidos.forEach(p => {
+            const marcadorCliente = L.marker([p.cliente_latitud, p.cliente_longitud], {
+                icon: iconoEmojiEntregas('📍'),
+            }).bindPopup(`<b>#${p.pedido_id} — ${p.cliente}</b><br>${p.direccion_entrega || 'Destino de entrega'}`);
+            capaEntregas.addLayer(marcadorCliente);
+            puntos.push([p.cliente_latitud, p.cliente_longitud]);
+
+            if (p.ruta_polyline) {
+                const trazado = decodificarPolylineEntregas(p.ruta_polyline);
+                L.polyline(trazado, { color: '#8b5cf6', weight: 4, opacity: 0.7 }).addTo(capaEntregas);
+            }
+        });
+
+        if (marcadorPropio) puntos.push(marcadorPropio.getLatLng());
+
+        mapaEntregas.invalidateSize();
+        if (puntos.length > 0) {
+            mapaEntregas.fitBounds(puntos, { padding: [40, 40], maxZoom: 15 });
+        }
+    } catch (error) {
+        console.error('Error cargando mapa de entregas:', error);
+    }
+}
+
+if (mapaEntregas) {
+    cargarMapaEntregas();
+    setInterval(cargarMapaEntregas, 10000);
 }
 </script>
 {% endblock %}

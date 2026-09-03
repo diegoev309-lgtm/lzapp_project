@@ -467,6 +467,28 @@
             #mainNav.navbar.fixed-top {
                 right: 300px;
             }
+            /* Con el widget del carrito reservando 300px, el navbar queda
+               angosto para 4 íconos (carrito/domicilio/notificaciones/perfil)
+               + los links de texto — sin esto, "Perfil" se cae a una
+               segunda línea porque el <ul> de íconos hace flex-wrap. */
+            #mainNav .container {
+                gap: 6px;
+            }
+            #mainNav ul.justify-content-end {
+                flex-wrap: nowrap;
+                gap: 2px !important;
+            }
+            #mainNav ul.justify-content-end .nav-link {
+                padding: 0.4rem !important;
+            }
+        }
+
+        /* Desde 1200px para arriba ya no hay squeeze del widget, pero de
+           todos modos evitamos que los 4 íconos se partan en dos líneas. */
+        @media (min-width: 1201px) {
+            #mainNav ul.justify-content-end {
+                flex-wrap: nowrap;
+            }
         }
         
 
@@ -934,51 +956,124 @@
                 </div>
 
                 <ul class="nav justify-content-end align-items-center gap-2">
-                
-                    <!-- Perfil -->
-                    <li class="nav-item dropdown">
-                    
-                        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
-                           href="#"
-                           id="perfilDropdown"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                    
-                            <i class="bi bi-person-circle fs-4"></i>
-                    
-                        </a>
-                    
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                        
-                            <li>
-                                <span class="dropdown-item-text fw-bold">
-                                    👋 Hola,
-                                    {{ request.session.nombre }}
-                                </span>
-                            </li>
-                        
-                            <li><hr class="dropdown-divider"></li>
-                        
-                            <li>
-                                <a class="dropdown-item text-danger"
-                                   href="{% url 'logout' %}">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    Cerrar sesión
-                                </a>
-                            </li>
-                        
-                        </ul>
-                    
-                    </li>
-                
+
                     <!-- Carrito -->
                     <li class="nav-item">
                          <a class="nav-link p-1 nav-link-icon nav-link-carrito" href="{% url 'carro' %}" title="Carrito de compras">
                             <i class="bi bi-basket fs-4"></i>
                         </a>
                     </li>
-                
+
+                    <!-- Pedidos a domicilio: seguimiento en vivo del pedido activo -->
+                    <li class="nav-item">
+                        <a class="nav-link p-1 nav-link-icon" href="{% url 'mi_pedido_seguimiento' %}" title="Seguimiento de mi pedido">
+                            <i class="bi bi-truck fs-4"></i>
+                        </a>
+                    </li>
+
+                    <!-- Notificaciones -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
+                           href="#"
+                           id="notifDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           title="Notificaciones">
+                            <i class="bi bi-bell fs-4"></i>
+                            {% if notificaciones_no_leidas %}
+                                <span class="carrito-badge">{{ notificaciones_no_leidas }}</span>
+                            {% endif %}
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 notif-dropdown-menu"
+                            aria-labelledby="notifDropdown"
+                            data-url-marcar-leida="{% url 'marcar_notificacion_leida_cliente' id=0 %}"
+                            data-url-marcar-todas="{% url 'marcar_todas_leidas_cliente' %}">
+
+                            <li class="notif-menu-head">
+                                <span>Notificaciones</span>
+                                {% if notificaciones_no_leidas %}
+                                    <button type="button" class="notif-marcar-todas">
+                                        Marcar todas leídas
+                                    </button>
+                                {% endif %}
+                            </li>
+
+                            <li class="notif-lista">
+                                {% for n in notificaciones_recientes %}
+                                    <a href="{{ n.url|default:'#' }}"
+                                       class="notif-item tipo-{{ n.tipo }}{% if not n.leida %} no-leida{% endif %}"
+                                       data-id="{{ n.id }}">
+                                        <i class="bi {{ n.icono }}"></i>
+                                        <div class="notif-item-texto">
+                                            {% if n.titulo %}<strong>{{ n.titulo }}</strong>{% endif %}
+                                            <p>{{ n.mensaje }}</p>
+                                            <span class="notif-item-fecha">{{ n.fecha_creacion|timesince }} atrás</span>
+                                        </div>
+                                    </a>
+                                {% empty %}
+                                    <div class="notif-vacio">
+                                        <i class="bi bi-bell-slash"></i>
+                                        <p>No tienes notificaciones por ahora.</p>
+                                    </div>
+                                {% endfor %}
+                            </li>
+
+                            <li>
+                                <a href="{% url 'mis_notificaciones' %}" class="notif-ver-todas">Ver historial completo</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Perfil -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
+                           href="#"
+                           id="perfilDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           title="Mi cuenta">
+                            <i class="bi bi-person-circle fs-4"></i>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 perfil-dropdown-menu" aria-labelledby="perfilDropdown">
+
+                            <li class="perfil-menu-head">
+                                <div class="perfil-menu-avatar">{{ request.session.nombre|slice:":1"|upper }}</div>
+                                <div class="perfil-menu-info">
+                                    <strong>{{ request.session.nombre }}</strong>
+                                    <span>👋 ¡Bienvenido de nuevo!</span>
+                                </div>
+                            </li>
+
+                            <li>
+                                <a class="perfil-menu-item" href="{% url 'configuracion' %}">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span>Mi Perfil</span>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="perfil-menu-item" href="{% url 'mis_notificaciones' %}">
+                                    <i class="bi bi-bell"></i>
+                                    <span>Notificaciones</span>
+                                </a>
+                            </li>
+
+                            <li class="perfil-menu-divisor"></li>
+
+                            <li>
+                                <a class="perfil-menu-item perfil-menu-item-peligro" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Cerrar sesión</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
                 </ul>
 
                 {% block navbar_actions %}{% endblock %}
@@ -1211,6 +1306,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'home/js/notificaciones_navbar.js' %}"></script>
     <script>
         document.querySelectorAll('.favorito').forEach(btn => {
             btn.addEventListener('click', () => {

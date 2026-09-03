@@ -87,14 +87,11 @@ def actualizar_ubicacion_repartidor(request):
 
     return JsonResponse({'ok': True})
 
-@vista_dashboard
-def api_pedidos_tiempo_real(request):
-    """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega."""
-    pedidos = (Pedido.objects
-               .select_related('venta', 'venta__usuario', 'repartidor', 'repartidor__perfilemple')
-               .prefetch_related('venta__detalles')
-               .order_by('-fecha_creacion')[:20])
-
+def _serializar_pedidos_tiempo_real(pedidos):
+    """Arma el mismo JSON de seguimiento en vivo (posición del repartidor,
+    destino del cliente, ruta) para cualquier queryset de Pedido ya filtrado
+    — lo reutilizan el panel admin, el seguimiento del cliente y el mapa
+    del repartidor, cada uno con su propio alcance de datos."""
     lista = []
     for ped in pedidos:
         venta = ped.venta
@@ -113,6 +110,7 @@ def api_pedidos_tiempo_real(request):
             'repartidor': (ped.repartidor.get_full_name() or ped.repartidor.username) if ped.repartidor else None,
             'items': n_items,
             'incidencia': ped.incidencia,
+            'direccion_entrega': ped.direccion_entrega,
             'cliente_latitud': float(ped.cliente_latitud) if ped.cliente_latitud else None,
             'cliente_longitud': float(ped.cliente_longitud) if ped.cliente_longitud else None,
             'repartidor_latitud': float(perfil_repartidor.repartidor_latitud) if perfil_repartidor and perfil_repartidor.repartidor_latitud else None,
@@ -121,6 +119,18 @@ def api_pedidos_tiempo_real(request):
             'tiempo_estimado_min': ped.tiempo_estimado_min,
             'ruta_polyline': ped.ruta_polyline,
         })
+    return lista
+
+
+@vista_dashboard
+def api_pedidos_tiempo_real(request):
+    """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega."""
+    pedidos = (Pedido.objects
+               .select_related('venta', 'venta__usuario', 'repartidor', 'repartidor__perfilemple')
+               .prefetch_related('venta__detalles')
+               .order_by('-fecha_creacion')[:20])
+
+    lista = _serializar_pedidos_tiempo_real(pedidos)
 
     resumen = {
         'pendientes': sum(1 for p in lista if p['estado'] in ('pendiente', 'preparando')),
@@ -130,6 +140,48 @@ def api_pedidos_tiempo_real(request):
     }
 
     return JsonResponse({'pedidos': lista, 'resumen': resumen})
+
+
+@login_required
+def mi_pedido_seguimiento(request):
+    """Página del cliente: seguimiento en vivo de su pedido activo más reciente."""
+    pedido_activo = (Pedido.objects
+                      .filter(venta__usuario=request.user, estado__in=['pendiente', 'preparando', 'en_camino'])
+                      .select_related('venta')
+                      .order_by('-fecha_creacion')
+                      .first())
+    return render(request, 'mi_pedido_seguimiento.html', {'pedido_activo': pedido_activo})
+
+
+@login_required
+def mi_pedido_tiempo_real(request):
+    """Igual que api_pedidos_tiempo_real, pero acotado a los pedidos activos
+    del cliente logueado — nunca expone pedidos ni ubicaciones ajenas."""
+    pedidos = (Pedido.objects
+               .filter(venta__usuario=request.user, estado__in=['pendiente', 'preparando', 'en_camino'])
+               .select_related('venta', 'venta__usuario', 'repartidor', 'repartidor__perfilemple')
+               .prefetch_related('venta__detalles')
+               .order_by('-fecha_creacion'))
+
+    return JsonResponse({'pedidos': _serializar_pedidos_tiempo_real(pedidos)})
+
+
+@login_required
+def mis_entregas_tiempo_real(request):
+    """Igual que api_pedidos_tiempo_real, pero acotado a las entregas
+    asignadas al repartidor logueado — para que vea en el mapa a dónde
+    tiene que llevar cada pedido activo."""
+    perfil_emple = PerfilEmple.objects.filter(empleado=request.user, rol='empleado').first()
+    if not perfil_emple:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    pedidos = (Pedido.objects
+               .filter(repartidor=request.user, estado__in=['preparando', 'en_camino'])
+               .select_related('venta', 'venta__usuario', 'repartidor', 'repartidor__perfilemple')
+               .prefetch_related('venta__detalles')
+               .order_by('-fecha_creacion'))
+
+    return JsonResponse({'pedidos': _serializar_pedidos_tiempo_real(pedidos)})
 
 @login_required
 @require_POST

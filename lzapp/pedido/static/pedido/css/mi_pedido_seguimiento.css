@@ -1,0 +1,134 @@
+/* ============================================================
+   SEGUIMIENTO EN VIVO DEL PEDIDO — estilo propio, sobre la base
+   visual de config.css (perfil-wrapper / perfil-header / perfil-card).
+   ============================================================ */
+
+.avatar-circulo i{
+    font-size: 1.8rem;
+    color: var(--dorado-claro);
+}
+
+.mps-wrapper{ max-width: 720px; }
+
+.mps-card{ padding-top: 1.8rem; }
+
+.mps-vacio{
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--gris-texto);
+}
+.mps-vacio i{ font-size: 2.6rem; color: var(--azul-claro); display: block; margin-bottom: 14px; }
+.mps-vacio p{ margin: 0 0 4px; font-weight: 700; color: var(--azul-profundo); }
+.mps-vacio span{ font-size: 0.88rem; }
+
+/* ---- Timeline de estados ---- */
+.mps-timeline{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 1.6rem;
+    flex-wrap: nowrap;
+}
+.mps-paso{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.mps-paso-punto{
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gris-claro, #f7f8fc);
+    color: #9aa0ab;
+    font-size: 1rem;
+    border: 2px solid var(--gris-claro, #f7f8fc);
+    transition: var(--transition, .3s ease);
+}
+.mps-paso-texto{
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #9aa0ab;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+.mps-linea{
+    flex: 1;
+    height: 3px;
+    background: var(--gris-claro, #f7f8fc);
+    margin: 0 4px;
+    margin-bottom: 22px;
+    border-radius: 2px;
+    min-width: 16px;
+}
+
+.mps-paso.completo .mps-paso-punto{
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: var(--azul-profundo);
+}
+.mps-paso.completo .mps-paso-texto{ color: var(--azul-profundo); }
+.mps-linea.completa{ background: var(--dorado); }
+
+.mps-paso.actual .mps-paso-punto{
+    background: var(--azul-profundo);
+    border-color: var(--dorado);
+    color: var(--dorado-claro);
+    box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.18);
+}
+.mps-paso.actual .mps-paso-texto{ color: var(--azul-profundo); }
+
+.mps-paso.cancelado .mps-paso-punto{
+    background: #fdecec;
+    border-color: #e2402d;
+    color: #e2402d;
+}
+
+/* ---- Fila de datos rápidos ---- */
+.mps-info-fila{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+}
+.mps-info-item{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gris-claro, #f7f8fc);
+    color: var(--azul-profundo);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 50px;
+}
+.mps-info-item i{ color: var(--azul-medio, #1a5fa8); }
+
+/* ---- Mapa ---- */
+.mps-mapa-box{
+    width: 100%;
+    height: 360px;
+    border-radius: 18px;
+    overflow: hidden;
+}
+.mps-mapa-vacio{
+    display: none;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--gris-texto);
+}
+.mps-mapa-vacio i{ font-size: 2rem; color: var(--azul-claro); display: block; margin-bottom: 10px; }
+.mps-mapa-vacio p{ margin: 0; font-size: 0.85rem; }
+
+@media (max-width: 576px){
+    .mps-mapa-box{ height: 280px; }
+    .mps-paso-texto{ font-size: 0.6rem; }
+    .mps-paso-punto{ width: 32px; height: 32px; font-size: 0.85rem; }
+}
