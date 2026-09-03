@@ -9,6 +9,7 @@ from dashboard.models import SesionActiva
 from .decorators import vista_dashboard
 from .models import RegistroAuditoria
 from .utils import describir_dispositivo, obtener_configuracion, registrar_auditoria
+from .validators import leer_entero_acotado
 
 
 @vista_dashboard
@@ -57,14 +58,9 @@ def guardar_configuracion_seguridad(request):
     configuracion.deteccion_inactividad_activa = request.POST.get('activa') == 'on'
 
     minutos_raw = request.POST.get('minutos', '').strip()
-    try:
-        minutos = int(minutos_raw)
-    except (TypeError, ValueError):
-        messages.error(request, 'Los minutos deben ser un número entero.')
-        return redirect('panel_seguridad')
-
-    if minutos < 1:
-        messages.error(request, 'Los minutos deben ser al menos 1.')
+    minutos, error = leer_entero_acotado(minutos_raw, 1, 1440, 'Los minutos')
+    if error:
+        messages.error(request, error)
         return redirect('panel_seguridad')
 
     configuracion.minutos_inactividad = minutos

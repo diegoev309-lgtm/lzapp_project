@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate, TruncWeek
@@ -472,12 +474,20 @@ def importar_produccion(request):
                     filas_omitidas.append((num_fila, problemas))
                     continue
 
-                produccion = Produccion.objects.create(
+                produccion = Produccion(
                     producto=producto,
                     cantidad_producida=cantidad,
                     fecha_vencimiento=fecha_venc,
                     observacion=observacion,
                 )
+                try:
+                    produccion.full_clean(exclude=['cantidad_disponible'])
+                except ValidationError as error:
+                    filas_omitidas.append((num_fila, error.messages))
+                    continue
+
+                with transaction.atomic():
+                    produccion.save()
                 ids_nuevos.append(produccion.id)
 
             request.session['producciones_importadas_ids'] = ids_nuevos

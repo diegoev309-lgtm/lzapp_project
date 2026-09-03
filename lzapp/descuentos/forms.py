@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 from django.db.models import F
 from dashboard.models import CampanaDescuento, Producto
@@ -38,3 +40,30 @@ class CampanaDescuentoForm(forms.ModelForm):
             'frecuencia': forms.Select(attrs={'class': 'form-select'}),
             'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def clean_porcentaje_descuento(self):
+        porcentaje = self.cleaned_data.get('porcentaje_descuento')
+
+        if porcentaje is not None and not (Decimal('0.01') <= porcentaje <= Decimal('100')):
+            raise forms.ValidationError('El porcentaje de descuento debe estar entre 0.01% y 100%.')
+
+        return porcentaje
+
+    def clean_porcentaje_maximo_clientes(self):
+        porcentaje = self.cleaned_data.get('porcentaje_maximo_clientes')
+
+        if porcentaje is not None and not (Decimal('0') <= porcentaje <= Decimal('100')):
+            raise forms.ValidationError('El porcentaje máximo de clientes debe estar entre 0% y 100%.')
+
+        return porcentaje
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+
+        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+            raise forms.ValidationError('La fecha de fin no puede ser anterior a la fecha de inicio.')
+
+        return cleaned_data

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from datetime import timedelta
+from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Avg, Count
 
@@ -57,8 +58,14 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     imagen_hash = models.CharField(max_length=32, blank=True, null=True, db_index=True, editable=False)
     precio = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    stock_actual = models.PositiveIntegerField(default=0, null=True, blank=True)
-    stock_minimo = models.PositiveIntegerField(default=15, null=True, blank=True)
+    stock_actual = models.PositiveIntegerField(
+        default=0, null=True, blank=True,
+        validators=[MaxValueValidator(100_000)],
+    )
+    stock_minimo = models.PositiveIntegerField(
+        default=15, null=True, blank=True,
+        validators=[MaxValueValidator(100_000)],
+    )
     disponibilidad = models.BooleanField(default=True, null=True)
     fecha_vencimiento = models.DateField(
         null=True, blank=True,
@@ -92,7 +99,7 @@ class Producto(models.Model):
 
 class Produccion(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
-    cantidad_producida = models.PositiveIntegerField()
+    cantidad_producida = models.PositiveIntegerField(validators=[MaxValueValidator(100_000)])
     cantidad_disponible = models.PositiveIntegerField(default=0, editable=False)
     fecha_vencimiento = models.DateField(help_text='Fecha de vencimiento de este lote específico.')
     fecha_produccion = models.DateTimeField(auto_now_add=True)
@@ -441,29 +448,34 @@ class CampanaDescuento(models.Model):
 
     porcentaje_descuento = models.DecimalField(
         max_digits=5, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('100'))],
         help_text='Ej: 20.00 para 20% de descuento'
     )
 
     # ---- criterio de selección de clientes ----
     dias_sin_compra = models.PositiveIntegerField(
         default=30,
+        validators=[MaxValueValidator(3650)],
         help_text='Se elige entre clientes que no han comprado este producto '
                    'en los últimos X días (o nunca lo han comprado).'
     )
     cantidad_clientes = models.PositiveIntegerField(
         default=10,
+        validators=[MaxValueValidator(100_000)],
         help_text='Tope preferido de clientes "ganadores" por ejecución. '
                    'El límite real será el menor entre esto, el stock disponible '
                    'y el porcentaje_maximo_clientes.'
     )
     porcentaje_maximo_clientes = models.DecimalField(
         max_digits=5, decimal_places=2, default=10,
+        validators=[MinValueValidator(Decimal('0')), MaxValueValidator(Decimal('100'))],
         help_text='Tope como % del total de clientes activos que pueden recibir '
                    'el premio en UNA sola ejecución (ej: 10.00 = máx 10% de la base). '
                    'Evita saturar de descuentos y controla el consumo de memoria/consultas.'
     )
     stock_reservado_no_ofertable = models.PositiveIntegerField(
         default=0,
+        validators=[MaxValueValidator(100_000)],
         help_text='Unidades de stock que NO se cuentan como disponibles para oferta '
                    '(colchón extra por encima del stock_minimo del producto).'
     )
@@ -471,6 +483,7 @@ class CampanaDescuento(models.Model):
     # ---- vigencia del premio individual ----
     dias_validez_premio = models.PositiveIntegerField(
         default=7,
+        validators=[MaxValueValidator(365)],
         help_text='Cuántos días dura activo el premio para el cliente que lo ganó'
     )
 
@@ -695,6 +708,7 @@ class ConfiguracionSeguridad(models.Model):
     )
     minutos_inactividad = models.PositiveIntegerField(
         default=15,
+        validators=[MinValueValidator(1), MaxValueValidator(1440)],
         help_text='Minutos de inactividad antes de cerrar la sesión automáticamente.'
     )
     fecha_actualizacion = models.DateTimeField(auto_now=True)

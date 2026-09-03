@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from dashboard.models import Pedido, PerfilEmple, Notificacion
 from pedido.services import obtener_distancia_km
 from seguridad.decorators import vista_dashboard
+from seguridad.validators import leer_decimal_acotado
 
 @vista_dashboard
 def Pedidos(request):
@@ -49,10 +50,15 @@ def actualizar_ubicacion_repartidor(request):
     if not tiene_entrega_activa:
         return JsonResponse({'error': 'No tienes entregas activas asignadas'}, status=403)
 
-    lat = request.POST.get('latitud')
-    lng = request.POST.get('longitud')
-    if not lat or not lng:
+    lat_raw = request.POST.get('latitud')
+    lng_raw = request.POST.get('longitud')
+    if not lat_raw or not lng_raw:
         return JsonResponse({'error': 'Faltan coordenadas'}, status=400)
+
+    lat, error_lat = leer_decimal_acotado(lat_raw, -90, 90, 'La latitud')
+    lng, error_lng = leer_decimal_acotado(lng_raw, -180, 180, 'La longitud')
+    if error_lat or error_lng:
+        return JsonResponse({'error': error_lat or error_lng}, status=400)
 
     perfil_emple.repartidor_latitud = lat
     perfil_emple.repartidor_longitud = lng

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -182,6 +183,7 @@ def previsualizar_producto(request, pk):
     return JsonResponse({'producto': producto.nombre, 'previsualizaciones': previsualizaciones})
 
 
+@login_required
 def marcar_premio_mostrado(request):
     """
     Llamado por el JS del home justo después de que termina la animación
@@ -192,7 +194,7 @@ def marcar_premio_mostrado(request):
     if request.method != 'POST':
         return JsonResponse({'ok': False, 'error': 'metodo no permitido'}, status=405)
 
-    codigo = request.POST.get('codigo', '').strip()
+    codigo = request.POST.get('codigo', '').strip()[:10]
     actualizados = DescuentoAsignado.objects.filter(
         usuario=request.user, codigo=codigo, mostrado=False
     ).update(mostrado=True)

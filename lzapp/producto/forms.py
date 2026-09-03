@@ -15,6 +15,10 @@ NOMBRE_VALIDO_RE = re.compile(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$')
 PRECIO_MAX_DIGITOS_ENTEROS = 6
 PRECIO_MAXIMO = 10 ** PRECIO_MAX_DIGITOS_ENTEROS - 1  # 999999
 
+STOCK_MAXIMO = 100_000
+DESCRIPCION_MAX_CARACTERES = 2000
+IMAGEN_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+
 
 def producto_esta_completo(imagen, descripcion, stock_actual, stock_minimo, precio):
     """
@@ -110,6 +114,9 @@ class ProductoForm(forms.ModelForm):
         if stock_actual is not None and stock_actual <= 0:
             raise forms.ValidationError('El stock actual no puede ser 0, debe ingresar una cantidad.')
 
+        if stock_actual is not None and stock_actual > STOCK_MAXIMO:
+            raise forms.ValidationError(f'El stock actual no puede superar {STOCK_MAXIMO:,}'.replace(',', '.') + ' unidades.')
+
         return stock_actual
 
     def clean_stock_minimo(self):
@@ -118,7 +125,20 @@ class ProductoForm(forms.ModelForm):
         if stock_minimo is not None and stock_minimo <= 0:
             raise forms.ValidationError('El stock mínimo no puede ser 0, debe ingresar una cantidad.')
 
+        if stock_minimo is not None and stock_minimo > STOCK_MAXIMO:
+            raise forms.ValidationError(f'El stock mínimo no puede superar {STOCK_MAXIMO:,}'.replace(',', '.') + ' unidades.')
+
         return stock_minimo
+
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion', '')
+
+        if descripcion and len(descripcion) > DESCRIPCION_MAX_CARACTERES:
+            raise forms.ValidationError(
+                f'La descripción no puede superar {DESCRIPCION_MAX_CARACTERES} caracteres.'
+            )
+
+        return descripcion
 
     def clean_fecha_vencimiento(self):
         fecha_vencimiento = self.cleaned_data.get('fecha_vencimiento')
@@ -135,6 +155,11 @@ class ProductoForm(forms.ModelForm):
 
         if 'imagen' not in self.files:
             return imagen
+
+        if imagen.size > IMAGEN_MAX_BYTES:
+            raise forms.ValidationError(
+                f'La imagen no puede pesar más de {IMAGEN_MAX_BYTES // (1024 * 1024)} MB.'
+            )
 
         imagen.seek(0)
         nuevo_hash = hashlib.md5(imagen.read()).hexdigest()

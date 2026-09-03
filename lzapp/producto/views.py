@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import F, Q, Avg, Count, OuterRef, Subquery, Value, Case, When, BooleanField
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
@@ -218,7 +220,7 @@ def importar_productos(request):
                 if not (descripcion and str(descripcion).strip()) or not stock_actual or not stock_minimo:
                     incompletos += 1
 
-                producto = Producto.objects.create(
+                producto = Producto(
                     nombre=str(nombre).strip(),
                     descripcion=descripcion,
                     precio=precio,
@@ -226,6 +228,14 @@ def importar_productos(request):
                     stock_minimo=stock_minimo or 15,
                     disponibilidad=bool(disponibilidad),
                 )
+                try:
+                    producto.full_clean(exclude=['imagen', 'imagen_hash'])
+                except ValidationError as error:
+                    filas_omitidas.append((num_fila, error.messages))
+                    continue
+
+                with transaction.atomic():
+                    producto.save()
                 ids_nuevos.append(producto.id)
 
             request.session['productos_importados_ids'] = ids_nuevos
@@ -244,7 +254,7 @@ def importar_productos(request):
 
             if filas_omitidas:
                 detalle = '; '.join(
-                    f'fila {n} (falta {" y ".join(campos)})' for n, campos in filas_omitidas
+                    f'fila {n} ({" / ".join(campos)})' for n, campos in filas_omitidas
                 )
                 messages.warning(
                     request,
