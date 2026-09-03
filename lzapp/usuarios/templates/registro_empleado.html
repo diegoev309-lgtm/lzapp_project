@@ -17,8 +17,43 @@
             <form method="post">
                 {% csrf_token %}
 
+                {% if form.non_field_errors %}
+                    <ul class="errorlist errorlist-general">{{ form.non_field_errors }}</ul>
+                {% endif %}
+
                 <div class="form-grid">
-                    {{ form.as_p }}
+                    <div class="campo">
+                        <label for="{{ form.username.id_for_label }}">Usuario</label>
+                        {{ form.username }}
+                        {% if form.username.help_text %}<span class="helptext">{{ form.username.help_text }}</span>{% endif %}
+                        {% if form.username.errors %}<ul class="errorlist">{{ form.username.errors }}</ul>{% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="{{ form.email.id_for_label }}">Correo electrónico</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<ul class="errorlist">{{ form.email.errors }}</ul>{% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}<ul class="errorlist">{{ form.telefono.errors }}</ul>{% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}<span class="helptext">{{ form.password1.help_text }}</span>{% endif %}
+                        {% if form.password1.errors %}<ul class="errorlist">{{ form.password1.errors }}</ul>{% endif %}
+                    </div>
+
+                    <div class="campo">
+                        <label for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+                        {{ form.password2 }}
+                        {% if form.password2.help_text %}<span class="helptext">{{ form.password2.help_text }}</span>{% endif %}
+                        {% if form.password2.errors %}<ul class="errorlist">{{ form.password2.errors }}</ul>{% endif %}
+                    </div>
                 </div>
 
                 <div class="botones">

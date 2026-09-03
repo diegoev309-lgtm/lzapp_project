@@ -73,6 +73,22 @@ def listar_productos(request):
     })
 
 
+def _es_peticion_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def _respuesta_form_invalido(request, form):
+    #"""
+    #Para peticiones AJAX: devuelve los errores como JSON (por campo, mismo
+    #formato que consume el JS de formpt.html) en vez de re-renderizar toda
+    #la página — así el navegador nunca navega/recarga, y el <input
+    #type="file"> con la imagen ya elegida no se pierde.
+    #"""
+    if _es_peticion_ajax(request):
+        return JsonResponse({'ok': False, 'errors': form.errors.get_json_data(escape_html=True)}, status=400)
+    return render(request, 'formpt.html', {'form': form})
+
+
 @vista_dashboard
 def crear_producto(request):
     if request.method == "POST":
@@ -86,7 +102,11 @@ def crear_producto(request):
                 titulo='Producto creado',
                 url=reverse('editar_producto', args=[producto.id]),
             )
+            if _es_peticion_ajax(request):
+                return JsonResponse({'ok': True, 'redirect_url': reverse('listar_productos')})
             return redirect('listar_productos')
+
+        return _respuesta_form_invalido(request, form)
     else:
         form = ProductoForm()
 
@@ -113,7 +133,11 @@ def editar_producto(request, id):
                 titulo='Producto actualizado',
                 url=reverse('editar_producto', args=[producto.id]),
             )
+            if _es_peticion_ajax(request):
+                return JsonResponse({'ok': True, 'redirect_url': reverse('listar_productos')})
             return redirect('listar_productos')
+
+        return _respuesta_form_invalido(request, form)
     else:
         form = ProductoForm(instance=producto)
 

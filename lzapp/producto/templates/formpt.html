@@ -28,10 +28,76 @@
                 {% csrf_token %}
 
                 <div class="form-con-aviso">
+                    {% if form.non_field_errors %}
+                        <ul class="errorlist errorlist-general">{{ form.non_field_errors }}</ul>
+                    {% endif %}
+
                     <div class="form-grid">
-                        {{ form.as_p }}
+                        <div class="campo">
+                            <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                            {{ form.nombre }}
+                            {% if form.nombre.help_text %}<span class="helptext">{{ form.nombre.help_text }}</span>{% endif %}
+                            {% if form.nombre.errors %}<ul class="errorlist">{{ form.nombre.errors }}</ul>{% endif %}
+                        </div>
+
+                        <div class="campo">
+                            <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.help_text %}<span class="helptext">{{ form.descripcion.help_text }}</span>{% endif %}
+                            {% if form.descripcion.errors %}<ul class="errorlist">{{ form.descripcion.errors }}</ul>{% endif %}
+                        </div>
+
+                        <div class="campo">
+                            <label for="{{ form.imagen.id_for_label }}">Imagen</label>
+                            {{ form.imagen }}
+                            {% if form.imagen.help_text %}<span class="helptext">{{ form.imagen.help_text }}</span>{% endif %}
+                            {% if form.imagen.errors %}<ul class="errorlist">{{ form.imagen.errors }}</ul>{% endif %}
+                        </div>
+
+                        <div class="campo">
+                            <label for="{{ form.precio.id_for_label }}">Precio</label>
+                            {{ form.precio }}
+                            {% if form.precio.help_text %}<span class="helptext">{{ form.precio.help_text }}</span>{% endif %}
+                            {% if form.precio.errors %}<ul class="errorlist">{{ form.precio.errors }}</ul>{% endif %}
+                        </div>
+
+                        {% if form.stock_actual.label %}
+                        <div class="campo">
+                            <label for="{{ form.stock_actual.id_for_label }}">Stock actual</label>
+                            {{ form.stock_actual }}
+                            {% if form.stock_actual.errors %}<ul class="errorlist">{{ form.stock_actual.errors }}</ul>{% endif %}
+                        </div>
+                        {% else %}
+                            {{ form.stock_actual }}
+                        {% endif %}
+
+                        {% if form.stock_minimo.label %}
+                        <div class="campo">
+                            <label for="{{ form.stock_minimo.id_for_label }}">Stock mínimo</label>
+                            {{ form.stock_minimo }}
+                            {% if form.stock_minimo.errors %}<ul class="errorlist">{{ form.stock_minimo.errors }}</ul>{% endif %}
+                        </div>
+                        {% else %}
+                            {{ form.stock_minimo }}
+                        {% endif %}
+
+                        <div class="campo">
+                            <label for="{{ form.disponibilidad.id_for_label }}">Disponibilidad</label>
+                            {{ form.disponibilidad }}
+                            {% if form.disponibilidad.errors %}<ul class="errorlist">{{ form.disponibilidad.errors }}</ul>{% endif %}
+                        </div>
+
+                        {% if form.fecha_vencimiento.label %}
+                        <div class="campo">
+                            <label for="{{ form.fecha_vencimiento.id_for_label }}">Fecha vencimiento</label>
+                            {{ form.fecha_vencimiento }}
+                            {% if form.fecha_vencimiento.errors %}<ul class="errorlist">{{ form.fecha_vencimiento.errors }}</ul>{% endif %}
+                        </div>
+                        {% else %}
+                            {{ form.fecha_vencimiento }}
+                        {% endif %}
                     </div>
-                
+
                     <aside class="aviso-completitud" id="avisoCompletitud">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                         <span>
@@ -88,6 +154,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const avisoCompletitud = document.getElementById('avisoCompletitud');
     const teniaImagenAlCargar = form.dataset.tieneImagen === '1';
 
+    // Estas variables las usan actualizarBotonGuardar/mostrarError/etc,
+    // que a su vez se llaman desde actualizarEstadoCompletitud() más abajo
+    // -- tienen que quedar declaradas ANTES de esa primera llamada o el
+    // script entero se cae con "Cannot access before initialization" y
+    // ninguna validación (ni el envío por AJAX) llega a activarse nunca.
+    const NOMBRE_VALIDO_RE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/;
+    const erroresActuales = {};
+    let hayErrorGeneral = false;
+    const formConAviso = form.querySelector('.form-con-aviso');
+
     function productoEstaCompleto() {
         const imagenOk = (inputImagen && inputImagen.files.length > 0) || teniaImagenAlCargar;
         const descripcionOk = inputDescripcion && inputDescripcion.value.trim() !== '';
@@ -118,9 +194,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (inputImagen) inputImagen.addEventListener('change', actualizarEstadoCompletitud);
 
     actualizarEstadoCompletitud();
-
-    const NOMBRE_VALIDO_RE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/;
-    const erroresActuales = {};
 
     // Sugerencia de stock mínimo: por debajo de este número se considera
     // un margen de reacción muy corto para reabastecer a tiempo.
@@ -168,7 +241,43 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!btnGuardar) return;
         const hayErrores = Object.keys(erroresActuales).length > 0;
         const incompleto = typeof productoEstaCompleto === 'function' ? !productoEstaCompleto() : false;
-        btnGuardar.disabled = hayErrores || incompleto;
+        btnGuardar.disabled = hayErrores || incompleto || hayErrorGeneral;
+    }
+
+    function mostrarErrorGeneral(mensaje) {
+        let caja = form.querySelector('.errorlist-general');
+        if (!caja) {
+            caja = document.createElement('ul');
+            caja.classList.add('errorlist', 'errorlist-general');
+            formConAviso.insertBefore(caja, formConAviso.firstChild);
+        }
+        const li = document.createElement('li');
+        li.textContent = mensaje;
+        caja.appendChild(li);
+        hayErrorGeneral = true;
+        actualizarBotonGuardar();
+    }
+
+    function limpiarErroresGenerales() {
+        const caja = form.querySelector('.errorlist-general');
+        if (caja) caja.remove();
+        hayErrorGeneral = false;
+    }
+
+    // Traduce el JSON de errores que devuelve el servidor
+    // (form.errors.get_json_data()) al mismo mecanismo visual que ya usan
+    // las validaciones del lado del cliente (mostrarError por campo).
+    function mostrarErroresServidor(erroresPorCampo) {
+        limpiarErroresGenerales();
+        Object.keys(erroresPorCampo).forEach(function (campo) {
+            const mensaje = erroresPorCampo[campo].map(function (e) { return e.message; }).join(' ');
+            const input = campo === '__all__' ? null : document.getElementById('id_' + campo);
+            if (input) {
+                mostrarError(input, mensaje);
+            } else {
+                mostrarErrorGeneral(mensaje);
+            }
+        });
     }
 
     // Las "sugerencias" son consejos, no bloquean el guardado (a diferencia
@@ -361,6 +470,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     form.addEventListener('submit', function (evento) {
+        // Siempre se maneja por AJAX (fetch), nunca por navegación normal:
+        // así, si el servidor rechaza algo, la página nunca se recarga y el
+        // <input type="file"> con la imagen ya elegida no se pierde.
+        evento.preventDefault();
+
         validarFormatoNombre();
         validarPrecio();
         validarStockActual();
@@ -370,8 +484,32 @@ document.addEventListener('DOMContentLoaded', function () {
         const incompleto = typeof productoEstaCompleto === 'function' ? !productoEstaCompleto() : false;
 
         if (Object.keys(erroresActuales).length > 0 || incompleto) {
-            evento.preventDefault();
+            return;
         }
+
+        limpiarErroresGenerales();
+        if (btnGuardar) btnGuardar.disabled = true;
+
+        const datos = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: datos,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        })
+            .then(function (respuesta) { return respuesta.json(); })
+            .then(function (data) {
+                if (data.ok) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+                mostrarErroresServidor(data.errors || {});
+            })
+            .catch(function () {
+                mostrarErrorGeneral('No se pudo guardar: hubo un problema de conexión. Intenta de nuevo.');
+            })
+            .finally(function () {
+                actualizarBotonGuardar();
+            });
     });
 });
 </script>
