@@ -26,6 +26,61 @@
         </a>
     </li>
 
+    <!-- Notificaciones -->
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle p-1 nav-link-icon"
+           href="#"
+           id="notifDropdown"
+           role="button"
+           data-bs-toggle="dropdown"
+           aria-expanded="false"
+           title="Notificaciones">
+            <i class="bi bi-bell fs-4"></i>
+            {% if notificaciones_no_leidas %}
+                <span class="carrito-badge">{{ notificaciones_no_leidas }}</span>
+            {% endif %}
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 notif-dropdown-menu"
+            aria-labelledby="notifDropdown"
+            data-url-marcar-leida="{% url 'marcar_notificacion_leida' id=0 %}"
+            data-url-marcar-todas="{% url 'marcar_todas_leidas' %}">
+
+            <li class="notif-menu-head">
+                <span>Notificaciones</span>
+                {% if notificaciones_no_leidas %}
+                    <button type="button" class="notif-marcar-todas">
+                        Marcar todas leídas
+                    </button>
+                {% endif %}
+            </li>
+
+            <li class="notif-lista">
+                {% for n in notificaciones_recientes %}
+                    <a href="{{ n.url|default:'#' }}"
+                       class="notif-item tipo-{{ n.tipo }}{% if not n.leida %} no-leida{% endif %}"
+                       data-id="{{ n.id }}">
+                        <i class="bi {{ n.icono }}"></i>
+                        <div class="notif-item-texto">
+                            {% if n.titulo %}<strong>{{ n.titulo }}</strong>{% endif %}
+                            <p>{{ n.mensaje }}</p>
+                            <span class="notif-item-fecha">{{ n.fecha_creacion|timesince }} atrás</span>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="notif-vacio">
+                        <i class="bi bi-bell-slash"></i>
+                        <p>No tienes notificaciones por ahora.</p>
+                    </div>
+                {% endfor %}
+            </li>
+
+            <li>
+                <a href="{% url 'Notificaciones' %}" class="notif-ver-todas">Ver historial completo</a>
+            </li>
+        </ul>
+    </li>
+
     <!-- Perfil -->
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle p-1 nav-link-icon"

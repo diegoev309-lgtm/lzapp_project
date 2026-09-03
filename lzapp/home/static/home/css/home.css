@@ -225,6 +225,82 @@ body {
     animation: carritoDestello 9s ease-in-out infinite;
 }
 
+/* ---- Notificaciones (campana) en el navbar del cliente ---- */
+.notif-dropdown-menu {
+    width: 340px;
+    max-width: 90vw;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 10px !important;
+}
+
+.notif-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--azul-claro);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--azul-profundo);
+}
+
+.notif-marcar-todas {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dorado);
+    padding: 0;
+}
+.notif-marcar-todas:hover { text-decoration: underline; }
+
+.notif-lista { max-height: 360px; overflow-y: auto; }
+
+.notif-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--gris-claro);
+    color: var(--gris-texto);
+    transition: background 0.15s;
+}
+.notif-item:hover { background: var(--gris-claro); }
+.notif-item:last-child { border-bottom: none; }
+
+.notif-item i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+.notif-item.tipo-success i { color: #1a8f4f; }
+.notif-item.tipo-warning i { color: var(--dorado); }
+.notif-item.tipo-error i { color: #e2402d; }
+.notif-item.tipo-info i { color: #1a5fa8; }
+
+.notif-item-texto strong { display: block; font-size: 0.82rem; color: var(--azul-profundo); margin-bottom: 2px; }
+.notif-item-texto p { margin: 0; font-size: 0.82rem; line-height: 1.4; color: var(--gris-texto); }
+.notif-item-fecha { display: block; margin-top: 4px; font-size: 0.7rem; color: #9aa0ab; }
+
+.notif-item.no-leida { background: rgba(201, 168, 76, 0.08); }
+
+.notif-vacio {
+    padding: 30px 14px;
+    text-align: center;
+    color: #9aa0ab;
+}
+.notif-vacio i { font-size: 22px; display: block; margin-bottom: 8px; }
+.notif-vacio p { margin: 0; font-size: 0.82rem; }
+
+.notif-ver-todas {
+    display: block;
+    text-align: center;
+    padding: 11px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--dorado);
+    border-top: 1px solid var(--gris-claro);
+}
+.notif-ver-todas:hover { background: var(--gris-claro); }
+
 /* ============================================================
    CARRUSEL HERO — contenedor general
    ============================================================ */

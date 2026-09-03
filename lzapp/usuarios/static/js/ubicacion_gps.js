@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnTrigger = document.getElementById('btnAbrirUbicacion');
     const textoTrigger = document.getElementById('textoUbicacionTrigger');
     const estado = document.getElementById('estado-ubicacion');
-    const inputBuscar = document.getElementById('buscador-direccion');
-    const sugerenciasBox = document.getElementById('sugerenciasDireccion');
+    const btnExpandirMapa = document.getElementById('btn-expandir-mapa');
+    const mapaBox = document.getElementById('mapa-ubicacion');
 
     if (!btnGps) return;
 
@@ -125,66 +125,34 @@ document.addEventListener('DOMContentLoaded', function () {
         if (clase) estado.classList.add(clase);
     }
 
-    // ---------- Buscador de direcciones (Nominatim) ----------
-    let temporizadorBusqueda = null;
+    // ---------- Expandir/minimizar mapa ----------
+    let mapaExpandido = false;
 
-    if (inputBuscar) {
-        inputBuscar.addEventListener('input', function () {
-            clearTimeout(temporizadorBusqueda);
-            const texto = this.value.trim();
+    if (btnExpandirMapa) {
+        btnExpandirMapa.addEventListener('click', function () {
+            mapaExpandido = !mapaExpandido;
+            mapaBox.classList.toggle('mapa-grande', mapaExpandido);
+            modalUbicacion.classList.toggle('mapa-expandido', mapaExpandido);
+            btnExpandirMapa.querySelector('i').className = mapaExpandido
+                ? 'bi bi-fullscreen-exit'
+                : 'bi bi-arrows-fullscreen';
+            btnExpandirMapa.title = mapaExpandido ? 'Ver mapa normal' : 'Ver mapa completo';
 
-            if (texto.length < 4) {
-                sugerenciasBox.innerHTML = '';
-                sugerenciasBox.classList.remove('activo');
-                return;
-            }
-
-            // Esperamos 500ms sin que el usuario escriba más, para no saturar
-            // el servidor gratuito de Nominatim (pide máx. 1 petición/seg).
-            temporizadorBusqueda = setTimeout(() => buscarDireccion(texto), 500);
+            // Esperamos a que termine la transición de altura antes de que
+            // Leaflet recalcule el tamaño de sus tiles, si no quedan a medio cargar.
+            setTimeout(() => { if (mapa) mapa.invalidateSize(); }, 380);
         });
     }
 
-    async function buscarDireccion(texto) {
-        try {
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(texto)}&countrycodes=co&limit=5`;
-            const respuesta = await fetch(url, { headers: { 'Accept-Language': 'es' } });
-            const resultados = await respuesta.json();
-
-            if (resultados.length === 0) {
-                sugerenciasBox.innerHTML = '<div class="ubicacion-sugerencia-vacia">Sin resultados</div>';
-                sugerenciasBox.classList.add('activo');
-                return;
-            }
-
-            sugerenciasBox.innerHTML = resultados.map(r => `
-                <div class="ubicacion-sugerencia-item" data-lat="${r.lat}" data-lon="${r.lon}">
-                    <i class="bi bi-geo-alt"></i> ${r.display_name}
-                </div>
-            `).join('');
-            sugerenciasBox.classList.add('activo');
-
-            sugerenciasBox.querySelectorAll('.ubicacion-sugerencia-item').forEach((item) => {
-                item.addEventListener('click', function () {
-                    const lat = parseFloat(this.dataset.lat);
-                    const lon = parseFloat(this.dataset.lon);
-
-                    if (mapa) {
-                        mapa.setView([lat, lon], 16);
-                        marcador.setLatLng([lat, lon]);
-                    }
-                    fijarUbicacion(lat, lon);
-
-                    inputBuscar.value = this.textContent.trim();
-                    sugerenciasBox.innerHTML = '';
-                    sugerenciasBox.classList.remove('activo');
-                });
-            });
-
-        } catch (error) {
-            console.error('Error buscando dirección:', error);
+    modalUbicacion.addEventListener('hidden.bs.modal', function () {
+        if (mapaExpandido) {
+            mapaExpandido = false;
+            mapaBox.classList.remove('mapa-grande');
+            modalUbicacion.classList.remove('mapa-expandido');
+            btnExpandirMapa.querySelector('i').className = 'bi bi-arrows-fullscreen';
+            btnExpandirMapa.title = 'Ver mapa completo';
         }
-    }
+    });
 
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', function () {
