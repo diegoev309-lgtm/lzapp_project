@@ -1340,6 +1340,11 @@ a{ text-decoration:none; color:inherit; }
     border-radius:var(--radius-btn); color:var(--red); font-size:13px;
 }
 
+/* teléfono con selector de código de país (registro_empleado.html) */
+.card-form .campo-telefono-wrap{ display:flex; gap:8px; }
+.card-form .campo-telefono-wrap select{ flex:0 0 auto; width:auto; min-width:92px; max-width:130px; cursor:pointer; }
+.card-form .campo-telefono-wrap input{ flex:1; min-width:0; width:auto; }
+
 .card-form label{
     font-weight:600; color:var(--text-secondary);
     margin-bottom:6px; font-size:13px;

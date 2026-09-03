@@ -472,10 +472,18 @@ body{
     transition:transform var(--transition),box-shadow var(--transition);
     margin-bottom: 1.2rem; /* separa el botón del texto de abajo */
 }
-.btn-auth:hover{
+.btn-auth:hover:not(:disabled){
     transform:translateY(-2px);
     box-shadow:0 12px 28px rgba(201,168,76,.4);
 }
+.btn-auth:disabled{opacity:.7;cursor:not-allowed;}
+
+/* indicador de carga: 3 puntitos animados dentro del botón */
+.puntos-cargando{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
+.puntos-cargando span{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.3;animation:puntoRebote 1s infinite ease-in-out;}
+.puntos-cargando span:nth-child(2){animation-delay:.15s;}
+.puntos-cargando span:nth-child(3){animation-delay:.3s;}
+@keyframes puntoRebote{0%,80%,100%{opacity:.3;transform:translateY(0);}40%{opacity:1;transform:translateY(-4px);}}
 .btn-auth::after{
     content:'';
     position:absolute;top:0;left:-60%;

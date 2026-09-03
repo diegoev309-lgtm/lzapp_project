@@ -296,6 +296,11 @@ body{
     background:#fff;
 }
 
+/* teléfono con selector de código de país */
+.campo-telefono-wrap{display:flex;gap:8px;}
+.campo-telefono-wrap .select-codigo-pais{flex:0 0 auto;width:auto;min-width:92px;max-width:118px;padding-right:1.6rem;cursor:pointer;}
+.campo-telefono-wrap input{flex:1;min-width:0;}
+
 .btn-dorado{
     background:linear-gradient(120deg,var(--dorado),var(--dorado-claro));
     color:var(--azul-profundo);

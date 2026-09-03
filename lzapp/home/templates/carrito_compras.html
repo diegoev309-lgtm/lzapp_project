@@ -1195,9 +1195,9 @@
                             </div>
                             <div class="card-footer bg-white border-0">
                                 <div class="footer-botones">
-                                    <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito">
+                                    <button type="button" class="btn btn-carrito" data-producto-id="{{ premio_activo.producto.id }}" data-premio="{{ premio_activo.codigo }}">
                                         <i class="bi bi-gift-fill"></i> Reclamar premio
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1239,9 +1239,9 @@
                             </div>
                             <div class="card-footer bg-white border-0">
                                 <div class="footer-botones">
-                                    <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito">
+                                    <button type="button" class="btn btn-carrito" data-producto-id="{{ i.id }}">
                                         <i class="bi bi-cart-plus"></i> Añadir al carrito
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1307,6 +1307,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'home/js/notificaciones_navbar.js' %}"></script>
+    <script src="{% static 'home/js/carrito_ajax.js' %}"></script>
     <script>
         document.querySelectorAll('.favorito').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1395,9 +1396,9 @@
                                 </div>
                                 <div class="card-footer bg-white border-0">
                                     <div class="footer-botones">
-                                        <a href="${urlAgregar(p.id)}" class="btn btn-carrito">
+                                        <button type="button" class="btn btn-carrito" data-producto-id="${p.id}">
                                             <i class="bi bi-cart-plus"></i> Añadir al carrito
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

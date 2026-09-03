@@ -458,7 +458,7 @@
 
   <div class="carrito-widget__lista">
     {% for i,j in request.session.carro.items %}
-    <div class="carrito-item {% if j.es_premio %}carrito-item--premio{% endif %}">
+    <div class="carrito-item {% if j.es_premio %}carrito-item--premio{% endif %}" data-producto-id="{{ i }}">
       <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
       <div class="carrito-item__info">
         <span class="carrito-item__nombre">
@@ -466,7 +466,7 @@
           {% if j.es_premio %}<span class="carrito-item__badge-premio"><i class="bi bi-gift-fill"></i> Premio</span>{% endif %}
         </span>
         <span class="carrito-item__cantidad">
-          Cantidad: {{ j.cantidad }} ·
+          Cantidad: <span class="carrito-item__cantidad-num">{{ j.cantidad }}</span> ·
           {% if j.es_premio %}
             <s>$ {{ j.precio_original|cop }} COP</s>
             <strong>$ {{ j.precio|cop }} COP</strong> c/u
@@ -476,9 +476,9 @@
         </span>
       </div>
       <div class="carrito-item__controles">
-        <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
+        <button type="button" class="btn-qty btn-qty--restar" data-accion="restar" data-producto-id="{{ i }}">−</button>
         {% if not j.es_premio %}
-          <a href="{% url 'carro:agregar' i %}" class="btn-qty btn-qty--sumar">+</a>
+          <button type="button" class="btn-qty btn-qty--sumar" data-accion="sumar" data-producto-id="{{ i }}">+</button>
         {% endif %}
       </div>
     </div>
@@ -512,15 +512,27 @@
         <div id="wallet_container" class="mp-wallet-container"></div>
       </div>
 
-      <form action="{% url 'carro:limpiar' %}" method="post" onsubmit="return confirm('¿Vaciar el carrito?');">
-        {% csrf_token %}
-        <button type="submit" class="btn-vaciar">Vaciar carrito</button>
-      </form>
+      <button type="button" class="btn-vaciar" id="btnVaciarCarrito">Vaciar carrito</button>
     </div>
   </div>
   {% endif %}
 
 </aside>
+
+<!-- Confirmación de "vaciar carrito" -- reemplaza el confirm() feo del
+     navegador por una tarjeta con el mismo estilo que ya usa el overlay
+     de resultado de pago (.mp-overlay/.mp-overlay-card) más abajo en
+     esta misma página. -->
+<div class="mp-overlay mp-overlay--fallido" id="modalVaciarCarrito" style="display:none; z-index:2000;">
+  <div class="mp-overlay-card">
+    <h2>¿Vaciar el carrito?</h2>
+    <p>Se eliminarán todos los productos que agregaste.</p>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button type="button" class="mp-overlay-btn" id="btnCancelarVaciar" style="background:#eee; color:#333;">Cancelar</button>
+      <button type="button" class="mp-overlay-btn" id="btnConfirmarVaciar" style="background:#c0392b;">Sí, vaciar</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 
@@ -543,6 +555,7 @@
 
       const lat = document.getElementById('cliente_latitud').value;
       const lng = document.getElementById('cliente_longitud').value;
+      const direccionTexto = (document.getElementById('direccion_entrega_texto') || {}).value || '';
 
       if (!lat || !lng) {
         mostrarError('Antes de pagar, confirma tu ubicación de entrega arriba.');
@@ -553,7 +566,8 @@
       btnPago.textContent = 'Preparando el pago...';
 
       try {
-        const url = "{% url 'carro:crear_preferencia_ajax' %}?lat=" + encodeURIComponent(lat) + "&lng=" + encodeURIComponent(lng);
+        const url = "{% url 'carro:crear_preferencia_ajax' %}?lat=" + encodeURIComponent(lat) +
+          "&lng=" + encodeURIComponent(lng) + "&direccion=" + encodeURIComponent(direccionTexto);
         const response = await fetch(url);
         const data = await response.json();
 
@@ -639,5 +653,109 @@
     if (toggle) toggle.addEventListener('click', abrirCarrito);
     if (cerrar) cerrar.addEventListener('click', cerrarCarrito);
     if (overlay) overlay.addEventListener('click', cerrarCarrito);
+  })();
+
+  /* ============================================================
+     +/− y "vaciar carrito" por AJAX -- sin recargar la página, y sin
+     el confirm() feo del navegador para vaciar. mostrarToastCarrito /
+     actualizarIndicadorCarrito vienen de carrito_ajax.js, que
+     carrito_compras.html carga antes de incluir este widget.
+     ============================================================ */
+  (function () {
+    const URL_RESTAR_BASE = "{% url 'carro:restar' 1 %}";
+    const URL_AGREGAR_BASE_QTY = "{% url 'carro:agregar' 1 %}";
+    const URL_LIMPIAR = "{% url 'carro:limpiar' %}";
+
+    function formatoCop(numero) {
+      return Number(numero).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function actualizarTotal(total) {
+      const strong = document.querySelector('.carrito-widget__total strong');
+      if (strong) strong.textContent = '$ ' + formatoCop(total) + ' COP';
+    }
+
+    function actualizarContadores(cantidadItems) {
+      if (typeof actualizarIndicadorCarrito === 'function') actualizarIndicadorCarrito(cantidadItems);
+      if (cantidadItems === 0) {
+        const footer = document.querySelector('.carrito-widget__footer');
+        if (footer) footer.style.display = 'none';
+        const lista = document.querySelector('.carrito-widget__lista');
+        if (lista) {
+          lista.innerHTML = '<div class="carrito-widget__vacio"><i class="bi bi-cart-x"></i><p>Tu carrito está vacío.</p></div>';
+        }
+      }
+    }
+
+    document.querySelectorAll('.btn-qty[data-accion]').forEach(function (boton) {
+      boton.addEventListener('click', function () {
+        if (boton.disabled) return;
+        boton.disabled = true;
+
+        const productoId = boton.dataset.productoId;
+        const base = boton.dataset.accion === 'sumar' ? URL_AGREGAR_BASE_QTY : URL_RESTAR_BASE;
+        const url = base.replace(/\/1\/?$/, '/' + productoId + '/');
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then((respuesta) => respuesta.json())
+          .then((datos) => {
+            if (!datos.ok) {
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito(datos.error || 'No se pudo actualizar el carrito.', 'error');
+              return;
+            }
+
+            const fila = document.querySelector('.carrito-item[data-producto-id="' + productoId + '"]');
+            if (datos.item) {
+              if (fila) {
+                const numCantidad = fila.querySelector('.carrito-item__cantidad-num');
+                if (numCantidad) numCantidad.textContent = datos.item.cantidad;
+              }
+            } else if (fila) {
+              fila.remove(); // restó hasta 0: el backend ya lo eliminó del carrito
+            }
+
+            actualizarTotal(datos.total);
+            actualizarContadores(datos.cantidad_items);
+          })
+          .catch(() => {
+            if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo actualizar el carrito. Intenta de nuevo.', 'error');
+          })
+          .finally(() => { boton.disabled = false; });
+      });
+    });
+
+    const btnVaciar = document.getElementById('btnVaciarCarrito');
+    const modalVaciar = document.getElementById('modalVaciarCarrito');
+    const btnCancelarVaciar = document.getElementById('btnCancelarVaciar');
+    const btnConfirmarVaciar = document.getElementById('btnConfirmarVaciar');
+
+    if (btnVaciar && modalVaciar) {
+      btnVaciar.addEventListener('click', () => { modalVaciar.style.display = 'flex'; });
+      if (btnCancelarVaciar) btnCancelarVaciar.addEventListener('click', () => { modalVaciar.style.display = 'none'; });
+      modalVaciar.addEventListener('click', (e) => { if (e.target === modalVaciar) modalVaciar.style.display = 'none'; });
+
+      if (btnConfirmarVaciar) {
+        btnConfirmarVaciar.addEventListener('click', function () {
+          btnConfirmarVaciar.disabled = true;
+
+          fetch(URL_LIMPIAR, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then((respuesta) => respuesta.json())
+            .then((datos) => {
+              modalVaciar.style.display = 'none';
+              if (!datos.ok) {
+                if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo vaciar el carrito.', 'error');
+                return;
+              }
+              actualizarContadores(0);
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('Se vació el carrito.', 'success');
+            })
+            .catch(() => {
+              modalVaciar.style.display = 'none';
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo vaciar el carrito. Intenta de nuevo.', 'error');
+            })
+            .finally(() => { btnConfirmarVaciar.disabled = false; });
+        });
+      }
+    }
   })();
 </script>

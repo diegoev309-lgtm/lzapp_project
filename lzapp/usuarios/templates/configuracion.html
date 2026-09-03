@@ -122,7 +122,11 @@
 
                 <div class="col-md-6">
                     <label class="form-label">Teléfono</label>
-                    {{ perfil_form.telefono }}
+                    <div class="campo-telefono-wrap">
+                        {{ perfil_form.codigo_pais }}
+                        {{ perfil_form.telefono }}
+                    </div>
+                    {{ perfil_form.codigo_pais.errors }}
                     {{ perfil_form.telefono.errors }}
                 </div>
                 

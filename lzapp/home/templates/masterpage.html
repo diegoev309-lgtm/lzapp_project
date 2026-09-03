@@ -752,9 +752,9 @@
                                         </p>
                                     </div>
                                     <div class="card-footer bg-white border-0">
-                                        <a href="{% url 'carro:agregar' premio_activo.producto.id %}?premio={{ premio_activo.codigo }}" class="btn btn-carrito w-100">
+                                        <button type="button" class="btn btn-carrito w-100" data-producto-id="{{ premio_activo.producto.id }}" data-premio="{{ premio_activo.codigo }}">
                                             <i class="bi bi-gift-fill"></i> Reclamar premio
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -839,9 +839,9 @@
                                         <p class="precio">$ {{ i.precio|cop }} COP</p>
                                     </div>
                                     <div class="card-footer bg-white border-0">
-                                        <a href="{% url 'carro:agregar' i.id %}" class="btn btn-carrito w-100">
+                                        <button type="button" class="btn btn-carrito w-100" data-producto-id="{{ i.id }}">
                                             <i class="bi bi-cart-plus"></i> Añadir al carrito
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1068,6 +1068,7 @@
         })();
     </script>
     <script src="{% static 'home/js/notificaciones_navbar.js' %}"></script>
+    <script src="{% static 'home/js/carrito_ajax.js' %}"></script>
 
 
     <script>
@@ -2744,9 +2745,9 @@
                             </div>
                             <div class="card-footer bg-white border-0">
                                 <div class="footer-botones">
-                                    <a href="${urlAgregar(p.id)}" class="btn btn-carrito">
+                                    <button type="button" class="btn btn-carrito" data-producto-id="${p.id}">
                                         <i class="bi bi-cart-plus"></i> Añadir al carrito
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -2770,9 +2771,9 @@
                             <p class="precio">$ ${Number(p.precio).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} COP</p>
                         </div>
                         <div class="card-footer bg-white border-0">
-                            <a href="${urlAgregar(p.id)}" class="btn btn-carrito w-100">
+                            <button type="button" class="btn btn-carrito w-100" data-producto-id="${p.id}">
                                 <i class="bi bi-cart-plus"></i> Añadir al carrito
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>

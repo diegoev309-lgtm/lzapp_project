@@ -76,6 +76,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (direccion) {
                 const texto = prefijo ? `${prefijo} — ${direccion}` : direccion;
                 mostrarEstado(texto, 'text-success');
+
+                // Antes solo se mostraba, no se guardaba en ningún lado -- se
+                // usa para que el pedido final tenga una dirección legible,
+                // no solo coordenadas.
+                const inputDireccion = document.getElementById('direccion_entrega_texto');
+                if (inputDireccion) inputDireccion.value = direccion;
             }
         } catch (error) {
             // Si Nominatim falla, no es crítico: las coordenadas ya quedaron

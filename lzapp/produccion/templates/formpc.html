@@ -201,6 +201,14 @@ select option{
     margin-top:5px;
 }
 
+input.is-invalid,
+select.is-invalid,
+textarea.is-invalid{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(220,53,69,.15) !important;
+}
+.btn-guardar:disabled{ opacity:.5; cursor:not-allowed; }
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */
@@ -345,7 +353,7 @@ select option{
                     </a>
 
 
-                    <button type="submit" class="btn btn-guardar">
+                    <button type="submit" class="btn btn-guardar" id="btnGuardarProduccion">
                         <i class="bi bi-check-circle-fill"></i>
 
                         Guardar Producción
@@ -361,5 +369,78 @@ select option{
 
 
 {% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputCantidad = document.getElementById('{{ form.cantidad_producida.id_for_label }}');
+    const inputFecha = document.getElementById('{{ form.fecha_vencimiento.id_for_label }}');
+    const btnGuardar = document.getElementById('btnGuardarProduccion');
+    const CANTIDAD_MAXIMA = 100000;
+    const erroresActuales = {};
 
+    function mostrarError(input, mensaje) {
+        input.classList.add('is-invalid');
+        let lista = input.parentElement.querySelector('.errorlist');
+        if (!lista) {
+            lista = document.createElement('ul');
+            lista.classList.add('errorlist');
+            input.insertAdjacentElement('afterend', lista);
+        }
+        lista.innerHTML = '<li>' + mensaje + '</li>';
+        erroresActuales[input.id] = true;
+        actualizarBoton();
+    }
+
+    function limpiarError(input) {
+        input.classList.remove('is-invalid');
+        const lista = input.parentElement.querySelector('.errorlist');
+        if (lista) lista.remove();
+        delete erroresActuales[input.id];
+        actualizarBoton();
+    }
+
+    function actualizarBoton() {
+        if (btnGuardar) btnGuardar.disabled = Object.keys(erroresActuales).length > 0;
+    }
+
+    function validarCantidad() {
+        if (!inputCantidad) return;
+        const valor = parseInt(inputCantidad.value, 10);
+
+        if (inputCantidad.value.trim() === '') {
+            limpiarError(inputCantidad); // el "required" del navegador ya lo cubre
+        } else if (isNaN(valor) || valor <= 0) {
+            mostrarError(inputCantidad, 'La cantidad producida debe ser mayor a 0.');
+        } else if (valor > CANTIDAD_MAXIMA) {
+            mostrarError(inputCantidad, 'La cantidad producida no puede superar ' + CANTIDAD_MAXIMA.toLocaleString('es-CO') + ' unidades.');
+        } else {
+            limpiarError(inputCantidad);
+        }
+    }
+
+    function validarFecha() {
+        if (!inputFecha || !inputFecha.value) {
+            if (inputFecha) limpiarError(inputFecha);
+            return;
+        }
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaIngresada = new Date(inputFecha.value + 'T00:00:00');
+
+        if (fechaIngresada < hoy) {
+            mostrarError(inputFecha, 'La fecha de vencimiento no puede ser una fecha pasada.');
+        } else {
+            limpiarError(inputFecha);
+        }
+    }
+
+    if (inputCantidad) inputCantidad.addEventListener('input', validarCantidad);
+    if (inputFecha) inputFecha.addEventListener('change', validarFecha);
+
+    document.querySelector('form').addEventListener('submit', function (evento) {
+        validarCantidad();
+        validarFecha();
+        if (Object.keys(erroresActuales).length > 0) evento.preventDefault();
+    });
+});
+</script>
 {% endblock %}

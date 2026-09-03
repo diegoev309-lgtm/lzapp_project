@@ -292,6 +292,30 @@ body{
 
 .text-danger{font-size:.78rem;margin-top:.3rem;color:#dc3545;font-weight:500;}
 
+/* teléfono con selector de código de país */
+.campo-telefono-wrap{display:flex;gap:8px;}
+.campo-telefono-wrap .select-codigo-pais{flex:0 0 auto;width:auto;min-width:92px;max-width:118px;padding-right:1.6rem;cursor:pointer;}
+.campo-telefono-wrap input{flex:1;min-width:0;}
+
+/* fortaleza de la contraseña */
+.fortaleza-contrasena{margin-top:.5rem;}
+.fortaleza-barra{height:5px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;}
+.fortaleza-barra span{display:block;height:100%;width:0;border-radius:3px;transition:width .3s ease,background-color .3s ease;}
+.fortaleza-texto{display:block;font-size:.76rem;margin-top:.35rem;font-weight:600;}
+.fortaleza-debil .fortaleza-barra span{width:33%;background:#dc3545;}
+.fortaleza-debil .fortaleza-texto{color:#dc3545;}
+.fortaleza-media .fortaleza-barra span{width:66%;background:#a9791c;}
+.fortaleza-media .fortaleza-texto{color:#a9791c;}
+.fortaleza-fuerte .fortaleza-barra span{width:100%;background:#198754;}
+.fortaleza-fuerte .fortaleza-texto{color:#198754;}
+
+/* indicador de carga: 3 puntitos animados dentro del botón */
+.puntos-cargando{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle;}
+.puntos-cargando span{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.3;animation:puntoRebote 1s infinite ease-in-out;}
+.puntos-cargando span:nth-child(2){animation-delay:.15s;}
+.puntos-cargando span:nth-child(3){animation-delay:.3s;}
+@keyframes puntoRebote{0%,80%,100%{opacity:.3;transform:translateY(0);}40%{opacity:1;transform:translateY(-4px);}}
+
 .auth-errores{
     background:#fdecec;border:1px solid #f4b9b9;color:#b3261e;
     border-radius:10px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:1.3rem;
