@@ -478,27 +478,27 @@ def editar_usuario(
 
     if request.method == 'POST':
 
-        usuario.username = request.POST.get(
-            'username'
-        )
+        form = UserUpdateForm(request.POST, instance=usuario)
 
-        usuario.email = request.POST.get(
-            'email'
-        )
+        if form.is_valid():
+            form.save()
 
-        usuario.save()
+            messages.success(
+                request,
+                'Usuario actualizado correctamente.'
+            )
 
-        messages.success(
-            request,
-            'Usuario actualizado correctamente.'
-        )
+            return redirect('Usuario')
 
-        return redirect('usuarios')
+        messages.error(request, 'Revisa los datos del formulario.')
+
+    else:
+        form = UserUpdateForm(instance=usuario)
 
     return render(
         request,
         'editar_usuario.html',
-        {'usuario': usuario}
+        {'usuario': usuario, 'form': form}
     )
 
 
@@ -546,7 +546,8 @@ def eliminar_usuario(
 @require_POST
 def eliminar_usuarios_multiple(request):
 
-    ids = request.POST.getlist('usuarios_seleccionados')
+    ids_crudos = request.POST.getlist('usuarios_seleccionados')
+    ids = [i for i in ids_crudos if i.isdigit()]
 
     if not ids:
         messages.error(request, 'No seleccionaste ningún usuario.')

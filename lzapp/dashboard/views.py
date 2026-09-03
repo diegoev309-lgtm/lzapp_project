@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento
 from seguridad.decorators import vista_dashboard
+from seguridad.validators import leer_entero_acotado
 
 import calendar
 
@@ -79,7 +80,9 @@ def Inicio(request):
 def api_ventas_mensuales(request):
     """Ventas reales agrupadas por mes para el año pedido (para el gráfico Plotly principal)."""
     hoy = timezone.now()
-    anio = int(request.GET.get('anio', hoy.year))
+    anio, error = leer_entero_acotado(request.GET.get('anio', hoy.year), 2000, 2100, 'El año')
+    if error:
+        return JsonResponse({'error': error}, status=400)
 
     ventas_qs = (Venta.objects
                  .filter(fecha__year=anio)
@@ -108,7 +111,10 @@ def api_ventas_mensuales(request):
 @vista_dashboard
 def api_ventas_dia(request, anio, mes):
     """Detalle día a día de un mes: ventas, N° de pedidos y problemas/incidencias reportadas."""
-    dias_en_mes = calendar.monthrange(int(anio), int(mes))[1]
+    if not (1 <= mes <= 12):
+        return JsonResponse({'error': 'El mes debe estar entre 1 y 12.'}, status=400)
+
+    dias_en_mes = calendar.monthrange(anio, mes)[1]
 
     ventas_qs = (Venta.objects
                  .filter(fecha__year=anio, fecha__month=mes)
@@ -176,7 +182,9 @@ def api_distribucion_productos(request):
 @vista_dashboard
 def api_stock_flujo(request):
     """Entradas (producción) vs. salidas (ventas) de stock, día a día, de los últimos 14 días."""
-    dias_atras = int(request.GET.get('dias', 14))
+    dias_atras, error = leer_entero_acotado(request.GET.get('dias', 14), 1, 365, 'Los días')
+    if error:
+        return JsonResponse({'error': error}, status=400)
     hoy = timezone.localdate()
     fechas = [hoy - timedelta(days=i) for i in range(dias_atras - 1, -1, -1)]
 

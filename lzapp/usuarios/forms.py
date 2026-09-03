@@ -103,6 +103,21 @@ class RegistroForm(UserCreationForm):
 
         return email
 
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono', '').strip()
+
+        if not re.match(r'^[0-9+\-\s()]+$', telefono):
+            raise forms.ValidationError(
+                "El teléfono solo puede contener números, espacios y los símbolos + - ( )."
+            )
+
+        if not any(c.isdigit() for c in telefono):
+            raise forms.ValidationError(
+                "El teléfono debe contener al menos un número."
+            )
+
+        return telefono
+
 
 class RegistroEmpleadoForm(RegistroForm):
     """
