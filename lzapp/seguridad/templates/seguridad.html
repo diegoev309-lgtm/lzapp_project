@@ -1,0 +1,215 @@
+{% extends "masterpage_dashboard.html" %}
+{% block page_icon %}bi bi-shield-lock-fill{% endblock %}
+{% block page_title %}Seguridad{% endblock %}
+{% block page_subtitle %}Detección de inactividad y dispositivos conectados a tu cuenta{% endblock %}
+
+{% block content %}
+
+<style>
+
+.switch-activo{ position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; }
+.switch-activo input{ opacity:0; width:0; height:0; position:absolute; }
+.switch-slider{
+    position:absolute; inset:0; cursor:pointer;
+    background:rgba(255,255,255,.12);
+    border-radius:22px;
+    transition:.3s;
+}
+.switch-slider::before{
+    content:""; position:absolute; height:16px; width:16px; left:3px; bottom:3px;
+    background:#fff; border-radius:50%; transition:.3s;
+}
+.switch-activo input:checked + .switch-slider{ background:var(--green); }
+.switch-activo input:checked + .switch-slider::before{ transform:translateX(18px); }
+
+.campo-minutos{ display:flex; align-items:center; gap:8px; margin:14px 0; }
+.campo-minutos label{ font-size:12.5px; color:var(--text-secondary); }
+.campo-minutos input[type=number]{
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--border-subtle);
+    color:var(--text-primary);
+    border-radius:8px;
+    padding:6px 10px;
+    width:90px;
+    font-size:13px;
+}
+
+.tarjeta-seguridad{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:20px;
+}
+.tarjeta-seguridad-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.tarjeta-seguridad h3{ font-size:16px; margin:0 0 4px; color:var(--text-primary); }
+.tarjeta-seguridad p.descripcion{ font-size:12.5px; color:var(--text-tertiary); margin:0; }
+
+.tabla-dispositivos{ width:100%; border-collapse:collapse; }
+.tabla-dispositivos th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em;
+    color:var(--text-tertiary); padding:8px 10px; border-bottom:1px solid var(--border-subtle);
+}
+.tabla-dispositivos td{ padding:12px 10px; border-bottom:1px solid var(--border-hair); font-size:13px; color:var(--text-secondary); }
+.tabla-dispositivos tr:last-child td{ border-bottom:none; }
+.badge-dispositivo-actual{
+    background:var(--gold-dim); color:var(--gold); font-size:10.5px; font-weight:700;
+    padding:3px 9px; border-radius:var(--radius-pill);
+}
+.btn-cerrar-sesion-remota{ padding:5px 10px; font-size:11.5px; }
+
+/* Toasts (mismo patrón que listdes.html) */
+.contenedor-toasts{
+    position:fixed; top:20px; right:20px; z-index:99999;
+    display:flex; flex-direction:column; gap:10px;
+    max-width:min(360px, calc(100vw - 40px));
+}
+.toast-mensaje{
+    background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:14px;
+    box-shadow:0 15px 35px rgba(0,0,0,.5); padding:14px 16px;
+    display:flex; align-items:flex-start; gap:10px;
+    border-left:4px solid var(--green);
+}
+.toast-mensaje.toast-error, .toast-mensaje.toast-danger{ border-left-color:var(--red); }
+.toast-mensaje-icono{ font-size:17px; color:var(--green); margin-top:1px; }
+.toast-mensaje.toast-error .toast-mensaje-icono, .toast-mensaje.toast-danger .toast-mensaje-icono{ color:var(--red); }
+.toast-mensaje-texto{ flex:1; font-size:13px; color:var(--text-primary); line-height:1.4; }
+.toast-mensaje-cerrar{ background:transparent; border:none; color:var(--text-tertiary); font-size:14px; cursor:pointer; }
+
+</style>
+
+{% if messages %}
+    <div class="contenedor-toasts">
+        {% for m in messages %}
+            <div class="toast-mensaje toast-{{ m.tags }}">
+                <span class="toast-mensaje-icono">
+                    {% if m.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+                    {% elif m.tags == 'error' or m.tags == 'danger' %}<i class="bi bi-x-circle-fill"></i>
+                    {% else %}<i class="bi bi-info-circle-fill"></i>
+                    {% endif %}
+                </span>
+                <span class="toast-mensaje-texto">{{ m }}</span>
+                <button type="button" class="toast-mensaje-cerrar" onclick="this.closest('.toast-mensaje').remove()"><i class="bi bi-x-lg"></i></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="tarjeta-seguridad">
+    <form method="post" action="{% url 'guardar_configuracion_seguridad' %}">
+        {% csrf_token %}
+        <div class="tarjeta-seguridad-top">
+            <div>
+                <h3><i class="bi bi-hourglass-split"></i> Detección de inactividad</h3>
+                <p class="descripcion">Cierra la sesión automáticamente si el panel queda abierto sin actividad.</p>
+            </div>
+            <label class="switch-activo">
+                <input type="checkbox" name="activa" {% if configuracion.deteccion_inactividad_activa %}checked{% endif %}>
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+
+        <div class="campo-minutos">
+            <label for="minutos-inactividad">Minutos de inactividad antes de cerrar sesión</label>
+            <input type="number" id="minutos-inactividad" name="minutos" min="1"
+                   value="{{ configuracion.minutos_inactividad }}">
+        </div>
+
+        <button type="submit" class="dash-btn dash-btn-solid">
+            <i class="bi bi-check-lg"></i> Guardar
+        </button>
+    </form>
+</div>
+
+<div class="tarjeta-seguridad">
+    <h3><i class="bi bi-laptop"></i> Dispositivos conectados</h3>
+    <p class="descripcion" style="margin-bottom:14px;">
+        Sesiones activas ahora mismo en tu cuenta. Si no reconoces alguna, ciérrala.
+    </p>
+
+    {% if dispositivos %}
+        <div style="overflow-x:auto;">
+            <table class="tabla-dispositivos">
+                <thead>
+                    <tr>
+                        <th>Dispositivo</th>
+                        <th>Dirección IP</th>
+                        <th>Última actividad</th>
+                        <th>Conectado desde</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in dispositivos %}
+                        <tr>
+                            <td>
+                                <i class="bi bi-display"></i>
+                                {{ d.dispositivo }}
+                                {% if d.es_actual %}<span class="badge-dispositivo-actual">Este dispositivo</span>{% endif %}
+                            </td>
+                            <td>{{ d.direccion_ip|default:"—" }}</td>
+                            <td>{{ d.ultima_actividad|timesince }} atrás</td>
+                            <td>{{ d.fecha_inicio|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if not d.es_actual %}
+                                    <form method="post" action="{% url 'cerrar_sesion_remota' d.session_key %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dash-btn dash-btn-danger btn-cerrar-sesion-remota">
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <i class="bi bi-laptop display-4 text-secondary"></i>
+            <h5 class="mt-3">No hay otras sesiones activas.</h5>
+        </div>
+    {% endif %}
+</div>
+
+<div class="tarjeta-seguridad">
+    <h3><i class="bi bi-journal-text"></i> Registro de auditoría</h3>
+    <p class="descripcion" style="margin-bottom:14px;">
+        Últimas acciones sensibles hechas desde el panel: quién, qué y desde qué IP.
+    </p>
+
+    {% if registro_auditoria %}
+        <div style="overflow-x:auto;">
+            <table class="tabla-dispositivos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Quién</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evento in registro_auditoria %}
+                        <tr>
+                            <td>{{ evento.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>{{ evento.actor.username|default:"Sistema" }}</td>
+                            <td>{{ evento.accion }}</td>
+                            <td>{{ evento.descripcion }}</td>
+                            <td>{{ evento.direccion_ip|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <i class="bi bi-journal-text display-4 text-secondary"></i>
+            <h5 class="mt-3">Todavía no se registró ninguna acción.</h5>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
