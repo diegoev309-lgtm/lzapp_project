@@ -34,8 +34,10 @@ CSRF_TRUSTED_ORIGINS = [
 MERCADOPAGO_ACCESS_TOKEN = "APP_USR-3569434423018606-072916-47fd605aeda608e3647b1d515e5f680b-3575141051"
 MERCADOPAGO_PUBLIC_KEY = "APP_USR-e9497343-694d-4adc-83e6-2403bcab07c0"
 
-# URL base de tu sitio (para back_urls y notificaciones)
-SITE_URL = "https://surgery-reputable-exceeding.ngrok-free.dev"
+# URL base de tu sitio (para back_urls y notificaciones).
+# Dominio reservado de ngrok (no cambia entre reinicios del túnel, a
+# diferencia de una URL aleatoria de "ngrok http 8000" sin --url).
+SITE_URL = "https://spent-daycare-sludge.ngrok-free.dev"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
