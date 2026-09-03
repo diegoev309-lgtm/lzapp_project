@@ -149,13 +149,13 @@
                 <!-- ---------- SLIDE 2: IMAGEN — Variedad de Quesos (con quesos interactivos) ---------- -->
                 <div class="carrusel-slide">
                     <div class="slide-imagen">
-                        <img src="{% static 'home/media/productos-horizontal.png' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos">
-                        <img src="{% static 'home/media/productos-vertical.png' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical">
+                        <img src="{% static 'home/media/productos-horizontal.webp' %}" class="slide-imagen-fondo slide-imagen-fondo-desktop" alt="Variedad de quesos artesanales venezolanos" loading="lazy">
+                        <img src="{% static 'home/media/productos-vertical.webp' %}" class="slide-imagen-fondo slide-imagen-fondo-mobile" alt="Variedad de quesos artesanales venezolanos - versión vertical" loading="lazy">
                         <div class="slide-imagen-overlay slide-imagen-overlay-quesos"></div>
                         <!--SECCION DE QUESOS INTERACTIVOS-->
                         <div class="quesos-interactivos"
-                            data-bg="{% static 'home/media/productos-horizontal.png' %}"
-                            data-bg-mobile="{% static 'home/media/productos-vertical.png' %}"
+                            data-bg="{% static 'home/media/productos-horizontal.webp' %}"
+                            data-bg-mobile="{% static 'home/media/productos-vertical.webp' %}"
                             data-oferta-fondo="{% static 'home/media/oferta-fondo.png' %}"
                             {% if premio_activo %}
                             data-origen-premio="campana"
@@ -223,7 +223,7 @@
                                         <div class="queso-oferta-centro">
                                             <div class="queso-oferta-foto">
                                                 {% if p.imagen %}
-                                                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+                                                    <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}" loading="lazy">
                                                 {% else %}
                                                     <i class="bi bi-image"></i>
                                                 {% endif %}
@@ -376,8 +376,8 @@
                         <div class="oferta-reveal-overlay" id="ofertaRevealOverlay">
                             <div class="oferta-reveal-tarjeta">
                                 <div class="oferta-reveal-queso-wrap">
-                                    <img src="{% static 'home/media/queso-prueba.png' %}"
-                                        alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen">
+                                    <img src="{% static 'home/media/queso-prueba.webp' %}"
+                                        alt="Premio" class="oferta-reveal-queso" id="ofertaRevealImagen" loading="lazy">
                                     <!-- Ícono usado como placeholder cuando el premio (ruleta diaria)
                                         no tiene producto/foto real: CUPON_5, ENVIO_GRATIS, BOLETO_DORADO,
                                         y la variante "vuelve mañana". Oculto por defecto. -->
@@ -450,7 +450,7 @@
                 <!-- ---------- SLIDE 3: DOMICILIOS — Seguimiento en tiempo real ---------- -->
                 <div class="carrusel-slide">
                     <div class="slide-imagen">
-                        <img src="{% static 'home/media/img-carrusel-pedidos.webp' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos">
+                        <img src="{% static 'home/media/img-carrusel-pedidos.webp' %}" class="slide-imagen-fondo" alt="Domicilios Lácteos Zulianos" loading="lazy">
                         <div class="slide-imagen-overlay"></div>
                         <div class="container slide-imagen-contenido">
                             <div class="row align-items-center g-4">
@@ -687,7 +687,7 @@
                     </div>
                     <div class="col-lg-6 order-1 order-lg-2 reveal-right">
                         <div class="productos-imagen-wrapper">
-                            <img src="{% static 'home/media/queso3.png' %}" alt="Nuestros productos artesanales" loading="lazy">
+                            <img src="{% static 'home/media/queso3.webp' %}" alt="Nuestros productos artesanales" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -733,9 +733,9 @@
                                     <div class="producto-img-wrapper">
                                         <span class="badge-stock premio">-{{ premio_activo.campana.porcentaje_descuento|floatformat:0 }}%</span>
                                         {% if premio_activo.producto.imagen %}
-                                            <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto">
+                                            <img src="{{ premio_activo.producto.imagen.url }}" class="imagen-producto" loading="lazy">
                                         {% else %}
-                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto" loading="lazy">
                                         {% endif %}
                                     </div>
                                     <div class="card-body">
@@ -818,9 +818,9 @@
                                             <span class="badge-stock bajo">Stock bajo</span>
                                         {% endif %}
                                         {% if i.imagen %}
-                                            <img src="{{ i.imagen.url }}" class="imagen-producto">
+                                            <img src="{{ i.imagen.url }}" class="imagen-producto" loading="lazy">
                                         {% else %}
-                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto">
+                                            <img src="{% static 'img/no-image.png' %}" class="imagen-producto" loading="lazy">
                                         {% endif %}
                                     </div>
                                     <div class="card-body">
@@ -932,10 +932,8 @@
 
         <!-- ===== BANDA CTA ===== -->
         <section class="seccion-cta" id="contacto">
-            <video class="cta-video" muted loop playsinline preload="auto">
-                <!-- nuevo optimizado -->
-                <source src="{% static 'home/media/video-pie-pagina.mp4' %}" type="video/mp4">
-            </video>
+            <video class="cta-video" muted loop playsinline preload="none"
+                   data-src-mp4="{% static 'home/media/video-pie-pagina.mp4' %}"></video>
             <div class="cta-video-overlay"></div>
             <div class="container text-center position-relative" style="z-index:1;">
                 <div class="reveal">
@@ -986,7 +984,7 @@
                 </div>
             
                 <div class="footer-bottom">
-                    <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" class="footer-sena">
+                    <img src="{% static 'home/media/sena.png' %}" alt="Logo SENA" class="footer-sena" loading="lazy">
                     <p>&copy; Todos los derechos reservados a Lácteos Zulianos</p>
                 </div>
             </div>
@@ -1430,11 +1428,11 @@
                 const contornoPoligono = p.querySelector('.queso-punto-contorno-linea');
 
                 const video = reverso ? reverso.querySelector('.queso-oferta-video') : null;
-                if (video && p.dataset.ofertaVideo) {
-                    video.src = p.dataset.ofertaVideo;
-                    if (p.dataset.ofertaPos) {
-                        video.style.objectPosition = p.dataset.ofertaPos;
-                    }
+                // video.src se asigna en activar(), recién cuando el usuario
+                // abre el modo interactivo (clic en el globo) — así brillos.mp4
+                // no se descarga en el load de la página si nunca lo abre.
+                if (video && p.dataset.ofertaPos) {
+                    video.style.objectPosition = p.dataset.ofertaPos;
                 }
                 const tieneDescuento = p.dataset.descuento && !isNaN(parseInt(p.dataset.descuento, 10));
                 if (reverso) {
@@ -1718,37 +1716,19 @@
         let sorteoEnCurso = false;
         let sincronizando = false;
 
-        const CLAVE_OFERTA = 'lz_oferta_del_dia';
-
-        function leerOfertaGuardada() {
-            try {
-                const raw = localStorage.getItem(CLAVE_OFERTA);
-                if (!raw) return null;
-                const data = JSON.parse(raw);
-                if (!data || !data.timestamp || !data.valor) return null;
-                const segundosPasados = (Date.now() - data.timestamp) / 1000;
-                if (segundosPasados >= 1) {
-                    localStorage.removeItem(CLAVE_OFERTA);
-                    return null;
-                }
-                return data;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function guardarOfertaDelDia(valor) {
-            try {
-                localStorage.setItem(CLAVE_OFERTA, JSON.stringify({ valor, timestamp: Date.now() }));
-            } catch (e) {}
-        }
-        const ofertaGuardada = leerOfertaGuardada();
-        if (ofertaGuardada) {
+        // "Ya tienes un premio de campaña activo (sin usar)": persiste el
+        // estado directo desde la BD (DescuentoAsignado.usado=False vía
+        // data-tiene-premio), igual que el bloque de 'ganado' de abajo, para
+        // que sobreviva cualquier reload o inicio de sesión en otro
+        // dispositivo (antes dependía de localStorage, que es por-navegador
+        // y por eso los quesos se "apagaban" al recargar o cambiar de equipo).
+        if (origenPremio === 'campana' && tienePremio) {
             sorteoHecho = true;
+            wrap.classList.add('sorteo-hecho', 'modo-ofertas');
             quesosArr.forEach((q) => q.classList.add('encendido'));
             if (ruedaWrap) {
                 const texto = ruedaWrap.querySelector('.rueda-descuento');
-                if (texto) texto.textContent = `${ofertaGuardada.valor}% de descuento hoy`;
+                if (texto) texto.textContent = `${premioPorcentaje}% de descuento hoy`;
                 ruedaWrap.classList.add('visible');
             }
         }
@@ -2126,7 +2106,6 @@
             wrap.classList.add('sorteo-hecho');
 
             if (origenPremio === 'campana') {
-                guardarOfertaDelDia(premioPorcentaje);
                 marcarPremioMostrado(); // avisa al backend: este premio real ya se le mostró al cliente
             } else if (origenPremio === 'ruleta_diaria') {
                 reclamarPremioDia(); // aplica el efecto real: cupón/envío en sesión, o marca el boleto dorado
@@ -2340,8 +2319,13 @@
 
             quesosArr.forEach((q) => {
                 const video = obtenerVideo(q);
-                if (video && video.readyState < 2) {
-                    video.load();
+                if (video) {
+                    if (!video.src && q.dataset.ofertaVideo) {
+                        video.src = q.dataset.ofertaVideo;
+                    }
+                    if (video.readyState < 2) {
+                        video.load();
+                    }
                 }
             });
         }
@@ -2745,7 +2729,7 @@
                     <div class="card producto-card">
                         <div class="producto-img-wrapper">
                             ${badgeHtml(p)}
-                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
+                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}" loading="lazy">
                         </div>
                         <div class="producto-info">
                             <div class="card-body">
@@ -2776,7 +2760,7 @@
                     <div class="card producto-card producto-card--vertical h-100">
                         <div class="producto-img-wrapper">
                             ${badgeHtml(p)}
-                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}">
+                            <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}" loading="lazy">
                         </div>
                         <div class="card-body">
                             ${estrellasHtml(p)}

@@ -173,4 +173,43 @@
     {% endif %}
 </div>
 
+<div class="tarjeta-seguridad">
+    <h3><i class="bi bi-journal-text"></i> Registro de auditoría</h3>
+    <p class="descripcion" style="margin-bottom:14px;">
+        Últimas acciones sensibles hechas desde el panel: quién, qué y desde qué IP.
+    </p>
+
+    {% if registro_auditoria %}
+        <div style="overflow-x:auto;">
+            <table class="tabla-dispositivos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Quién</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evento in registro_auditoria %}
+                        <tr>
+                            <td>{{ evento.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>{{ evento.actor.username|default:"Sistema" }}</td>
+                            <td>{{ evento.accion }}</td>
+                            <td>{{ evento.descripcion }}</td>
+                            <td>{{ evento.direccion_ip|default:"—" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="estado-vacio">
+            <i class="bi bi-journal-text display-4 text-secondary"></i>
+            <h5 class="mt-3">Todavía no se registró ninguna acción.</h5>
+        </div>
+    {% endif %}
+</div>
+
 {% endblock %}

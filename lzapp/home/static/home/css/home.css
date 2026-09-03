@@ -1925,6 +1925,9 @@ footer {
     .hero-title .palabra { transform: none; opacity: 1; }
     .hero-sub, .hero-actions { opacity: 1; }
     .carrusel-track { transition: none; }
+    .quesos-interactivos.modo-ofertas .queso-punto:not(.encendido) .queso-punto-glow {
+        animation: none !important;
+    }
 }
 
 /* ============================================================
@@ -2016,15 +2019,20 @@ footer {
 }
 
 @keyframes brilloDeslizante {
-    0%   { background-position: 160% 160%; }
-    40%  { background-position: -60% -60%; }
-    100% { background-position: -60% -60%; }
-}
-
-@keyframes brilloDeslizante {
     0%   { background-position: 140% 140%; }
     45%  { background-position: -40% -40%; }
     100% { background-position: -40% -40%; }
+}
+
+/* En mobile se quita el destello blanco tipo reflejo de vidrio (queda
+   solo en desktop): el halo dorado normal (.queso-punto-glow del estado
+   "encendido") y el borde/ventana no se tocan. */
+@media (max-width: 991px) {
+    .quesos-interactivos.modo-ofertas .queso-punto:not(.encendido) .queso-punto-glow {
+        background: none;
+        animation: none;
+        opacity: 0;
+    }
 }
 
 /* Aro dorado nítido: copia de la misma silueta (clip-path),

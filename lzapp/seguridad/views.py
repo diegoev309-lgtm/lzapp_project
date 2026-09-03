@@ -3,9 +3,13 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from .decorators import vista_dashboard
+
 from dashboard.models import SesionActiva
-from .utils import describir_dispositivo, obtener_configuracion
+
+from .decorators import vista_dashboard
+from .models import RegistroAuditoria
+from .utils import describir_dispositivo, obtener_configuracion, registrar_auditoria
+
 
 @vista_dashboard
 def panel_seguridad(request):
@@ -37,10 +41,14 @@ def panel_seguridad(request):
         for sesion in SesionActiva.objects.filter(session_key__in=claves_vigentes, usuario=request.user)
     ]
 
+    registro_auditoria = RegistroAuditoria.objects.select_related('actor')[:50]
+
     return render(request, 'seguridad.html', {
         'configuracion': configuracion,
         'dispositivos': dispositivos,
+        'registro_auditoria': registro_auditoria,
     })
+
 
 @vista_dashboard
 @require_POST
@@ -64,8 +72,15 @@ def guardar_configuracion_seguridad(request):
         'deteccion_inactividad_activa', 'minutos_inactividad', 'fecha_actualizacion',
     ])
 
+    estado = 'activada' if configuracion.deteccion_inactividad_activa else 'desactivada'
+    registrar_auditoria(
+        request, 'config_seguridad',
+        f'Detección de inactividad {estado} ({configuracion.minutos_inactividad} min).',
+    )
+
     messages.success(request, 'Configuración de seguridad actualizada.')
     return redirect('panel_seguridad')
+
 
 @vista_dashboard
 @require_POST
@@ -83,6 +98,8 @@ def cerrar_sesion_remota(request, session_key):
 
     Session.objects.filter(session_key=session_key).delete()
     SesionActiva.objects.filter(session_key=session_key).delete()
+
+    registrar_auditoria(request, 'sesion_cerrada_remota', 'Cerró una sesión en otro dispositivo propio.')
 
     messages.success(request, 'Sesión cerrada en ese dispositivo.')
     return redirect('panel_seguridad')

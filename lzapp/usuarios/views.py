@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
 from seguridad.decorators import vista_dashboard
+from seguridad.utils import registrar_auditoria
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -408,6 +409,11 @@ def registro_empleado(request):
                 rol='empleado'
             )
 
+            registrar_auditoria(
+                request, 'empleado_registrado',
+                f'Registró al empleado "{usuario.username}" (id {usuario.id}).',
+            )
+
             messages.success(
                 request,
                 'Empleado registrado correctamente.'
@@ -526,10 +532,45 @@ def eliminar_usuario(
 
     usuario.delete()
 
+    registrar_auditoria(request, 'usuario_eliminado', f'Eliminó al usuario "{nombre}" (id {id}).')
+
     messages.success(
         request,
         f'El usuario "{nombre}" fue eliminado correctamente.'
     )
+
+    return redirect('Usuario')
+
+
+@vista_dashboard
+@require_POST
+def eliminar_usuarios_multiple(request):
+
+    ids = request.POST.getlist('usuarios_seleccionados')
+
+    if not ids:
+        messages.error(request, 'No seleccionaste ningún usuario.')
+        return redirect('Usuario')
+
+    usuarios_qs = User.objects.filter(id__in=ids).exclude(id=request.user.id)
+    nombres = list(usuarios_qs.values_list('username', flat=True))
+
+    if not nombres:
+        messages.error(request, 'No puedes eliminar tu propia cuenta.')
+        return redirect('Usuario')
+
+    usuarios_qs.delete()
+
+    registrar_auditoria(
+        request, 'usuarios_eliminados_multiple',
+        f'Eliminó {len(nombres)} usuario(s) en lote: {", ".join(nombres)}.',
+    )
+
+    omitido_propio = str(request.user.id) in ids
+    mensaje = f'Se eliminaron {len(nombres)} usuario(s) correctamente.'
+    if omitido_propio:
+        mensaje += ' Tu propia cuenta fue omitida.'
+    messages.success(request, mensaje)
 
     return redirect('Usuario')
 

@@ -13,6 +13,22 @@
 </a>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+.barra-eliminar-multiple{
+    display:none;
+    align-items:center; justify-content:space-between;
+    gap:12px; margin:0 20px 14px;
+    padding:10px 16px;
+    background:rgba(220,53,69,.08);
+    border:1px solid rgba(220,53,69,.3);
+    border-radius:12px;
+    font-size:13px; color:var(--text-primary);
+}
+.barra-eliminar-multiple.visible{ display:flex; }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- ===== Stat cards: cantidad / activos / inactivos ===== -->
@@ -128,10 +144,18 @@
 <!-- ===== Bloque tipo lista (mismo patrón que Productos) ===== -->
 <div class="bloque-productos">
 
+    <div id="barra-eliminar-multiple" class="barra-eliminar-multiple">
+        <span><strong id="contador-seleccionados">0</strong> usuario(s) seleccionado(s)</span>
+        <button type="button" class="dash-btn dash-btn-danger" id="btn-eliminar-seleccionados">
+            <i class="bi bi-trash3-fill"></i> Eliminar seleccionados
+        </button>
+    </div>
+
     <div style="padding: 4px 20px 20px; overflow-x:auto;">
         <table class="dash-table">
             <thead>
                 <tr>
+                    <th style="width:36px;"><input type="checkbox" id="chk-seleccionar-todos" title="Seleccionar todos"></th>
                     <th>ID</th>
                     <th>Usuario</th>
                     <th>Email</th>
@@ -144,6 +168,11 @@
             <tbody>
                 {% for usuario in usuarios %}
                 <tr>
+                    <td>
+                        {% if usuario != request.user %}
+                            <input type="checkbox" class="chk-usuario-fila" value="{{ usuario.id }}" data-username="{{ usuario.username }}">
+                        {% endif %}
+                    </td>
                     <td class="muted">#{{ usuario.id }}</td>
                     <td style="font-weight:600;">{{ usuario.username }}</td>
                     <td class="muted">{{ usuario.email|default:"Sin correo registrado" }}</td>
@@ -173,7 +202,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="estado-vacio">
                             <i class="bi bi-people"></i>
                             <h6 class="mt-3 mb-0">No hay usuarios registrados</h6>
@@ -185,6 +214,10 @@
             </tbody>
         </table>
     </div>
+
+    <form id="form-eliminar-multiple" method="post" action="{% url 'eliminar_usuarios_multiple' %}" style="display:none;">
+        {% csrf_token %}
+    </form>
 
     <!-- ===== Paginación ===== -->
     {% if usuarios.paginator.num_pages > 1 %}
@@ -211,4 +244,57 @@
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const chkTodos = document.getElementById('chk-seleccionar-todos');
+    const filas = Array.from(document.querySelectorAll('.chk-usuario-fila'));
+    const barra = document.getElementById('barra-eliminar-multiple');
+    const contador = document.getElementById('contador-seleccionados');
+    const btnEliminar = document.getElementById('btn-eliminar-seleccionados');
+    const formEliminar = document.getElementById('form-eliminar-multiple');
+
+    function actualizarBarra() {
+        const seleccionados = filas.filter((f) => f.checked);
+        contador.textContent = seleccionados.length;
+        barra.classList.toggle('visible', seleccionados.length > 0);
+        if (chkTodos) {
+            chkTodos.checked = filas.length > 0 && seleccionados.length === filas.length;
+        }
+    }
+
+    filas.forEach((f) => f.addEventListener('change', actualizarBarra));
+
+    if (chkTodos) {
+        chkTodos.addEventListener('change', () => {
+            filas.forEach((f) => { f.checked = chkTodos.checked; });
+            actualizarBarra();
+        });
+    }
+
+    if (btnEliminar) {
+        btnEliminar.addEventListener('click', () => {
+            const seleccionados = filas.filter((f) => f.checked);
+            if (!seleccionados.length) return;
+
+            const nombres = seleccionados.map((f) => f.dataset.username).join(', ');
+            if (!confirm(`¿Desea eliminar a ${seleccionados.length} usuario(s)? (${nombres})`)) return;
+
+            formEliminar.querySelectorAll('input[name="usuarios_seleccionados"]').forEach((el) => el.remove());
+            seleccionados.forEach((f) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'usuarios_seleccionados';
+                input.value = f.value;
+                formEliminar.appendChild(input);
+            });
+            formEliminar.submit();
+        });
+    }
+
+    actualizarBarra();
+})();
+</script>
 {% endblock %}

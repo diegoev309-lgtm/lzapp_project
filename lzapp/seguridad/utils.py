@@ -1,5 +1,7 @@
 from dashboard.models import ConfiguracionSeguridad
 
+from .models import RegistroAuditoria
+
 
 def obtener_ip_cliente(request):
     #"""
@@ -60,3 +62,19 @@ def obtener_configuracion():
         defaults={'deteccion_inactividad_activa': True, 'minutos_inactividad': 15},
     )
     return config
+
+
+def registrar_auditoria(request, accion, descripcion):
+    #"""
+    #Deja constancia en RegistroAuditoria de una acción sensible del panel
+    #(quién, qué, cuándo, desde qué IP). Se llama explícitamente desde cada
+    #vista que hace algo irreversible o que cambia el acceso de otra
+    #cuenta — no es un middleware genérico a propósito, para no terminar
+    #logueando clics sin valor.
+    #"""
+    RegistroAuditoria.objects.create(
+        actor=request.user if request.user.is_authenticated else None,
+        accion=accion,
+        descripcion=descripcion,
+        direccion_ip=obtener_ip_cliente(request),
+    )

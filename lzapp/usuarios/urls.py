@@ -13,6 +13,7 @@ urlpatterns = [
     path('Usuario', views.Usuarios, name="Usuario"),
     path('registro-empleado/', views.registro_empleado, name='registro_empleado'),
     path('usuarios/eliminar/<int:id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/eliminar-multiple/', views.eliminar_usuarios_multiple, name='eliminar_usuarios_multiple'),
     path('usuarios/editar/<int:id>/', views.editar_usuario, name='editar_usuario'),
     path('api/estadisticas-usuarios/', views.api_estadisticas_usuarios, name='api_estadisticas_usuarios'),
 
