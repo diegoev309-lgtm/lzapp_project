@@ -1,0 +1,93 @@
+/* ============================================================
+   ÍCONOS ANIMADOS COMPARTIDOS — dibujados en SVG propio (nada de
+   emoji ni de fuente de íconos metida en una burbuja). Los usan
+   pedidos.html (admin), mi_pedido_seguimiento.js (cliente) y
+   mis_entregas.html (repartidor) a través de mapa_iconos.js.
+
+   Los SVG se insertan tal cual como HTML de un L.divIcon, así que
+   estas reglas no están scopeadas a ningún contenedor — los nombres
+   sí lo están (prefijo mi-), para no chocar con nada más del sitio.
+   ============================================================ */
+
+.mi-svg{ overflow: visible; display: block; }
+
+/* ---- Destino del cliente: pin que cae + radar en la base ---- */
+.mi-pin-grupo{
+    transform-origin: 20px 41px;
+    animation: miPinCaer 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes miPinCaer{
+    from{ transform: translateY(-14px) scale(0.7); opacity: 0; }
+    to{ transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.mi-pin-cuerpo{ fill: #e2402d; }
+.mi-pin-nucleo{ fill: #fff; }
+.mi-pin-casa{ fill: #e2402d; }
+
+.mi-radar{
+    fill: none;
+    stroke: #e2402d;
+    stroke-width: 2;
+    transform-origin: 20px 41px;
+    animation: miRadarPulso 2s ease-out infinite;
+}
+.mi-radar-2{ animation-delay: 1s; }
+@keyframes miRadarPulso{
+    0%{ transform: scale(0.4); opacity: 0.8; }
+    100%{ transform: scale(2.6); opacity: 0; }
+}
+
+/* ---- Repartidor: burbuja con scooter, líneas de movimiento y halo ---- */
+.mi-rep-halo{
+    fill: none;
+    stroke: rgba(240, 217, 138, 0.55);
+    stroke-width: 2;
+    transform-origin: 22px 22px;
+    animation: miRepHalo 1.8s ease-out infinite;
+}
+@keyframes miRepHalo{
+    0%{ transform: scale(0.85); opacity: 0.9; }
+    100%{ transform: scale(1.35); opacity: 0; }
+}
+
+.mi-rep-fondo{
+    fill: #022C63;
+    stroke: #f0d98a;
+    stroke-width: 1.5;
+}
+
+.mi-rep-scooter{
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: miRepFlotar 1.2s ease-in-out infinite;
+}
+@keyframes miRepFlotar{
+    0%, 100%{ transform: translateY(0) rotate(-4deg); }
+    50%{ transform: translateY(-2.5px) rotate(4deg); }
+}
+
+.mi-rep-lineas line{
+    animation: miRepVelocidad 0.9s ease-in-out infinite;
+    transform-box: fill-box;
+}
+.mi-rep-lineas line:nth-child(1){ animation-delay: 0s; }
+.mi-rep-lineas line:nth-child(2){ animation-delay: 0.15s; }
+.mi-rep-lineas line:nth-child(3){ animation-delay: 0.3s; }
+@keyframes miRepVelocidad{
+    0%{ transform: translateX(4px); opacity: 0; }
+    40%{ opacity: 1; }
+    100%{ transform: translateX(-3px); opacity: 0; }
+}
+
+/* ---- Mi propia posición (vista del repartidor): punto con halo ---- */
+.mi-yo-nucleo{ fill: #1a8f4f; stroke: #fff; stroke-width: 2; }
+.mi-yo-halo{
+    fill: rgba(26, 143, 79, 0.3);
+    transform-origin: 12px 12px;
+    animation: miYoPulso 1.6s ease-out infinite;
+}
+@keyframes miYoPulso{
+    0%{ transform: scale(0.5); opacity: 0.8; }
+    100%{ transform: scale(1.6); opacity: 0; }
+}

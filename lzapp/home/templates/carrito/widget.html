@@ -1,4 +1,4 @@
-{% load static %}
+{% load static l10n %}
 {% load producto_extras %}
 
 <style>
@@ -526,10 +526,15 @@
 
 <script>
   {% if perfil_latitud and perfil_longitud %}
-    document.getElementById('cliente_latitud').value = "{{ perfil_latitud }}";
-    document.getElementById('cliente_longitud').value = "{{ perfil_longitud }}";
-    document.getElementById('textoUbicacionTrigger').textContent = 'Ubicación de entrega guardada';
+    // El cliente ya registró su ubicación (en el registro o en su perfil):
+    // el botón deja de pedirla y pasa a ofrecer editarla.
+    // unlocalize: sin esto Django escribe "6,244200" (coma decimal de es-co)
+    // y parseFloat() lo corta en la coma, mandando la entrega a otro lugar.
+    document.getElementById('cliente_latitud').value = "{{ perfil_latitud|unlocalize }}";
+    document.getElementById('cliente_longitud').value = "{{ perfil_longitud|unlocalize }}";
+    document.getElementById('textoUbicacionTrigger').textContent = 'Editar ubicación de entrega';
     document.getElementById('btnAbrirUbicacion').classList.add('ubicacion-lista');
+    document.getElementById('btnAbrirUbicacion').querySelector('i').className = 'bi bi-pencil-square';
   {% endif %}
 
   const mp = new MercadoPago('{{ MP_PUBLIC_KEY }}', { locale: 'es-CO' });

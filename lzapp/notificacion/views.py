@@ -3,6 +3,8 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
+from django.utils.timesince import timesince
 from django.views.decorators.http import require_POST
 
 from dashboard.models import Notificacion
@@ -64,6 +66,32 @@ def marcar_todas_leidas(request):
 # Vistas para el cliente (no staff): mismo historial, pero sin el
 # gate de @vista_dashboard, que exige is_staff/is_superuser.
 # =========================================================
+
+@login_required
+def api_notificaciones(request):
+    """Notificaciones recientes del usuario logueado, para que la campana
+    se actualice sola sin recargar la página. Sirve para los tres roles:
+    cliente, admin y repartidor — cada uno ve solo lo suyo."""
+    notificaciones = Notificacion.objects.filter(
+        _notificaciones_del_usuario(request)
+    ).order_by('-fecha_creacion')
+
+    recientes = [{
+        'id': n.id,
+        'titulo': n.titulo,
+        'mensaje': n.mensaje,
+        'tipo': n.tipo,
+        'icono': n.icono,
+        'url': n.url or '',
+        'leida': n.leida,
+        'hace': timesince(n.fecha_creacion, timezone.now()),
+    } for n in notificaciones[:8]]
+
+    return JsonResponse({
+        'no_leidas': notificaciones.filter(leida=False).count(),
+        'notificaciones': recientes,
+    })
+
 
 @login_required
 def mis_notificaciones(request):

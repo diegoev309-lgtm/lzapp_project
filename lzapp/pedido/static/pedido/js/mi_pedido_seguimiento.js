@@ -5,21 +5,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const cajaMapa = document.getElementById('mapaSeguimiento');
     if (!cajaMapa) return;
 
-    const mapa = L.map('mapaSeguimiento').setView(CENTRO_DEFECTO, 13);
+    // El botón "salir" vive arriba a la izquierda y el badge de estado
+    // arriba centrado — el control de zoom se pasa a la derecha para no
+    // chocar con ninguno de los dos.
+    const mapa = L.map('mapaSeguimiento', { zoomControl: false }).setView(CENTRO_DEFECTO, 13);
+    L.control.zoom({ position: 'topright' }).addTo(mapa);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
     }).addTo(mapa);
     const capaMarcadores = L.layerGroup().addTo(mapa);
-
-    function iconoEmoji(emoji) {
-        return L.divIcon({
-            html: `<span style="font-size:24px; line-height:1;">${emoji}</span>`,
-            className: '',
-            iconSize: [26, 26],
-            iconAnchor: [13, 13],
-        });
-    }
 
     function decodificarPolyline(codificada) {
         let index = 0, lat = 0, lng = 0;
@@ -68,7 +63,51 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    const TEXTO_BADGE = {
+        pendiente: 'Confirmado',
+        preparando: 'Preparando tu pedido',
+        en_camino: 'En camino hacia ti',
+        entregado: 'Entregado',
+        cancelado: 'Cancelado',
+    };
+    const ICONO_BADGE = {
+        pendiente: 'bi-check-lg',
+        preparando: 'bi-egg-fried',
+        en_camino: 'bi-scooter',
+        entregado: 'bi-house-check-fill',
+        cancelado: 'bi-x-circle-fill',
+    };
+
+    function actualizarBadge(estado) {
+        const badge = document.getElementById('mpsBadgeEstado');
+        if (!badge) return;
+        badge.className = 'mps-badge-estado ' + estado;
+        document.getElementById('mpsBadgeTexto').textContent = TEXTO_BADGE[estado] || estado;
+        document.getElementById('mpsBadgeIcono').className = 'bi ' + (ICONO_BADGE[estado] || 'bi-info-circle-fill');
+    }
+
     let huboDatosAlgunaVez = false;
+    let modalPreparacionMostrado = false;
+
+    const modalFondo = document.getElementById('mpsModalFondo');
+    const btnCerrarModal = document.getElementById('mpsModalCerrar');
+    if (btnCerrarModal) {
+        btnCerrarModal.addEventListener('click', () => modalFondo.classList.remove('abierto'));
+    }
+    if (modalFondo) {
+        modalFondo.addEventListener('click', (e) => {
+            if (e.target === modalFondo) modalFondo.classList.remove('abierto');
+        });
+    }
+
+    function mostrarModalPreparacion(minutos) {
+        // Se muestra una sola vez por visita, apenas el pedido entra en
+        // preparación: no tiene sentido interrumpir en cada refresco.
+        if (modalPreparacionMostrado || !modalFondo) return;
+        document.getElementById('mpsModalMinutos').textContent = minutos ?? '—';
+        modalFondo.classList.add('abierto');
+        modalPreparacionMostrado = true;
+    }
 
     async function cargarSeguimiento() {
         try {
@@ -87,6 +126,22 @@ document.addEventListener('DOMContentLoaded', function () {
             huboDatosAlgunaVez = true;
 
             actualizarTimeline(pedido.estado);
+            actualizarBadge(pedido.estado);
+
+            if (pedido.estado === 'preparando') {
+                mostrarModalPreparacion(datos.minutos_preparacion);
+            }
+
+            const bloqueCodigo = document.getElementById('mpsCodigo');
+            if (bloqueCodigo) {
+                if (pedido.codigo_entrega && pedido.estado === 'en_camino') {
+                    document.getElementById('mpsCodigoValor').textContent =
+                        pedido.codigo_entrega.split('').join(' ');
+                    bloqueCodigo.style.display = 'block';
+                } else {
+                    bloqueCodigo.style.display = 'none';
+                }
+            }
 
             const infoRepartidor = document.getElementById('mpsInfoRepartidor');
             const repartidorNombre = document.getElementById('mpsRepartidorNombre');
@@ -108,21 +163,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 infoDistancia.style.display = 'none';
             }
 
+            const avisoIncidencia = document.getElementById('mpsIncidencia');
+            if (pedido.incidencia) {
+                document.getElementById('mpsIncidenciaTexto').textContent = pedido.incidencia;
+                avisoIncidencia.style.display = 'flex';
+            } else {
+                avisoIncidencia.style.display = 'none';
+            }
+
             const vacio = document.getElementById('mapaSeguimientoVacio');
             capaMarcadores.clearLayers();
 
+            // El mapa nunca se esconde (display:none le rompe la medida a
+            // Leaflet); el aviso de "sin ubicación" flota encima con su
+            // propia clase, tapándolo sin desmontarlo.
             if (!pedido.cliente_latitud || !pedido.cliente_longitud) {
-                cajaMapa.style.display = 'none';
-                vacio.style.display = 'block';
+                vacio.classList.add('visible');
+                mapa.invalidateSize();
                 return;
             }
-            cajaMapa.style.display = 'block';
-            vacio.style.display = 'none';
+            vacio.classList.remove('visible');
 
             const puntos = [];
 
             const marcadorCliente = L.marker([pedido.cliente_latitud, pedido.cliente_longitud], {
-                icon: iconoEmoji('📍'),
+                icon: crearIconoDestino(),
             }).bindPopup('Tu dirección de entrega');
             capaMarcadores.addLayer(marcadorCliente);
             puntos.push([pedido.cliente_latitud, pedido.cliente_longitud]);
@@ -132,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? `${pedido.distancia_km} km · ${pedido.tiempo_estimado_min ?? '—'} min restantes`
                     : 'En camino hacia ti';
                 const marcadorRepartidor = L.marker([pedido.repartidor_latitud, pedido.repartidor_longitud], {
-                    icon: iconoEmoji('🚚'),
+                    icon: crearIconoRepartidor(),
                 }).bindPopup(`<b>${pedido.repartidor || 'Repartidor'}</b><br>${detalle}`);
                 capaMarcadores.addLayer(marcadorRepartidor);
                 puntos.push([pedido.repartidor_latitud, pedido.repartidor_longitud]);

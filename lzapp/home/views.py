@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q, Avg, Count, OuterRef, Subquery, Value, IntegerField
@@ -8,6 +10,8 @@ from django.views.decorators.cache import never_cache
 from dashboard.models import Producto, Calificacion, TiradaDiaria, PerfilEmple
 from carrito.logic import limpiar_premios_invalidos_del_carrito, premio_ya_en_carrito
 from descuentos.services import obtener_premio_activo_para_home, obtener_producto_ids_con_premio_activo
+
+logger = logging.getLogger(__name__)
 
 
 def _redirigir_segun_rol(usuario):
@@ -189,6 +193,24 @@ def carro(request):
     if status_mp:
         if status_mp == "approved":
             pago_status = "exitoso"
+
+            # Respaldo del webhook: si Mercado Pago no logró notificarnos
+            # (el túnel público puede estar caído), la venta se registra
+            # aquí mismo cuando el cliente vuelve de pagar. Es idempotente,
+            # así que si el webhook sí llegó, esto no duplica nada.
+            if payment_id:
+                from carrito.views import registrar_pago_aprobado
+                coords = (
+                    request.session.get("entrega_lat"),
+                    request.session.get("entrega_lng"),
+                )
+                try:
+                    registrar_pago_aprobado(str(payment_id), coords_respaldo=coords)
+                except Exception:
+                    # Si falla (MP caído, red, etc.) no rompemos la pantalla
+                    # de "pago exitoso": el webhook puede registrarla después.
+                    logger.exception("No se pudo registrar el pago %s al volver de MP", payment_id)
+
             comprados = request.session.pop("mp_items_comprados", [])
             carro = request.session.get("carro", {})
             for pid in comprados:

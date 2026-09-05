@@ -639,12 +639,70 @@
         if (btnTodas) {
             btnTodas.addEventListener('click', (e) => {
                 e.stopPropagation();
-                peticionPost(urlMarcarTodas).then(() => {
-                    // Refresca la página para reflejar el estado "leídas" en el menú.
-                    window.location.reload();
+                peticionPost(urlMarcarTodas).then(refrescarNotificaciones);
+            });
+        }
+
+        // La campana se refresca sola: cuando entra un pedido a preparar,
+        // el aviso le aparece al admin (y al repartidor) sin recargar.
+        const lista = menu.querySelector('.dash-notif-lista');
+        const disparador = trigger;
+
+        function enlazarItems() {
+            menu.querySelectorAll('.dash-notif-item').forEach((item) => {
+                item.addEventListener('click', (e) => {
+                    const id = item.dataset.id;
+                    if (item.getAttribute('href') === '#') e.preventDefault();
+                    if (id && urlMarcarLeidaPlantilla) {
+                        peticionPost(urlMarcarLeidaPlantilla.replace('/0/', '/' + id + '/'));
+                    }
                 });
             });
         }
+
+        async function refrescarNotificaciones() {
+            try {
+                const respuesta = await fetch("{% url 'api_notificaciones' %}");
+                const datos = await respuesta.json();
+
+                let punto = disparador.querySelector('.dot');
+                if (datos.no_leidas > 0 && !punto) {
+                    punto = document.createElement('span');
+                    punto.className = 'dot';
+                    disparador.appendChild(punto);
+                } else if (datos.no_leidas === 0 && punto) {
+                    punto.remove();
+                }
+
+                if (!lista) return;
+
+                if (datos.notificaciones.length === 0) {
+                    lista.innerHTML = `
+                        <div class="dash-notif-vacio">
+                            <i class="bi bi-bell-slash"></i>
+                            <p>No tienes notificaciones por ahora.</p>
+                        </div>`;
+                } else {
+                    lista.innerHTML = datos.notificaciones.map(n => `
+                        <a href="${n.url || '#'}"
+                           class="dash-notif-item tipo-${n.tipo} ${n.leida ? '' : 'no-leida'}"
+                           data-id="${n.id}">
+                            <i class="bi ${n.icono}"></i>
+                            <div class="dash-notif-item-texto">
+                                ${n.titulo ? `<strong>${n.titulo}</strong>` : ''}
+                                <p>${n.mensaje}</p>
+                                <span class="dash-notif-item-fecha">${n.hace} atrás</span>
+                            </div>
+                        </a>`).join('');
+                }
+
+                enlazarItems();
+            } catch (error) {
+                console.error('Error refrescando notificaciones:', error);
+            }
+        }
+
+        setInterval(refrescarNotificaciones, 15000);
     })();
 
     // Toasts: se autodestruyen solos y también se pueden cerrar a mano

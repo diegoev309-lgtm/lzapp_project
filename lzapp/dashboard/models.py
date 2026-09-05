@@ -5,7 +5,7 @@ from django.db import models
 from datetime import timedelta
 from decimal import Decimal
 from django.utils import timezone
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 
 import random
 import string
@@ -258,9 +258,18 @@ class Pedido(models.Model):
         max_length=255, blank=True, null=True,
         help_text='Problema reportado en el pedido (retraso, producto dañado, cliente ausente, etc.)'
     )
+    minutos_extra_incidencia = models.PositiveIntegerField(
+        default=0,
+        help_text='Demora extra por la incidencia. Se suma al tiempo estimado que ve el cliente.'
+    )
     notificado_proximidad = models.BooleanField(
-        default=False, 
+        default=False,
         help_text='Evita mandar la notificación de "está cerca" más de una vez'
+    )
+    codigo_entrega = models.CharField(
+        max_length=4, blank=True, null=True,
+        help_text='PIN de 4 dígitos que el cliente muestra y el repartidor '
+                   'escribe para confirmar que entregó el pedido correcto.'
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -277,52 +286,108 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender=Venta)
 def crear_pedido_automatico(sender, instance, created, **kwargs):
-    """Cada Venta nueva obtiene automáticamente su Pedido de seguimiento."""
-    if created:
-        Pedido.objects.get_or_create(venta=instance)
-        from django.utils import timezone
+    """Cada Venta nueva obtiene automáticamente su Pedido de seguimiento.
+
+    El pedido nace con la ubicación que el cliente tiene registrada en su
+    perfil: así ningún pedido queda sin destino aunque el checkout no haya
+    alcanzado a mandar el pin (y sin destino no se puede asignar
+    repartidor, ni calcular ruta, ni dibujar nada en el mapa). Si el
+    checkout sí manda un pin, después lo sobreescribe con ese.
+    """
+    if not created:
+        return
+
+    perfil = Perfil.objects.filter(usuario=instance.usuario).first()
+    valores = {}
+    if perfil and perfil.latitud and perfil.longitud:
+        valores = {
+            'cliente_latitud': perfil.latitud,
+            'cliente_longitud': perfil.longitud,
+            'direccion_entrega': perfil.direccion,
+        }
+
+    Pedido.objects.get_or_create(venta=instance, defaults=valores)
+
+
 from datetime import timedelta
 from pedido.services import obtener_repartidor_mas_cercano, obtener_ruta_completa
+
+
+def _repartidor_menos_cargado():
+    """Repartidor disponible con menos entregas activas encima.
+
+    Es el plan B de la asignación: se usa cuando nadie tiene GPS reciente.
+    Antes, sin este respaldo, un pedido no se le asignaba a nadie hasta que
+    algún repartidor abriera la app y empezara a compartir ubicación — es
+    decir, el pedido se quedaba trabado esperando algo que el repartidor no
+    tenía por qué haber hecho todavía.
+    """
+    activos = Count(
+        'empleado__entregas_asignadas',
+        filter=Q(empleado__entregas_asignadas__estado__in=[
+            Pedido.Estado.PREPARANDO, Pedido.Estado.EN_CAMINO,
+        ]),
+    )
+    return (PerfilEmple.objects
+            .filter(rol='empleado', disponible=True)
+            .select_related('empleado')
+            .annotate(entregas_activas=activos)
+            .order_by('entregas_activas', 'id')
+            .first())
 
 
 @receiver(post_save, sender=Pedido)
 def asignar_repartidor_automatico(sender, instance, created, **kwargs):
     """Cuando el pedido pasa a 'preparando' y aún no tiene repartidor,
-    busca automáticamente al disponible más cercano al cliente."""
+    busca automáticamente al disponible más cercano al cliente. Si ninguno
+    tiene ubicación reciente, igual se lo asigna al menos cargado: la ruta
+    y el tiempo se calculan después, apenas ese repartidor comparta su GPS."""
     if instance.estado != Pedido.Estado.PREPARANDO or instance.repartidor_id:
         return
-    if not instance.cliente_latitud or not instance.cliente_longitud:
+
+    mejor = distancia_km = tiempo_min = None
+    tiene_destino = bool(instance.cliente_latitud and instance.cliente_longitud)
+
+    if tiene_destino:
+        limite = timezone.now() - timedelta(minutes=15)
+        candidatos = PerfilEmple.objects.filter(
+            rol='empleado',
+            disponible=True,
+            ubicacion_actualizada__gte=limite,
+            repartidor_latitud__isnull=False,
+            repartidor_longitud__isnull=False,
+        ).select_related('empleado')
+
+        mejor, distancia_km, tiempo_min = obtener_repartidor_mas_cercano(
+            instance.cliente_latitud, instance.cliente_longitud, candidatos
+        )
+
+    if not mejor:
+        mejor = _repartidor_menos_cargado()
+        distancia_km = tiempo_min = None
+
+    if not mejor:
         return
 
-    limite = timezone.now() - timedelta(minutes=15)
-    candidatos = PerfilEmple.objects.filter(
-        rol='empleado',
-        disponible=True,
-        ubicacion_actualizada__gte=limite,
-        repartidor_latitud__isnull=False,
-        repartidor_longitud__isnull=False,
-    ).select_related('empleado')
+    instance.repartidor = mejor.empleado
 
-    mejor, distancia_km, tiempo_min = obtener_repartidor_mas_cercano(
-        instance.cliente_latitud, instance.cliente_longitud, candidatos
-    )
-
-    if mejor:
-        instance.repartidor = mejor.empleado
-        instance.distancia_km = round(distancia_km, 2) if distancia_km else None
-        if tiempo_min:
-            instance.tiempo_estimado_min = tiempo_min
-
-        # Pedimos la geometría de la ruta solo para el repartidor ya elegido
-        # (una petición extra a OSRM, pero ocurre una sola vez por asignación,
-        # no en cada ping de GPS).
-        _, _, polyline = obtener_ruta_completa(
+    # Pedimos la geometría de la ruta solo para el repartidor ya elegido
+    # (una petición extra a OSRM, pero ocurre una sola vez por asignación,
+    # no en cada ping de GPS). Esa misma respuesta trae distancia y tiempo,
+    # así que los tomamos de ahí en vez de descartarlos.
+    if tiene_destino and mejor.repartidor_latitud and mejor.repartidor_longitud:
+        distancia_ruta, tiempo_ruta, polyline = obtener_ruta_completa(
             instance.cliente_latitud, instance.cliente_longitud,
             mejor.repartidor_latitud, mejor.repartidor_longitud,
         )
         instance.ruta_polyline = polyline
+        distancia_km = distancia_ruta if distancia_ruta is not None else distancia_km
+        tiempo_min = tiempo_ruta if tiempo_ruta is not None else tiempo_min
 
-        instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min', 'ruta_polyline'])
+    instance.distancia_km = round(distancia_km, 2) if distancia_km else None
+    instance.tiempo_estimado_min = tiempo_min
+
+    instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min', 'ruta_polyline'])
 
 # =========================================================
 # #Tabla de pedidos con un hostorial
@@ -349,6 +414,13 @@ def registrar_historial_estado(sender, instance, created, **kwargs):
     if created or not ultimo or ultimo.estado != instance.estado:
         HistorialEstadoPedido.objects.create(pedido=instance, estado=instance.estado)
 
+        # Apenas sale a ruta se genera el PIN que el cliente le muestra al
+        # repartidor para confirmar la entrega. Se genera una sola vez por
+        # pedido (si ya lo tenía, por ejemplo al reabrirlo, se conserva).
+        if instance.estado == Pedido.Estado.EN_CAMINO and not instance.codigo_entrega:
+            instance.codigo_entrega = f'{random.randint(0, 9999):04d}'
+            instance.save(update_fields=['codigo_entrega'])
+
 MENSAJES_ESTADO_CLIENTE = {
     Pedido.Estado.PREPARANDO: ('Tu pedido está en preparación 👨‍🍳', 'info'),
     Pedido.Estado.EN_CAMINO:  ('¡Tu pedido salió para entrega! 🚚', 'info'),
@@ -357,24 +429,57 @@ MENSAJES_ESTADO_CLIENTE = {
 }
 
 @receiver(post_save, sender=HistorialEstadoPedido)
-def notificar_cliente_cambio_estado(sender, instance, created, **kwargs):
+def notificar_cambio_estado(sender, instance, created, **kwargs):
     """Cada fila nueva del historial (o sea, cada cambio real de estado)
-    genera una notificación para el cliente dueño del pedido."""
+    avisa a los tres lados del pedido: el cliente que lo espera, el admin
+    que lo tiene que preparar y el repartidor que lo va a llevar."""
     if not created:
         return
 
+    pedido = instance.pedido
     datos = MENSAJES_ESTADO_CLIENTE.get(instance.estado)
     if not datos:
         return
 
     mensaje, tipo = datos
+    minutos = obtener_configuracion_entrega().minutos_preparacion
+
+    # --- Cliente ---
+    detalle_tiempo = ''
+    if instance.estado == Pedido.Estado.PREPARANDO:
+        detalle_tiempo = f' Tiempo estimado de preparación: {minutos} min.'
+
     Notificacion.objects.create(
-        usuario=instance.pedido.venta.usuario,
+        usuario=pedido.venta.usuario,
         titulo='Actualización de tu pedido',
-        mensaje=f'{mensaje} — Pedido #{instance.pedido_id}',
+        mensaje=f'{mensaje} — Pedido #{pedido.id}.{detalle_tiempo}',
         tipo=tipo,
-        url='/carro',  # o la url de "mis pedidos" cuando exista
+        url='/pedido/mi-pedido',
     )
+
+    if instance.estado != Pedido.Estado.PREPARANDO:
+        return
+
+    # --- Admin: le toca prepararlo ---
+    for staff in User.objects.filter(is_staff=True, is_active=True):
+        Notificacion.objects.create(
+            usuario=staff,
+            titulo='Pedido para preparar',
+            mensaje=f'El pedido #{pedido.id} entró en preparación ({minutos} min estimados).',
+            tipo='warning',
+            url='/pedido/Pedidos',
+        )
+
+    # --- Repartidor asignado: que sepa que ya se está preparando lo suyo ---
+    if pedido.repartidor_id:
+        Notificacion.objects.create(
+            usuario_id=pedido.repartidor_id,
+            titulo='Entrega asignada',
+            mensaje=(f'El pedido #{pedido.id} se está preparando '
+                     f'({minutos} min estimados). Prepárate para salir.'),
+            tipo='info',
+            url='/pedido/mis-entregas',
+        )
 
 # =========================================================
 # #Tabla de notificaciones
@@ -694,6 +799,36 @@ class PremioRuletaDiaria(models.Model):
     def __str__(self):
         estado = 'activo' if self.activo else 'inactivo'
         return f'{self.get_codigo_display()} ({self.peso}%, {estado})'
+
+class ConfiguracionEntrega(models.Model):
+    #"""
+    #Fila única (pk=1) con los tiempos de entrega del negocio.
+    #El tiempo de preparación es general (no por pedido): es lo que la
+    #cocina tarda en dejar listo cualquier pedido, y el admin lo ajusta
+    #desde el panel de Pedidos según cómo venga el día.
+    #"""
+
+    minutos_preparacion = models.PositiveIntegerField(
+        default=20,
+        validators=[MinValueValidator(1), MaxValueValidator(600)],
+        help_text='Minutos que tarda la preparación de un pedido antes de salir a ruta.'
+    )
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'configuracion_entrega'
+
+    def __str__(self):
+        return f'Preparación: {self.minutos_preparacion} min'
+
+
+def obtener_configuracion_entrega():
+    #"""Fila única (pk=1). La crea con valores por defecto si no existe."""
+    config, _ = ConfiguracionEntrega.objects.get_or_create(
+        pk=1, defaults={'minutos_preparacion': 20},
+    )
+    return config
+
 
 class ConfiguracionSeguridad(models.Model):
     #"""

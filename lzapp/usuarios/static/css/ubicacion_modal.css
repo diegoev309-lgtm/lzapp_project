@@ -146,6 +146,19 @@
     background: var(--dorado-claro, #f0d98a);
 }
 
+/* Con el encabezado oculto, el botón de minimizar se pasa a la izquierda
+   para no encimarse con el botón de cerrar (X), que sigue arriba a la
+   derecha — y el control de zoom de Leaflet vive siempre abajo a la
+   izquierda, lejos de los dos. */
+#modalUbicacionEntrega.mapa-expandido .ubicacion-mapa-expandir{
+    top: 16px;
+    left: 16px;
+    right: auto;
+}
+#modalUbicacionEntrega.mapa-expandido .ubicacion-modal-cerrar{
+    z-index: 1002;
+}
+
 /* ---- Mapa a pantalla completa (botón de expandir) ---- */
 #modalUbicacionEntrega.mapa-expandido .modal-dialog{
     max-width: 100vw;
@@ -162,9 +175,12 @@
     display: flex;
     flex-direction: column;
 }
+/* El encabezado ("Entrega a domicilio" / "¿A dónde te lo llevamos?") se
+   quita por completo al maximizar: en pantallas chicas se comía casi un
+   cuarto del alto y dejaba menos mapa visible que en la vista normal —
+   justo lo contrario de lo que se espera de un botón "ver mapa completo". */
 #modalUbicacionEntrega.mapa-expandido .ubicacion-modal-header{
-    flex-shrink: 0;
-    padding: 1.1rem 3.5rem 1.4rem 2rem;
+    display: none;
 }
 #modalUbicacionEntrega.mapa-expandido .ubicacion-modal-cuerpo{
     flex: 1;
@@ -232,6 +248,26 @@
 }
 #modalUbicacionEntrega.mapa-expandido .ubicacion-confirmar-btn:disabled{
     display: none;
+}
+
+/* En celulares angostos, la dirección completa no entra al lado del GPS
+   y el confirmar sin recortarse ilegible ("Call..."): se apila arriba de
+   los botones en vez de compartir la fila con ellos. */
+@media (max-width: 480px){
+    #modalUbicacionEntrega.mapa-expandido .ubicacion-controles-inferiores{
+        flex-wrap: wrap;
+        justify-content: center;
+        bottom: 16px;
+        max-width: 94vw;
+    }
+    #modalUbicacionEntrega.mapa-expandido .ubicacion-estado-texto{
+        order: -1;
+        max-width: 78vw;
+        white-space: normal;
+        text-align: center;
+        flex-basis: 100%;
+        margin-bottom: 4px;
+    }
 }
 
 .ubicacion-gps-btn{

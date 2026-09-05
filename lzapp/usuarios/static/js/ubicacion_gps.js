@@ -19,6 +19,24 @@ document.addEventListener('DOMContentLoaded', function () {
     let mapa, marcador, mapaInicializado = false;
     const CENTRO_DEFECTO = [6.2442, -75.5812]; // Medellín
 
+    const latGuardada = document.getElementById('cliente_latitud').value;
+    const lngGuardada = document.getElementById('cliente_longitud').value;
+    const tieneUbicacionGuardada = Boolean(latGuardada && lngGuardada);
+
+    // Si el cliente ya registró su ubicación (en el registro o en su
+    // perfil), el botón ofrece editarla en vez de pedirla de cero.
+    if (tieneUbicacionGuardada) {
+        marcarTriggerComoListo();
+        if (btnConfirmar) btnConfirmar.disabled = false;
+    }
+
+    function marcarTriggerComoListo() {
+        if (!btnTrigger || !textoTrigger) return;
+        textoTrigger.textContent = 'Editar ubicación de entrega';
+        btnTrigger.classList.add('ubicacion-lista');
+        btnTrigger.querySelector('i').className = 'bi bi-pencil-square';
+    }
+
     // El mapa de Leaflet necesita que su contenedor sea visible para medir
     // bien el tamaño — como está dentro de un modal oculto, lo inicializamos
     // justo cuando el modal se abre por primera vez.
@@ -31,14 +49,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function inicializarMapa() {
-        mapa = L.map('mapa-ubicacion').setView(CENTRO_DEFECTO, 13);
+        // Si ya hay ubicación guardada, el mapa abre ahí en vez de en el
+        // centro de Medellín, para que se vea qué está por editar.
+        const centro = tieneUbicacionGuardada
+            ? [parseFloat(latGuardada), parseFloat(lngGuardada)]
+            : CENTRO_DEFECTO;
+
+        // El botón de expandir vive arriba a la derecha (o arriba a la
+        // izquierda al maximizar); el control de zoom se pasa abajo a la
+        // izquierda para no chocar con él.
+        mapa = L.map('mapa-ubicacion', { zoomControl: false }).setView(centro, tieneUbicacionGuardada ? 16 : 13);
+        L.control.zoom({ position: 'bottomleft' }).addTo(mapa);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             maxZoom: 19,
         }).addTo(mapa);
 
-        marcador = L.marker(CENTRO_DEFECTO, { draggable: true }).addTo(mapa);
+        marcador = L.marker(centro, { draggable: true }).addTo(mapa);
 
         marcador.on('dragend', function () {
             const pos = marcador.getLatLng();
@@ -157,9 +185,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', function () {
             if (btnTrigger && textoTrigger) {
-                textoTrigger.textContent = 'Ubicación de entrega guardada';
+                // Ya hay ubicación: el botón pasa a ser "editar", no "agregar".
+                textoTrigger.textContent = 'Editar ubicación de entrega';
                 btnTrigger.classList.add('ubicacion-lista');
-                btnTrigger.querySelector('i').className = 'bi bi-check-circle-fill';
+                btnTrigger.querySelector('i').className = 'bi bi-pencil-square';
             }
         });
     }

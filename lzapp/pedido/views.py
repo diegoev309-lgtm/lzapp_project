@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from dashboard.models import Pedido, PerfilEmple, Notificacion
-from pedido.services import obtener_distancia_km
+from dashboard.models import Pedido, PerfilEmple, Notificacion, obtener_configuracion_entrega
+from pedido.services import obtener_distancia_km, obtener_ruta_completa
 from seguridad.decorators import vista_dashboard
-from seguridad.validators import leer_decimal_acotado
+from seguridad.validators import leer_decimal_acotado, leer_entero_acotado
 
 @vista_dashboard
 def Pedidos(request):
@@ -62,17 +62,42 @@ def actualizar_ubicacion_repartidor(request):
     perfil_emple.ubicacion_actualizada = timezone.now()
     perfil_emple.save(update_fields=['repartidor_latitud', 'repartidor_longitud', 'ubicacion_actualizada'])
 
-    pedidos_en_camino = Pedido.objects.filter(
+    pedidos_activos = Pedido.objects.filter(
         repartidor=request.user,
-        estado='en_camino',
+        estado__in=['preparando', 'en_camino'],
         cliente_latitud__isnull=False,
-        notificado_proximidad=False,
-    )
-    for pedido in pedidos_en_camino:
-        distancia_km, _ = obtener_distancia_km(
-            lat, lng, pedido.cliente_latitud, pedido.cliente_longitud
-        )
-        if distancia_km <= 1:  # menos de 1 km = "está por llegar"
+    ).select_related('venta', 'venta__usuario')
+
+    for pedido in pedidos_activos:
+        campos = []
+
+        # La ruta se pide una sola vez por pedido: es el caso del pedido
+        # que se asignó cuando el repartidor todavía no compartía GPS, así
+        # que recién ahora podemos trazar por dónde tiene que ir.
+        if not pedido.ruta_polyline:
+            distancia_km, tiempo_min, polyline = obtener_ruta_completa(
+                lat, lng, pedido.cliente_latitud, pedido.cliente_longitud
+            )
+            pedido.ruta_polyline = polyline
+            campos.append('ruta_polyline')
+        else:
+            distancia_km, tiempo_min = obtener_distancia_km(
+                lat, lng, pedido.cliente_latitud, pedido.cliente_longitud
+            )
+
+        if distancia_km is not None:
+            pedido.distancia_km = round(distancia_km, 2)
+            campos.append('distancia_km')
+        if tiempo_min is not None:
+            # Si el admin registró una incidencia, el tiempo que ve el
+            # cliente incluye la demora extra de esa incidencia.
+            pedido.tiempo_estimado_min = tiempo_min + pedido.minutos_extra_incidencia
+            campos.append('tiempo_estimado_min')
+
+        if (pedido.estado == 'en_camino'
+                and not pedido.notificado_proximidad
+                and distancia_km is not None
+                and distancia_km <= 1):  # menos de 1 km = "está por llegar"
             Notificacion.objects.create(
                 usuario=pedido.venta.usuario,
                 titulo='Tu pedido está cerca',
@@ -80,7 +105,10 @@ def actualizar_ubicacion_repartidor(request):
                 tipo='info',
             )
             pedido.notificado_proximidad = True
-            pedido.save(update_fields=['notificado_proximidad'])
+            campos.append('notificado_proximidad')
+
+        if campos:
+            pedido.save(update_fields=campos)
 
     return JsonResponse({'ok': True})
 
@@ -107,6 +135,8 @@ def _serializar_pedidos_tiempo_real(pedidos):
             'repartidor': (ped.repartidor.get_full_name() or ped.repartidor.username) if ped.repartidor else None,
             'items': n_items,
             'incidencia': ped.incidencia,
+            'minutos_extra_incidencia': ped.minutos_extra_incidencia,
+            'codigo_entrega': ped.codigo_entrega,
             'direccion_entrega': ped.direccion_entrega,
             'cliente_latitud': float(ped.cliente_latitud) if ped.cliente_latitud else None,
             'cliente_longitud': float(ped.cliente_longitud) if ped.cliente_longitud else None,
@@ -136,7 +166,30 @@ def api_pedidos_tiempo_real(request):
         'cancelados': sum(1 for p in lista if p['estado'] == 'cancelado'),
     }
 
-    return JsonResponse({'pedidos': lista, 'resumen': resumen})
+    return JsonResponse({
+        'pedidos': lista,
+        'resumen': resumen,
+        'minutos_preparacion': obtener_configuracion_entrega().minutos_preparacion,
+    })
+
+
+@vista_dashboard
+@require_POST
+def actualizar_tiempo_preparacion(request):
+    """Tiempo de preparación general del negocio (no por pedido): lo que
+    tarda la cocina en dejar listo cualquier pedido. El admin lo ajusta
+    según cómo venga el día y afecta a todos los pedidos nuevos."""
+    minutos, error = leer_entero_acotado(
+        request.POST.get('minutos_preparacion'), 1, 600, 'El tiempo de preparación'
+    )
+    if error:
+        return JsonResponse({'error': error}, status=400)
+
+    config = obtener_configuracion_entrega()
+    config.minutos_preparacion = minutos
+    config.save(update_fields=['minutos_preparacion'])
+
+    return JsonResponse({'ok': True, 'minutos_preparacion': config.minutos_preparacion})
 
 
 @login_required
@@ -160,7 +213,10 @@ def mi_pedido_tiempo_real(request):
                .prefetch_related('venta__detalles')
                .order_by('-fecha_creacion'))
 
-    return JsonResponse({'pedidos': _serializar_pedidos_tiempo_real(pedidos)})
+    return JsonResponse({
+        'pedidos': _serializar_pedidos_tiempo_real(pedidos),
+        'minutos_preparacion': obtener_configuracion_entrega().minutos_preparacion,
+    })
 
 
 @login_required
@@ -178,7 +234,72 @@ def mis_entregas_tiempo_real(request):
                .prefetch_related('venta__detalles')
                .order_by('-fecha_creacion'))
 
-    return JsonResponse({'pedidos': _serializar_pedidos_tiempo_real(pedidos)})
+    return JsonResponse({
+        'pedidos': _serializar_pedidos_tiempo_real(pedidos),
+        'minutos_preparacion': obtener_configuracion_entrega().minutos_preparacion,
+    })
+
+@login_required
+@require_POST
+def actualizar_entrega_pedido(request, pedido_id):
+    """El admin ajusta el tiempo estimado y/o registra una incidencia.
+
+    El tiempo se calcula solo con OSRM, pero el admin manda: puede
+    sobreescribirlo a mano. Si registra una incidencia con demora, esos
+    minutos quedan guardados aparte y se le suman al tiempo cada vez que
+    se recalcula la ruta, en vez de perderse en el siguiente ping del GPS.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+
+    pedido = Pedido.objects.select_related('venta', 'venta__usuario').filter(id=pedido_id).first()
+    if not pedido:
+        return JsonResponse({'error': 'Pedido no encontrado'}, status=404)
+
+    campos = []
+    incidencia_nueva = False
+
+    if 'incidencia' in request.POST:
+        incidencia = (request.POST.get('incidencia') or '').strip()[:255]
+        incidencia_nueva = bool(incidencia) and incidencia != (pedido.incidencia or '')
+        pedido.incidencia = incidencia or None
+        campos.append('incidencia')
+
+    if 'minutos_extra' in request.POST:
+        minutos_extra, error = leer_entero_acotado(
+            request.POST.get('minutos_extra'), 0, 600, 'La demora extra'
+        )
+        if error:
+            return JsonResponse({'error': error}, status=400)
+
+        # La demora extra reemplaza a la anterior (no se acumula sola), pero
+        # sí se refleja en el tiempo que ve el cliente ahora mismo.
+        base = (pedido.tiempo_estimado_min or 0) - pedido.minutos_extra_incidencia
+        pedido.minutos_extra_incidencia = minutos_extra
+        pedido.tiempo_estimado_min = max(base, 0) + minutos_extra
+        campos += ['minutos_extra_incidencia', 'tiempo_estimado_min']
+
+    if not campos:
+        return JsonResponse({'error': 'No se envió nada para actualizar'}, status=400)
+
+    pedido.save(update_fields=campos)
+
+    if incidencia_nueva:
+        Notificacion.objects.create(
+            usuario=pedido.venta.usuario,
+            titulo='Novedad con tu pedido',
+            mensaje=f'{pedido.incidencia} — Pedido #{pedido.id}',
+            tipo='warning',
+            url='/pedido/mi-pedido',
+        )
+
+    return JsonResponse({
+        'ok': True,
+        'incidencia': pedido.incidencia,
+        'minutos_extra': pedido.minutos_extra_incidencia,
+        'tiempo_estimado_min': pedido.tiempo_estimado_min,
+    })
+
 
 @login_required
 @require_POST
@@ -202,3 +323,30 @@ def actualizar_estado_pedido(request, pedido_id):
         'ok': True,
         'repartidor': (pedido.repartidor.get_full_name() or pedido.repartidor.username) if pedido.repartidor else None,
     })
+
+
+@login_required
+@require_POST
+def confirmar_entrega_pedido(request, pedido_id):
+    """El repartidor cierra la entrega escribiendo el PIN de 4 dígitos que
+    el cliente le muestra en su pantalla. Es la única forma de pasar a
+    'entregado' desde el lado del repartidor — así queda constancia de que
+    entregó el pedido correcto a la persona correcta, no cualquiera."""
+    pedido = (Pedido.objects
+              .select_related('venta', 'venta__usuario')
+              .filter(id=pedido_id, repartidor=request.user)
+              .first())
+    if not pedido:
+        return JsonResponse({'error': 'No tienes esta entrega asignada'}, status=403)
+
+    if pedido.estado != Pedido.Estado.EN_CAMINO:
+        return JsonResponse({'error': 'Este pedido no está en camino'}, status=400)
+
+    codigo = (request.POST.get('codigo') or '').strip()
+    if not pedido.codigo_entrega or codigo != pedido.codigo_entrega:
+        return JsonResponse({'error': 'Código incorrecto. Confírmalo con el cliente.'}, status=400)
+
+    pedido.estado = Pedido.Estado.ENTREGADO
+    pedido.save(update_fields=['estado'])
+
+    return JsonResponse({'ok': True})

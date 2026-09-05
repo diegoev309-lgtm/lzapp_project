@@ -18,8 +18,19 @@ from django.db.models import Count
 from datetime import timedelta
 
 from dashboard.models import Venta, Perfil, PerfilEmple
+from seguridad.validators import leer_decimal_acotado
 
 from .utils import enviar_email_recuperacion, enviar_email_bienvenida
+
+
+def _coordenada(raw):
+    """Lat/lng que llega del modal del mapa. Devuelve None si viene vacía o
+    inválida — nunca a medias, porque una coordenada mal parseada manda la
+    entrega a otro lugar (en es-co puede llegar con coma decimal)."""
+    if not raw:
+        return None
+    valor, error = leer_decimal_acotado(raw, -180, 180, 'La coordenada')
+    return None if error else valor
 
 from .forms import (
     RegistroForm,
@@ -72,8 +83,8 @@ def registro(request):
             Perfil.objects.create(
                 usuario=usuario,
                 telefono=form.cleaned_data['telefono'],
-                latitud=request.POST.get('cliente_latitud') or None,
-                longitud=request.POST.get('cliente_longitud') or None,
+                latitud=_coordenada(request.POST.get('cliente_latitud')),
+                longitud=_coordenada(request.POST.get('cliente_longitud')),
             )
 
             enviar_email_bienvenida(usuario.id)
@@ -211,9 +222,9 @@ def configuracion(request):
             user_form.save()
             perfil_form.save()
 
-            lat = request.POST.get('cliente_latitud')
-            lng = request.POST.get('cliente_longitud')
-            if lat and lng:
+            lat = _coordenada(request.POST.get('cliente_latitud'))
+            lng = _coordenada(request.POST.get('cliente_longitud'))
+            if lat is not None and lng is not None:
                 perfil.latitud = lat
                 perfil.longitud = lng
                 perfil.save(update_fields=['latitud', 'longitud'])
@@ -248,6 +259,10 @@ def configuracion(request):
         {
             'user_form': user_form,
             'perfil_form': perfil_form,
+            # Para que el botón del mapa diga "editar" en vez de "agregar"
+            # cuando el cliente ya tiene una ubicación registrada.
+            'perfil_latitud': perfil.latitud,
+            'perfil_longitud': perfil.longitud,
         }
     )
 

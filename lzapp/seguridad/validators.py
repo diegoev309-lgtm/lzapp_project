@@ -21,9 +21,15 @@ def leer_entero_acotado(raw, minimo, maximo, nombre='valor'):
 
 
 def leer_decimal_acotado(raw, minimo, maximo, nombre='valor'):
-    #"""Igual que leer_entero_acotado, pero para decimales (ej. coordenadas)."""
+    #"""
+    #Igual que leer_entero_acotado, pero para decimales (ej. coordenadas).
+    #Acepta coma como separador decimal: el proyecto corre en es-co, así que
+    #un valor renderizado o tipeado como "6,244200" tiene que entenderse
+    #igual que "6.244200" — si no, se corta en la coma y la ubicación
+    #termina en otro lugar.
+    #"""
     try:
-        valor = Decimal(str(raw).strip())
+        valor = Decimal(str(raw).strip().replace(',', '.'))
     except (TypeError, ValueError, InvalidOperation):
         return None, f'{nombre} debe ser un número válido.'
 

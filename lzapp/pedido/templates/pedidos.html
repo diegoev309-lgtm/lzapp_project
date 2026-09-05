@@ -8,6 +8,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="{% static 'pedido/css/mapa_iconos.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -82,6 +83,116 @@
     .pedido-en-vivo-info{ display:flex; flex-direction:column; gap:2px; }
     .pedido-en-vivo-cliente{ font-weight:700; color:var(--text-primary); font-size:13px; }
     .pedido-en-vivo-detalle{ font-size:11.5px; color:var(--text-tertiary); }
+
+    /* ---- Tiempo de preparación general ---- */
+    .prep-control{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        flex-wrap:wrap;
+        font-size:12.5px;
+        color:var(--text-secondary);
+    }
+    .prep-control label{
+        display:flex; align-items:center; gap:6px;
+        margin:0; font-weight:700; color:var(--text-primary);
+    }
+    .prep-control input{
+        width:70px;
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--border-subtle);
+        border-radius:10px;
+        padding:6px 10px;
+        color:var(--text-primary);
+        font-size:13px;
+    }
+    .prep-control input:focus{ outline:none; border-color:var(--gold); }
+    .prep-unidad{ color:var(--text-tertiary); }
+    .prep-control button{
+        border:none; border-radius:10px;
+        padding:6px 14px;
+        background:var(--gold); color:#1A1A2E;
+        font-size:12.5px; font-weight:700; cursor:pointer;
+    }
+    .prep-control button:disabled{ opacity:.6; cursor:not-allowed; }
+    .prep-estado{ font-size:12px; color:var(--green); }
+    .prep-estado.error{ color:var(--red); }
+
+    /* ---- Botón e indicador de incidencia en la tabla ---- */
+    .btn-entrega{
+        background:rgba(255,255,255,.06);
+        border:none;
+        border-radius:10px;
+        padding:6px 10px;
+        color:var(--text-secondary);
+        font-size:12px;
+        cursor:pointer;
+        white-space:nowrap;
+        transition:.2s;
+    }
+    .btn-entrega:hover{ background:var(--gold); color:#1A1A2E; }
+    .btn-entrega.con-incidencia{ color:var(--gold); }
+    .celda-incidencia{ font-size:11.5px; color:var(--gold); margin-top:4px; }
+
+    /* ---- Modal de entrega (tiempo estimado / incidencia) ---- */
+    .entrega-modal-fondo{
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:120;
+        background:rgba(0,0,0,.55);
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    }
+    .entrega-modal-fondo.abierto{ display:flex; }
+    .entrega-modal{
+        width:100%;
+        max-width:420px;
+        background:var(--bg-panel);
+        border:1px solid var(--border-subtle);
+        border-radius:18px;
+        overflow:hidden;
+    }
+    .entrega-modal-head{
+        display:flex; align-items:center; justify-content:space-between;
+        padding:16px 18px;
+        border-bottom:1px solid var(--border-subtle);
+    }
+    .entrega-modal-head h5{ margin:0; font-size:15px; color:var(--text-primary); }
+    .entrega-modal-cerrar{
+        background:none; border:none; cursor:pointer;
+        color:var(--text-tertiary); font-size:14px;
+    }
+    .entrega-modal-cuerpo{ padding:18px; display:flex; flex-direction:column; gap:16px; }
+    .entrega-campo{ display:flex; flex-direction:column; gap:6px; }
+    .entrega-campo > span{ font-size:12.5px; font-weight:700; color:var(--text-primary); }
+    .entrega-campo input{
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--border-subtle);
+        border-radius:10px;
+        padding:10px 12px;
+        color:var(--text-primary);
+        font-size:13px;
+    }
+    .entrega-campo input:focus{ outline:none; border-color:var(--gold); }
+    .entrega-campo small{ font-size:11px; color:var(--text-tertiary); line-height:1.4; }
+    .entrega-modal-error{
+        margin:0; font-size:12px; color:var(--red); display:none;
+    }
+    .entrega-modal-error.visible{ display:block; }
+    .entrega-modal-pie{
+        display:flex; justify-content:flex-end; gap:10px;
+        padding:14px 18px;
+        border-top:1px solid var(--border-subtle);
+    }
+    .btn-entrega-cancelar, .btn-entrega-guardar{
+        border:none; border-radius:10px; padding:9px 16px;
+        font-size:13px; font-weight:700; cursor:pointer;
+    }
+    .btn-entrega-cancelar{ background:rgba(255,255,255,.06); color:var(--text-secondary); }
+    .btn-entrega-guardar{ background:var(--gold); color:#1A1A2E; }
+    .btn-entrega-guardar:disabled{ opacity:.6; cursor:not-allowed; }
 </style>
 
 <div class="pedidos-stats" id="pedidosStats">
@@ -112,6 +223,17 @@
             <i class="bi bi-geo-alt-fill"></i> Mapa en vivo
         </div>
     </div>
+
+    <!-- Tiempo de preparación general del negocio (no por pedido) -->
+    <div class="prep-control">
+        <label for="inputPreparacion">
+            <i class="bi bi-stopwatch"></i> Tiempo de preparación
+        </label>
+        <input type="number" id="inputPreparacion" min="1" max="600" step="1">
+        <span class="prep-unidad">min</span>
+        <button type="button" id="btnGuardarPreparacion">Guardar</button>
+        <span class="prep-estado" id="prepEstado"></span>
+    </div>
 </div>
 
 <div class="contenedor-productos">
@@ -138,23 +260,14 @@
                         <th>Cambiar</th>
                         <th class="d-none d-md-table-cell">Repartidor</th>
                         <th class="d-none d-lg-table-cell">Distancia / Tiempo</th>
+                        <th>Entrega</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpoTablaPedidos">
                     <tr>
-                        <td colspan="8" class="estado-vacio">
+                        <td colspan="9" class="estado-vacio">
                             <i class="bi bi-arrow-repeat display-4 text-secondary"></i>
                             <h5 class="mt-3">Cargando pedidos...</h5>
-                        </td>
-                        <td><span class="badge-estado ${p.estado}">${p.estado_display}</span></td>
-                        <td>
-                            <select class="selector-estado" data-pedido-id="${p.pedido_id}" onchange="cambiarEstadoPedido(this)">
-                                <option value="pendiente"  ${p.estado === 'pendiente'  ? 'selected' : ''}>Pendiente</option>
-                                <option value="preparando" ${p.estado === 'preparando' ? 'selected' : ''}>Preparando</option>
-                                <option value="en_camino"  ${p.estado === 'en_camino'  ? 'selected' : ''}>En camino</option>
-                                <option value="entregado"  ${p.estado === 'entregado'  ? 'selected' : ''}>Entregado</option>
-                                <option value="cancelado"  ${p.estado === 'cancelado'  ? 'selected' : ''}>Cancelado</option>
-                            </select>
                         </td>
                     </tr>
                 </tbody>
@@ -170,10 +283,44 @@
             <div id="mapaEnVivo" class="pedidos-mapa-box"></div>
             <div id="mapaEnVivoVacio" class="pedidos-mapa-vacio" style="display:none;">
                 <i class="bi bi-map"></i>
-                No hay pedidos en camino con ubicación registrada en este momento.
+                No hay pedidos activos con ubicación registrada en este momento.
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- ============ MODAL: tiempo estimado e incidencias ============ -->
+<div class="entrega-modal-fondo" id="entregaModalFondo">
+    <div class="entrega-modal">
+        <div class="entrega-modal-head">
+            <h5 id="entregaModalTitulo">Entrega</h5>
+            <button type="button" class="entrega-modal-cerrar" id="entregaModalCerrar" aria-label="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="entrega-modal-cuerpo">
+            <label class="entrega-campo">
+                <span>Incidencia</span>
+                <input type="text" id="entregaIncidencia" maxlength="255"
+                       placeholder="Ej: tráfico pesado, cliente no responde...">
+                <small>Al guardarla, al cliente le llega un aviso con la novedad.</small>
+            </label>
+
+            <label class="entrega-campo">
+                <span>Demora extra por la incidencia (minutos)</span>
+                <input type="number" id="entregaMinutosExtra" min="0" max="600" step="1">
+                <small>Se le suma al tiempo estimado cada vez que se recalcula la ruta.</small>
+            </label>
+
+            <p class="entrega-modal-error" id="entregaModalError"></p>
+        </div>
+
+        <div class="entrega-modal-pie">
+            <button type="button" class="btn-entrega-cancelar" id="entregaModalCancelar">Cancelar</button>
+            <button type="button" class="btn-entrega-guardar" id="entregaModalGuardar">Guardar</button>
+        </div>
     </div>
 </div>
 
@@ -181,6 +328,7 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'pedido/js/mapa_iconos.js' %}"></script>
 <script>
 let mapaEnVivo, capaMarcadores, mapaEnVivoInicializado = false;
 const CENTRO_MAPA_DEFECTO = [6.2442, -75.5812]; // Medellín
@@ -227,6 +375,13 @@ async function cargarPedidosTiempoReal() {
 
         pedidosActuales = data.pedidos;
 
+        // El tiempo de preparación es general: si otro admin lo cambia,
+        // este panel lo ve en el siguiente refresco, sin recargar.
+        const inputPrep = document.getElementById('inputPreparacion');
+        if (inputPrep && document.activeElement !== inputPrep) {
+            inputPrep.value = data.minutos_preparacion;
+        }
+
         document.getElementById('statPendientes').textContent = data.resumen.pendientes;
         document.getElementById('statEnCamino').textContent = data.resumen.en_camino;
         document.getElementById('statEntregados').textContent = data.resumen.entregados;
@@ -251,7 +406,7 @@ function renderizarTabla(pedidos) {
     if (filtrados.length === 0) {
         cuerpo.innerHTML = `
             <tr>
-                <td colspan="7" class="estado-vacio">
+                <td colspan="9" class="estado-vacio">
                     <i class="bi bi-inbox display-4 text-secondary"></i>
                     <h5 class="mt-3">No hay pedidos que coincidan.</h5>
                 </td>
@@ -266,18 +421,154 @@ function renderizarTabla(pedidos) {
             <td class="d-none d-sm-table-cell">${p.fecha}</td>
             <td class="precio">$ ${p.total.toLocaleString('es-CO')}</td>
             <td><span class="badge-estado ${p.estado}">${p.estado_display}</span></td>
+            <td>
+                <select class="selector-estado" data-pedido-id="${p.pedido_id}" onchange="cambiarEstadoPedido(this)">
+                    <option value="pendiente"  ${p.estado === 'pendiente'  ? 'selected' : ''}>Pendiente</option>
+                    <option value="preparando" ${p.estado === 'preparando' ? 'selected' : ''}>Preparando</option>
+                    <option value="en_camino"  ${p.estado === 'en_camino'  ? 'selected' : ''}>En camino</option>
+                    <option value="entregado"  ${p.estado === 'entregado'  ? 'selected' : ''}>Entregado</option>
+                    <option value="cancelado"  ${p.estado === 'cancelado'  ? 'selected' : ''}>Cancelado</option>
+                </select>
+            </td>
             <td class="d-none d-md-table-cell">${p.repartidor || '<span class="text-secondary">Sin asignar</span>'}</td>
             <td class="d-none d-lg-table-cell">
-                ${p.distancia_km ? p.distancia_km + ' km · ' + p.tiempo_estimado_min + ' min' : '<span class="text-secondary">—</span>'}
+                ${p.distancia_km ? p.distancia_km + ' km' : '<span class="text-secondary">—</span>'}
+                ${p.tiempo_estimado_min ? ' · ' + p.tiempo_estimado_min + ' min' : ''}
+                ${p.incidencia ? `<div class="celda-incidencia"><i class="bi bi-exclamation-triangle-fill"></i> ${p.incidencia}</div>` : ''}
+            </td>
+            <td>
+                <button type="button" class="btn-entrega ${p.incidencia ? 'con-incidencia' : ''}"
+                        onclick="abrirModalEntrega(${p.pedido_id})">
+                    <i class="bi bi-exclamation-triangle"></i> Incidencia
+                </button>
             </td>
         </tr>
     `).join('');
 }
 
+// ---------------------------------------------------------------
+// Tiempo de preparación general del negocio
+// ---------------------------------------------------------------
+const btnGuardarPrep = document.getElementById('btnGuardarPreparacion');
+const prepEstado = document.getElementById('prepEstado');
+
+if (btnGuardarPrep) {
+    btnGuardarPrep.addEventListener('click', async () => {
+        const minutos = document.getElementById('inputPreparacion').value;
+
+        btnGuardarPrep.disabled = true;
+        prepEstado.textContent = '';
+        prepEstado.classList.remove('error');
+
+        try {
+            const respuesta = await fetch("{% url 'actualizar_tiempo_preparacion' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `minutos_preparacion=${encodeURIComponent(minutos)}`,
+            });
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok) {
+                prepEstado.textContent = datos.error || 'No se pudo guardar.';
+                prepEstado.classList.add('error');
+                return;
+            }
+
+            prepEstado.textContent = 'Guardado';
+            setTimeout(() => { prepEstado.textContent = ''; }, 2500);
+        } catch (error) {
+            prepEstado.textContent = 'No se pudo guardar.';
+            prepEstado.classList.add('error');
+        } finally {
+            btnGuardarPrep.disabled = false;
+        }
+    });
+}
+
+// ---------------------------------------------------------------
+// Modal de entrega: incidencias y demora
+// ---------------------------------------------------------------
+const modalFondo = document.getElementById('entregaModalFondo');
+const inputIncidencia = document.getElementById('entregaIncidencia');
+const inputMinutosExtra = document.getElementById('entregaMinutosExtra');
+const modalError = document.getElementById('entregaModalError');
+const btnGuardarEntrega = document.getElementById('entregaModalGuardar');
+let pedidoEnEdicion = null;
+
+function abrirModalEntrega(pedidoId) {
+    const pedido = pedidosActuales.find(p => p.pedido_id === pedidoId);
+    if (!pedido) return;
+
+    pedidoEnEdicion = pedidoId;
+    document.getElementById('entregaModalTitulo').textContent = `Pedido #${pedidoId} — ${pedido.cliente}`;
+    inputIncidencia.value = pedido.incidencia || '';
+    inputMinutosExtra.value = pedido.minutos_extra_incidencia || 0;
+    modalError.classList.remove('visible');
+    modalFondo.classList.add('abierto');
+}
+
+function cerrarModalEntrega() {
+    modalFondo.classList.remove('abierto');
+    pedidoEnEdicion = null;
+}
+
+document.getElementById('entregaModalCerrar').addEventListener('click', cerrarModalEntrega);
+document.getElementById('entregaModalCancelar').addEventListener('click', cerrarModalEntrega);
+modalFondo.addEventListener('click', (e) => {
+    if (e.target === modalFondo) cerrarModalEntrega();
+});
+
+btnGuardarEntrega.addEventListener('click', async () => {
+    if (pedidoEnEdicion === null) return;
+
+    btnGuardarEntrega.disabled = true;
+    modalError.classList.remove('visible');
+
+    try {
+        const url = `{% url 'actualizar_entrega_pedido' 0 %}`.replace('/0/', '/' + pedidoEnEdicion + '/');
+        const cuerpo = new URLSearchParams({
+            incidencia: inputIncidencia.value,
+            minutos_extra: inputMinutosExtra.value || 0,
+        });
+
+        const respuesta = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: cuerpo.toString(),
+        });
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            modalError.textContent = datos.error || 'No se pudo guardar.';
+            modalError.classList.add('visible');
+            return;
+        }
+
+        cerrarModalEntrega();
+        cargarPedidosTiempoReal();
+    } catch (error) {
+        modalError.textContent = 'No se pudo guardar. Revisa tu conexión.';
+        modalError.classList.add('visible');
+    } finally {
+        btnGuardarEntrega.disabled = false;
+    }
+});
+
 function actualizarMapaEnVivo(pedidos) {
     if (!mapaEnVivoInicializado) return; // el mapa aún no se ha abierto ni inicializado
 
-    const enCamino = pedidos.filter(p => p.estado === 'en_camino' && p.cliente_latitud && p.cliente_longitud);
+    // Se muestran los pedidos activos (preparando y en camino): apenas se
+    // asigna repartidor ya hay algo que mirar, no hace falta esperar a que
+    // salga a ruta.
+    const enCamino = pedidos.filter(p =>
+        ['preparando', 'en_camino'].includes(p.estado) && p.cliente_latitud && p.cliente_longitud
+    );
     const vacio = document.getElementById('mapaEnVivoVacio');
 
     capaMarcadores.clearLayers();
@@ -292,7 +583,7 @@ function actualizarMapaEnVivo(pedidos) {
 
     enCamino.forEach(p => {
         const marcadorCliente = L.marker([p.cliente_latitud, p.cliente_longitud], {
-            icon: iconoEmoji('📍'),
+            icon: crearIconoDestino(),
         }).bindPopup(`<b>#${p.pedido_id} — ${p.cliente}</b><br>Destino de entrega`);
         capaMarcadores.addLayer(marcadorCliente);
         puntos.push([p.cliente_latitud, p.cliente_longitud]);
@@ -300,7 +591,7 @@ function actualizarMapaEnVivo(pedidos) {
         if (p.repartidor_latitud && p.repartidor_longitud) {
             const detalle = p.distancia_km ? `${p.distancia_km} km · ${p.tiempo_estimado_min ?? '—'} min restantes` : 'En camino';
             const marcadorRepartidor = L.marker([p.repartidor_latitud, p.repartidor_longitud], {
-                icon: iconoEmoji('🚚'),
+                icon: crearIconoRepartidor(),
             }).bindPopup(`<b>${p.repartidor || 'Repartidor'}</b><br>${detalle}`);
             capaMarcadores.addLayer(marcadorRepartidor);
             puntos.push([p.repartidor_latitud, p.repartidor_longitud]);
@@ -315,15 +606,6 @@ function actualizarMapaEnVivo(pedidos) {
     if (puntos.length > 0) {
         mapaEnVivo.fitBounds(puntos, { padding: [40, 40], maxZoom: 15 });
     }
-}
-
-function iconoEmoji(emoji) {
-    return L.divIcon({
-        html: `<span style="font-size:22px; line-height:1;">${emoji}</span>`,
-        className: '',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-    });
 }
 
 // Decodifica el formato "polyline" estándar (el mismo que usa OSRM y Google

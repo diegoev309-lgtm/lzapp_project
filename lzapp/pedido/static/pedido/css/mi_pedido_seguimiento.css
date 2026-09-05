@@ -111,24 +111,267 @@
 }
 .mps-info-item i{ color: var(--azul-medio, #1a5fa8); }
 
-/* ---- Mapa ---- */
-.mps-mapa-box{
-    width: 100%;
-    height: 360px;
-    border-radius: 18px;
-    overflow: hidden;
-}
-.mps-mapa-vacio{
+/* ---- Modal de tiempo de preparación ---- */
+.mps-modal-fondo{
     display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(2, 44, 99, 0.55);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.mps-modal-fondo.abierto{ display: flex; }
+
+.mps-modal{
+    width: 100%;
+    max-width: 380px;
+    background: var(--blanco);
+    border-radius: 22px;
+    padding: 2rem 1.6rem 1.6rem;
     text-align: center;
-    padding: 2.5rem 1rem;
+    box-shadow: 0 30px 80px rgba(2, 44, 99, 0.35);
+}
+.mps-modal-icono{
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dorado-claro);
+    color: var(--azul-profundo);
+    font-size: 1.6rem;
+}
+.mps-modal h4{ color: var(--azul-profundo); font-weight: 700; font-size: 1.15rem; }
+.mps-modal-tiempo{
+    margin: 0.8rem 0 0.6rem;
+    font-size: 0.95rem;
     color: var(--gris-texto);
 }
-.mps-mapa-vacio i{ font-size: 2rem; color: var(--azul-claro); display: block; margin-bottom: 10px; }
-.mps-mapa-vacio p{ margin: 0; font-size: 0.85rem; }
+.mps-modal-tiempo strong{ color: var(--azul-profundo); }
+.mps-modal-nota{
+    font-size: 0.82rem;
+    color: var(--gris-texto);
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+}
+
+/* ---- Aviso de incidencia ---- */
+.mps-incidencia{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fff8e6;
+    border-left: 4px solid var(--dorado);
+    color: #8a6100;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+.mps-incidencia i{ margin-top: 2px; flex-shrink: 0; }
+
+/* ============================================================
+   VISTA DE SEGUIMIENTO: mapa a pantalla completa. Todo lo demás
+   (salir, estado, timeline, PIN) flota encima, sin quitarle espacio
+   al mapa — es lo único que de verdad importa ver mientras el
+   pedido está en camino.
+   ============================================================ */
+html:has(.mps-body-mapa), body.mps-body-mapa{
+    height: 100%;
+    overflow: hidden;
+    background: var(--azul-profundo);
+}
+
+.mps-fullscreen{
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.mps-mapa-fullscreen{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.mps-mapa-vacio-full{
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--gris-claro, #f7f8fc);
+    text-align: center;
+    padding: 2rem;
+    color: var(--gris-texto);
+}
+.mps-mapa-vacio-full.visible{ display: flex; }
+.mps-mapa-vacio-full i{ font-size: 2.4rem; color: var(--azul-claro); }
+.mps-mapa-vacio-full p{ margin: 0; font-size: 0.9rem; max-width: 280px; }
+
+/* ---- Botón de salir, flotando arriba a la izquierda ---- */
+.mps-btn-salir{
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 500;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--blanco);
+    color: var(--azul-profundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.3);
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    animation: mpsAparecerSalir 0.4s ease;
+}
+.mps-btn-salir:hover{ color: #e2402d; transform: scale(1.08); }
+
+/* ---- Badge de estado flotando arriba, centrado ---- */
+.mps-badge-estado{
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--azul-profundo);
+    color: var(--blanco);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 50px;
+    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.3);
+    animation: mpsAparecer 0.4s ease;
+    max-width: calc(100vw - 150px);
+}
+.mps-badge-estado i{ color: var(--dorado-claro); font-size: 1rem; flex-shrink: 0; }
+.mps-badge-estado span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- Panel inferior deslizable con toda la info ---- */
+.mps-panel-inferior{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 400;
+    background: var(--blanco);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 40px rgba(2, 44, 99, 0.25);
+    padding: 10px 1.4rem 1.4rem;
+    max-height: 55vh;
+    overflow-y: auto;
+    animation: mpsSubirPanel 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mps-panel-handle{
+    width: 40px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--gris-claro, #e3e6ee);
+    margin: 0 auto 0.9rem;
+}
+
+@keyframes mpsSubirPanel{
+    from{ transform: translateY(100%); }
+    to{ transform: translateY(0); }
+}
+@keyframes mpsAparecer{
+    from{ opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to{ opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes mpsAparecerSalir{
+    from{ opacity: 0; transform: translateY(-10px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
+
+/* En el panel flotante el timeline y la info van más compactos que en
+   la tarjeta del estado vacío. */
+.mps-panel-inferior .mps-timeline{ margin-bottom: 1rem; }
+.mps-panel-inferior .mps-info-fila{ margin-bottom: 0.8rem; }
+
+/* ---- Código de entrega ---- */
+.mps-codigo{
+    text-align: center;
+    background: linear-gradient(135deg, var(--azul-profundo), var(--azul-principal, #083b78));
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    margin-top: 0.4rem;
+    animation: mpsAparecerCodigo 0.5s ease;
+}
+@keyframes mpsAparecerCodigo{
+    from{ opacity: 0; transform: scale(0.9); }
+    to{ opacity: 1; transform: scale(1); }
+}
+.mps-codigo span{
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--dorado-claro);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.mps-codigo strong{
+    display: block;
+    font-size: 1.9rem;
+    letter-spacing: 0.3em;
+    color: var(--blanco);
+    font-family: 'Montserrat', monospace;
+}
+.mps-codigo small{
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+}
+
+/* ============================================================
+   ÍCONOS ANIMADOS — el paso activo del timeline y del badge se
+   mueven, para que se note de un vistazo en qué va el pedido.
+   ============================================================ */
+@keyframes mpsGirarLento{ from{ transform: rotate(0); } to{ transform: rotate(360deg); } }
+@keyframes mpsRebotar{ 0%, 100%{ transform: translateX(0); } 50%{ transform: translateX(4px); } }
+@keyframes mpsPulsar{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(1.18); } }
+@keyframes mpsSaltar{ 0%, 100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+
+.mps-paso.actual[data-estado="preparando"] .mps-paso-punto i,
+.mps-badge-estado.preparando i{
+    animation: mpsGirarLento 2.2s linear infinite;
+    display: inline-block;
+}
+.mps-paso.actual[data-estado="en_camino"] .mps-paso-punto i,
+.mps-badge-estado.en_camino i{
+    animation: mpsRebotar 0.7s ease-in-out infinite;
+    display: inline-block;
+}
+.mps-paso.actual[data-estado="entregado"] .mps-paso-punto,
+.mps-badge-estado.entregado{
+    animation: mpsPulsar 1.3s ease-in-out infinite;
+}
+.mps-paso[data-estado="pendiente"].completo .mps-paso-punto i{
+    animation: mpsSaltar 0.5s ease;
+}
 
 @media (max-width: 576px){
-    .mps-mapa-box{ height: 280px; }
     .mps-paso-texto{ font-size: 0.6rem; }
     .mps-paso-punto{ width: 32px; height: 32px; font-size: 0.85rem; }
+    .mps-panel-inferior{ max-height: 60vh; }
+    .mps-codigo strong{ font-size: 1.6rem; letter-spacing: 0.25em; }
 }

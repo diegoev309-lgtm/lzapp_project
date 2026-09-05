@@ -6,28 +6,69 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="{% static 'pedido/css/mapa_iconos.css' %}">
 {% endblock %}
 
 {% block content %}
 
 <style>
-.mapa-entregas-box{
+/* ---- Mapa: contenedor relativo para el botón de expandir y el aviso
+   vacío, y estado a pantalla completa igual que el selector de ubicación. ---- */
+.mapa-entregas-wrap{
+    position:relative;
     margin:15px;
     height:320px;
     border-radius:16px;
     overflow:hidden;
+    transition:height .3s ease;
 }
+.mapa-entregas-wrap.expandido{
+    position:fixed;
+    inset:0;
+    margin:0;
+    z-index:2000;
+    height:auto;
+    border-radius:0;
+}
+.mapa-entregas-box{ position:absolute; inset:0; }
+.mapa-entregas-wrap.expandido .mapa-entregas-box{ border-radius:0; }
+
+.mapa-entregas-expandir{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:1000;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:none;
+    background:var(--bg-panel);
+    color:var(--text-primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 2px 10px rgba(0,0,0,.4);
+    cursor:pointer;
+    transition:.2s;
+}
+.mapa-entregas-expandir:hover{ background:var(--gold); color:#1A1A2E; }
+
 .mapa-entregas-vacio{
     display:none;
-    margin:15px;
-    padding:2.2rem 1rem;
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:8px;
     text-align:center;
     color:var(--text-tertiary);
     background:var(--bg-panel);
-    border-radius:16px;
+    padding:2rem 1rem;
 }
-.mapa-entregas-vacio i{ font-size:2rem; display:block; margin-bottom:10px; }
-.mapa-entregas-vacio p{ margin:0; font-size:13px; }
+.mapa-entregas-vacio.visible{ display:flex; }
+.mapa-entregas-vacio i{ font-size:2rem; }
+.mapa-entregas-vacio p{ margin:0; font-size:13px; max-width:260px; }
 .ubicacion-panel{
     margin:15px;
     background:var(--bg-panel);
@@ -81,6 +122,35 @@
     color:var(--text-tertiary);
 }
 
+.entregas-buscador{
+    margin:0 15px 12px;
+    position:relative;
+}
+.entregas-buscador i{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--text-tertiary);
+    font-size:14px;
+}
+.entregas-buscador input{
+    width:100%;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:12px;
+    padding:11px 14px 11px 38px;
+    color:var(--text-primary);
+    font-size:13.5px;
+}
+.entregas-buscador input:focus{ outline:none; border-color:var(--gold); }
+.entregas-sin-resultados{
+    margin:0 15px 15px;
+    text-align:center;
+    color:var(--text-tertiary);
+    font-size:13px;
+}
+
 .entregas-lista{ margin:0 15px 15px; display:flex; flex-direction:column; gap:10px; }
 .entrega-item{
     background:var(--bg-panel);
@@ -93,6 +163,71 @@
 }
 .entrega-cliente{ font-weight:700; color:var(--text-primary); font-size:14px; }
 .entrega-direccion{ font-size:12px; color:var(--text-tertiary); margin-top:2px; }
+.entrega-detalle{ font-size:12px; color:var(--text-secondary); margin-top:4px; }
+.entrega-incidencia{
+    font-size:12px;
+    color:var(--gold);
+    margin-top:4px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+/* ---- Íconos de estado animados ---- */
+.entrega-estado-icono{ font-size:15px; margin-right:6px; display:inline-block; }
+.entrega-estado-icono.preparando{ color:var(--blue); animation: entGirar 2.2s linear infinite; }
+.entrega-estado-icono.en_camino{ color:var(--purple); animation: entRebote .7s ease-in-out infinite; }
+@keyframes entGirar{ from{ transform:rotate(0); } to{ transform:rotate(360deg); } }
+@keyframes entRebote{ 0%,100%{ transform:translateX(0); } 50%{ transform:translateX(3px); } }
+
+/* ---- Confirmar entrega con PIN ---- */
+.entrega-confirmar{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+}
+.entrega-confirmar input{
+    width:90px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-subtle);
+    border-radius:10px;
+    padding:8px 10px;
+    color:var(--text-primary);
+    font-size:14px;
+    letter-spacing:2px;
+    text-align:center;
+}
+.entrega-confirmar input:focus{ outline:none; border-color:var(--gold); }
+.entrega-confirmar button{
+    border:none;
+    border-radius:10px;
+    padding:8px 14px;
+    background:var(--green);
+    color:#0F2E1C;
+    font-weight:700;
+    font-size:12.5px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+.entrega-confirmar button:disabled{ opacity:.6; cursor:not-allowed; }
+.entrega-confirmar-error{
+    font-size:11.5px;
+    color:var(--red);
+    margin-top:4px;
+    display:none;
+}
+.entrega-confirmar-error.visible{ display:block; }
+
+/* ---- Responsivo: en celulares angostos el badge de estado se va
+   arriba del todo y el PIN + botón se apilan en vez de amontonarse. ---- */
+@media (max-width: 480px){
+    .entrega-item{ flex-direction:column; align-items:flex-start; }
+    .entrega-item .badge-estado{ align-self:flex-start; order:-1; margin-bottom:4px; }
+    .entrega-confirmar{ flex-wrap:wrap; }
+    .entrega-confirmar input{ flex:1; min-width:70px; }
+    .entrega-confirmar button{ flex:1; }
+    .mapa-entregas-wrap{ height:260px; }
+}
 </style>
 
 <div class="ubicacion-panel">
@@ -110,32 +245,36 @@
     </p>
 </div>
 
-{% if pedidos_activos %}
-<div id="mapaEntregas" class="mapa-entregas-box"></div>
-<div id="mapaEntregasVacio" class="mapa-entregas-vacio">
-    <i class="bi bi-geo-alt"></i>
-    <p>Todavía no hay coordenadas de entrega para mostrar en el mapa.</p>
-</div>
-{% endif %}
-
-{% if pedidos_activos %}
-<div class="entregas-lista">
-    {% for p in pedidos_activos %}
-    <div class="entrega-item">
-        <div>
-            <div class="entrega-cliente">#{{ p.id }} — {{ p.venta.usuario.get_full_name|default:p.venta.usuario.username }}</div>
-            <div class="entrega-direccion">{{ p.direccion_entrega|default:"Sin dirección registrada" }}</div>
-        </div>
-        <span class="badge-estado {{ p.estado }}">{{ p.get_estado_display }}</span>
+<div class="mapa-entregas-wrap" id="mapaEntregasWrap">
+    <button type="button" class="mapa-entregas-expandir" id="btnExpandirMapaEntregas" title="Ver mapa completo">
+        <i class="bi bi-arrows-fullscreen"></i>
+    </button>
+    <div id="mapaEntregas" class="mapa-entregas-box"></div>
+    <div id="mapaEntregasVacio" class="mapa-entregas-vacio">
+        <i class="bi bi-geo-alt"></i>
+        <p>Cuando te asignen una entrega, aquí vas a ver a dónde llevarla y la ruta.</p>
     </div>
-    {% endfor %}
 </div>
-{% endif %}
+
+<div class="entregas-buscador">
+    <i class="bi bi-search"></i>
+    <input type="text" id="buscarEntrega" placeholder="Buscar por cliente o # de pedido..." autocomplete="off">
+</div>
+
+{% comment %}
+La lista la repinta el mismo polling que refresca el mapa, para que una
+entrega recién asignada aparezca sin que el repartidor recargue la página.
+{% endcomment %}
+<div class="entregas-lista" id="entregasLista"></div>
+<p class="entregas-sin-resultados" id="entregasSinResultados" style="display:none;">
+    No hay ninguna entrega que coincida con la búsqueda.
+</p>
 
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'pedido/js/mapa_iconos.js' %}"></script>
 <script>
 function getCookie(nombre) {
     let valor = null;
@@ -218,6 +357,8 @@ const cajaMapaEntregas = document.getElementById('mapaEntregas');
 let mapaEntregas, capaEntregas, marcadorPropio = null;
 
 if (cajaMapaEntregas) {
+    // El botón de expandir vive arriba a la derecha del mapa; el control
+    // de zoom se queda a la izquierda (posición de siempre) para no chocar.
     mapaEntregas = L.map('mapaEntregas').setView([6.2442, -75.5812], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -226,24 +367,36 @@ if (cajaMapaEntregas) {
     capaEntregas = L.layerGroup().addTo(mapaEntregas);
 }
 
-function iconoEmojiEntregas(emoji) {
-    return L.divIcon({
-        html: `<span style="font-size:24px; line-height:1;">${emoji}</span>`,
-        className: '',
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-    });
-}
-
 function moverMarcadorPropio(lat, lng) {
     if (!mapaEntregas) return;
     if (!marcadorPropio) {
-        marcadorPropio = L.marker([lat, lng], { icon: iconoEmojiEntregas('🛵') })
+        marcadorPropio = L.marker([lat, lng], { icon: crearIconoYo() })
             .bindPopup('Mi ubicación')
             .addTo(mapaEntregas);
     } else {
         marcadorPropio.setLatLng([lat, lng]);
     }
+}
+
+// ---------------------------------------------------------------
+// Expandir/minimizar el mapa a pantalla completa (igual que en el
+// selector de ubicación) — en el celular es donde más falta hace ver
+// bien la ruta completa.
+// ---------------------------------------------------------------
+const wrapMapaEntregas = document.getElementById('mapaEntregasWrap');
+const btnExpandirMapaEntregas = document.getElementById('btnExpandirMapaEntregas');
+let mapaEntregasExpandido = false;
+
+if (btnExpandirMapaEntregas) {
+    btnExpandirMapaEntregas.addEventListener('click', () => {
+        mapaEntregasExpandido = !mapaEntregasExpandido;
+        wrapMapaEntregas.classList.toggle('expandido', mapaEntregasExpandido);
+        btnExpandirMapaEntregas.querySelector('i').className = mapaEntregasExpandido
+            ? 'bi bi-fullscreen-exit'
+            : 'bi bi-arrows-fullscreen';
+        btnExpandirMapaEntregas.title = mapaEntregasExpandido ? 'Ver mapa normal' : 'Ver mapa completo';
+        setTimeout(() => mapaEntregas && mapaEntregas.invalidateSize(), 320);
+    });
 }
 
 // Decodifica el formato "polyline" estándar (el mismo que usa OSRM).
@@ -273,28 +426,157 @@ function decodificarPolylineEntregas(codificada) {
     return coordenadas;
 }
 
+const ICONOS_ESTADO = {
+    preparando: 'bi-egg-fried',
+    en_camino: 'bi-scooter',
+};
+
+let ultimosPedidos = [];
+
+const inputBuscarEntrega = document.getElementById('buscarEntrega');
+if (inputBuscarEntrega) {
+    inputBuscarEntrega.addEventListener('input', () => renderizarEntregas(ultimosPedidos));
+}
+
+function renderizarEntregas(pedidos) {
+    ultimosPedidos = pedidos;
+    const lista = document.getElementById('entregasLista');
+    const sinResultados = document.getElementById('entregasSinResultados');
+    if (!lista) return;
+
+    // Conservamos lo que el repartidor ya haya escrito en el PIN si el
+    // polling repinta a mitad de que lo esté tecleando.
+    const codigosEnCurso = {};
+    lista.querySelectorAll('.entrega-confirmar input').forEach((input) => {
+        codigosEnCurso[input.dataset.pedidoId] = input.value;
+    });
+
+    const filtro = (inputBuscarEntrega ? inputBuscarEntrega.value : '').trim().toLowerCase();
+    const filtrados = pedidos.filter(p =>
+        !filtro || p.cliente.toLowerCase().includes(filtro) || String(p.pedido_id).includes(filtro)
+    );
+
+    if (pedidos.length === 0) {
+        lista.innerHTML = '';
+        if (sinResultados) sinResultados.style.display = 'none';
+        return;
+    }
+
+    if (filtrados.length === 0) {
+        lista.innerHTML = '';
+        if (sinResultados) sinResultados.style.display = 'block';
+        return;
+    }
+    if (sinResultados) sinResultados.style.display = 'none';
+
+    lista.innerHTML = filtrados.map(p => {
+        const tiempo = p.tiempo_estimado_min ? `${p.tiempo_estimado_min} min` : null;
+        const distancia = p.distancia_km ? `${p.distancia_km} km` : null;
+        const detalle = [distancia, tiempo].filter(Boolean).join(' · ');
+        const icono = ICONOS_ESTADO[p.estado];
+        const valorPrevio = codigosEnCurso[p.pedido_id] || '';
+
+        return `
+            <div class="entrega-item">
+                <div style="flex:1;">
+                    <div class="entrega-cliente">
+                        ${icono ? `<i class="bi ${icono} entrega-estado-icono ${p.estado}"></i>` : ''}#${p.pedido_id} — ${p.cliente}
+                    </div>
+                    <div class="entrega-direccion">${p.direccion_entrega || 'Sin dirección registrada'}</div>
+                    ${detalle ? `<div class="entrega-detalle">${detalle}</div>` : ''}
+                    ${p.incidencia ? `<div class="entrega-incidencia"><i class="bi bi-exclamation-triangle-fill"></i> ${p.incidencia}</div>` : ''}
+                    ${p.estado === 'en_camino' ? `
+                        <div class="entrega-confirmar">
+                            <input type="text" inputmode="numeric" maxlength="4" placeholder="PIN"
+                                   data-pedido-id="${p.pedido_id}" value="${valorPrevio}">
+                            <button type="button" class="btn-confirmar-entrega" data-pedido-id="${p.pedido_id}">
+                                <i class="bi bi-check-circle-fill"></i> Confirmar entrega
+                            </button>
+                        </div>
+                        <div class="entrega-confirmar-error" id="errorEntrega${p.pedido_id}"></div>
+                    ` : ''}
+                </div>
+                <span class="badge-estado ${p.estado}">${p.estado_display}</span>
+            </div>`;
+    }).join('');
+
+    lista.querySelectorAll('.btn-confirmar-entrega').forEach((btn) => {
+        btn.addEventListener('click', () => confirmarEntrega(btn.dataset.pedidoId));
+    });
+}
+
+async function confirmarEntrega(pedidoId) {
+    const input = obtenerInputPedido(pedidoId);
+    const btn = document.querySelector(`.btn-confirmar-entrega[data-pedido-id="${pedidoId}"]`);
+    const error = document.getElementById(`errorEntrega${pedidoId}`);
+    const codigo = (input.value || '').trim();
+
+    error.classList.remove('visible');
+
+    if (codigo.length !== 4) {
+        error.textContent = 'Escribe los 4 dígitos del PIN.';
+        error.classList.add('visible');
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const url = `{% url 'confirmar_entrega_pedido' 0 %}`.replace('/0/', '/' + pedidoId + '/');
+        const respuesta = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `codigo=${encodeURIComponent(codigo)}`,
+        });
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            error.textContent = datos.error || 'No se pudo confirmar.';
+            error.classList.add('visible');
+            return;
+        }
+
+        cargarMapaEntregas();
+    } catch (e) {
+        error.textContent = 'No se pudo confirmar. Revisa tu conexión.';
+        error.classList.add('visible');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function obtenerInputPedido(pedidoId) {
+    return document.querySelector(`.entrega-confirmar input[data-pedido-id="${pedidoId}"]`);
+}
+
 async function cargarMapaEntregas() {
     if (!mapaEntregas) return;
     try {
         const respuesta = await fetch("{% url 'mis_entregas_tiempo_real' %}");
         const datos = await respuesta.json();
-        const pedidos = (datos.pedidos || []).filter(p => p.cliente_latitud && p.cliente_longitud);
+        const todos = datos.pedidos || [];
+        const pedidos = todos.filter(p => p.cliente_latitud && p.cliente_longitud);
+
+        renderizarEntregas(todos);
 
         const vacio = document.getElementById('mapaEntregasVacio');
         capaEntregas.clearLayers();
 
+        // El mapa nunca se esconde: al ocultarlo y volverlo a mostrar,
+        // Leaflet pierde la medida del contenedor y los tiles se caen.
         if (pedidos.length === 0) {
-            cajaMapaEntregas.style.display = 'none';
-            vacio.style.display = 'block';
+            vacio.classList.add('visible');
+            mapaEntregas.invalidateSize();
             return;
         }
-        cajaMapaEntregas.style.display = 'block';
-        vacio.style.display = 'none';
+        vacio.classList.remove('visible');
 
         const puntos = [];
         pedidos.forEach(p => {
             const marcadorCliente = L.marker([p.cliente_latitud, p.cliente_longitud], {
-                icon: iconoEmojiEntregas('📍'),
+                icon: crearIconoDestino(),
             }).bindPopup(`<b>#${p.pedido_id} — ${p.cliente}</b><br>${p.direccion_entrega || 'Destino de entrega'}`);
             capaEntregas.addLayer(marcadorCliente);
             puntos.push([p.cliente_latitud, p.cliente_longitud]);

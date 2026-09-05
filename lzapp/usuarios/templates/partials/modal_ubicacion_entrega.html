@@ -1,4 +1,4 @@
-{% load static %}
+{% load static l10n %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="{% static 'css/ubicacion_modal.css' %}">
 
@@ -7,8 +7,13 @@
     <span id="textoUbicacionTrigger">Agregar ubicación de entrega</span>
 </button>
 
-<input type="hidden" name="cliente_latitud" id="cliente_latitud">
-<input type="hidden" name="cliente_longitud" id="cliente_longitud">
+{% comment %}
+unlocalize es obligatorio: con LANGUAGE_CODE es-co, Django escribiría
+"6,244200" y parseFloat() lo cortaría en la coma, mandando el mapa a otra
+ubicación (y el POST fallaría al convertirlo a Decimal).
+{% endcomment %}
+<input type="hidden" name="cliente_latitud" id="cliente_latitud" value="{{ perfil_latitud|default_if_none:''|unlocalize }}">
+<input type="hidden" name="cliente_longitud" id="cliente_longitud" value="{{ perfil_longitud|default_if_none:''|unlocalize }}">
 
 <div class="modal fade" id="modalUbicacionEntrega" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -29,6 +34,7 @@
                     <button type="button" class="ubicacion-mapa-expandir" id="btn-expandir-mapa" title="Ver mapa completo">
                         <i class="bi bi-arrows-fullscreen"></i>
                     </button>
+
                     <div id="mapa-ubicacion" class="ubicacion-mapa-box"></div>
                 </div>
 
