@@ -74,6 +74,12 @@
     color:var(--text-tertiary);
     cursor:not-allowed;
 }
+.ubicacion-panel-ayuda{
+    margin:0;
+    font-size:12px;
+    line-height:1.4;
+    color:var(--text-tertiary);
+}
 
 .entregas-lista{ margin:0 15px 15px; display:flex; flex-direction:column; gap:10px; }
 .entrega-item{
@@ -95,14 +101,13 @@
         <span id="textoEstadoUbicacion">Ubicación no compartida</span>
     </div>
 
-    <button type="button" class="btn-compartir-ubicacion" id="btnCompartirUbicacion"
-            {% if not pedidos_activos %}disabled{% endif %}>
-        {% if pedidos_activos %}
-            <i class="bi bi-broadcast"></i> Empezar a compartir mi ubicación
-        {% else %}
-            No tienes entregas activas asignadas
-        {% endif %}
+    <button type="button" class="btn-compartir-ubicacion" id="btnCompartirUbicacion">
+        <i class="bi bi-broadcast"></i> Empezar a compartir mi ubicación
     </button>
+    <p class="ubicacion-panel-ayuda">
+        Compártela aunque todavía no tengas una entrega asignada — es lo que te hace
+        aparecer disponible para que te lleguen pedidos nuevos.
+    </p>
 </div>
 
 {% if pedidos_activos %}
@@ -150,7 +155,7 @@ const punto = document.getElementById('puntoEstado');
 const texto = document.getElementById('textoEstadoUbicacion');
 let watchId = null;
 
-if (btn && !btn.disabled) {
+if (btn) {
     btn.addEventListener('click', function () {
         if (watchId === null) {
             iniciarCompartir();

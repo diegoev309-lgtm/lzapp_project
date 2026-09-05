@@ -36,19 +36,16 @@ def mis_entregas(request):
 @login_required
 @require_POST
 def actualizar_ubicacion_repartidor(request):
-    """El repartidor reporta su posición actual. Solo se acepta si tiene
-    al menos un pedido activo asignado — sin eso, no hay nada que rastrear."""
+    """El repartidor reporta su posición actual — mientras esté disponible,
+    no hace falta que ya tenga un pedido activo asignado: es justamente
+    esta ubicación la que usa asignar_repartidor_automatico() para poder
+    elegirlo como candidato en el próximo pedido que entre a 'preparando'.
+    (Antes esto exigía una entrega activa para aceptar la ubicación, lo
+    cual era un candado circular: nunca se le podía asignar una primera
+    entrega a nadie porque nadie tenía coordenadas todavía.)"""
     perfil_emple = PerfilEmple.objects.filter(empleado=request.user, rol='empleado').first()
     if not perfil_emple:
         return JsonResponse({'error': 'No autorizado'}, status=403)
-
-    tiene_entrega_activa = Pedido.objects.filter(
-        repartidor=request.user,
-        estado__in=['preparando', 'en_camino'],
-    ).exists()
-
-    if not tiene_entrega_activa:
-        return JsonResponse({'error': 'No tienes entregas activas asignadas'}, status=403)
 
     lat_raw = request.POST.get('latitud')
     lng_raw = request.POST.get('longitud')
