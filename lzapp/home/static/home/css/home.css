@@ -170,8 +170,8 @@ body {
     position: absolute;
     top: -4px;
     right: -6px;
-    min-width: 16px;
-    height: 16px;
+    min-width: 18px;
+    height: 18px;
     aspect-ratio: 1 / 1;
     padding: 0 3px;
     display: flex;
@@ -180,8 +180,8 @@ body {
     border-radius: 50%;
     background: var(--dorado);
     color: var(--azul-profundo);
-    font-size: 0.62rem;
-    font-weight: 700;
+    font-size: 0.65rem;
+    font-weight: 800;
     line-height: 1;
     text-align: center;
     text-transform: none;
@@ -189,6 +189,23 @@ body {
     border: 1px solid var(--azul-profundo);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
     pointer-events: none;
+}
+
+/* El badge del carrito (a diferencia del de notificaciones) tiene que
+   poder aparecer/desaparecer en vivo por AJAX sin recargar la página,
+   así que siempre está en el DOM y solo se muestra con .visible. */
+.nav-link-carrito .carrito-badge {
+    display: none;
+}
+
+.nav-link-carrito .carrito-badge.visible {
+    display: flex;
+    animation: carritoBadgePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes carritoBadgePop {
+    0%   { transform: scale(0.4); }
+    100% { transform: scale(1); }
 }
 
 /* Cada cierto tiempo el ícono del carrito "brilla" para que quien no
@@ -1072,18 +1089,38 @@ HERO — escena 3D animada (slide 1 del carrusel)
 }
 
 .producto-card {
+    position: relative;
     background: var(--blanco);
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid rgba(8, 59, 120, 0.08);
+    box-shadow: 0 4px 18px rgba(2, 44, 99, 0.06);
     transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     height: 100%;
 }
 
+.producto-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--azul-principal), var(--dorado) 50%, var(--azul-principal));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+    z-index: 3;
+}
+
 .producto-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 24px 60px rgba(2, 44, 99, 0.16);
-    border-color: rgba(201, 168, 76, 0.35);
+    box-shadow: 0 26px 56px rgba(2, 44, 99, 0.18);
+    border-color: rgba(201, 168, 76, 0.4);
+}
+
+.producto-card:hover::before {
+    transform: scaleX(1);
 }
 
 .producto-descripcion {
@@ -1097,10 +1134,18 @@ HERO — escena 3D animada (slide 1 del carrusel)
 .producto-img-wrapper {
     position: relative;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 40%, #eef3fb 0%, var(--gris-claro) 75%);
+    background: linear-gradient(155deg, #eef3fb 0%, #f7f8fc 55%, #f4ecdb 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.producto-img-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 -1px 0 rgba(8, 59, 120, 0.07);
+    pointer-events: none;
 }
 
 .imagen-producto {
@@ -1108,11 +1153,12 @@ HERO — escena 3D animada (slide 1 del carrusel)
     object-fit: contain;
     object-position: center;
     border-radius: 14px;
+    filter: drop-shadow(0 12px 16px rgba(2, 44, 99, 0.14));
     transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .producto-card:hover .imagen-producto {
-    transform: scale(1.08);
+    transform: scale(1.07) translateY(-2px);
 }
 
 .badge-stock {
@@ -1120,22 +1166,73 @@ HERO — escena 3D animada (slide 1 del carrusel)
     top: 14px;
     left: 14px;
     z-index: 5;
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: 0.66rem;
+    font-weight: 800;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 0.3rem 0.8rem;
+    padding: 0.38rem 0.9rem;
     border-radius: 50px;
-    background: var(--blanco);
-    box-shadow: 0 4px 10px rgba(2, 44, 99, 0.12);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 16px rgba(2, 44, 99, 0.15);
 }
 
-.badge-stock.disponible { color: var(--azul-principal); }
+.badge-stock.disponible { color: #1b8f5e; }
 .badge-stock.bajo { color: #c0392b; }
 
+/* Badge tipo "notificación" con la cantidad de ESTE producto puntual
+   que ya está en el carrito -- esquina opuesta a .badge-stock para que
+   nunca choquen. Siempre está en el DOM (aunque la cantidad sea 0) para
+   poder mostrarlo/actualizarlo por AJAX sin recargar la página. */
+.producto-card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 6;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    border-radius: 50%;
+    background: var(--dorado);
+    color: var(--azul-profundo);
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1;
+    border: 2px solid var(--blanco);
+    box-shadow: 0 4px 12px rgba(2, 44, 99, 0.3);
+}
+
+.producto-card-badge.visible {
+    display: flex;
+    animation: productoBadgePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.producto-card-badge--rebote {
+    animation: productoBadgeRebote 0.4s ease;
+}
+
+@keyframes productoBadgePop {
+    0%   { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes productoBadgeRebote {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+}
+
 .estrellas {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     color: var(--dorado);
-    font-size: 0.85rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     margin-bottom: 0.6rem;
 }
 
@@ -1145,6 +1242,10 @@ HERO — escena 3D animada (slide 1 del carrusel)
     color: #111;
     margin: 0;
     line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .precio {
@@ -1153,6 +1254,7 @@ HERO — escena 3D animada (slide 1 del carrusel)
     font-weight: 800;
     margin: 0;
     white-space: nowrap;
+    letter-spacing: -0.2px;
 }
 
 .card-footer {
@@ -1175,21 +1277,27 @@ HERO — escena 3D animada (slide 1 del carrusel)
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: var(--azul-principal);
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-profundo));
     color: var(--blanco);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.9rem;
+    letter-spacing: 0.01em;
     padding: 0.75rem 1.8rem;
     border-radius: 50px;
     border: none;
-    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    box-shadow: 0 8px 18px rgba(8, 59, 120, 0.22);
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition), color var(--transition);
 }
 
 .btn-carrito:hover {
-    background: var(--dorado);
+    background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
     color: var(--azul-profundo);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(201, 168, 76, 0.4);
+}
+
+.btn-carrito:active {
+    transform: translateY(-1px);
 }
 
 /* ============================================================
@@ -3332,13 +3440,18 @@ footer {
 }
 
 .producto-card--vertical .producto-img-wrapper {
-    height: 160px;   /* antes 220px */
-    padding: 12px;   /* antes 20px */
+    height: 176px;   /* antes 160px */
+    padding: 20px;   /* antes 12px */
 }
 
 .producto-card--vertical .estrellas {
-    font-size: 0.85rem;
-    margin-bottom: 0.3rem;
+    font-size: 0.66rem;
+    margin-bottom: 0.5rem;
+}
+
+.producto-card--vertical .calificacion-widget-pub {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
 }
 
 .producto-card--vertical .imagen-producto {
@@ -3346,36 +3459,40 @@ footer {
 }
 
 .producto-card--vertical .card-body {
-    padding: 0.9rem 1.1rem 0.2rem; /* antes 1.2rem 1.3rem 0.4rem */
+    padding: 1.1rem 1.2rem 0.2rem; /* antes 0.9rem 1.1rem 0.2rem */
 }
 
 .producto-card--vertical .titulo-producto {
-    font-size: 0.95rem;
-    margin-bottom: 0.3rem;
+    font-size: 0.98rem;
+    margin-bottom: 0.35rem;
     min-height: unset;          /* antes 2.6em */
     line-height: 1.3;
 }
 
 .producto-card--vertical .producto-descripcion {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: 0.8rem;
     -webkit-line-clamp: 2;      /* antes 3 líneas */
     line-clamp: 2;
     min-height: calc(0.8rem * 1.5 * 2); /* ajustada a 2 líneas */
     line-height: 1.5;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.7rem;
 }
 
 .producto-card--vertical .precio {
-    font-size: 1.1rem;          /* antes 1.25rem */
+    font-size: 1.15rem;          /* antes 1.1rem */
 }
 
 .producto-card--vertical .card-footer {
-    padding: 0 1.1rem 1rem;     /* antes 1.3rem 1.3rem */
+    padding: 0 1.2rem 1.2rem;     /* antes 0 1.1rem 1rem */
 }
 
 .producto-card--vertical .btn-carrito {
-    padding: 0.5rem 1rem;       /* si tu botón usa padding grande por defecto */
-    font-size: 0.9rem;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
 }
 
 /* Responsive: en móvil 2 columnas en vez de 1 sola tarjeta gigante */
@@ -3467,33 +3584,43 @@ footer {
     position: relative;
     overflow: visible;
     border: 2px solid var(--dorado);
-    box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25);
+    box-shadow: 0 10px 28px rgba(2, 44, 99, 0.1), 0 0 0 3px rgba(201, 168, 76, 0.25);
     animation: premioCardBrillo 2.6s ease-in-out infinite;
 }
 
+.producto-card--premio::before {
+    background: linear-gradient(90deg, var(--dorado), var(--dorado-claro), var(--dorado));
+    transform: scaleX(1);
+}
+
+.producto-card--premio .producto-img-wrapper {
+    background: radial-gradient(circle at 50% 42%, rgba(240, 217, 138, 0.4) 0%, rgba(247, 248, 252, 0.4) 70%);
+}
+
 @keyframes premioCardBrillo {
-    0%, 100% { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.08), 0 0 0 3px rgba(201, 168, 76, 0.25); }
-    50%      { box-shadow: 0 8px 24px rgba(2, 44, 99, 0.12), 0 0 22px rgba(240, 217, 138, 0.55), 0 0 0 3px rgba(201, 168, 76, 0.55); }
+    0%, 100% { box-shadow: 0 10px 28px rgba(2, 44, 99, 0.1), 0 0 0 3px rgba(201, 168, 76, 0.25); }
+    50%      { box-shadow: 0 10px 28px rgba(2, 44, 99, 0.14), 0 0 26px rgba(240, 217, 138, 0.6), 0 0 0 3px rgba(201, 168, 76, 0.6); }
 }
 
 .premio-cinta-mini {
     position: absolute;
-    top: 14px;
-    right: -30px;
-    background: var(--dorado);
+    top: 18px;
+    right: -34px;
+    background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
     color: #1a1a1a;
     font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.04em;
-    padding: 3px 34px;
+    letter-spacing: 0.06em;
+    padding: 4px 38px;
     transform: rotate(35deg);
-    z-index: 5;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    z-index: 6;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .badge-stock.premio {
-    background: var(--dorado);
+    background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
     color: #1a1a1a;
+    box-shadow: 0 6px 16px rgba(201, 168, 76, 0.45);
 }
 
 .precio-tachado {
@@ -4217,6 +4344,13 @@ footer {
     gap: 10px;
     max-width: 340px;
     width: calc(100% - 40px);
+    transition: right var(--transition, 0.3s ease);
+}
+/* El panel del carrito (carrito/widget.html) sale de la misma esquina --
+   cuando está abierto, se corren los toasts para que no queden tapados
+   detrás/debajo de él. */
+body.carrito-widget-abierto .lz-toasts {
+    right: 440px;
 }
 @media (max-width: 480px) {
     .lz-toasts {
@@ -4224,6 +4358,9 @@ footer {
         left: 10px;
         width: auto;
         max-width: none;
+    }
+    body.carrito-widget-abierto .lz-toasts {
+        right: 10px;
     }
 }
 .lz-toast {

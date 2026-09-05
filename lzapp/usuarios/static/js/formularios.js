@@ -76,17 +76,218 @@ function mostrarPassword(id, boton) {
 }
 
 /* =========================================================
+   INDICADOR DE CARGA (3 puntitos) — compartido entre login y registro
+   ========================================================= */
+function mostrarCargandoBoton(boton, textoCargando) {
+    if (!boton) return;
+    if (!boton.dataset.textoOriginal) boton.dataset.textoOriginal = boton.textContent.trim();
+    boton.disabled = true;
+    boton.innerHTML = (textoCargando || boton.dataset.textoOriginal) +
+        ' <span class="puntos-cargando"><span></span><span></span><span></span></span>';
+}
+
+function restaurarBoton(boton, texto) {
+    if (!boton) return;
+    boton.disabled = false;
+    boton.textContent = texto || boton.dataset.textoOriginal || boton.textContent;
+}
+
+/* =========================================================
+   LOGIN: mostrar los puntitos de carga al enviar
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById('loginForm');
+    if (!loginForm) return; // no estamos en login.html
+
+    const btnLogin = loginForm.querySelector('.btn-auth');
+    loginForm.addEventListener('submit', function () {
+        mostrarCargandoBoton(btnLogin, 'Iniciando sesión');
+    });
+});
+
+/* =========================================================
+   CORREO: validación de formato en tiempo real (solo Registro)
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function () {
+    const emailInput = document.getElementById('id_email');
+    const emailFeedback = document.getElementById('email-feedback');
+    if (!emailInput || !emailFeedback) return; // no estamos en registro.html
+
+    const EMAIL_VALIDO_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function validarEmail() {
+        const valor = emailInput.value.trim();
+        emailInput.classList.remove('username-valido', 'username-invalido');
+
+        if (valor === '') {
+            emailFeedback.textContent = '';
+            emailFeedback.className = 'username-feedback';
+            return;
+        }
+
+        if (!valor.includes('@')) {
+            emailInput.classList.add('username-invalido');
+            emailFeedback.textContent = 'Falta el @ en el correo.';
+            emailFeedback.className = 'username-feedback error';
+            return;
+        }
+
+        if (!EMAIL_VALIDO_RE.test(valor)) {
+            emailInput.classList.add('username-invalido');
+            emailFeedback.textContent = 'Ese correo no tiene un formato válido (ej: nombre@gmail.com).';
+            emailFeedback.className = 'username-feedback error';
+            return;
+        }
+
+        emailInput.classList.add('username-valido');
+        emailFeedback.textContent = '✓ Correo válido.';
+        emailFeedback.className = 'username-feedback success';
+    }
+
+    emailInput.addEventListener('input', validarEmail);
+    emailInput.addEventListener('blur', validarEmail);
+});
+
+/* =========================================================
+   TELÉFONO: validación en tiempo real (solo Registro) -- la regla en
+   sí (cuántos dígitos según el país) vive en telefono_validacion.js,
+   compartido con configuracion.html y registro_empleado.html; acá solo
+   se sanea el input (nada de +, espacios, guiones ni paréntesis: el
+   código de país ya lo elige el select de al lado) y se pinta el
+   resultado con el mismo look de username-feedback que ya usan email
+   y usuario en esta página.
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function () {
+    const selectPais = document.getElementById('id_codigo_pais');
+    const telefonoInput = document.getElementById('id_telefono');
+    const telefonoFeedback = document.getElementById('telefono-feedback');
+    if (!telefonoInput || !telefonoFeedback || !window.LZ_TELEFONO) return; // no estamos en registro.html
+
+    function actualizarMaxLength() {
+        if (!selectPais) return;
+        const [, maximo] = LZ_TELEFONO.rango(selectPais.value);
+        telefonoInput.maxLength = maximo;
+    }
+
+    function validarTelefono() {
+        const limpio = LZ_TELEFONO.sanear(telefonoInput.value);
+        if (limpio !== telefonoInput.value) telefonoInput.value = limpio;
+
+        telefonoInput.classList.remove('username-valido', 'username-invalido');
+
+        const codigoPais = selectPais ? selectPais.value : '';
+        const resultado = LZ_TELEFONO.validar(codigoPais, limpio);
+
+        if (resultado.ok === null) {
+            telefonoFeedback.textContent = '';
+            telefonoFeedback.className = 'username-feedback';
+            return;
+        }
+
+        telefonoInput.classList.add(resultado.ok ? 'username-valido' : 'username-invalido');
+        telefonoFeedback.textContent = resultado.mensaje;
+        telefonoFeedback.className = 'username-feedback ' + (resultado.ok ? 'success' : 'error');
+    }
+
+    actualizarMaxLength();
+    if (selectPais) {
+        selectPais.addEventListener('change', function () {
+            actualizarMaxLength();
+            validarTelefono();
+        });
+    }
+    telefonoInput.addEventListener('input', validarTelefono);
+    telefonoInput.addEventListener('blur', validarTelefono);
+});
+
+/* =========================================================
+   CONTRASEÑA: fortaleza en tiempo real + coincidencia (solo Registro)
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function () {
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    const fortalezaCaja = document.getElementById('password-fortaleza');
+    if (!password1 || !fortalezaCaja) return; // no estamos en registro.html
+
+    const barra = fortalezaCaja.querySelector('.fortaleza-barra span');
+    const texto = fortalezaCaja.querySelector('.fortaleza-texto');
+    const coincideCaja = document.getElementById('password-coincide');
+
+    function evaluarFortaleza() {
+        const valor = password1.value;
+        fortalezaCaja.classList.remove('fortaleza-debil', 'fortaleza-media', 'fortaleza-fuerte');
+
+        if (valor.length === 0) {
+            texto.textContent = '';
+            barra.style.width = '0';
+            return;
+        }
+
+        const esSoloNumeros = /^[0-9]+$/.test(valor);
+        let puntos = 0;
+        if (valor.length >= 8) puntos++;
+        if (/[a-z]/.test(valor) && /[A-Z]/.test(valor)) puntos++;
+        if (/[0-9]/.test(valor)) puntos++;
+        if (/[^A-Za-z0-9]/.test(valor)) puntos++;
+
+        if (valor.length < 8 || esSoloNumeros || puntos <= 1) {
+            fortalezaCaja.classList.add('fortaleza-debil');
+            texto.textContent = valor.length < 8
+                ? 'Muy corta: usa al menos 8 caracteres.'
+                : esSoloNumeros
+                    ? 'No puede ser solo números.'
+                    : 'Débil: agrega mayúsculas, números o símbolos.';
+        } else if (puntos <= 2) {
+            fortalezaCaja.classList.add('fortaleza-media');
+            texto.textContent = 'Media: agrega algún símbolo o mayúscula para reforzarla.';
+        } else {
+            fortalezaCaja.classList.add('fortaleza-fuerte');
+            texto.textContent = '✓ Contraseña segura.';
+        }
+    }
+
+    function evaluarCoincidencia() {
+        if (!coincideCaja || !password2) return;
+
+        if (password2.value === '') {
+            coincideCaja.textContent = '';
+            coincideCaja.className = 'username-feedback';
+            return;
+        }
+
+        if (password1.value === password2.value) {
+            coincideCaja.textContent = '✓ Las contraseñas coinciden.';
+            coincideCaja.className = 'username-feedback success';
+        } else {
+            coincideCaja.textContent = 'Las contraseñas no coinciden.';
+            coincideCaja.className = 'username-feedback error';
+        }
+    }
+
+    password1.addEventListener('input', function () {
+        evaluarFortaleza();
+        evaluarCoincidencia();
+    });
+    if (password2) password2.addEventListener('input', evaluarCoincidencia);
+});
+
+/* =========================================================
    VALIDACIÓN DEL USUARIO EN TIEMPO REAL (solo página Registro)
    ========================================================= */
 document.addEventListener('DOMContentLoaded', function () {
 
     const usernameInput = document.getElementById('id_username');
+    const registroForm = document.getElementById('registroForm');
 
-    // Si no existe (por ejemplo, en login.html), no hacemos nada más.
-    if (!usernameInput) return;
+    // login.html también tiene un campo "id_username" (se loguea por
+    // usuario, no por correo), así que ese chequeo solo no alcanza para
+    // saber si estamos en registro.html -- sin el chequeo de registroForm,
+    // este bloque intentaba correr en login.html también y explotaba en
+    // registroForm.addEventListener() más abajo (registroForm es null ahí),
+    // lo que dejaba SIN REGISTRAR todo el resto del script en esa página.
+    if (!usernameInput || !registroForm) return;
 
     const usernameFeedback = document.getElementById('username-feedback');
-    const registroForm = document.getElementById('registroForm');
     const btnRegistro = document.getElementById('btnRegistro');
 
     let usernameExiste = false;
@@ -185,8 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.existe) {
                     usernameInput.classList.add('username-invalido');
                     mostrarFeedback('Este nombre de usuario ya está registrado.', 'error');
-                    btnRegistro.disabled = false;
-                    btnRegistro.innerText = 'Crear Cuenta';
+                    restaurarBoton(btnRegistro, 'Crear Cuenta');
                     enviandoDespuesDeValidar = false;
                     return;
                 }
@@ -195,8 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 mostrarFeedback('✓ Nombre de usuario disponible.', 'success');
 
                 if (enviarDespues || enviandoDespuesDeValidar) {
-                    btnRegistro.disabled = true;
-                    btnRegistro.innerText = 'Creando cuenta...';
+                    mostrarCargandoBoton(btnRegistro, 'Creando cuenta');
                     HTMLFormElement.prototype.submit.call(registroForm);
                 }
             })
@@ -205,8 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 usernameValidado = false;
                 usernameExiste = false;
                 usernameInput.classList.remove('username-validando');
-                btnRegistro.disabled = false;
-                btnRegistro.innerText = 'Crear Cuenta';
+                restaurarBoton(btnRegistro, 'Crear Cuenta');
                 enviandoDespuesDeValidar = false;
                 mostrarFeedback('No se pudo comprobar el usuario. Intenta nuevamente.', 'error');
             });
@@ -221,8 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
         usernameValidado = false;
         ultimaConsulta = '';
         enviandoDespuesDeValidar = false;
-        btnRegistro.disabled = false;
-        btnRegistro.innerText = 'Crear Cuenta';
+        restaurarBoton(btnRegistro, 'Crear Cuenta');
 
         const formatoCorrecto = validarFormato(username);
         if (!formatoCorrecto) return;
@@ -251,15 +448,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (usernameValidado && ultimaConsulta === username) {
-            btnRegistro.disabled = true;
-            btnRegistro.innerText = 'Creando cuenta...';
+            mostrarCargandoBoton(btnRegistro, 'Creando cuenta');
             return;
         }
 
         event.preventDefault();
         enviandoDespuesDeValidar = true;
-        btnRegistro.disabled = true;
-        btnRegistro.innerText = 'Comprobando usuario...';
+        mostrarCargandoBoton(btnRegistro, 'Comprobando usuario');
         mostrarFeedback('Comprobando disponibilidad...', 'warning');
 
         clearTimeout(timeoutUsername);

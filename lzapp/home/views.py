@@ -62,9 +62,11 @@ def buscar_productos_ajax(request):
     #no es una tupla.
 
     productos, query = obtener_productos_filtrados(request)
+    carro = request.session.get('carro', {})
 
     resultados = []
     for p in productos:
+        entrada_carro = carro.get(str(p.id))
         resultados.append({
             "id": p.id,
             "nombre": p.nombre,
@@ -76,6 +78,7 @@ def buscar_productos_ajax(request):
             "promedio_calificacion": round(p.promedio_calificacion, 1) if p.promedio_calificacion else None,
             "total_calificaciones": p.total_calificaciones,
             "mi_calificacion": p.mi_calificacion,
+            "cantidad_en_carrito": entrada_carro['cantidad'] if entrada_carro else 0,
         })
 
     return JsonResponse({"productos": resultados, "query": query})

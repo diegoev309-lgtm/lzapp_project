@@ -214,6 +214,7 @@ def configuracion(request):
 
         perfil_form = PerfilUpdateForm(
             request.POST,
+            request.FILES,
             instance=perfil
         )
 

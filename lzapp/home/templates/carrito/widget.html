@@ -15,8 +15,8 @@
 
   /* ============================================================
      SIDEBAR — Carrito. Ahora es SIEMPRE panel superpuesto
-     (off-canvas) en cualquier tamaño de pantalla, controlado
-     por el botón flotante.
+     (off-canvas) en cualquier tamaño de pantalla, abierto desde el
+     ícono del carrito en la navbar.
      ============================================================ */
   .carrito-widget {
     position: fixed;
@@ -125,30 +125,31 @@
 
   .carrito-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 12px;
-    background: var(--azul-claro);
-    border: 1px solid transparent;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--blanco);
+    border: 1px solid var(--gris-borde);
+    box-shadow: 0 2px 8px rgba(2, 44, 99, 0.05);
     flex-shrink: 0;
-    transition: background 0.25s ease, border-color 0.2s ease;
+    transition: box-shadow 0.25s ease, border-color 0.2s ease, transform 0.2s ease;
   }
 
   .carrito-item:hover {
-    background: #ddeafd;
-    border-color: rgba(201, 168, 76, 0.35);
+    box-shadow: 0 8px 20px rgba(2, 44, 99, 0.12);
+    border-color: rgba(201, 168, 76, 0.4);
+    transform: translateY(-1px);
   }
 
   .carrito-item__imagen {
-    width: 60px;
-    height: 60px;
+    width: 68px;
+    height: 68px;
     object-fit: cover;
     border-radius: 12px;
     flex-shrink: 0;
     border: 1px solid var(--gris-borde);
-    background: var(--blanco);
+    background: var(--gris-claro, #f7f8fc);
   }
 
   .carrito-item__info {
@@ -159,40 +160,79 @@
     min-width: 0;
   }
 
+  .carrito-item__cabecera {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
   .carrito-item__nombre {
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 700;
     color: var(--azul-profundo);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 210px;
+    max-width: 100%;
+    line-height: 1.3;
   }
 
-  .carrito-item__cantidad {
-    font-size: 0.85rem;
+  .carrito-item__precio-unitario {
+    font-size: 0.78rem;
     color: var(--gris-texto);
-    margin-top: 2px;
   }
 
-  .carrito-item__controles {
+  .carrito-item__precio-unitario s {
+    opacity: 0.7;
+  }
+
+  .carrito-item__pie {
     display: flex;
     align-items: center;
-    gap: 6px;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .carrito-item__stepper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--azul-claro);
+    border-radius: 50px;
+    padding: 4px;
     flex-shrink: 0;
   }
 
+  .carrito-item__stepper-num {
+    min-width: 16px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.88rem;
+    color: var(--azul-profundo);
+  }
+
+  .carrito-item__subtotal {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--azul-profundo);
+    white-space: nowrap;
+  }
+
   .btn-qty {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1;
+    border: none;
     transition: transform 0.15s ease, opacity 0.15s ease;
   }
 
@@ -232,9 +272,42 @@
     opacity: 0.8;
   }
 
-  /* --- Footer: fijo abajo, SIEMPRE visible mientras haya productos --- */
+  .carrito-widget__vacio p {
+    font-weight: 700;
+    color: var(--azul-profundo);
+    margin-bottom: 4px;
+  }
+
+  .carrito-widget__vacio-sub {
+    font-size: 0.82rem;
+    color: var(--gris-texto);
+    max-width: 220px;
+  }
+
+  /* --- Fila recién agregada/actualizada: destello breve para que se
+     note el cambio sin depender de animar TODA la lista --- */
+  @keyframes carritoItemDestello {
+    0%   { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.55); }
+    100% { box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+  }
+
+  .carrito-item--resaltado {
+    animation: carritoItemDestello 0.9s ease-out;
+    border-color: rgba(201, 168, 76, 0.6) !important;
+  }
+
+  /* --- Footer: fijo abajo, SIEMPRE visible mientras haya productos ---
+     max-height + scroll propio como red de seguridad: en ventanas bajas
+     (laptop con poca altura útil, zoom del navegador, etc.) el total +
+     ubicación + pagar + vaciar pueden pesar más que el espacio que le
+     queda debajo del header y la lista. Sin esto, "Vaciar carrito"
+     podía quedar recortado por el overflow:hidden del panel y ser
+     imposible de alcanzar; con esto, en el peor caso el footer mismo
+     scrollea y el botón sigue siendo alcanzable. */
   .carrito-widget__footer {
     flex-shrink: 0;
+    max-height: 60vh;
+    overflow-y: auto;
     padding: 16px 20px 20px;
     border-top: 1px solid var(--gris-borde);
     background: var(--blanco);
@@ -284,57 +357,6 @@
   .btn-vaciar:hover {
     border-color: #e63950;
     color: #e63950;
-  }
-
-  /* ============================================================
-     BOTÓN FLOTANTE — visible SIEMPRE, en cualquier tamaño
-     ============================================================ */
-  .carrito-toggle {
-    display: flex;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--azul-profundo);
-    color: var(--blanco);
-    border: 2px solid var(--dorado);
-    box-shadow: 0 10px 30px rgba(2, 44, 99, 0.5);
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    z-index: 99999;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  .carrito-toggle:hover {
-    background: var(--dorado);
-    color: var(--azul-profundo);
-    transform: scale(1.08);
-  }
-
-  .carrito-toggle__count {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: var(--dorado);
-    color: var(--azul-profundo);
-    font-size: 0.68rem;
-    font-weight: 800;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    border: 2px solid var(--blanco);
   }
 
   /* --- Fondo oscuro detrás del panel, en cualquier tamaño --- */
@@ -431,15 +453,76 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-</style>
 
-<!-- Botón flotante: SIEMPRE visible, en cualquier pantalla -->
-<button class="carrito-toggle" id="carritoToggle" type="button" aria-label="Abrir carrito">
-  <i class="bi bi-cart3"></i>
-  {% if request.session.carro %}
-    <span class="carrito-toggle__count">{{ request.session.carro|length }}</span>
-  {% endif %}
-</button>
+  /* ---- Modal de confirmación "¿Vaciar el carrito?" ----
+     Antes reutilizaba las clases .mp-overlay/.mp-overlay-card que
+     carrito_compras.html define para su overlay de resultado de pago,
+     pero esas reglas viven SOLO en el <style> de esa página -- como
+     este widget ahora se incluye también en las páginas de productos
+     (que no cargan ese CSS), el modal quedaba en el DOM con
+     display:flex pero sin ningún estilo (invisible), así que "vaciar
+     carrito" parecía no hacer nada. Se le dan clases propias, con su
+     CSS acá mismo, para que funcione sin importar en qué página esté
+     incluido el widget y sin depender del estilo de otra página. */
+  .carrito-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 44, 99, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: carritoConfirmFadeIn 0.3s ease forwards;
+  }
+
+  @keyframes carritoConfirmFadeIn {
+    to { opacity: 1; }
+  }
+
+  .carrito-confirm-card {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 32px 28px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    border-top: 4px solid #c0392b;
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+    animation: carritoConfirmEntrar 0.4s ease 0.15s forwards;
+  }
+
+  @keyframes carritoConfirmEntrar {
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .carrito-confirm-card h2 {
+    color: var(--azul-profundo);
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+
+  .carrito-confirm-card p {
+    color: var(--gris-texto);
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+
+  .carrito-confirm-btn {
+    margin-top: 10px;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+    color: var(--blanco);
+  }
+
+  .carrito-confirm-btn:hover {
+    filter: brightness(1.12);
+  }
+</style>
 
 <!-- Fondo oscuro al abrir -->
 <div class="carrito-overlay" id="carritoOverlay"></div>
@@ -456,37 +539,20 @@
     </div>
   </div>
 
-  <div class="carrito-widget__lista">
-    {% for i,j in request.session.carro.items %}
-    <div class="carrito-item {% if j.es_premio %}carrito-item--premio{% endif %}">
-      <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
-      <div class="carrito-item__info">
-        <span class="carrito-item__nombre">
-          {{ j.nombre }}
-          {% if j.es_premio %}<span class="carrito-item__badge-premio"><i class="bi bi-gift-fill"></i> Premio</span>{% endif %}
-        </span>
-        <span class="carrito-item__cantidad">
-          Cantidad: {{ j.cantidad }} ·
-          {% if j.es_premio %}
-            <s>$ {{ j.precio_original|cop }} COP</s>
-            <strong>$ {{ j.precio|cop }} COP</strong> c/u
-          {% else %}
-            $ {{ j.precio|cop }} COP c/u
-          {% endif %}
-        </span>
-      </div>
-      <div class="carrito-item__controles">
-        <a href="{% url 'carro:restar' i %}" class="btn-qty btn-qty--restar">−</a>
-        {% if not j.es_premio %}
-          <a href="{% url 'carro:agregar' i %}" class="btn-qty btn-qty--sumar">+</a>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
+  <div class="carrito-widget__lista" id="carritoLista">
+    {% include 'carrito/_lista_items.html' %}
   </div>
 
-  {% if request.session.carro %}
-  <div class="carrito-widget__footer">
+  <!-- El footer (total + pago + vaciar) SIEMPRE se renderiza, aunque el
+       carrito esté vacío ahora mismo -- solo se oculta con display:none.
+       Antes se omitía por completo cuando el carrito venía vacío del
+       servidor, lo que estaba bien mientras cada acción recargaba la
+       página, pero con el carrito actualizándose por AJAX eso significaba
+       que el botón de pago (con sus listeners enganchados UNA sola vez,
+       acá abajo, al cargar la página) nunca llegaba a existir si el
+       primer producto se agregaba sin recargar -- el primer intento de
+       pagar simplemente no hacía nada. -->
+  <div class="carrito-widget__footer" style="{% if not request.session.carro %}display:none;{% endif %}">
     <div class="carrito-widget__total">
       <span>Total:</span>
       <strong>$ {{ totalizar_carro|cop }} COP</strong>
@@ -512,15 +578,25 @@
         <div id="wallet_container" class="mp-wallet-container"></div>
       </div>
 
-      <form action="{% url 'carro:limpiar' %}" method="post" onsubmit="return confirm('¿Vaciar el carrito?');">
-        {% csrf_token %}
-        <button type="submit" class="btn-vaciar">Vaciar carrito</button>
-      </form>
+      <button type="button" class="btn-vaciar" id="btnVaciarCarrito">Vaciar carrito</button>
     </div>
   </div>
-  {% endif %}
 
 </aside>
+
+<!-- Confirmación de "vaciar carrito" -- reemplaza el confirm() feo del
+     navegador por una tarjeta con estilo propio (ver .carrito-confirm-*
+     en el <style> de arriba). -->
+<div class="carrito-confirm-overlay" id="modalVaciarCarrito" style="display:none; z-index:2000;">
+  <div class="carrito-confirm-card">
+    <h2>¿Vaciar el carrito?</h2>
+    <p>Se eliminarán todos los productos que agregaste.</p>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button type="button" class="carrito-confirm-btn" id="btnCancelarVaciar" style="background:#eee; color:#333;">Cancelar</button>
+      <button type="button" class="carrito-confirm-btn" id="btnConfirmarVaciar" style="background:#c0392b;">Sí, vaciar</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 
@@ -548,6 +624,7 @@
 
       const lat = document.getElementById('cliente_latitud').value;
       const lng = document.getElementById('cliente_longitud').value;
+      const direccionTexto = (document.getElementById('direccion_entrega_texto') || {}).value || '';
 
       if (!lat || !lng) {
         mostrarError('Antes de pagar, confirma tu ubicación de entrega arriba.');
@@ -558,7 +635,8 @@
       btnPago.textContent = 'Preparando el pago...';
 
       try {
-        const url = "{% url 'carro:crear_preferencia_ajax' %}?lat=" + encodeURIComponent(lat) + "&lng=" + encodeURIComponent(lng);
+        const url = "{% url 'carro:crear_preferencia_ajax' %}?lat=" + encodeURIComponent(lat) +
+          "&lng=" + encodeURIComponent(lng) + "&direccion=" + encodeURIComponent(direccionTexto);
         const response = await fetch(url);
         const data = await response.json();
 
@@ -625,7 +703,6 @@
 
   (function () {
     const widget = document.getElementById('carritoWidget');
-    const toggle = document.getElementById('carritoToggle');
     const cerrar = document.getElementById('carritoCerrar');
     const overlay = document.getElementById('carritoOverlay');
 
@@ -633,16 +710,117 @@
       widget.classList.add('activo');
       overlay.classList.add('activo');
       document.body.style.overflow = 'hidden';
+      // Corre los toasts (.lz-toast, carrito_ajax.js) para que no queden
+      // tapados debajo del panel -- ambos viven en la esquina derecha.
+      document.body.classList.add('carrito-widget-abierto');
     }
 
     function cerrarCarrito() {
       widget.classList.remove('activo');
       overlay.classList.remove('activo');
       document.body.style.overflow = '';
+      document.body.classList.remove('carrito-widget-abierto');
     }
 
-    if (toggle) toggle.addEventListener('click', abrirCarrito);
     if (cerrar) cerrar.addEventListener('click', cerrarCarrito);
     if (overlay) overlay.addEventListener('click', cerrarCarrito);
+
+    // El ícono del carrito en la navbar (clients.html/users.html, y el
+    // propio navbar de carrito_compras.html) ahora abre este mismo panel
+    // en vez de navegar a una página aparte -- así se ve/edita el
+    // carrito sin perder el lugar donde se estaba navegando. El href a
+    // "carro" queda como respaldo (clic derecho, sin JS, etc.).
+    // Delegado en document (no enganchado directo al link) porque
+    // masterpage.html CLONA el contenido de #navbarActionsDesktop hacia
+    // el menú mobile con innerHTML DESPUÉS de que este script corre --
+    // un listener pegado directo al nodo original nunca llegaría al
+    // clon, y el ícono del carrito en mobile se quedaría sin abrir el
+    // panel.
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('.nav-link-carrito');
+      if (!link) return;
+      e.preventDefault();
+      abrirCarrito();
+    });
+  })();
+
+  /* ============================================================
+     +/− y "vaciar carrito" por AJAX -- sin recargar la página, y sin
+     el confirm() feo del navegador para vaciar. Delegado en el
+     contenedor de la lista (no en cada botón) porque su contenido se
+     reemplaza por completo en cada acción (aplicarRespuestaCarrito, en
+     carrito_ajax.js) para que un producto agregado por primera vez
+     aparezca de una vez, sin recargar la página.
+     ============================================================ */
+  (function () {
+    const URL_RESTAR_BASE = "{% url 'carro:restar' 1 %}";
+    const URL_AGREGAR_BASE_QTY = "{% url 'carro:agregar' 1 %}";
+    const URL_LIMPIAR = "{% url 'carro:limpiar' %}";
+    const lista = document.getElementById('carritoLista');
+
+    if (lista) {
+      lista.addEventListener('click', function (evento) {
+        const boton = evento.target.closest('.btn-qty[data-accion]');
+        if (!boton || boton.disabled) return;
+
+        boton.disabled = true;
+
+        const productoId = boton.dataset.productoId;
+        const base = boton.dataset.accion === 'sumar' ? URL_AGREGAR_BASE_QTY : URL_RESTAR_BASE;
+        const url = base.replace(/\/1\/?$/, '/' + productoId + '/');
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then((respuesta) => respuesta.json())
+          .then((datos) => {
+            if (!datos.ok) {
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito(datos.error || 'No se pudo actualizar el carrito.', 'error');
+              return;
+            }
+            if (typeof aplicarRespuestaCarrito === 'function') aplicarRespuestaCarrito(datos, productoId);
+          })
+          .catch(() => {
+            if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo actualizar el carrito. Intenta de nuevo.', 'error');
+          })
+          .finally(() => { boton.disabled = false; });
+        // Nota: no reactivamos "boton" tras un éxito porque
+        // aplicarRespuestaCarrito ya reemplazó ese nodo (o toda la
+        // lista) -- el .finally solo cubre el caso de red fallida,
+        // donde el botón original sigue en el DOM.
+      });
+    }
+
+    const btnVaciar = document.getElementById('btnVaciarCarrito');
+    const modalVaciar = document.getElementById('modalVaciarCarrito');
+    const btnCancelarVaciar = document.getElementById('btnCancelarVaciar');
+    const btnConfirmarVaciar = document.getElementById('btnConfirmarVaciar');
+
+    if (btnVaciar && modalVaciar) {
+      btnVaciar.addEventListener('click', () => { modalVaciar.style.display = 'flex'; });
+      if (btnCancelarVaciar) btnCancelarVaciar.addEventListener('click', () => { modalVaciar.style.display = 'none'; });
+      modalVaciar.addEventListener('click', (e) => { if (e.target === modalVaciar) modalVaciar.style.display = 'none'; });
+
+      if (btnConfirmarVaciar) {
+        btnConfirmarVaciar.addEventListener('click', function () {
+          btnConfirmarVaciar.disabled = true;
+
+          fetch(URL_LIMPIAR, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then((respuesta) => respuesta.json())
+            .then((datos) => {
+              modalVaciar.style.display = 'none';
+              if (!datos.ok) {
+                if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo vaciar el carrito.', 'error');
+                return;
+              }
+              if (typeof aplicarRespuestaCarrito === 'function') aplicarRespuestaCarrito(datos);
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('Se vació el carrito.', 'success');
+            })
+            .catch(() => {
+              modalVaciar.style.display = 'none';
+              if (typeof mostrarToastCarrito === 'function') mostrarToastCarrito('No se pudo vaciar el carrito. Intenta de nuevo.', 'error');
+            })
+            .finally(() => { btnConfirmarVaciar.disabled = false; });
+        });
+      }
+    }
   })();
 </script>

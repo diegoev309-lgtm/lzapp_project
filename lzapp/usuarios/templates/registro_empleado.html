@@ -1,6 +1,10 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+{% endblock %}
+
 {% block content %}
 
 <div class="overlay">
@@ -37,7 +41,11 @@
 
                     <div class="campo">
                         <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
-                        {{ form.telefono }}
+                        <div class="campo-telefono-wrap">
+                            {{ form.codigo_pais }}
+                            {{ form.telefono }}
+                        </div>
+                        {% if form.codigo_pais.errors %}<ul class="errorlist">{{ form.codigo_pais.errors }}</ul>{% endif %}
                         {% if form.telefono.errors %}<ul class="errorlist">{{ form.telefono.errors }}</ul>{% endif %}
                     </div>
 
@@ -60,7 +68,7 @@
                     <a href="{% url 'Usuario' %}" class="btn-volver">
                         <i class="bi bi-arrow-left"></i> Volver
                     </a>
-                    <button type="submit" class="btn-guardar">
+                    <button type="submit" class="btn-guardar" id="btnRegistrarEmpleado">
                         <i class="bi bi-check-circle-fill"></i> Registrar empleado
                     </button>
                 </div>
@@ -68,5 +76,126 @@
         </div>
     </div>
 </div>
+
+<script src="{% static 'js/telefono_validacion.js' %}"></script>
+<script src="{% static 'js/pais_selector.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputUsername = document.getElementById('{{ form.username.id_for_label }}');
+    const inputEmail = document.getElementById('{{ form.email.id_for_label }}');
+    const selectPais = document.getElementById('{{ form.codigo_pais.id_for_label }}');
+    const inputTelefono = document.getElementById('{{ form.telefono.id_for_label }}');
+    const btnGuardar = document.getElementById('btnRegistrarEmpleado');
+    const erroresActuales = {};
+
+    function mostrarError(input, mensaje) {
+        input.classList.add('is-invalid');
+        let lista = input.parentElement.querySelector('.errorlist');
+        if (!lista) {
+            lista = document.createElement('ul');
+            lista.classList.add('errorlist');
+            (input.closest('.campo-telefono-wrap') || input).insertAdjacentElement('afterend', lista);
+        }
+        lista.innerHTML = '<li>' + mensaje + '</li>';
+        erroresActuales[input.id] = true;
+        actualizarBoton();
+    }
+
+    function limpiarError(input) {
+        input.classList.remove('is-invalid');
+        const contenedor = input.closest('.campo-telefono-wrap') || input;
+        const lista = contenedor.nextElementSibling;
+        if (lista && lista.classList.contains('errorlist')) lista.remove();
+        delete erroresActuales[input.id];
+        actualizarBoton();
+    }
+
+    function actualizarBoton() {
+        if (btnGuardar) btnGuardar.disabled = Object.keys(erroresActuales).length > 0;
+    }
+
+    function validarUsername() {
+        if (!inputUsername) return;
+        const valor = inputUsername.value.trim();
+
+        if (valor === '') {
+            limpiarError(inputUsername);
+        } else if (valor.length < 6) {
+            mostrarError(inputUsername, 'El nombre de usuario debe tener al menos 6 caracteres.');
+        } else if (valor.length > 20) {
+            mostrarError(inputUsername, 'El nombre de usuario no puede tener más de 20 caracteres.');
+        } else if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(valor)) {
+            mostrarError(inputUsername, 'Debe comenzar con una letra y solo puede contener letras, números y guiones bajos (_).');
+        } else if (!/[0-9]/.test(valor)) {
+            mostrarError(inputUsername, 'El nombre de usuario debe contener al menos un número.');
+        } else {
+            limpiarError(inputUsername);
+        }
+    }
+
+    function validarEmail() {
+        if (!inputEmail) return;
+        const valor = inputEmail.value.trim();
+
+        if (valor === '') {
+            limpiarError(inputEmail);
+        } else if (!valor.includes('@')) {
+            mostrarError(inputEmail, 'Falta el @ en el correo.');
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+            mostrarError(inputEmail, 'Ese correo no tiene un formato válido.');
+        } else {
+            limpiarError(inputEmail);
+        }
+    }
+
+    function actualizarMaxLengthTelefono() {
+        if (!inputTelefono || !selectPais || !window.LZ_TELEFONO) return;
+        const [, maximo] = LZ_TELEFONO.rango(selectPais.value);
+        inputTelefono.maxLength = maximo;
+    }
+
+    // La regla (cuántos dígitos según el país) vive en
+    // telefono_validacion.js, compartida con registro.html y
+    // configuracion.html. Acá solo se sanea el input -- nada de +,
+    // espacios, guiones ni paréntesis, el código de país ya lo elige el
+    // select de al lado -- y se pinta con el mismo mostrarError/
+    // limpiarError que ya usan usuario y correo en este formulario.
+    function validarTelefono() {
+        if (!inputTelefono || !window.LZ_TELEFONO) return;
+
+        const limpio = LZ_TELEFONO.sanear(inputTelefono.value);
+        if (limpio !== inputTelefono.value) inputTelefono.value = limpio;
+
+        const codigoPais = selectPais ? selectPais.value : '';
+        const resultado = LZ_TELEFONO.validar(codigoPais, limpio);
+
+        if (resultado.ok === null) {
+            limpiarError(inputTelefono);
+        } else if (!resultado.ok) {
+            mostrarError(inputTelefono, resultado.mensaje);
+        } else {
+            limpiarError(inputTelefono);
+        }
+    }
+
+    if (inputUsername) inputUsername.addEventListener('input', validarUsername);
+    if (inputEmail) inputEmail.addEventListener('input', validarEmail);
+    if (inputTelefono) inputTelefono.addEventListener('input', validarTelefono);
+    if (selectPais) {
+        selectPais.addEventListener('change', function () {
+            actualizarMaxLengthTelefono();
+            validarTelefono();
+        });
+    }
+    actualizarMaxLengthTelefono();
+
+    document.querySelector('form').addEventListener('submit', function (evento) {
+        validarUsername();
+        validarEmail();
+        validarTelefono();
+        if (Object.keys(erroresActuales).length > 0) evento.preventDefault();
+    });
+});
+</script>
 
 {% endblock %}

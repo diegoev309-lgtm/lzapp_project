@@ -17,10 +17,11 @@ import hashlib
 
 class Perfil(models.Model):
     usuario = models.OneToOneField(User,on_delete=models.CASCADE)
-    telefono = models.CharField(max_length=15)
+    telefono = models.CharField(max_length=20)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    foto = models.ImageField(upload_to='perfiles/', blank=True, null=True)
 
     class Meta:
         db_table = 'perfil'

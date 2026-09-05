@@ -6,13 +6,12 @@
 {% block navbar_actions %}
 <ul class="nav justify-content-end align-items-center gap-2">
 
-    <!-- Carrito -->
+    <!-- Carrito: abre el panel deslizante (carrito/widget.html) en vez de
+         navegar a una página aparte -- ver el JS al final de ese include. -->
     <li class="nav-item">
         <a class="nav-link p-1 nav-link-icon nav-link-carrito{% if carrito_cantidad_items %} tiene-items{% endif %}" href="{% url 'carro' %}" title="Carrito de compras">
-            <i class="bi bi-basket fs-4"></i>
-            {% if carrito_cantidad_items %}
-                <span class="carrito-badge">{{ carrito_cantidad_items }}</span>
-            {% endif %}
+            <i class="bi bi-cart3 fs-4"></i>
+            <span class="carrito-badge{% if carrito_cantidad_items %} visible{% endif %}">{{ carrito_cantidad_items|default:0 }}</span>
         </a>
     </li>
 
@@ -110,7 +109,7 @@
 
             <li>
                 <a class="perfil-menu-item" href="{% url 'carro' %}">
-                    <i class="bi bi-basket"></i>
+                    <i class="bi bi-cart3"></i>
                     <span>Mi carrito</span>
                 </a>
             </li>

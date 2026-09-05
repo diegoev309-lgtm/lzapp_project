@@ -68,7 +68,18 @@
 }
 
 </style>
-<ul class="nav justify-content-end align-items-center">
+<ul class="nav justify-content-end align-items-center gap-2">
+
+    <!-- Carrito: visitantes también pueden armar carrito (queda en su
+         sesión) -- antes no tenían ninguna forma de verlo sin conocer
+         la URL de memoria. Abre el panel deslizante, igual que en
+         clients.html (ver JS al final de carrito/widget.html). -->
+    <li class="nav-item">
+        <a class="nav-link p-1 nav-link-icon nav-link-carrito{% if carrito_cantidad_items %} tiene-items{% endif %}" href="{% url 'carro' %}" title="Carrito de compras">
+            <i class="bi bi-cart3 fs-4"></i>
+            <span class="carrito-badge{% if carrito_cantidad_items %} visible{% endif %}">{{ carrito_cantidad_items|default:0 }}</span>
+        </a>
+    </li>
 
     <li class="nav-item me-2">
         <a class="btn btn-login" href="{% url 'login' %}">

@@ -265,6 +265,13 @@ input[type=checkbox]{
     font-size:12.5px;
 }
 
+input.is-invalid,
+select.is-invalid{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(220,53,69,.15) !important;
+}
+.btn-guardar:disabled{ opacity:.5; cursor:not-allowed; }
+
 /*==========================
       SCROLL MODERNO
 ==========================*/
@@ -490,7 +497,7 @@ input[type=checkbox]{
                         <i class="bi bi-arrow-left"></i>
                         Volver
                     </a>
-                    <button type="submit" class="btn btn-guardar">
+                    <button type="submit" class="btn btn-guardar" id="btnGuardarCampana">
                         <i class="bi bi-check-circle-fill"></i>
                         {% if modo == 'crear' %}Crear campaña{% else %}Guardar cambios{% endif %}
                     </button>
@@ -503,5 +510,91 @@ input[type=checkbox]{
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputPorcentaje = document.getElementById('{{ form.porcentaje_descuento.id_for_label }}');
+    const inputPorcentajeMax = document.getElementById('{{ form.porcentaje_maximo_clientes.id_for_label }}');
+    const inputFechaInicio = document.getElementById('{{ form.fecha_inicio.id_for_label }}');
+    const inputFechaFin = document.getElementById('{{ form.fecha_fin.id_for_label }}');
+    const btnGuardar = document.getElementById('btnGuardarCampana');
+    const erroresActuales = {};
+
+    function mostrarError(input, mensaje) {
+        input.classList.add('is-invalid');
+        let lista = input.parentElement.querySelector('.errorlist');
+        if (!lista) {
+            lista = document.createElement('ul');
+            lista.classList.add('errorlist');
+            input.insertAdjacentElement('afterend', lista);
+        }
+        lista.innerHTML = '<li>' + mensaje + '</li>';
+        erroresActuales[input.id] = true;
+        actualizarBoton();
+    }
+
+    function limpiarError(input) {
+        input.classList.remove('is-invalid');
+        const lista = input.parentElement.querySelector('.errorlist');
+        if (lista) lista.remove();
+        delete erroresActuales[input.id];
+        actualizarBoton();
+    }
+
+    function actualizarBoton() {
+        if (btnGuardar) btnGuardar.disabled = Object.keys(erroresActuales).length > 0;
+    }
+
+    function validarPorcentaje() {
+        if (!inputPorcentaje) return;
+        const valor = parseFloat(inputPorcentaje.value);
+
+        if (inputPorcentaje.value.trim() === '') {
+            limpiarError(inputPorcentaje);
+        } else if (isNaN(valor) || valor <= 0 || valor > 100) {
+            mostrarError(inputPorcentaje, 'El porcentaje de descuento debe estar entre 0.01% y 100%.');
+        } else {
+            limpiarError(inputPorcentaje);
+        }
+    }
+
+    function validarPorcentajeMax() {
+        if (!inputPorcentajeMax) return;
+        const valor = parseFloat(inputPorcentajeMax.value);
+
+        if (inputPorcentajeMax.value.trim() === '') {
+            limpiarError(inputPorcentajeMax);
+        } else if (isNaN(valor) || valor < 0 || valor > 100) {
+            mostrarError(inputPorcentajeMax, 'El porcentaje máximo de clientes debe estar entre 0% y 100%.');
+        } else {
+            limpiarError(inputPorcentajeMax);
+        }
+    }
+
+    function validarFechas() {
+        if (!inputFechaInicio || !inputFechaFin || !inputFechaInicio.value || !inputFechaFin.value) {
+            if (inputFechaFin) limpiarError(inputFechaFin);
+            return;
+        }
+        if (new Date(inputFechaFin.value) < new Date(inputFechaInicio.value)) {
+            mostrarError(inputFechaFin, 'La fecha de fin no puede ser anterior a la fecha de inicio.');
+        } else {
+            limpiarError(inputFechaFin);
+        }
+    }
+
+    if (inputPorcentaje) inputPorcentaje.addEventListener('input', validarPorcentaje);
+    if (inputPorcentajeMax) inputPorcentajeMax.addEventListener('input', validarPorcentajeMax);
+    if (inputFechaInicio) inputFechaInicio.addEventListener('change', validarFechas);
+    if (inputFechaFin) inputFechaFin.addEventListener('change', validarFechas);
+
+    document.querySelector('form').addEventListener('submit', function (evento) {
+        validarPorcentaje();
+        validarPorcentajeMax();
+        validarFechas();
+        if (Object.keys(erroresActuales).length > 0) evento.preventDefault();
+    });
+});
+</script>
 
 {% endblock %}

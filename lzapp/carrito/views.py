@@ -12,16 +12,50 @@ from django.db import transaction
 from django.db.models import F
 from .logic import Carro
 from .utils import enviar_email_compra
+from .context_processor import totalizar_carro as _totalizar_carro
 from dashboard.models import Producto, DescuentoAsignado, Venta, DetalleVenta, Pedido, Perfil
 from django.conf import settings
 from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
 from django.contrib import messages
 
 
 sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+
+
+def _es_peticion_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def _resumen_carro(request, producto_id=None):
+    #"""
+    #Snapshot del carrito para las respuestas AJAX: cuántos ítems hay en
+    #total, el total en plata (mismo cálculo que ya usa el context
+    #processor totalizar_carro, incluido el cupón de la ruleta), el
+    #estado puntual del producto que se acaba de tocar (o None si ya no
+    #está, ej. al restar hasta 0), y el HTML ya renderizado de la lista
+    #del widget -- así el cliente solo tiene que reemplazarlo, en vez de
+    #tener que reconstruir cada fila a mano en JS (lo que antes hacía que
+    #un producto NUEVO nunca apareciera en el carrito sin recargar).
+    #"""
+    datos = _totalizar_carro(request)
+    item = None
+    if producto_id is not None:
+        entrada = request.session.get('carro', {}).get(str(producto_id))
+        if entrada:
+            item = {
+                'cantidad': entrada['cantidad'],
+                'subtotal': round(float(entrada['precio']) * entrada['cantidad'], 2),
+            }
+    return {
+        'cantidad_items': datos['carrito_cantidad_items'],
+        'total': datos['totalizar_carro'],
+        'item': item,
+        'lista_html': render_to_string('carrito/_lista_items.html', {}, request=request),
+    }
 
 
 def agregar_producto(request, producto_id):
@@ -41,6 +75,12 @@ def agregar_producto(request, producto_id):
         ).first()
 
     resultado = carro.agregar(producto=identificador, premio=premio)
+
+    if _es_peticion_ajax(request):
+        if not resultado['ok']:
+            return JsonResponse({'ok': False, 'error': resultado['error']}, status=409)
+        return JsonResponse({'ok': True, **_resumen_carro(request, producto_id)})
+
     if not resultado["ok"]:
         messages.warning(request, resultado["error"])
 
@@ -51,6 +91,10 @@ def eliminar_producto(request,producto_id):
     carro=Carro(request)
     identificador=Producto.objects.get(id=producto_id)
     carro.eliminar(producto=identificador)
+
+    if _es_peticion_ajax(request):
+        return JsonResponse({'ok': True, **_resumen_carro(request, producto_id)})
+
     return redirect("carro")
 
 
@@ -58,21 +102,29 @@ def restar_producto(request,producto_id):
     carro=Carro(request)
     identificador=Producto.objects.get(id=producto_id)
     carro.restar(producto=identificador)
+
+    if _es_peticion_ajax(request):
+        return JsonResponse({'ok': True, **_resumen_carro(request, producto_id)})
+
     return redirect("carro")
 
 
 def limpiar_carro(request):
     carro=Carro(request)
     carro.limpiar_carro()
+
+    if _es_peticion_ajax(request):
+        return JsonResponse({'ok': True, **_resumen_carro(request)})
+
     return redirect("carro")
 
 
-def _leer_coords_entrega(request):
+def _leer_coords_entrega(request, lat=None, lng=None):
     """Lee lat/lng de la ubicación de entrega que manda el widget del carrito.
     Se guardan en sesión como respaldo: si el navegador vuelve de Mercado Pago
     sin ellas (o el webhook llega primero), igual sabemos a dónde entregar."""
-    lat = request.GET.get("lat")
-    lng = request.GET.get("lng")
+    lat = lat or request.GET.get("lat")
+    lng = lng or request.GET.get("lng")
 
     if lat and lng:
         request.session["entrega_lat"] = lat
@@ -82,7 +134,7 @@ def _leer_coords_entrega(request):
     return request.session.get("entrega_lat"), request.session.get("entrega_lng")
 
 
-def _construir_preference_data(request):
+def _construir_preference_data(request, lat=None, lng=None, direccion=None):
     carro = request.session.get("carro", {})
 
     if not carro:
@@ -116,7 +168,7 @@ def _construir_preference_data(request):
 
     usuario_id = request.session.get("_auth_user_id") or request.session.get("usuario_id")
     request.session["mp_items_comprados"] = list(carro.keys())
-    entrega_lat, entrega_lng = _leer_coords_entrega(request)
+    entrega_lat, entrega_lng = _leer_coords_entrega(request, lat, lng)
 
     carro_url = urljoin(settings.SITE_URL, reverse("carro"))
     notification_url = urljoin(settings.SITE_URL, reverse("carro:webhook_mp"))
@@ -144,11 +196,13 @@ def _construir_preference_data(request):
             # listas de diccionarios anidados, así que lo serializamos
             # y lo parseamos de vuelta en el webhook.
             "items_comprados_json": json.dumps(items_comprados),
-            # Coordenadas de entrega: viajan con la preferencia para que el
-            # webhook pueda dejarlas en el Pedido aunque la sesión del
-            # navegador ya no exista cuando Mercado Pago nos notifique.
+            # Coordenadas y dirección de entrega: viajan con la preferencia
+            # para que el webhook pueda dejarlas en el Pedido aunque la
+            # sesión del navegador ya no exista cuando Mercado Pago nos
+            # notifique.
             "entrega_lat": entrega_lat,
             "entrega_lng": entrega_lng,
+            "direccion_entrega": (direccion or '')[:255],
         },
     }
 
@@ -181,6 +235,15 @@ def crear_preferencia_ajax(request):
     if not carro:
         return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+    direccion = request.GET.get('direccion')
+
+    # El JS ya bloquea el botón de pago si faltan, pero se revalida acá
+    # también -- no hay que confiar solo en el chequeo del navegador.
+    if not lat or not lng:
+        return JsonResponse({"error": "Confirma tu ubicación de entrega antes de pagar."}, status=400)
+
     errores_stock = _validar_stock_carro(carro)
     if errores_stock:
         return JsonResponse({
@@ -188,7 +251,7 @@ def crear_preferencia_ajax(request):
             "detalle": errores_stock,
         }, status=409)
 
-    preference_data = _construir_preference_data(request)
+    preference_data = _construir_preference_data(request, lat=lat, lng=lng, direccion=direccion)
     if not preference_data:
         return JsonResponse({"error": "El carrito está vacío"}, status=400)
 
@@ -273,6 +336,7 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
 
     lat = metadata.get("entrega_lat")
     lng = metadata.get("entrega_lng")
+    direccion = metadata.get("direccion_entrega")
     if (not lat or not lng) and coords_respaldo:
         lat, lng = coords_respaldo
 
@@ -319,7 +383,7 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
         # El Pedido lo crea la señal post_save de Venta; aquí le dejamos
         # la ubicación de entrega, que es lo que después usa
         # asignar_repartidor_automatico() para elegir repartidor y ruta.
-        _guardar_ubicacion_entrega(venta, lat, lng)
+        _guardar_ubicacion_entrega(venta, lat, lng, direccion)
 
     # Marca cada premio usado como YA UTILIZADO
     if codigos_premio:
@@ -335,8 +399,8 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
     return venta
 
 
-def _guardar_ubicacion_entrega(venta, lat, lng):
-    """Copia las coordenadas de entrega al Pedido recién creado.
+def _guardar_ubicacion_entrega(venta, lat, lng, direccion=None):
+    """Copia las coordenadas y dirección de entrega al Pedido recién creado.
 
     Si por lo que sea no llegaron con el pago (una preferencia vieja, la
     sesión perdida, el navegador que volvió sin ellas), se cae a la
@@ -364,7 +428,9 @@ def _guardar_ubicacion_entrega(venta, lat, lng):
     except (InvalidOperation, TypeError, ValueError):
         return
 
-    if perfil and perfil.direccion:
+    if direccion:
+        pedido.direccion_entrega = direccion[:255]
+    elif perfil and perfil.direccion:
         pedido.direccion_entrega = perfil.direccion
 
     pedido.save(update_fields=["cliente_latitud", "cliente_longitud", "direccion_entrega"])
