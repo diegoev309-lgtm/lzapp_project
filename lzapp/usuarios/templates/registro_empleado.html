@@ -1,6 +1,10 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+{% endblock %}
+
 {% block content %}
 
 <div class="overlay">
@@ -73,10 +77,13 @@
     </div>
 </div>
 
+<script src="{% static 'js/telefono_validacion.js' %}"></script>
+<script src="{% static 'js/pais_selector.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const inputUsername = document.getElementById('{{ form.username.id_for_label }}');
     const inputEmail = document.getElementById('{{ form.email.id_for_label }}');
+    const selectPais = document.getElementById('{{ form.codigo_pais.id_for_label }}');
     const inputTelefono = document.getElementById('{{ form.telefono.id_for_label }}');
     const btnGuardar = document.getElementById('btnRegistrarEmpleado');
     const erroresActuales = {};
@@ -141,14 +148,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function validarTelefono() {
-        if (!inputTelefono) return;
-        const valor = inputTelefono.value.trim();
+    function actualizarMaxLengthTelefono() {
+        if (!inputTelefono || !selectPais || !window.LZ_TELEFONO) return;
+        const [, maximo] = LZ_TELEFONO.rango(selectPais.value);
+        inputTelefono.maxLength = maximo;
+    }
 
-        if (valor === '') {
+    // La regla (cuántos dígitos según el país) vive en
+    // telefono_validacion.js, compartida con registro.html y
+    // configuracion.html. Acá solo se sanea el input -- nada de +,
+    // espacios, guiones ni paréntesis, el código de país ya lo elige el
+    // select de al lado -- y se pinta con el mismo mostrarError/
+    // limpiarError que ya usan usuario y correo en este formulario.
+    function validarTelefono() {
+        if (!inputTelefono || !window.LZ_TELEFONO) return;
+
+        const limpio = LZ_TELEFONO.sanear(inputTelefono.value);
+        if (limpio !== inputTelefono.value) inputTelefono.value = limpio;
+
+        const codigoPais = selectPais ? selectPais.value : '';
+        const resultado = LZ_TELEFONO.validar(codigoPais, limpio);
+
+        if (resultado.ok === null) {
             limpiarError(inputTelefono);
-        } else if (!/^[0-9+\-\s()]+$/.test(valor) || !/[0-9]/.test(valor)) {
-            mostrarError(inputTelefono, 'El teléfono solo puede contener números, espacios y los símbolos + - ( ), con al menos un número.');
+        } else if (!resultado.ok) {
+            mostrarError(inputTelefono, resultado.mensaje);
         } else {
             limpiarError(inputTelefono);
         }
@@ -157,6 +181,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (inputUsername) inputUsername.addEventListener('input', validarUsername);
     if (inputEmail) inputEmail.addEventListener('input', validarEmail);
     if (inputTelefono) inputTelefono.addEventListener('input', validarTelefono);
+    if (selectPais) {
+        selectPais.addEventListener('change', function () {
+            actualizarMaxLengthTelefono();
+            validarTelefono();
+        });
+    }
+    actualizarMaxLengthTelefono();
 
     document.querySelector('form').addEventListener('submit', function (evento) {
         validarUsername();

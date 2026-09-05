@@ -297,6 +297,31 @@ body{
 .campo-telefono-wrap .select-codigo-pais{flex:0 0 auto;width:auto;min-width:92px;max-width:118px;padding-right:1.6rem;cursor:pointer;}
 .campo-telefono-wrap input{flex:1;min-width:0;}
 
+/* Selector de país con bandera real (pais_selector.js reemplaza
+   visualmente el <select> de arriba por esto -- el <select> sigue
+   existiendo oculto y es el que en verdad se envía con el form). */
+.pais-selector-input-real{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;}
+.pais-selector{position:relative;flex:0 0 auto;}
+.pais-selector__boton{
+    display:flex;align-items:center;gap:6px;
+    height:50px;padding:0 .7rem;border-radius:12px;
+    border:1.5px solid #e3e6ee;background:#fafbfd;cursor:pointer;
+    transition:border-color var(--transition),background var(--transition);
+}
+.pais-selector__boton:hover,
+.pais-selector__boton[aria-expanded="true"]{border-color:var(--dorado);background:#fff;}
+.pais-selector__bandera{width:22px;line-height:16px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;}
+.pais-selector__codigo{font-size:.82rem;font-weight:600;color:var(--azul-profundo);white-space:nowrap;}
+.pais-selector__chevron{font-size:.7rem;color:#9aa3b2;margin-left:2px;}
+.pais-selector__lista{
+    position:absolute;top:calc(100% + 6px);left:0;z-index:30;
+    width:190px;max-height:240px;overflow-y:auto;
+    background:#fff;border-radius:12px;box-shadow:0 12px 30px rgba(2,44,99,.25);
+    padding:6px;list-style:none;margin:0;
+}
+.pais-selector__opcion{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:.85rem;color:var(--azul-profundo);}
+.pais-selector__opcion:hover{background:#f2f4f9;}
+
 /* fortaleza de la contraseña */
 .fortaleza-contrasena{margin-top:.5rem;}
 .fortaleza-barra{height:5px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;}

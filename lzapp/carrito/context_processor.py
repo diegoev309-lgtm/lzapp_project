@@ -25,9 +25,11 @@ def totalizar_carro(request):
     total = 0
     carro = request.session.get("carro", {})
     cantidad_items = 0
+    cantidades_por_producto = {}
     for key, value in carro.items():
         total += float(value["precio"]) * value["cantidad"]
         cantidad_items += value["cantidad"]
+        cantidades_por_producto[key] = value["cantidad"]
 
     # Cupón de 5% ganado en la ruleta diaria (NO usa DescuentoAsignado,
     # es solo un % ligero en sesión aplicado sobre el total del carrito).
@@ -46,6 +48,7 @@ def totalizar_carro(request):
     return {
         "totalizar_carro": total,
         "carrito_cantidad_items": cantidad_items,
+        "carrito_cantidades": cantidades_por_producto,
         "cupon_ruleta_activo": cupon_ruleta,
         "descuento_cupon_ruleta": descuento_cupon_ruleta,
         "envio_gratis_ruleta_activo": envio_gratis_ruleta,

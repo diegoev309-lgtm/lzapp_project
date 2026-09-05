@@ -149,6 +149,58 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* =========================================================
+   TELÉFONO: validación en tiempo real (solo Registro) -- la regla en
+   sí (cuántos dígitos según el país) vive en telefono_validacion.js,
+   compartido con configuracion.html y registro_empleado.html; acá solo
+   se sanea el input (nada de +, espacios, guiones ni paréntesis: el
+   código de país ya lo elige el select de al lado) y se pinta el
+   resultado con el mismo look de username-feedback que ya usan email
+   y usuario en esta página.
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function () {
+    const selectPais = document.getElementById('id_codigo_pais');
+    const telefonoInput = document.getElementById('id_telefono');
+    const telefonoFeedback = document.getElementById('telefono-feedback');
+    if (!telefonoInput || !telefonoFeedback || !window.LZ_TELEFONO) return; // no estamos en registro.html
+
+    function actualizarMaxLength() {
+        if (!selectPais) return;
+        const [, maximo] = LZ_TELEFONO.rango(selectPais.value);
+        telefonoInput.maxLength = maximo;
+    }
+
+    function validarTelefono() {
+        const limpio = LZ_TELEFONO.sanear(telefonoInput.value);
+        if (limpio !== telefonoInput.value) telefonoInput.value = limpio;
+
+        telefonoInput.classList.remove('username-valido', 'username-invalido');
+
+        const codigoPais = selectPais ? selectPais.value : '';
+        const resultado = LZ_TELEFONO.validar(codigoPais, limpio);
+
+        if (resultado.ok === null) {
+            telefonoFeedback.textContent = '';
+            telefonoFeedback.className = 'username-feedback';
+            return;
+        }
+
+        telefonoInput.classList.add(resultado.ok ? 'username-valido' : 'username-invalido');
+        telefonoFeedback.textContent = resultado.mensaje;
+        telefonoFeedback.className = 'username-feedback ' + (resultado.ok ? 'success' : 'error');
+    }
+
+    actualizarMaxLength();
+    if (selectPais) {
+        selectPais.addEventListener('change', function () {
+            actualizarMaxLength();
+            validarTelefono();
+        });
+    }
+    telefonoInput.addEventListener('input', validarTelefono);
+    telefonoInput.addEventListener('blur', validarTelefono);
+});
+
+/* =========================================================
    CONTRASEÑA: fortaleza en tiempo real + coincidencia (solo Registro)
    ========================================================= */
 document.addEventListener('DOMContentLoaded', function () {

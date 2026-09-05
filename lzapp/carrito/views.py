@@ -19,6 +19,7 @@ from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
 from django.contrib import messages
 
 
@@ -33,9 +34,12 @@ def _resumen_carro(request, producto_id=None):
     #"""
     #Snapshot del carrito para las respuestas AJAX: cuántos ítems hay en
     #total, el total en plata (mismo cálculo que ya usa el context
-    #processor totalizar_carro, incluido el cupón de la ruleta), y el
+    #processor totalizar_carro, incluido el cupón de la ruleta), el
     #estado puntual del producto que se acaba de tocar (o None si ya no
-    #está, ej. al restar hasta 0).
+    #está, ej. al restar hasta 0), y el HTML ya renderizado de la lista
+    #del widget -- así el cliente solo tiene que reemplazarlo, en vez de
+    #tener que reconstruir cada fila a mano en JS (lo que antes hacía que
+    #un producto NUEVO nunca apareciera en el carrito sin recargar).
     #"""
     datos = _totalizar_carro(request)
     item = None
@@ -50,6 +54,7 @@ def _resumen_carro(request, producto_id=None):
         'cantidad_items': datos['carrito_cantidad_items'],
         'total': datos['totalizar_carro'],
         'item': item,
+        'lista_html': render_to_string('carrito/_lista_items.html', {}, request=request),
     }
 
 

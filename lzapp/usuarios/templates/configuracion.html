@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
 
     <link rel="stylesheet" href="{% static 'css/config.css' %}">
 </head>
@@ -38,8 +39,46 @@
 
         <span class="perfil-eyebrow"><span class="dot"></span> Mi cuenta</span>
 
-        <div class="avatar-circulo">
-            <img src="{% static 'img/logo.png' %}" alt="Lácteos Zulianos" class="avatar-logo">
+        <div class="avatar-wrap">
+            <div class="avatar-circulo">
+                <img {% if perfil.foto %}src="{{ perfil.foto.url }}"{% endif %}
+                     alt="Foto de perfil" class="avatar-logo avatar-foto" id="avatarPreview"
+                     {% if not perfil.foto %}style="display:none;"{% endif %}>
+                <span class="avatar-placeholder-icono" id="avatarPlaceholder"
+                      {% if perfil.foto %}style="display:none;"{% endif %}>
+                    <i class="bi bi-image"></i>
+                </span>
+            </div>
+
+            <button type="button" class="avatar-camara-btn" id="avatarCamaraBtn"
+                    aria-label="Cambiar foto de perfil" aria-haspopup="true" aria-expanded="false">
+                <i class="bi bi-camera-fill"></i>
+            </button>
+
+            <div class="avatar-menu" id="avatarMenu" hidden>
+                <button type="button" class="avatar-menu-item" id="btnElegirGaleria">
+                    <i class="bi bi-images"></i> Elegir de la galería
+                </button>
+                <button type="button" class="avatar-menu-item" id="btnTomarFoto">
+                    <i class="bi bi-camera"></i> Tomar foto
+                </button>
+            </div>
+
+            {% comment %}
+            Selectores auxiliares: NO se envían con el formulario, eligen
+            el archivo y JS lo copia al input real de abajo (dentro del
+            elemento form), que es el que sí viaja con el resto de los
+            datos.
+
+            Ojo: display none no sirve para estos dos -- varios
+            navegadores ignoran el click programático sobre un input de
+            archivo que esté display none (el picker de archivos nunca se
+            abre). La clase avatar-input-oculto lo esconde visualmente
+            sin sacarlo del layout (1x1px, opacity 0), así que el click
+            sí funciona.
+            {% endcomment %}
+            <input type="file" accept="image/*" id="fotoGaleriaInput" class="avatar-input-oculto">
+            <input type="file" accept="image/*" capture="environment" id="fotoCamaraInput" class="avatar-input-oculto">
         </div>
 
         <h3>Configuración de mi cuenta</h3>
@@ -77,8 +116,16 @@
             {% endfor %}
         {% endif %}
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            {% comment %}
+            El input real vive acá (dentro del form) para que se envíe con
+            el resto de datos; el círculo clicable de arriba, en el
+            header, es un <label> que apunta a este mismo input por id,
+            así que abrirlo desde ahí funciona aunque esté fuera del
+            <form> en el HTML.
+            {% endcomment %}
+            {{ perfil_form.foto }}
 
             <div class="seccion-titulo">
                 <i class="bi bi-person-badge"></i>
@@ -126,6 +173,7 @@
                         {{ perfil_form.codigo_pais }}
                         {{ perfil_form.telefono }}
                     </div>
+                    <small id="telefonoFeedbackPerfil" class="form-text"></small>
                     {{ perfil_form.codigo_pais.errors }}
                     {{ perfil_form.telefono.errors }}
                 </div>
@@ -159,5 +207,134 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/telefono_validacion.js' %}"></script>
+<script src="{% static 'js/pais_selector.js' %}"></script>
+<script>
+    (function () {
+        const inputReal = document.getElementById('{{ perfil_form.foto.id_for_label }}'); // el que viaja con el form
+        const preview = document.getElementById('avatarPreview');
+        const placeholder = document.getElementById('avatarPlaceholder');
+        const btnCamara = document.getElementById('avatarCamaraBtn');
+        const menu = document.getElementById('avatarMenu');
+        const inputGaleria = document.getElementById('fotoGaleriaInput');
+        const inputCamara = document.getElementById('fotoCamaraInput');
+        const btnGaleria = document.getElementById('btnElegirGaleria');
+        const btnTomarFoto = document.getElementById('btnTomarFoto');
+
+        if (!inputReal || !preview || !btnCamara || !menu) return;
+
+        function mostrarMenu() {
+            menu.hidden = false;
+            btnCamara.setAttribute('aria-expanded', 'true');
+        }
+        function ocultarMenu() {
+            menu.hidden = true;
+            btnCamara.setAttribute('aria-expanded', 'false');
+        }
+
+        btnCamara.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (menu.hidden) mostrarMenu(); else ocultarMenu();
+        });
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !menu.contains(e.target) && e.target !== btnCamara) ocultarMenu();
+        });
+
+        function aplicarArchivo(archivo) {
+            if (!archivo) return;
+
+            if (!archivo.type.startsWith('image/')) {
+                alert('Selecciona un archivo de imagen.');
+                return;
+            }
+            if (archivo.size > 5 * 1024 * 1024) {
+                alert('La foto no puede pesar más de 5 MB.');
+                return;
+            }
+
+            // Copia el archivo elegido (desde el selector de galería o el
+            // de cámara) al input real que sí se envía con el formulario
+            // -- un <input type="file"> no puede recibir un FileList de
+            // otro directamente, pero sí a través de un DataTransfer.
+            const dt = new DataTransfer();
+            dt.items.add(archivo);
+            inputReal.files = dt.files;
+
+            const lector = new FileReader();
+            lector.onload = function (evento) {
+                preview.src = evento.target.result;
+                preview.style.display = '';
+                placeholder.style.display = 'none';
+            };
+            lector.readAsDataURL(archivo);
+        }
+
+        if (inputGaleria && btnGaleria) {
+            btnGaleria.addEventListener('click', function () {
+                ocultarMenu();
+                inputGaleria.click();
+            });
+            inputGaleria.addEventListener('change', function () {
+                aplicarArchivo(inputGaleria.files && inputGaleria.files[0]);
+            });
+        }
+
+        if (inputCamara && btnTomarFoto) {
+            btnTomarFoto.addEventListener('click', function () {
+                ocultarMenu();
+                inputCamara.click();
+            });
+            inputCamara.addEventListener('change', function () {
+                aplicarArchivo(inputCamara.files && inputCamara.files[0]);
+            });
+        }
+    })();
+
+    // Validación de teléfono en vivo -- la regla (cuántos dígitos según
+    // el país) vive en telefono_validacion.js, compartida con
+    // registro.html y registro_empleado.html. Acá solo se sanea el
+    // input (nada de +, espacios, guiones ni paréntesis: el código de
+    // país ya lo elige el select de al lado) y se pinta con las
+    // clases utilitarias de Bootstrap que ya usa esta página.
+    (function () {
+        const selectPais = document.getElementById('{{ perfil_form.codigo_pais.id_for_label }}');
+        const inputTelefono = document.getElementById('{{ perfil_form.telefono.id_for_label }}');
+        const feedback = document.getElementById('telefonoFeedbackPerfil');
+        if (!inputTelefono || !feedback || !window.LZ_TELEFONO) return;
+
+        function actualizarMaxLength() {
+            if (!selectPais) return;
+            const [, maximo] = LZ_TELEFONO.rango(selectPais.value);
+            inputTelefono.maxLength = maximo;
+        }
+
+        function validarTelefono() {
+            const limpio = LZ_TELEFONO.sanear(inputTelefono.value);
+            if (limpio !== inputTelefono.value) inputTelefono.value = limpio;
+
+            const codigoPais = selectPais ? selectPais.value : '';
+            const resultado = LZ_TELEFONO.validar(codigoPais, limpio);
+
+            if (resultado.ok === null) {
+                feedback.textContent = '';
+                feedback.className = 'form-text';
+                return;
+            }
+
+            feedback.textContent = resultado.mensaje;
+            feedback.className = 'form-text ' + (resultado.ok ? 'text-success' : 'text-danger');
+        }
+
+        actualizarMaxLength();
+        if (selectPais) {
+            selectPais.addEventListener('change', function () {
+                actualizarMaxLength();
+                validarTelefono();
+            });
+        }
+        inputTelefono.addEventListener('input', validarTelefono);
+        inputTelefono.addEventListener('blur', validarTelefono);
+    })();
+</script>
 </body>
 </html>

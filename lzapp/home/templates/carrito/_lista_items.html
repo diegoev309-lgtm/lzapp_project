@@ -1,0 +1,37 @@
+{% load producto_extras %}
+{% for i,j in request.session.carro.items %}
+<div class="carrito-item {% if j.es_premio %}carrito-item--premio{% endif %}" data-producto-id="{{ i }}">
+  <img src="{{ j.imagen }}" alt="{{ j.nombre }}" class="carrito-item__imagen">
+  <div class="carrito-item__info">
+    <div class="carrito-item__cabecera">
+      <span class="carrito-item__nombre">{{ j.nombre }}</span>
+      {% if j.es_premio %}<span class="carrito-item__badge-premio"><i class="bi bi-gift-fill"></i> Premio</span>{% endif %}
+    </div>
+
+    <span class="carrito-item__precio-unitario">
+      {% if j.es_premio %}
+        <s>$ {{ j.precio_original|cop }} COP</s> <strong>$ {{ j.precio|cop }} COP</strong> c/u
+      {% else %}
+        $ {{ j.precio|cop }} COP c/u
+      {% endif %}
+    </span>
+
+    <div class="carrito-item__pie">
+      <div class="carrito-item__stepper">
+        <button type="button" class="btn-qty btn-qty--restar" data-accion="restar" data-producto-id="{{ i }}" aria-label="Quitar una unidad">−</button>
+        <span class="carrito-item__stepper-num">{{ j.cantidad }}</span>
+        {% if not j.es_premio %}
+          <button type="button" class="btn-qty btn-qty--sumar" data-accion="sumar" data-producto-id="{{ i }}" aria-label="Agregar una unidad">+</button>
+        {% endif %}
+      </div>
+      <span class="carrito-item__subtotal">$ {{ j.precio|mul:j.cantidad|cop }} COP</span>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="carrito-widget__vacio">
+  <i class="bi bi-cart-x"></i>
+  <p>Tu carrito está vacío.</p>
+  <span class="carrito-widget__vacio-sub">Explora nuestros productos y agrégalos aquí con un clic.</span>
+</div>
+{% endfor %}

@@ -21,6 +21,7 @@ class Perfil(models.Model):
     direccion = models.CharField(max_length=255, blank=True, null=True)
     latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    foto = models.ImageField(upload_to='perfiles/', blank=True, null=True)
 
     class Meta:
         db_table = 'perfil'

@@ -203,6 +203,7 @@ def configuracion(request):
 
         perfil_form = PerfilUpdateForm(
             request.POST,
+            request.FILES,
             instance=perfil
         )
 
@@ -248,6 +249,7 @@ def configuracion(request):
         {
             'user_form': user_form,
             'perfil_form': perfil_form,
+            'perfil': perfil,
         }
     )
 

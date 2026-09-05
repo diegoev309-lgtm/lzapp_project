@@ -8,22 +8,56 @@ import re
 # Códigos de país más relevantes para el negocio (Colombia primero, es el
 # default). No se usa una librería como django-phonenumber-field porque el
 # proyecto no tiene requirements.txt ni ninguna dependencia declarada hoy.
+#
+# La etiqueta es "bandera + código" (ej. "🇨🇴 +57") en vez del nombre del
+# país -- el <option> de un <select> nativo solo admite texto plano, pero
+# los emoji de bandera SÍ son texto plano (son pares de "regional
+# indicator"), así que esto funciona sin íconos ni CSS extra. En Windows
+# puede llegar a verse como dos letras en vez de la banderita si el
+# navegador/fuente no tiene el glifo, pero la mayoría de Chrome/Edge
+# actuales sí lo renderizan bien.
 CODIGOS_PAIS = [
-    ('+57', 'Colombia (+57)'),
-    ('+1', 'EE. UU. / Canadá (+1)'),
-    ('+52', 'México (+52)'),
-    ('+58', 'Venezuela (+58)'),
-    ('+593', 'Ecuador (+593)'),
-    ('+51', 'Perú (+51)'),
-    ('+56', 'Chile (+56)'),
-    ('+54', 'Argentina (+54)'),
-    ('+507', 'Panamá (+507)'),
-    ('+506', 'Costa Rica (+506)'),
-    ('+55', 'Brasil (+55)'),
-    ('+34', 'España (+34)'),
+    ('+57', '🇨🇴 +57'),
+    ('+1', '🇺🇸 +1'),
+    ('+52', '🇲🇽 +52'),
+    ('+58', '🇻🇪 +58'),
+    ('+593', '🇪🇨 +593'),
+    ('+51', '🇵🇪 +51'),
+    ('+56', '🇨🇱 +56'),
+    ('+54', '🇦🇷 +54'),
+    ('+507', '🇵🇦 +507'),
+    ('+506', '🇨🇷 +506'),
+    ('+55', '🇧🇷 +55'),
+    ('+34', '🇪🇸 +34'),
 ]
 CODIGO_PAIS_DEFECTO = '+57'
 CODIGOS_PAIS_VALIDOS = {codigo for codigo, _ in CODIGOS_PAIS}
+
+# Cantidad de dígitos (mínimo, máximo) del número LOCAL (sin el código de
+# país) según el plan de numeración real de cada país. Casi todos son un
+# valor fijo; Argentina/Brasil varían un poco porque el número puede
+# llevar o no el "9" célular / código de área según la región.
+#
+# OJO: si cambias esto, actualiza también LONGITUD_POR_PAIS en
+# usuarios/static/js/telefono_validacion.js -- son la misma regla
+# duplicada a propósito (server autoritativo + feedback en vivo en el
+# navegador), no hay una sola fuente de verdad compartida entre Python y
+# JS en este proyecto.
+LONGITUD_TELEFONO_POR_PAIS = {
+    '+57': (10, 10),   # Colombia: celular siempre 10 dígitos
+    '+1': (10, 10),    # EE. UU. / Canadá
+    '+52': (10, 10),   # México
+    '+58': (10, 10),   # Venezuela
+    '+593': (9, 9),    # Ecuador
+    '+51': (9, 9),     # Perú
+    '+56': (9, 9),     # Chile
+    '+54': (10, 11),   # Argentina (con/sin el "9" de celular)
+    '+507': (7, 8),    # Panamá
+    '+506': (8, 8),    # Costa Rica
+    '+55': (10, 11),   # Brasil (con/sin el 9no dígito de celular)
+    '+34': (9, 9),     # España
+}
+LONGITUD_TELEFONO_DEFECTO = (7, 15)
 
 # "+57 3001234567" -> ('+57', '3001234567'). Si el valor guardado no tiene
 # código (números guardados antes de este cambio), se asume el default.
@@ -36,6 +70,57 @@ def separar_codigo_pais(valor):
     if coincidencia and coincidencia.group(1) in CODIGOS_PAIS_VALIDOS:
         return coincidencia.group(1), coincidencia.group(2).strip()
     return CODIGO_PAIS_DEFECTO, valor
+
+
+# Validador de teléfono centralizado -- lo usan tanto RegistroForm como
+# PerfilUpdateForm (y por herencia, RegistroEmpleadoForm) para no tener
+# la misma regla duplicada en dos sitios que se puedan desincronizar.
+#
+# El código de país ya lo elige el select aparte, así que este campo es
+# SOLO el número local: nada de +, espacios, guiones ni paréntesis --
+# antes se permitían esos símbolos y por eso "+++" o "3001234567+"
+# pasaban la validación con tal de tener algún dígito de sobra.
+def validar_telefono(telefono):
+    telefono = (telefono or '').strip()
+
+    if not telefono:
+        raise forms.ValidationError("Ingresa tu número de teléfono.")
+
+    if not re.match(r'^[0-9]+$', telefono):
+        raise forms.ValidationError(
+            "El teléfono solo puede contener números -- el código de país ya lo eliges en la lista de al lado."
+        )
+
+    return telefono
+
+
+def validar_y_combinar_telefono(form, cleaned_data):
+    """
+    Se llama desde clean() de RegistroForm y PerfilUpdateForm: revisa que
+    la cantidad de dígitos del número coincida con el país elegido (ej.
+    Colombia exige exactamente 10) y, si todo cuadra, arma el valor final
+    "+57 3001234567" que se guarda en el modelo. Si no cuadra, adjunta el
+    error al campo telefono en vez de dejar pasar un número con la
+    longitud equivocada para ese país.
+    """
+    codigo_pais = cleaned_data.get('codigo_pais')
+    telefono = cleaned_data.get('telefono')
+    if not codigo_pais or not telefono:
+        return cleaned_data
+
+    minimo, maximo = LONGITUD_TELEFONO_POR_PAIS.get(codigo_pais, LONGITUD_TELEFONO_DEFECTO)
+    cantidad = len(telefono)
+
+    if cantidad < minimo or cantidad > maximo:
+        if minimo == maximo:
+            mensaje = f'Para este país, el número debe tener exactamente {minimo} dígitos.'
+        else:
+            mensaje = f'Para este país, el número debe tener entre {minimo} y {maximo} dígitos.'
+        form.add_error('telefono', mensaje)
+    else:
+        cleaned_data['telefono'] = f'{codigo_pais} {telefono}'
+
+    return cleaned_data
 
 
 class RegistroForm(UserCreationForm):
@@ -145,32 +230,11 @@ class RegistroForm(UserCreationForm):
         return email
 
     def clean_telefono(self):
-        telefono = self.cleaned_data.get('telefono', '').strip()
-
-        if not re.match(r'^[0-9+\-\s()]+$', telefono):
-            raise forms.ValidationError(
-                "El teléfono solo puede contener números, espacios y los símbolos + - ( )."
-            )
-
-        if not any(c.isdigit() for c in telefono):
-            raise forms.ValidationError(
-                "El teléfono debe contener al menos un número."
-            )
-
-        return telefono
+        return validar_telefono(self.cleaned_data.get('telefono'))
 
     def clean(self):
         cleaned_data = super().clean()
-
-        # clean_telefono ya validó que sea solo el número local; acá se le
-        # antepone el código de país elegido para guardar un solo valor
-        # combinado (ej: "+57 3001234567"), sin agregar una columna nueva.
-        codigo_pais = cleaned_data.get('codigo_pais')
-        telefono = cleaned_data.get('telefono')
-        if codigo_pais and telefono:
-            cleaned_data['telefono'] = f'{codigo_pais} {telefono}'
-
-        return cleaned_data
+        return validar_y_combinar_telefono(self, cleaned_data)
 
 
 class RegistroEmpleadoForm(RegistroForm):
@@ -272,7 +336,7 @@ class PerfilUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ['telefono', 'direccion']
+        fields = ['telefono', 'direccion', 'foto']
         widgets = {
             'telefono': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Número sin el código'}
@@ -280,7 +344,20 @@ class PerfilUpdateForm(forms.ModelForm):
             'direccion': forms.TextInput(
                 attrs={'class': 'form-control'}
             ),
+            'foto': forms.FileInput(
+                # style inline además de la clase: si el CSS todavía no
+                # cargó (o quedó cacheado viejo), igual no se ve el
+                # input crudo de "Elegir archivo" tapando el resto del
+                # formulario.
+                attrs={'class': 'avatar-input-oculto', 'accept': 'image/*', 'style': 'display:none;'}
+            ),
         }
+
+    def clean_foto(self):
+        foto = self.cleaned_data.get('foto')
+        if foto and hasattr(foto, 'size') and foto.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("La foto no puede pesar más de 5 MB.")
+        return foto
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -294,26 +371,8 @@ class PerfilUpdateForm(forms.ModelForm):
             self.initial['telefono'] = numero
 
     def clean_telefono(self):
-        telefono = self.cleaned_data.get('telefono', '').strip()
-
-        if not re.match(r'^[0-9+\-\s()]+$', telefono):
-            raise forms.ValidationError(
-                "El teléfono solo puede contener números, espacios y los símbolos + - ( )."
-            )
-
-        if not any(c.isdigit() for c in telefono):
-            raise forms.ValidationError(
-                "El teléfono debe contener al menos un número."
-            )
-
-        return telefono
+        return validar_telefono(self.cleaned_data.get('telefono'))
 
     def clean(self):
         cleaned_data = super().clean()
-
-        codigo_pais = cleaned_data.get('codigo_pais')
-        telefono = cleaned_data.get('telefono')
-        if codigo_pais and telefono:
-            cleaned_data['telefono'] = f'{codigo_pais} {telefono}'
-
-        return cleaned_data
+        return validar_y_combinar_telefono(self, cleaned_data)

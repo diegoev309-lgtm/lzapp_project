@@ -33,6 +33,8 @@
 </head>
 <body>
 
+    {% include 'carrito/widget.html' %}
+
     <!-- ===== NAVBAR (flota sobre el hero, sin separación) ===== -->
     <header>
         <nav class="navbar fixed-top navbar-expand-lg" id="mainNav">
@@ -237,7 +239,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
                             </a>
                             {% endwith %}
                            <!-- Queso 2: el del medio -->
@@ -274,7 +275,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
                             </a>
                             <!-- Queso 3: el de la derecha -->
                             <a href="#productos" class="queso-punto"
@@ -310,7 +310,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="queso-punto-tap"><i class="bi bi-hand-index-thumb"></i> Haz clic</span>
                             </a>
 
                             <svg class="silueta-unica" id="siluetaUnica" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
@@ -363,9 +362,6 @@
                             <i class="bi bi-hand-index-thumb"></i> Toca aquí si no vibra tu celular
                         </button>
 
-                        <div class="oferta-banner" id="ofertaBanner">
-                            Enciende los 3 quesos para revelar la oferta de hoy
-                        </div>
                         <div class="boton-sortear-wrap" id="botonSortearWrap">
                             <button type="button" class="boton-sortear" id="botonSortear">
                                 <i class="bi bi-dice-5-fill"></i> ¡Sortear la oferta del día!
@@ -817,6 +813,9 @@
                                         {% if i.stock_actual <= i.stock_minimo %}
                                             <span class="badge-stock bajo">Stock bajo</span>
                                         {% endif %}
+                                        {% with cantidad=carrito_cantidades|get_item:i.id %}
+                                        <span class="producto-card-badge{% if cantidad %} visible{% endif %}" data-producto-id="{{ i.id }}">{{ cantidad|default:0 }}</span>
+                                        {% endwith %}
                                         {% if i.imagen %}
                                             <img src="{{ i.imagen.url }}" class="imagen-producto" loading="lazy">
                                         {% else %}
@@ -1623,7 +1622,6 @@
     (function () {
         const wrap = document.querySelector('.quesos-interactivos');
         const boton = document.getElementById('botonOfertas');
-        const banner = document.getElementById('ofertaBanner');
         const confettiWrap = document.getElementById('confettiContenedor');
         const indicador = document.getElementById('globoIndicador');
         const ruedaWrap = document.getElementById('ofertaRuedaWrap');
@@ -2305,19 +2303,12 @@
         }
 
         let modoActivo = false;
-        let bannerTimeout = null;
 
         function activar() {
             modoActivo = true;
             wrap.classList.add('modo-ofertas');
             boton.classList.add('activo');
             lanzarConfetti(70);
-
-            if (!sorteoHecho) {
-                banner.classList.add('visible');
-                clearTimeout(bannerTimeout);
-                bannerTimeout = setTimeout(() => banner.classList.remove('visible'), 4000);
-            }
 
             quesosArr.forEach((q) => {
                 const video = obtenerVideo(q);
@@ -2332,46 +2323,6 @@
             });
         }
 
-        function desactivar() {
-            modoActivo = false;
-            wrap.classList.remove('modo-ofertas');
-            banner.classList.remove('visible');
-
-            if (sorteoHecho) {
-                boton.classList.remove('volando', 'reventado');
-                return;
-            }
-
-            wrap.classList.remove('sorteo-hecho');
-            ruedaWrap && ruedaWrap.classList.remove('visible');
-            wrap.querySelectorAll('.queso-punto.volteado')
-                .forEach((el) => {
-                    el.classList.remove('volteado');
-                    pausarVideoQueso(el);
-                    const v = obtenerVideo(el);
-                    if (v) { v.currentTime = 0; v.classList.remove('reproduciendo'); }
-                });
-            sincronizando = false;
-            wrap.querySelectorAll('.queso-punto-borde.resaltado-sorteo')
-                .forEach((el) => el.classList.remove('resaltado-sorteo'));
-
-            wrap.querySelectorAll('.queso-punto.encendido')
-                .forEach((el) => el.classList.remove('encendido'));
-            wrap.classList.remove('todos-encendidos');
-            const ruletaSueltaReset = document.getElementById('ofertaRuletaSuelta');
-            if (ruletaSueltaReset) ruletaSueltaReset.classList.remove('revelada');
-
-            vistos.clear();
-            sorteoEnCurso = false;
-            botonSortearWrap && botonSortearWrap.classList.remove('visible');
-            botonSortear && (botonSortear.disabled = false);
-
-            wrap.querySelectorAll('.es-ganador').forEach(el => el.classList.remove('es-ganador'));
-
-            boton.classList.remove('volando', 'reventado');
-            setTimeout(() => indicador && indicador.classList.add('visible'), 400);
-        }
-
         boton.addEventListener('click', () => {
             if (!window.LZ_USUARIO_AUTENTICADO) {
                 const modalEl = document.getElementById('modalPromoRegistro');
@@ -2382,11 +2333,10 @@
             }
 
             window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
-            if (sorteoHecho) return; // ya jugó hoy: nada que reventar/animar de nuevo
-            if (modoActivo) {
-                desactivar();
-                return;
-            }
+            // Ya jugó hoy, o la secuencia automática (encendido de quesos +
+            // sorteo) ya está en curso: un segundo click sobre el globo no
+            // debe interrumpirla ni reiniciar nada a medio camino.
+            if (sorteoHecho || modoActivo) return;
             if (boton.classList.contains('volando')) return;
 
             indicador && indicador.classList.remove('visible');
@@ -2396,6 +2346,7 @@
                 boton.classList.add('reventado');
                 reventarGlobo();
                 activar();
+                iniciarSecuenciaEncendidoAutomatico();
             }, 750);
         });
 
@@ -2505,6 +2456,14 @@
 
             iniciarConfettiSuave();
             mostrarBotonSortear();
+
+            // Igual que en desktop: tras ver un momento los 3 quesos
+            // encendidos y la tarjeta de descuento, se "presiona" solo
+            // el botón de sortear.
+            setTimeout(() => {
+                if (sorteoHecho || sorteoEnCurso) return;
+                botonSortear && botonSortear.click();
+            }, 2000);
         }
 
         function iniciarSecuenciaAgitado() {
@@ -2629,46 +2588,80 @@
 
         } // cierre del if (!sorteoHecho)
 
+        // Enciende un queso (manual o automático) y, si con este ya quedaron
+        // los 3 encendidos, dispara el mismo flujo de "todos encendidos"
+        // (flip a video, ruleta, tarjeta de descuento y botón sortear).
+        function encenderQuesoInteractivo(p) {
+            if (!p || p.classList.contains('encendido')) return;
+            p.classList.add('encendido');
+
+            const cx = parseFloat(p.dataset.centroX) || 50;
+            const cy = parseFloat(p.dataset.centroY) || 50;
+            lanzarConfettiLocal(cx, cy);
+            vistos.add(p);
+
+            if (vistos.size === quesosArr.length && !sorteoHecho) {
+                quesosArr.forEach((q) => q.classList.add('volteado'));
+                wrap.classList.add('todos-encendidos');
+                reproducirTodosSincronizados();
+                iniciarConfettiSuave();
+
+                const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
+                const ruletaUnica = document.getElementById('ofertaInfoRuleta');
+                if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
+                if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, premioPorcentaje);
+
+                mostrarBotonSortear();
+            }
+        }
+
+        // Apaga un queso (solo ocurre por click manual): revierte el flip
+        // de video y oculta el botón sortear si ya se había mostrado.
+        function apagarQuesoInteractivo(p) {
+            if (!p || !p.classList.contains('encendido')) return;
+            p.classList.remove('encendido');
+            vistos.delete(p);
+            quesosArr.forEach((q) => {
+                q.classList.remove('volteado');
+                pausarVideoQueso(q);
+            });
+            wrap.classList.remove('todos-encendidos');
+            detenerConfettiSuave();
+            botonSortearWrap && botonSortearWrap.classList.remove('visible');
+        }
+
+        /* ---- Encendido automático de los 3 quesos al reventar el globo ----
+           En vez de esperar a que el usuario toque cada queso, se encienden
+           solos en orden, con una pausa cómoda entre cada uno, y al final
+           se "presiona" el botón de sortear para revelar la oferta sin más
+           interacción del usuario. */
+        const RETARDO_ENTRE_QUESOS_AUTO = 800; // ms entre queso y queso: ritmo pausado, no abrumar
+        const ESPERA_ANTES_DE_SORTEAR_AUTO = 2000; // ms extra para ver el reverso (video) del queso antes de sortear
+
+        function iniciarSecuenciaEncendidoAutomatico() {
+            quesosArr.forEach((q, i) => {
+                setTimeout(() => {
+                    if (sorteoHecho || sorteoEnCurso) return;
+                    encenderQuesoInteractivo(q);
+                }, RETARDO_ENTRE_QUESOS_AUTO * (i + 1));
+            });
+
+            setTimeout(() => {
+                if (sorteoHecho || sorteoEnCurso) return;
+                botonSortear && botonSortear.click();
+            }, RETARDO_ENTRE_QUESOS_AUTO * quesosArr.length + ESPERA_ANTES_DE_SORTEAR_AUTO);
+        }
+
         wrap.querySelectorAll('.queso-punto').forEach((p) => {
             p.addEventListener('click', (e) => {
                 window.LZ_notificarInteraccion && window.LZ_notificarInteraccion();
                 if (!modoActivo || sorteoEnCurso || sorteoHecho) return;
                 e.preventDefault();
 
-                const encendiendo = !p.classList.contains('encendido');
-                p.classList.toggle('encendido');
-
-                const cx = parseFloat(p.dataset.centroX) || 50;
-                const cy = parseFloat(p.dataset.centroY) || 50;
-
-                if (encendiendo) {
-                    lanzarConfettiLocal(cx, cy);
-                    vistos.add(p);
+                if (p.classList.contains('encendido')) {
+                    apagarQuesoInteractivo(p);
                 } else {
-                    vistos.delete(p);
-                    quesosArr.forEach((q) => {
-                        q.classList.remove('volteado');
-                        pausarVideoQueso(q);
-                    });
-                    wrap.classList.remove('todos-encendidos');
-                    botonSortearWrap && botonSortearWrap.classList.remove('visible');
-                }
-
-                if (vistos.size === quesosArr.length && !sorteoHecho) {
-                    quesosArr.forEach((q) => q.classList.add('volteado'));
-                    wrap.classList.add('todos-encendidos');
-                    reproducirTodosSincronizados();
-                    iniciarConfettiSuave();
-                
-                    const tarjetaDescuento = document.getElementById('ofertaDescuentoTarjeta');
-                    const ruletaUnica = document.getElementById('ofertaInfoRuleta');
-                    if (tarjetaDescuento) tarjetaDescuento.classList.add('visible');
-                    if (ruletaUnica) mostrarNumeroFijo(ruletaUnica, premioPorcentaje);
-
-                    mostrarBotonSortear();
-                } else {
-                    wrap.classList.remove('todos-encendidos');
-                    detenerConfettiSuave();
+                    encenderQuesoInteractivo(p);
                 }
             });
         });
@@ -2719,6 +2712,11 @@
                 : '';
         }
 
+        function cantidadBadgeHtml(p) {
+            const cantidad = p.cantidad_en_carrito || 0;
+            return `<span class="producto-card-badge${cantidad > 0 ? ' visible' : ''}" data-producto-id="${p.id}">${cantidad}</span>`;
+        }
+
         function descripcionSegura(p) {
             return p.descripcion && p.descripcion.trim()
                 ? escapeHtml(p.descripcion)
@@ -2731,6 +2729,7 @@
                     <div class="card producto-card">
                         <div class="producto-img-wrapper">
                             ${badgeHtml(p)}
+                            ${cantidadBadgeHtml(p)}
                             <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}" loading="lazy">
                         </div>
                         <div class="producto-info">
@@ -2762,6 +2761,7 @@
                     <div class="card producto-card producto-card--vertical h-100">
                         <div class="producto-img-wrapper">
                             ${badgeHtml(p)}
+                            ${cantidadBadgeHtml(p)}
                             <img src="${p.imagen}" class="imagen-producto" alt="${escapeHtml(p.nombre)}" loading="lazy">
                         </div>
                         <div class="card-body">
