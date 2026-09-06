@@ -1,17 +1,11 @@
 {% extends 'masterpage_dashboard.html' %}
-{% load static paginacion_tags %}
+{% load static paginacion_tags orden_tags %}
 
 {% block title %}LzApp · Usuarios{% endblock %}
 {% block page_icon %}bi-people-fill{% endblock %}
 {% block page_title %}Usuarios{% endblock %}
 {% block page_subtitle %}Administra usuarios, empleados y actividad del sistema{% endblock %}
 
-{% block header_actions %}
-<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
-    <i class="bi bi-file-earmark-pdf-fill"></i>
-    <span>PDF</span>
-</a>
-{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -125,20 +119,22 @@
     </div>
 </div>
 
-<div class="productos-toolbar">
+{% comment %}
+Mismo patrón que los demás módulos: pestañas a la izquierda y acciones
+agrupadas a la derecha.
+{% endcomment %}
+<div class="productos-toolbar productos-toolbar-derecha">
     <div class="tab-group" role="group" aria-label="Filtrar por rol">
         <a href="{% url 'Usuario' %}" class="tab-item {% if not filtro_rol %}active{% endif %}">Todos</a>
         <a href="{% url 'Usuario' %}?rol=usuario" class="tab-item {% if filtro_rol == 'usuario' %}active{% endif %}">Usuarios</a>
         <a href="{% url 'Usuario' %}?rol=empleado" class="tab-item {% if filtro_rol == 'empleado' %}active{% endif %}">Empleados</a>
     </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <a href="{% url 'registro' %}" class="dash-btn dash-btn-solid">
-            <i class="bi bi-person-plus-fill"></i> Usuario
-        </a>
-        <a href="{% url 'registro_empleado' %}" class="dash-btn dash-btn-solid">
-            <i class="bi bi-person-workspace"></i> Empleado
-        </a>
-    </div>
+    <a href="{% url 'registro' %}" class="dash-btn dash-btn-solid">
+        <i class="bi bi-person-plus-fill"></i> Usuario
+    </a>
+    <a href="{% url 'registro_empleado' %}" class="dash-btn dash-btn-solid">
+        <i class="bi bi-person-workspace"></i> Empleado
+    </a>
 </div>
 
 <!-- ===== Bloque tipo lista (mismo patrón que Productos) ===== -->
@@ -151,17 +147,58 @@
         </button>
     </div>
 
+    {% comment %}
+    Buscador y filtros con la misma forma que Productos, Descuentos y
+    Producción: campo de búsqueda a la izquierda y los selectores al
+    extremo derecho. El rol viaja escondido para no perder la pestaña
+    activa al filtrar, y el orden se escribe en los mismos parámetros que
+    usan las cabeceras de la tabla.
+    {% endcomment %}
+    <div class="busqueda-fila">
+        <form method="get" class="barra-busqueda" id="formBuscarUsuario">
+            {% if filtro_rol %}<input type="hidden" name="rol" value="{{ filtro_rol }}">{% endif %}
+
+            <div class="campo-busqueda">
+                <i class="bi bi-search"></i>
+                <input type="text" name="q" class="input-busqueda"
+                       placeholder="Buscar usuario, correo o teléfono..."
+                       value="{{ query }}" autocomplete="off">
+            </div>
+
+            <select name="estado" class="input-busqueda select-estado-producto"
+                    onchange="this.form.submit()" aria-label="Filtrar por estado">
+                <option value="todos" {% if estado == 'todos' %}selected{% endif %}>Todos los estados</option>
+                <option value="activos" {% if estado == 'activos' %}selected{% endif %}>Activos</option>
+                <option value="inactivos" {% if estado == 'inactivos' %}selected{% endif %}>Inactivos</option>
+            </select>
+
+            <select name="orden" class="input-busqueda select-estado-producto filtro-orden"
+                    onchange="this.form.submit()" aria-label="Ordenar por">
+                <option value="id" {% if orden == 'id' %}selected{% endif %}>Ordenar: ID</option>
+                <option value="usuario" {% if orden == 'usuario' %}selected{% endif %}>Ordenar: Usuario</option>
+                <option value="email" {% if orden == 'email' %}selected{% endif %}>Ordenar: Email</option>
+                <option value="registro" {% if orden == 'registro' %}selected{% endif %}>Ordenar: Registro</option>
+            </select>
+
+            <select name="dir" class="input-busqueda select-estado-producto filtro-dir"
+                    onchange="this.form.submit()" aria-label="Dirección del orden">
+                <option value="asc" {% if direccion == 'asc' %}selected{% endif %}>Ascendente</option>
+                <option value="desc" {% if direccion == 'desc' %}selected{% endif %}>Descendente</option>
+            </select>
+        </form>
+    </div>
+
     <div style="padding: 4px 20px 20px; overflow-x:auto;">
         <table class="dash-table">
             <thead>
                 <tr>
                     <th style="width:36px;"><input type="checkbox" id="chk-seleccionar-todos" title="Seleccionar todos"></th>
-                    <th>ID</th>
-                    <th>Usuario</th>
-                    <th>Email</th>
+                    <th>{% th_orden "id" "ID" orden direccion %}</th>
+                    <th>{% th_orden "usuario" "Usuario" orden direccion %}</th>
+                    <th>{% th_orden "email" "Email" orden direccion %}</th>
                     <th>Teléfono</th>
                     <th>Rol</th>
-                    <th>Registro</th>
+                    <th>{% th_orden "registro" "Registro" orden direccion %}</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -190,7 +227,7 @@
                             <span class="badge-green"><i class="bi bi-person-fill"></i> Usuarios</span>
                         {% endif %}
                     </td>
-                    <td class="muted">{{ usuario.date_joined|date:"d/m/Y" }}</td>
+                    <td class="muted celda-fecha">{{ usuario.date_joined|date:"d/m/Y" }}</td>
                     <td>
                         <form method="post" action="{% url 'eliminar_usuario' usuario.id %}" style="display:inline;" onsubmit="return confirm('¿Desea eliminar a {{ usuario.username }}?');">
                             {% csrf_token %}

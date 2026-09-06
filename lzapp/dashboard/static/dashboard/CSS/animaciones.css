@@ -361,6 +361,37 @@ body.saliendo .dash-main{
     gap:10px;
 }
 
+/* El ícono y la etiqueta de cada pestaña iban pegados: `.tab-item` es un
+   flex sin gap, así que "Tabla" arrancaba justo donde terminaba el ícono. */
+.tab-group .tab-item{ gap:7px; }
+
+/* Celda de producto con miniatura: la imagen y el nombre en una sola
+   línea, alineados.
+
+   `.img-producto-caja` es un flex de nivel bloque, así que cuando comparte
+   celda con el nombre —como en Descuentos, que no le da columna propia a
+   la imagen— el nombre caía debajo y desalineado respecto de la miniatura.
+   Este contenedor los pone lado a lado sin necesidad de partir la columna. */
+.celda-producto{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-align:left;
+}
+.celda-producto .img-producto-caja{ flex-shrink:0; }
+.celda-producto strong{ min-width:0; overflow-wrap:break-word; }
+
+/* El selector de vistas se va al extremo izquierdo de la misma fila.
+
+   No es una acción sobre el módulo como Importar o Nuevo: solo cambia
+   cómo se mira lo que ya está abajo. Separarlo del grupo de botones deja
+   claro de un vistazo cuáles son las dos cosas distintas, y el ancho
+   sobrante queda en el medio en vez de a la izquierda.
+
+   `margin-right:auto` en vez de `justify-content:space-between` porque a
+   la derecha hay dos o tres botones que deben seguir juntos entre sí. */
+.productos-toolbar-derecha > .tab-group{ margin-right:auto; }
+
 /* La barra de filtros: buscador ancho y los selectores tras él.
 
    El max-width:420px de .barra-busqueda tiene sentido cuando solo hay un
@@ -377,7 +408,14 @@ body.saliendo .dash-main{
     max-width:none;
     width:auto;
 }
-.busqueda-fila .campo-busqueda{ flex:1 1 240px; min-width:0; }
+/* Crece hasta un ancho cómodo y ahí se detiene.
+
+   Quitar el max-width:420px original resolvió que los filtros se apretaran
+   en dos renglones, pero dejó al buscador sin ningún techo: en Producción,
+   que no tiene filtros al lado, el campo cruzaba los 1300 px de la pantalla
+   para escribir el nombre de un queso. Un tope alto no vuelve a apretar los
+   filtros y evita el campo kilométrico. */
+.busqueda-fila .campo-busqueda{ flex:1 1 240px; min-width:0; max-width:560px; }
 
 /* Los selectores toman el ancho de su contenido, no un tercio del panel. */
 .busqueda-fila .select-estado-producto{
@@ -387,11 +425,116 @@ body.saliendo .dash-main{
     max-width:220px;
 }
 
+/* El buscador se queda a la izquierda y empuja los filtros al extremo
+   derecho de la fila. Antes el hueco sobrante quedaba a la derecha y los
+   filtros se apelotonaban contra el campo de búsqueda, sin quedar claro
+   dónde terminaba una cosa y empezaba la otra. */
+.busqueda-fila .barra-busqueda > .campo-busqueda{ margin-right:auto; }
+
+/* ---- Todos los selectores de filtro, con el mismo aspecto ----
+
+   `.input-busqueda` reserva 42 px a la izquierda para el ícono de la lupa.
+   En un <select> ese hueco no lo ocupa nada, así que el texto arrancaba
+   corrido y cada módulo se veía distinto según cuánto midiera su etiqueta.
+
+   La flecha se dibuja con dos degradados en vez de una imagen: así toma el
+   color del tema y no hay que mantener una versión clara y otra oscura. */
+.busqueda-fila select,
+.notif-filtros select{
+    appearance:none;
+    -webkit-appearance:none;
+    padding-left:14px;
+    padding-right:34px;
+    background-image:
+        linear-gradient(45deg,  transparent 50%, var(--text-tertiary) 50%),
+        linear-gradient(135deg, var(--text-tertiary) 50%, transparent 50%);
+    background-position:
+        calc(100% - 19px) calc(50% - 2px),
+        calc(100% - 14px) calc(50% - 2px);
+    background-size:5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+}
+/* El :focus de .input-busqueda usa el atajo `background`, que borraría la
+   flecha justo mientras se está usando el selector. */
+.busqueda-fila select:focus,
+.notif-filtros select:focus{
+    background-image:
+        linear-gradient(45deg,  transparent 50%, var(--gold) 50%),
+        linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+}
+.busqueda-fila select:hover{ border-color:var(--border-subtle); }
+
+/* ---- "Ordenar por" y "Ascendente" son un solo control ----
+
+   Son dos preguntas de la misma decisión: por qué columna y en qué
+   sentido. Sueltos parecían dos filtros independientes, y el de dirección
+   —"Ascendente"— no decía de qué. Unidos se leen como una sola pieza y se
+   distinguen del filtro de estado, que sí es otra cosa. */
+.busqueda-fila .filtro-orden{
+    border-top-right-radius:0;
+    border-bottom-right-radius:0;
+    padding-right:30px;
+}
+.busqueda-fila .filtro-dir{
+    border-top-left-radius:0;
+    border-bottom-left-radius:0;
+    border-left-color:transparent;
+    margin-left:-1px;
+    min-width:0;
+    padding-right:30px;
+}
+/* Al enfocar cualquiera de los dos, el borde dorado tiene que verse
+   entero: sin esto el vecino le tapa un lado. */
+.busqueda-fila .filtro-orden:focus,
+.busqueda-fila .filtro-dir:focus{ position:relative; z-index:1; }
+
+@media (max-width: 780px){
+    /* Al repartirse de a dos por fila pueden caer en renglones distintos,
+       y ahí el borde compartido no tendría sentido. */
+    .busqueda-fila .filtro-orden,
+    .busqueda-fila .filtro-dir{
+        border-radius:var(--radius-btn);
+        border-left-color:var(--border-hair);
+        margin-left:0;
+    }
+}
+
 @media (max-width: 780px){
     .productos-toolbar-derecha{ justify-content:stretch; }
-    .productos-toolbar-derecha .tab-group{ flex:1 1 100%; }
-    .productos-toolbar-derecha .dash-btn{ flex:1 1 auto; justify-content:center; }
-    .busqueda-fila .barra-busqueda .select-estado-producto{ flex:1 1 140px; max-width:none; }
+    /* En el teléfono el selector ya ocupa su propia fila completa, así que
+       el margen que lo empuja a la izquierda en PC sobra acá. */
+    .productos-toolbar-derecha > .tab-group{ flex:1 1 100%; margin-right:0; }
+
+    /* Dos botones por fila, y que sea el reparto quien lo decida, no el
+       largo del texto.
+
+       Con `flex-basis:auto` la fila se parte o no según cuánto mida cada
+       etiqueta, así que "Nueva Producción" se llevaba un renglón entero;
+       con basis 0 y nowrap pasaba lo contrario y el texto se desbordaba.
+       Fijando la base en la mitad de la fila el reparto es siempre el
+       mismo, y `white-space:normal` deja que la etiqueta larga baje a una
+       segunda línea dentro de su propio botón. */
+    .productos-toolbar-derecha .dash-btn{
+        flex:1 1 calc(50% - 5px);
+        min-width:0;
+        justify-content:center;
+        white-space:normal;
+        text-align:center;
+        line-height:1.25;
+        padding:10px 12px;
+        font-size:13px;
+    }
+    /* La altura fija de main.css cortaría la etiqueta de dos líneas. */
+    .productos-toolbar > .dash-btn{ height:auto; min-height:40px; }
+    .productos-toolbar-derecha .dash-btn i{ flex-shrink:0; }
+
+    /* Los filtros de a dos por fila en vez de uno por renglón. */
+    .busqueda-fila .campo-busqueda{ flex:1 1 100%; }
+    .busqueda-fila .barra-busqueda .select-estado-producto{
+        flex:1 1 calc(50% - 5px);
+        min-width:0;
+        max-width:none;
+    }
 }
 
 /* ============================================================
@@ -657,3 +800,188 @@ body.saliendo .dash-main{
     object-fit:cover;
 }
 .img-producto-caja img{ border-radius:10px; }
+
+/* Panel "Metas del mes" del Inicio cuando aún no hay ninguna aceptada */
+.metas-inicio-vacio{
+    text-align:center;
+    padding:26px 14px;
+    color:var(--text-tertiary);
+    font-size:12.5px;
+}
+.metas-inicio-vacio i{ font-size:1.9rem; display:block; margin-bottom:10px; }
+.metas-inicio-vacio p{ margin:0 0 14px; }
+
+/* ============================================================
+   MÓVIL: PESTAÑAS Y TABLAS
+
+   Las pestañas (Productos / Campañas / Ruleta diaria) no caben en un
+   celular y quedaban cortadas contra el borde, sin pista de que hubiera
+   más. Ahora la fila se desplaza de lado y se ve que sigue.
+   ============================================================ */
+@media (max-width: 780px){
+    .tab-group{
+        overflow-x:auto;
+        overflow-y:hidden;
+        flex-wrap:nowrap;
+        scrollbar-width:none;          /* la barra estorba en algo tan bajo */
+        -webkit-overflow-scrolling:touch;
+    }
+    .tab-group::-webkit-scrollbar{ display:none; }
+    .tab-group .tab-item{ flex:0 0 auto; white-space:nowrap; }
+
+    /* La primera columna se queda fija al desplazar la tabla: sin esto,
+       al mirar el precio ya no se sabe de qué producto era. */
+    .tabla-productos tbody td:first-child,
+    .tabla-productos thead th:first-child,
+    .dash-table tbody td:first-child,
+    .dash-table thead th:first-child{
+        position:sticky;
+        left:0;
+        z-index:2;
+        background:var(--bg-panel);
+    }
+    .tabla-productos thead th:first-child,
+    .dash-table thead th:first-child{ z-index:3; }
+
+    /* Aviso de que la tabla continúa hacia el lado */
+    .table-responsive{ position:relative; }
+    .table-responsive::after{
+        content:'';
+        position:absolute;
+        top:0; right:0; bottom:0;
+        width:22px;
+        pointer-events:none;
+        background:linear-gradient(90deg, transparent, var(--bg-panel));
+    }
+}
+
+/* ============================================================
+   MÓVIL: CABECERA Y TÍTULOS
+   ============================================================ */
+@media (max-width: 575px){
+    .dash-header h1{ font-size:22px; }
+    .dash-header p{ font-size:12px; }
+
+    /* Los paneles pegados a los bordes ganan ancho útil */
+    .contenedor-productos, .contenedor-produccion{ padding:0 10px; }
+    .busqueda-fila{ padding:10px 12px; }
+    .productos-toolbar{ padding:10px 12px; gap:8px; }
+
+    /* La zona de reportes y metas también */
+    .rp-zona, .metas-zona{ padding:10px; }
+    .rp-grid, .metas-grid{ grid-template-columns:1fr; }
+}
+
+/* Filtros de Notificaciones en móvil.
+
+   Antes cada control se comía un renglón: buscador, tipo, lectura y un
+   botón "Filtrar" cruzando la pantalla de lado a lado. Cuatro filas para
+   acotar una lista es más alto que la lista misma.
+
+   Ahora son dos: buscar + Filtrar arriba (que es el gesto completo, y por
+   eso van juntos), y los dos selectores repartiéndose la de abajo. El
+   orden visual no es el del HTML —el botón está último en el formulario
+   para que el tabulador llegue a él al final— así que se reordena acá. */
+@media (max-width: 640px){
+    .notif-filtros{ gap:8px; }
+
+    .notif-buscador{ flex:1 1 auto; min-width:0; order:1; }
+    .notif-buscador input{ padding:9px 12px 9px 33px; font-size:12.5px; }
+
+    .notif-btn-buscar{
+        flex:0 0 auto; order:2;
+        padding:9px 13px; font-size:12.5px;
+    }
+
+    .notif-filtros select{
+        flex:1 1 calc(50% - 4px); min-width:0; order:3;
+        padding:9px 10px; font-size:12.5px;
+    }
+
+    .notif-btn-limpiar{ flex:1 1 100%; order:4; justify-content:center; }
+}
+
+/* ============================================================
+   MÓVIL: CORRECCIONES DE DESBORDE
+
+   Varias tarjetas se salían del ancho de la pantalla: el badge de estado
+   y las cifras de la derecha quedaban cortados contra el borde. La causa
+   siempre es la misma: un hijo con contenido largo dentro de un flex no
+   se encoge por debajo de su tamaño mínimo salvo que se le diga.
+   ============================================================ */
+@media (max-width: 640px){
+
+    /* ---- Tarjetas de metas ---- */
+    .meta-card{ padding:14px; }
+    .meta-cabecera{ flex-wrap:wrap; }
+    .meta-titulo strong{ font-size:13.5px; }
+    .meta-titulo small{ font-size:11px; }
+    /* El badge baja a su propia línea en vez de empujar el título fuera */
+    .meta-cabecera .meta-badge{ order:3; margin-left:52px; }
+
+    .meta-objetivo{ font-size:20px; }
+    .meta-cifras{ gap:6px; }
+    .meta-base{ font-size:11px; }
+
+    /* La fila "Llevas X ... 100%" se partía y el porcentaje quedaba
+       fuera de la pantalla. */
+    .meta-progreso-cabecera{ flex-wrap:wrap; gap:4px; }
+    .meta-progreso-cabecera span{ min-width:0; }
+
+    .meta-acciones{ gap:6px; }
+    .meta-objetivo-input{ flex:1 1 100%; width:auto; }
+    .meta-btn{ flex:1 1 auto; justify-content:center; }
+
+    /* ---- Nada dentro de un panel puede empujar la página de lado ----
+
+       `anywhere` en vez de `break-word` fue un error mío: los dos parten
+       una palabra larga, pero solo `anywhere` reduce también el tamaño
+       min-content del elemento. Dentro de un flex eso da permiso a que el
+       hijo se encoja hasta UNA letra por línea, y así quedó la fecha de
+       las metas: "M e n s u a l" en vertical.
+
+       `break-word` parte lo que no cabe sin autorizar ese colapso. */
+    .dash-panel, .meta-card, .rp-card, .stat-card{ overflow-wrap:break-word; }
+
+    /* Y por si acaso, un piso explícito para la columna del título: el
+       reparto de la cabecera no depende de cuánto mida la fecha. */
+    .meta-titulo{ flex:1 1 140px; min-width:120px; }
+}
+
+/* ============================================================
+   MÓVIL: LAS FECHAS NO SE PARTEN
+
+   Una fecha es un dato indivisible. Al angostarse la columna, "22/08/2026
+   23:04" se partía en varias líneas —a veces por la mitad del año— y la
+   celda quedaba ilegible. Nada de esto se gana partiéndola: si no cabe,
+   que la tabla se desplace de lado, que para eso está.
+   ============================================================ */
+@media (max-width: 640px){
+    .celda-fecha,
+    .tabla-productos td .fecha-corta,
+    .tabla-productos td .fecha-larga{ white-space:nowrap; }
+
+    /* La cabecera de esa columna tampoco se parte letra por letra */
+    .celda-fecha, .tabla-productos th .th-orden{ overflow-wrap:normal; }
+}
+
+/* ============================================================
+   MÓVIL: ESPACIO MUERTO BAJO LAS LISTAS
+
+   La lista de notificaciones tenía altura mínima pensada para escritorio,
+   así que en una pantalla angosta quedaba media pantalla vacía debajo de
+   la paginación.
+   ============================================================ */
+@media (max-width: 780px){
+    .notif-pagina-lista{ min-height:0; }
+    .dash-panel:has(> .notif-pagina-lista){ min-height:0; }
+}
+
+/* ============================================================
+   NADA DEBE DESPLAZAR LA PÁGINA DE LADO
+
+   Se contiene en el contenedor del panel y NO en html/body: poner
+   overflow-x:hidden ahí rompe position:sticky, que es justo lo que
+   mantiene fija la primera columna de las tablas.
+   ============================================================ */
+.dash-frame{ max-width:100vw; overflow-x:clip; }

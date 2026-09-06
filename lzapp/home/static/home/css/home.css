@@ -4425,3 +4425,21 @@ body.carrito-widget-abierto .lz-toasts {
 .lz-toast__cerrar:hover {
     color: #022C63;
 }
+/* ============================================================
+   CONTENCIÓN HORIZONTAL EN MÓVIL
+
+   En el celular la portada se deslizaba de lado y aparecía una franja
+   blanca al costado: basta con que UN elemento sea más ancho que la
+   pantalla para que toda la página quede desplazable.
+
+   Se usa overflow-x: clip y no hidden: `hidden` convierte al elemento en
+   contenedor de scroll y rompe cualquier position:sticky de adentro;
+   `clip` recorta sin ese efecto secundario.
+
+   Nota honesta: esto contiene el síntoma. No pude identificar con
+   certeza qué elemento desborda sin medirlo en un navegador real; si
+   aparece de nuevo en alguna sección concreta, hay que corregir ahí.
+   ============================================================ */
+@media (max-width: 992px){
+    body{ overflow-x: clip; }
+}

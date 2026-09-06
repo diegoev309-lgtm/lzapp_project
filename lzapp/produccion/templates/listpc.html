@@ -5,14 +5,6 @@
 {% block page_title %}Historial de Producción{% endblock %}
 {% block page_subtitle %}Consulta todas las producciones registradas del sistema{% endblock %}
 
-{% block header_actions %}
-
-<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
-    <i class="bi bi-file-earmark-pdf-fill"></i>
-    <span class="btn-importar-texto">PDF</span>
-</a>
-
-{% endblock %}
 
 
 {% block content %}
@@ -42,12 +34,42 @@
     ====================================================== -->
     <div class="bloque-productos">
         <div class="busqueda-fila">
+            {% comment %}
+            Los mismos filtros que el resto de los módulos. El período ya
+            existía en la vista —la tabla mostraba solo los últimos 30 días—
+            pero no tenía ningún control en pantalla, así que las
+            producciones más viejas simplemente no aparecían y no había
+            forma de saber por qué.
+            {% endcomment %}
             <form method="get" class="barra-busqueda" id="formBuscarProduccion">
                 <div class="campo-busqueda">
                     <i class="bi bi-search"></i>
                     <input type="text" name="q" id="inputBuscarProduccion" class="input-busqueda"
                            placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
                 </div>
+
+                <select name="filtro" class="input-busqueda select-estado-producto"
+                        onchange="this.form.submit()" aria-label="Período">
+                    <option value="semana" {% if filtro == 'semana' %}selected{% endif %}>Última semana</option>
+                    <option value="mes" {% if filtro == 'mes' %}selected{% endif %}>Últimos 30 días</option>
+                    <option value="trimestre" {% if filtro == 'trimestre' %}selected{% endif %}>Últimos 90 días</option>
+                    <option value="todo" {% if filtro == 'todo' %}selected{% endif %}>Todo el historial</option>
+                </select>
+
+                <select name="orden" class="input-busqueda select-estado-producto filtro-orden"
+                        onchange="this.form.submit()" aria-label="Ordenar por">
+                    <option value="fecha" {% if orden == 'fecha' %}selected{% endif %}>Ordenar: Fecha</option>
+                    <option value="id" {% if orden == 'id' %}selected{% endif %}>Ordenar: ID</option>
+                    <option value="producto" {% if orden == 'producto' %}selected{% endif %}>Ordenar: Producto</option>
+                    <option value="cantidad" {% if orden == 'cantidad' %}selected{% endif %}>Ordenar: Cantidad</option>
+                    <option value="vencimiento" {% if orden == 'vencimiento' %}selected{% endif %}>Ordenar: Vencimiento</option>
+                </select>
+
+                <select name="dir" class="input-busqueda select-estado-producto filtro-dir"
+                        onchange="this.form.submit()" aria-label="Dirección del orden">
+                    <option value="asc" {% if direccion == 'asc' %}selected{% endif %}>Ascendente</option>
+                    <option value="desc" {% if direccion == 'desc' %}selected{% endif %}>Descendente</option>
+                </select>
             </form>
         </div>
         
@@ -61,7 +83,14 @@
                             <th class="d-none d-md-table-cell">{% th_orden "id" "ID" orden direccion %}</th>
                             <th>{% th_orden "producto" "Producto" orden direccion %}</th>
                             <th>{% th_orden "cantidad" "Cantidad Producida" orden direccion %}</th>
-                            <th class="d-none d-sm-table-cell">{% th_orden "fecha" "Fecha" orden direccion %}</th>
+                            {% comment %}
+                            La fecha se veía solo desde 576 px, así que en el
+                            teléfono la tabla quedaba en producto y cantidad: dos
+                            filas de "Fresco" sin nada que las distinguiera. Es la
+                            columna que da sentido a un historial, así que se queda
+                            siempre; lo que se oculta primero es el ID.
+                            {% endcomment %}
+                            <th>{% th_orden "fecha" "Fecha" orden direccion %}</th>
                             <th class="d-none d-md-table-cell">{% th_orden "vencimiento" "Vencimiento" orden direccion %}</th>
                             <th class="d-none d-lg-table-cell">Observación</th>
                         </tr>
@@ -73,8 +102,11 @@
                             <td class="d-none d-md-table-cell">{{ i.id }}</td>
                             <td><strong>{{ i.producto.nombre }}</strong></td>
                             <td><span class="badge bg-success"> + {{ i.cantidad_producida }}</span></td>
-                            <td class="d-none d-sm-table-cell">{{ i.fecha_produccion|date:"d/m/Y H:i" }}</td>
-                            <td class="d-none d-md-table-cell">
+                            <td class="celda-fecha">
+                                <span class="fecha-larga d-none d-sm-inline">{{ i.fecha_produccion|date:"d/m/Y H:i" }}</span>
+                                <span class="fecha-corta d-sm-none">{{ i.fecha_produccion|date:"d/m/y" }}</span>
+                            </td>
+                            <td class="celda-fecha d-none d-md-table-cell">
                                 {% if i.fecha_vencimiento %}
                                     {{ i.fecha_vencimiento|date:"d/m/Y" }}
                                 {% else %}

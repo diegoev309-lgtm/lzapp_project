@@ -312,11 +312,44 @@ módulo.
 <div class="contenedor-productos">
     <div class="bloque-productos">
 
+        {% comment %}
+        Los mismos filtros que el resto de los módulos: buscador a la
+        izquierda, estado y orden al extremo derecho. Acá no van por GET
+        porque la tabla la arma el navegador con lo que llega del sondeo:
+        recargar la página para filtrar perdería la actualización en vivo.
+        {% endcomment %}
         <div class="busqueda-fila">
-            <div class="campo-busqueda">
-                <i class="bi bi-search"></i>
-                <input type="text" id="inputBuscarPedido" class="input-busqueda"
-                       placeholder="Buscar por cliente o # de pedido..." autocomplete="off">
+            <div class="barra-busqueda">
+                <div class="campo-busqueda">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="inputBuscarPedido" class="input-busqueda"
+                           placeholder="Buscar por cliente o # de pedido..." autocomplete="off">
+                </div>
+
+                <select id="filtroEstadoPedido" class="input-busqueda select-estado-producto"
+                        aria-label="Filtrar por estado">
+                    <option value="todos">Todos los estados</option>
+                    <option value="preparando">En preparación</option>
+                    <option value="pendiente">Esperando repartidor</option>
+                    <option value="en_camino">En camino</option>
+                    <option value="entregado">Entregados</option>
+                    <option value="cancelado">Cancelados</option>
+                </select>
+
+                <select id="filtroOrdenPedido" class="input-busqueda select-estado-producto filtro-orden"
+                        aria-label="Ordenar por">
+                    <option value="fecha">Ordenar: Fecha</option>
+                    <option value="pedido">Ordenar: Pedido</option>
+                    <option value="cliente">Ordenar: Cliente</option>
+                    <option value="total">Ordenar: Total</option>
+                    <option value="estado">Ordenar: Estado</option>
+                </select>
+
+                <select id="filtroDirPedido" class="input-busqueda select-estado-producto filtro-dir"
+                        aria-label="Dirección del orden">
+                    <option value="desc">Descendente</option>
+                    <option value="asc">Ascendente</option>
+                </select>
             </div>
         </div>
 
@@ -576,9 +609,36 @@ function renderizarTabla(pedidos) {
     const cuerpo = document.getElementById('cuerpoTablaPedidos');
 
     const filtro = document.getElementById('inputBuscarPedido').value.trim().toLowerCase();
+    const estado = document.getElementById('filtroEstadoPedido').value;
+
     const filtrados = pedidos.filter(p =>
-        !filtro || p.cliente.toLowerCase().includes(filtro) || String(p.pedido_id).includes(filtro)
+        (!filtro || p.cliente.toLowerCase().includes(filtro) || String(p.pedido_id).includes(filtro))
+        && (estado === 'todos' || p.estado === estado)
     );
+
+    // El orden se aplica sobre TODO lo filtrado, no sobre una página: acá
+    // la tabla no está paginada, así que ordenar en el navegador sí da el
+    // resultado correcto (a diferencia de los módulos que sí paginan, que
+    // ordenan en la base a propósito).
+    const columna = document.getElementById('filtroOrdenPedido').value;
+    const signo = document.getElementById('filtroDirPedido').value === 'asc' ? 1 : -1;
+
+    const valorDe = {
+        fecha:   p => p.fecha_iso || '',
+        pedido:  p => p.pedido_id,
+        cliente: p => (p.cliente || '').toLowerCase(),
+        total:   p => p.total,
+        estado:  p => p.estado_display || '',
+    }[columna];
+
+    filtrados.sort((a, b) => {
+        const va = valorDe(a), vb = valorDe(b);
+        if (va < vb) return -signo;
+        if (va > vb) return signo;
+        // Desempate por número de pedido para que el orden no baile entre
+        // sondeos cuando dos filas empatan.
+        return a.pedido_id - b.pedido_id;
+    });
 
     if (filtrados.length === 0) {
         cuerpo.innerHTML = `
@@ -775,6 +835,9 @@ function decodificarPolyline(codificada) {
 }
 
 document.getElementById('inputBuscarPedido').addEventListener('input', () => renderizarTabla(pedidosActuales));
+['filtroEstadoPedido', 'filtroOrdenPedido', 'filtroDirPedido'].forEach((id) => {
+    document.getElementById(id).addEventListener('change', () => renderizarTabla(pedidosActuales));
+});
 
 cargarPedidosTiempoReal();
 setInterval(cargarPedidosTiempoReal, 10000);

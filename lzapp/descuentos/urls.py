@@ -11,7 +11,6 @@ urlpatterns = [
     path('producto/<int:pk>/previsualizar/', views.previsualizar_producto, name='previsualizar_producto'),
     path('premio-ruleta/<int:pk>/actualizar/', views.actualizar_premio_ruleta, name='actualizar_premio_ruleta'),
     path('premio/marcar-mostrado/', views.marcar_premio_mostrado, name='marcar_premio_mostrado'),
-    path('generar_pdf_descuentos/', views.generar_pdf_descuentos, name='generar_pdf_descuentos'),
     path('jugar-ruleta/', views.jugar_ruleta_dia, name='jugar_ruleta_dia'),
     path('reclamar-premio-dia/', views.reclamar_premio_dia_ajax, name='reclamar_premio_dia'),
 ]

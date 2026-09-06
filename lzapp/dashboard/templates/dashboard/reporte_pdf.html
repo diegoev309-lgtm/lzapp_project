@@ -1,0 +1,132 @@
+{% comment %}
+Plantilla común de todos los reportes en PDF.
+
+Es una sola para los seis: cada constructor de reportes.py entrega el
+mismo contrato (título, resumen, columnas, filas), así que el papel no
+necesita saber si está imprimiendo ventas o inventario. Antes había una
+plantilla por reporte y solo existía la de descuentos.
+{% endcomment %}<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+    @page {
+        size: A4 landscape;
+        margin: 1.6cm 1.2cm;
+        @bottom-center {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 8.5px;
+            color: #8a93a6;
+        }
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #1f2937;
+        font-size: 10px;
+    }
+
+    .encabezado {
+        border-bottom: 3px solid #192987;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+    }
+    .encabezado h1 { font-size: 19px; color: #192987; margin: 0 0 3px; }
+    .encabezado .descripcion { margin: 0 0 6px; font-size: 10px; color: #5b6472; }
+    .encabezado .meta { margin: 0; font-size: 9px; color: #8a93a6; }
+
+    .resumen {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .resumen-item {
+        flex: 1;
+        border: 1px solid #e3e6ee;
+        border-left: 3px solid #c9a227;
+        border-radius: 5px;
+        padding: 7px 10px;
+    }
+    .resumen-item .etiqueta {
+        display: block;
+        font-size: 8px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #8a93a6;
+        margin-bottom: 2px;
+    }
+    .resumen-item .valor { font-size: 14px; font-weight: bold; color: #192987; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { display: table-header-group; }   /* repite el encabezado en cada página */
+    th {
+        background: #192987;
+        color: #fff;
+        font-size: 9px;
+        text-align: left;
+        padding: 6px 8px;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+    }
+    td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #eceff5;
+        font-size: 9.5px;
+    }
+    tbody tr:nth-child(even) { background: #f7f8fc; }
+
+    .sin-datos {
+        text-align: center;
+        padding: 30px;
+        color: #8a93a6;
+        font-size: 11px;
+        border: 1px dashed #d7dce4;
+        border-radius: 6px;
+    }
+</style>
+</head>
+<body>
+
+<div class="encabezado">
+    <h1>{{ titulo }}</h1>
+    <p class="descripcion">{{ descripcion }}</p>
+    <p class="meta">
+        Lácteos Zulianos ·
+        {% if usa_periodo %}
+            Período: {{ desde|date:"d/m/Y" }} a {{ hasta|date:"d/m/Y" }} ·
+        {% endif %}
+        Generado el {{ generado|date:"d/m/Y H:i" }}
+    </p>
+</div>
+
+{% if resumen %}
+<div class="resumen">
+    {% for etiqueta, valor in resumen %}
+        <div class="resumen-item">
+            <span class="etiqueta">{{ etiqueta }}</span>
+            <span class="valor">{{ valor }}</span>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if filas %}
+<table>
+    <thead>
+        <tr>{% for columna in columnas %}<th>{{ columna }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+        {% for fila in filas %}
+            <tr>{% for celda in fila %}<td>{{ celda }}</td>{% endfor %}</tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="sin-datos">
+    No hay datos para
+    {% if usa_periodo %}el período seleccionado{% else %}este reporte{% endif %}.
+</div>
+{% endif %}
+
+</body>
+</html>

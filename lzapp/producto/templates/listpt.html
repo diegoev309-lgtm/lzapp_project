@@ -5,12 +5,6 @@
 {% block page_title %}Productos{% endblock %}
 {% block page_subtitle %}Administra todos los productos registrados del sistema{% endblock %}
 
-{% block header_actions %}
-<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
-    <i class="bi bi-file-earmark-pdf-fill"></i>
-    <span class="btn-importar-texto">PDF</span>
-</a>
-{% endblock %}
 
 {% block content %}
 
@@ -169,6 +163,40 @@
 
 </style>
 
+{% comment %}
+Acciones agrupadas a la derecha: selector de vista, Importar y Nuevo
+Producto. Importar estaba metido dentro del panel, en la fila del
+buscador, así que parecía un filtro más cuando en realidad es una acción
+sobre todo el módulo — igual que Nuevo Producto.
+{% endcomment %}
+<div class="productos-toolbar productos-toolbar-derecha">
+    <div class="tab-group" role="group" aria-label="Selector de vista">
+        <div class="tab-item active" id="btnVistaTabla" onclick="cambiarVista('tabla')">
+            <i class="bi bi-table"></i> Tabla
+        </div>
+        <div class="tab-item" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
+            <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
+        </div>
+    </div>
+
+    <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
+        <i class="bi bi-file-earmark-excel"></i>
+        <span class="btn-importar-texto">Importar</span>
+    </button>
+
+    <a href="{% url 'crear_producto' %}" class="dash-btn dash-btn-solid">
+        <i class="bi bi-plus-circle-fill"></i> Nuevo Producto
+    </a>
+</div>
+
+{% comment %}
+El aviso de stock bajo va después de la barra de acciones, no antes.
+Abría la plantilla empujando hacia abajo el módulo entero —pestañas,
+buscador y tabla— así que en cuanto un producto bajaba del mínimo la
+página dejaba de empezar por lo que uno viene a hacer. Sigue arriba
+del listado y sigue siendo lo primero dentro del contenido, pero ya no
+desplaza las acciones del módulo.
+{% endcomment %}
 <!-- ============ NOTIFICACIÓN: PRODUCTOS CON STOCK BAJO ============ -->
 {% if productos_bajo_stock %}
 <div class="notif-stock" id="notifStock">
@@ -207,32 +235,6 @@
 </div>
 {% endif %}
 
-{% comment %}
-Acciones agrupadas a la derecha: selector de vista, Importar y Nuevo
-Producto. Importar estaba metido dentro del panel, en la fila del
-buscador, así que parecía un filtro más cuando en realidad es una acción
-sobre todo el módulo — igual que Nuevo Producto.
-{% endcomment %}
-<div class="productos-toolbar productos-toolbar-derecha">
-    <div class="tab-group" role="group" aria-label="Selector de vista">
-        <div class="tab-item active" id="btnVistaTabla" onclick="cambiarVista('tabla')">
-            <i class="bi bi-table"></i> Tabla
-        </div>
-        <div class="tab-item" id="btnVistaTarjetas" onclick="cambiarVista('tarjetas')">
-            <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
-        </div>
-    </div>
-
-    <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
-        <i class="bi bi-file-earmark-excel"></i>
-        <span class="btn-importar-texto">Importar</span>
-    </button>
-
-    <a href="{% url 'crear_producto' %}" class="dash-btn dash-btn-solid">
-        <i class="bi bi-plus-circle-fill"></i> Nuevo Producto
-    </a>
-</div>
-
 <div class="contenedor-productos">
 
     <div class="bloque-productos">
@@ -257,7 +259,7 @@ sobre todo el módulo — igual que Nuevo Producto.
             la vista de tarjetas no tiene cabeceras, así que sin esto era
             imposible ordenar los productos cuando se miraban como tarjetas.
             {% endcomment %}
-            <select name="orden" id="selectOrdenProducto" class="input-busqueda select-estado-producto"
+            <select name="orden" id="selectOrdenProducto" class="input-busqueda select-estado-producto filtro-orden"
                     aria-label="Ordenar por">
                 <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Ordenar: Nombre</option>
                 <option value="precio" {% if orden == 'precio' %}selected{% endif %}>Ordenar: Precio</option>
@@ -265,7 +267,7 @@ sobre todo el módulo — igual que Nuevo Producto.
                 <option value="estado" {% if orden == 'estado' %}selected{% endif %}>Ordenar: Estado</option>
             </select>
 
-            <select name="dir" id="selectDirProducto" class="input-busqueda select-estado-producto"
+            <select name="dir" id="selectDirProducto" class="input-busqueda select-estado-producto filtro-dir"
                     aria-label="Dirección del orden">
                 <option value="asc" {% if direccion == 'asc' %}selected{% endif %}>Ascendente</option>
                 <option value="desc" {% if direccion == 'desc' %}selected{% endif %}>Descendente</option>

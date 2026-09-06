@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -34,6 +34,15 @@ def _resolver_periodo(request):
 
     if filtro == 'semana':
         desde = hoy - timedelta(days=6)
+        hasta = hoy
+    elif filtro == 'trimestre':
+        desde = hoy - timedelta(days=89)
+        hasta = hoy
+    elif filtro == 'todo':
+        # El historial completo. La fecha de arranque es una cota baja
+        # cualquiera anterior al sistema: más simple y más barato que un
+        # aggregate para averiguar cuál fue la primera producción.
+        desde = date(2000, 1, 1)
         hasta = hoy
     elif filtro == 'rango':
         try:

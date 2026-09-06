@@ -1,0 +1,144 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block title %}LzApp · Reportes{% endblock %}
+{% block page_icon %}bi-file-earmark-bar-graph{% endblock %}
+{% block page_title %}Reportes{% endblock %}
+{% block page_subtitle %}Elige qué exportar y de qué período{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rp-zona{ padding:15px; display:flex; flex-direction:column; gap:15px; }
+
+    .rp-periodo{
+        display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;
+        background:var(--bg-panel);
+        border:1px solid var(--border-subtle);
+        border-radius:14px;
+        padding:16px 18px;
+    }
+    .rp-campo{ display:flex; flex-direction:column; gap:6px; }
+    .rp-campo label{ font-size:11.5px; color:var(--text-tertiary); }
+    .rp-campo input{ padding:9px 12px; font-size:13px; }
+    .rp-periodo-nota{
+        flex:1 1 220px; min-width:0;
+        font-size:11.5px; line-height:1.5; color:var(--text-tertiary);
+    }
+    .rp-atajos{ display:flex; gap:6px; flex-wrap:wrap; }
+    .rp-atajo{
+        border:none; border-radius:9px; padding:8px 12px;
+        background:var(--control-bg); color:var(--text-secondary);
+        font-size:12px; font-weight:600; cursor:pointer; transition:.18s;
+    }
+    .rp-atajo:hover{ background:var(--gold); color:#1A1A2E; }
+
+    .rp-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+        gap:14px;
+    }
+    .rp-card{
+        background:var(--bg-panel);
+        border:1px solid var(--border-subtle);
+        border-radius:16px;
+        padding:18px;
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+        text-decoration:none;
+        transition:transform .2s ease, border-color .2s ease, box-shadow .25s ease;
+    }
+    .rp-card:hover{
+        transform:translateY(-3px);
+        border-color:rgba(228,200,112,.4);
+        box-shadow:0 14px 34px rgba(0,0,0,.28);
+    }
+    .rp-icono{
+        width:46px; height:46px; border-radius:13px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:20px;
+        background:var(--gold-dim); color:var(--gold);
+    }
+    .rp-card strong{ display:block; font-size:15px; color:var(--text-primary); }
+    .rp-card small{ display:block; font-size:11.5px; color:var(--text-tertiary); margin-top:3px; }
+    .rp-abrir{
+        margin-top:auto;
+        display:inline-flex; align-items:center; gap:7px;
+        font-size:12.5px; font-weight:700; color:var(--gold);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="rp-zona">
+
+    <form method="get" class="rp-periodo" id="formPeriodo">
+        <div class="rp-campo">
+            <label for="rpDesde">Desde</label>
+            <input type="date" id="rpDesde" name="desde" value="{{ desde|date:'Y-m-d' }}">
+        </div>
+        <div class="rp-campo">
+            <label for="rpHasta">Hasta</label>
+            <input type="date" id="rpHasta" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
+        </div>
+
+        <div class="rp-atajos">
+            <button type="button" class="rp-atajo" onclick="fijarPeriodo(7)">7 días</button>
+            <button type="button" class="rp-atajo" onclick="fijarPeriodo(30)">30 días</button>
+            <button type="button" class="rp-atajo" onclick="fijarPeriodo(90)">90 días</button>
+        </div>
+
+        <button type="submit" class="dash-btn dash-btn-solid">
+            <i class="bi bi-check-lg"></i> Aplicar
+        </button>
+
+        <p class="rp-periodo-nota">
+            Inventario y Campañas muestran el estado actual, así que no dependen
+            del período que elijas aquí.
+        </p>
+    </form>
+
+    <div class="rp-grid">
+        {% for r in catalogo %}
+            <a class="rp-card"
+               href="{% url 'generar_reporte' r.clave %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}"
+               target="_blank" rel="noopener">
+                <div class="rp-icono"><i class="bi {{ r.icono }}"></i></div>
+                <div>
+                    <strong>{{ r.etiqueta }}</strong>
+                    <small>
+                        {% if r.usa_periodo %}
+                            Del {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}
+                        {% else %}
+                            Estado actual
+                        {% endif %}
+                    </small>
+                </div>
+                <span class="rp-abrir">
+                    <i class="bi bi-file-earmark-pdf-fill"></i> Generar PDF
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Atajos de período: rellenan las fechas y envían, para no obligar a
+// abrir dos veces el calendario por algo tan común como "últimos 30 días".
+function fijarPeriodo(dias){
+    const hasta = new Date();
+    const desde = new Date();
+    desde.setDate(hasta.getDate() - (dias - 1));
+
+    const iso = (f) => f.toISOString().slice(0, 10);
+    document.getElementById('rpDesde').value = iso(desde);
+    document.getElementById('rpHasta').value = iso(hasta);
+    document.getElementById('formPeriodo').submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% comment %}
+Tarjeta de una meta. Recibe `item` (dict con meta/logro/progreso/restante)
+y `editable` (True solo para las propuestas: una meta ya aceptada no se
+edita desde acá, se descarta y se propone de nuevo).
+{% endcomment %}
+
+<div class="meta-card {{ item.meta.estado }}" data-meta-id="{{ item.meta.id }}">
+
+    <div class="meta-cabecera">
+        <div class="meta-icono">
+            <i class="bi
+                {% if item.meta.tipo == 'ventas' %}bi-cash-stack
+                {% elif item.meta.tipo == 'produccion' %}bi-box-seam-fill
+                {% elif item.meta.tipo == 'clientes' %}bi-people-fill
+                {% else %}bi-truck{% endif %}"></i>
+        </div>
+        <div class="meta-titulo">
+            <strong>{{ item.meta.get_tipo_display }}</strong>
+            <small>
+                {{ item.meta.get_periodo_display }} ·
+                {{ item.meta.fecha_inicio|date:"d M" }} a {{ item.meta.fecha_fin|date:"d M Y" }}
+            </small>
+        </div>
+        <span class="meta-badge {{ item.meta.estado }}">{{ item.meta.get_estado_display }}</span>
+    </div>
+
+    <div class="meta-cifras">
+        <span class="meta-objetivo">
+            {% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.meta.objetivo|floatformat:0 }}
+        </span>
+        <span class="meta-unidad">
+            {% if item.meta.tipo == 'ventas' %}de ingresos
+            {% elif item.meta.tipo == 'produccion' %}unidades a producir
+            {% elif item.meta.tipo == 'clientes' %}clientes nuevos
+            {% else %}pedidos entregados{% endif %}
+        </span>
+    </div>
+
+    {% if item.meta.base_historica %}
+    <p class="meta-base">
+        Tu promedio real fue
+        <b>{% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.meta.base_historica|floatformat:0 }}</b>
+        en {{ item.meta.periodos_analizados }} período{{ item.meta.periodos_analizados|pluralize }}
+        con actividad.
+    </p>
+    {% endif %}
+
+    <div>
+        <div class="meta-progreso-cabecera">
+            <span>
+                Llevas
+                <b>{% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.logro|floatformat:0 }}</b>
+            </span>
+            <span>{{ item.progreso }}%</span>
+        </div>
+        <div class="meta-riel">
+            <div class="meta-relleno {% if item.progreso >= 100 %}completo{% endif %}"
+                 style="width: {{ item.progreso }}%;"></div>
+        </div>
+        {% if item.restante > 0 %}
+            <div class="meta-progreso-cabecera" style="margin-top:6px;">
+                <span>
+                    Faltan
+                    {% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.restante|floatformat:0 }}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if editable %}
+    <div class="meta-acciones">
+        <input type="number" class="meta-objetivo-input" min="1" step="1"
+               value="{{ item.meta.objetivo|floatformat:0 }}"
+               aria-label="Ajustar el objetivo antes de aceptarlo">
+        <button type="button" class="meta-btn aceptar" onclick="resolverMeta({{ item.meta.id }}, 'aceptar')">
+            <i class="bi bi-check-lg"></i> Aceptar
+        </button>
+        <button type="button" class="meta-btn descartar" onclick="resolverMeta({{ item.meta.id }}, 'descartar')">
+            Descartar
+        </button>
+        <div class="meta-aviso"></div>
+    </div>
+    {% endif %}
+
+</div>

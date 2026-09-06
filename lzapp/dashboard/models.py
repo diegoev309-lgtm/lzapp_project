@@ -780,6 +780,75 @@ class PremioRuletaDiaria(models.Model):
         estado = 'activo' if self.activo else 'inactivo'
         return f'{self.get_codigo_display()} ({self.peso}%, {estado})'
 
+class Meta(models.Model):
+    #"""
+    #Objetivo del negocio para un período, propuesto por el sistema.
+    #
+    #La idea es que nadie tenga que inventar el número: el motor mira lo
+    #que de verdad pasó en los períodos anteriores y propone una meta
+    #alcanzable. El admin la acepta, la ajusta o la descarta — pero parte
+    #de un dato, no de una corazonada.
+    #
+    #Una meta descartada no se borra: si se borrara, el motor volvería a
+    #proponer lo mismo al día siguiente.
+    #"""
+
+    class Tipo(models.TextChoices):
+        VENTAS     = 'ventas',     'Ingresos por ventas'
+        PRODUCCION = 'produccion', 'Unidades producidas'
+        CLIENTES   = 'clientes',   'Clientes nuevos'
+        PEDIDOS    = 'pedidos',    'Pedidos entregados'
+
+    class Periodo(models.TextChoices):
+        SEMANAL = 'semanal', 'Semanal'
+        MENSUAL = 'mensual', 'Mensual'
+
+    class Estado(models.TextChoices):
+        PROPUESTA  = 'propuesta',  'Propuesta'
+        ACTIVA     = 'activa',     'Activa'
+        CUMPLIDA   = 'cumplida',   'Cumplida'
+        DESCARTADA = 'descartada', 'Descartada'
+
+    tipo = models.CharField(max_length=15, choices=Tipo.choices)
+    periodo = models.CharField(max_length=10, choices=Periodo.choices, default=Periodo.MENSUAL)
+    estado = models.CharField(max_length=12, choices=Estado.choices, default=Estado.PROPUESTA)
+
+    objetivo = models.DecimalField(
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
+        help_text='Cuánto hay que alcanzar en el período.'
+    )
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+
+    # De dónde salió el número: se guarda para poder explicárselo al
+    # admin en vez de mostrarle una cifra caída del cielo.
+    base_historica = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text='Promedio real de los períodos anteriores sobre el que se calculó.'
+    )
+    periodos_analizados = models.PositiveIntegerField(default=0)
+
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'meta_negocio'
+        ordering = ['-fecha_creacion']
+        constraints = [
+            # Una sola meta viva por tipo y período: si no, el panel
+            # mostraría dos objetivos distintos para lo mismo.
+            models.UniqueConstraint(
+                fields=['tipo', 'fecha_inicio', 'fecha_fin'],
+                condition=models.Q(estado__in=['propuesta', 'activa']),
+                name='meta_unica_viva_por_tipo_y_periodo',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.get_tipo_display()} — {self.objetivo} ({self.get_estado_display()})'
+
+
 class ConfiguracionEntrega(models.Model):
     #"""
     #Fila única (pk=1) con los tiempos de entrega del negocio.

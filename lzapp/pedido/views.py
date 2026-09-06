@@ -162,6 +162,9 @@ def _serializar_pedidos_tiempo_real(pedidos):
             'pedido_id': ped.id,
             'cliente': venta.usuario.get_full_name() or venta.usuario.username,
             'fecha': timezone.localtime(venta.fecha).strftime('%d/%m %H:%M'),
+            # La versión legible no sirve para ordenar: no lleva el año, así
+            # que un 31/12 quedaría siempre por encima de un 01/01 posterior.
+            'fecha_iso': venta.fecha.isoformat(),
             'total': float(venta.total),
             'estado': ped.estado,
             'estado_display': ped.get_estado_display(),

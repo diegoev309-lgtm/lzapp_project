@@ -200,9 +200,6 @@
         
         </nav>
 
-        <button class="dash-toggle" id="themeToggle" title="Cambiar modo" type="button">
-            <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
-        </button>
     </aside>
 
     <!-- ============ MAIN ============ -->
@@ -217,6 +214,14 @@
             
                 <div class="dash-header-actions">
                     {% block header_actions %}{% endblock %}
+
+                    {% comment %}
+                    El interruptor de tema pasó del pie del menú lateral a la
+                    cabecera: acá queda junto al resto de acciones de la vista.
+                    {% endcomment %}
+                    <button class="dash-icon-btn" id="themeToggle" title="Cambiar modo" type="button">
+                        <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
+                    </button>
                 
                     <div class="dash-notif-wrap"
                          data-url-marcar-leida="{% url 'marcar_notificacion_leida' id=0 %}"
@@ -283,9 +288,13 @@
                             <a href="{% url 'Usuario' %}" class="dash-user-menu-item">
                                 <i class="bi bi-person"></i> Mi perfil
                             </a>
-                            <a href="{% url 'panel_seguridad' %}" class="dash-user-menu-item">
-                                <i class="bi bi-shield-lock"></i> Seguridad
+                            <a href="{% url 'panel_metas' %}" class="dash-user-menu-item">
+                                <i class="bi bi-bullseye"></i> Metas
                             </a>
+                            <a href="{% url 'panel_reportes' %}" class="dash-user-menu-item">
+                                <i class="bi bi-file-earmark-bar-graph"></i> Reportes
+                            </a>
+                            {# Seguridad ya vive en el menú lateral. #}
                             <a href="{% url 'logout' %}" class="dash-user-menu-item danger">
                                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                             </a>

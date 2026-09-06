@@ -1,10 +1,22 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
-from django.http import JsonResponse
+from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from weasyprint import HTML
 from django.utils import timezone
-from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento
+from decimal import Decimal, InvalidOperation
+
+from django.views.decorators.http import require_POST
+
+from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento, Meta
+from .reportes import REPORTES, construir, rango_desde_peticion
+from .metas import (
+    MARGEN_CRECIMIENTO, PERIODOS_ANALIZADOS, con_progreso, generar_propuestas,
+    marcar_cumplidas,
+)
 from seguridad.decorators import vista_dashboard
 from seguridad.validators import leer_entero_acotado
 from pedido.views import _serializar_pedidos_tiempo_real
@@ -65,6 +77,8 @@ def Inicio(request):
         'variacion_ventas': variacion_ventas,
         'pedidos_semana': pedidos_semana,
         'diferencia_pedidos': diferencia_pedidos,
+        # Metas reales del módulo, para el panel "Metas del mes".
+        'metas_activas': con_progreso(Meta.objects.filter(estado=Meta.Estado.ACTIVA)[:3]),
         'campanas_totales': campanas_totales,
         'campanas_activas': campanas_activas,
         'campanas_inactivas': campanas_inactivas,
@@ -244,3 +258,98 @@ def api_pedidos_tiempo_real(request):
     }
 
     return JsonResponse({'pedidos': lista, 'resumen': resumen})
+
+
+@vista_dashboard
+def panel_metas(request):
+    """Módulo de metas: lo que el sistema propone y cómo va lo aceptado."""
+    generar_propuestas()
+    marcar_cumplidas()
+
+    propuestas = Meta.objects.filter(estado=Meta.Estado.PROPUESTA)
+    activas = Meta.objects.filter(estado=Meta.Estado.ACTIVA)
+    cerradas = Meta.objects.filter(
+        estado__in=[Meta.Estado.CUMPLIDA, Meta.Estado.DESCARTADA]
+    )[:12]
+
+    return render(request, 'metas.html', {
+        'propuestas': con_progreso(propuestas),
+        'activas': con_progreso(activas),
+        'cerradas': cerradas,
+        'margen': int((MARGEN_CRECIMIENTO - 1) * 100),
+        'periodos_analizados': PERIODOS_ANALIZADOS,
+    })
+
+
+@vista_dashboard
+@require_POST
+def resolver_meta(request, meta_id):
+    """El admin acepta, ajusta o descarta una meta propuesta."""
+    meta = Meta.objects.filter(id=meta_id).first()
+    if not meta:
+        return JsonResponse({'error': 'Esa meta ya no existe'}, status=404)
+
+    accion = request.POST.get('accion')
+
+    if accion == 'aceptar':
+        # Puede venir con un objetivo editado: el sistema propone, el
+        # admin decide. Si no manda nada, se acepta el propuesto.
+        objetivo_bruto = request.POST.get('objetivo')
+        if objetivo_bruto:
+            try:
+                objetivo = Decimal(str(objetivo_bruto).strip().replace(',', '.'))
+            except (InvalidOperation, TypeError):
+                return JsonResponse({'error': 'El objetivo debe ser un número'}, status=400)
+            if objetivo <= 0:
+                return JsonResponse({'error': 'El objetivo tiene que ser mayor que cero'}, status=400)
+            meta.objetivo = objetivo
+
+        meta.estado = Meta.Estado.ACTIVA
+        meta.save(update_fields=['objetivo', 'estado'])
+        return JsonResponse({'ok': True, 'estado': meta.estado, 'objetivo': str(meta.objetivo)})
+
+    if accion == 'descartar':
+        # Se marca, no se borra: si se borrara, el motor volvería a
+        # proponer exactamente lo mismo en la siguiente visita.
+        meta.estado = Meta.Estado.DESCARTADA
+        meta.save(update_fields=['estado'])
+        return JsonResponse({'ok': True, 'estado': meta.estado})
+
+    return JsonResponse({'error': 'Acción inválida'}, status=400)
+
+
+@vista_dashboard
+def panel_reportes(request):
+    """Módulo de reportes: se elige qué y de qué período, y se descarga."""
+    desde, hasta = rango_desde_peticion(request)
+
+    catalogo = [
+        {'clave': clave, 'etiqueta': etiqueta, 'icono': icono, 'usa_periodo': usa_periodo}
+        for clave, (etiqueta, icono, usa_periodo, _) in REPORTES.items()
+    ]
+
+    return render(request, 'reportes.html', {
+        'catalogo': catalogo,
+        'desde': desde,
+        'hasta': hasta,
+    })
+
+
+@vista_dashboard
+def generar_reporte(request, clave):
+    """Genera el PDF del reporte pedido."""
+    desde, hasta = rango_desde_peticion(request)
+    datos = construir(clave, desde, hasta)
+
+    if not datos:
+        messages.error(request, 'Ese reporte no existe.')
+        return redirect('panel_reportes')
+
+    html = render_to_string('dashboard/reporte_pdf.html', datos)
+    pdf = HTML(string=html, base_url=request.build_absolute_uri('/')).write_pdf()
+
+    respuesta = HttpResponse(pdf, content_type='application/pdf')
+    # inline y no attachment: se abre en el navegador y desde ahí se
+    # guarda o se imprime, que es lo que se hace el 90% de las veces.
+    respuesta['Content-Disposition'] = f'inline; filename="reporte_{clave}_{desde}_{hasta}.pdf"'
+    return respuesta

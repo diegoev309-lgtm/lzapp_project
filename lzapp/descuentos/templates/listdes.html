@@ -4,12 +4,6 @@
 {% block page_title %}Descuentos{% endblock %}
 {% block page_subtitle %}Campañas por lotería para productos que no se están vendiendo{% endblock %}
 
-{% block header_actions %}
-<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
-    <i class="bi bi-file-earmark-pdf-fill"></i>
-    <span class="btn-importar-texto">PDF</span>
-</a>
-{% endblock %}
 
 {% block content %}
 
@@ -356,10 +350,17 @@ Importar y Nueva Campaña.
                 <table class="table table-hover tabla-productos align-middle">
                     <thead>
                         <tr>
-                            <th class="d-none d-sm-table-cell">{% th_orden "producto" "Producto" orden direccion %}</th>
-                            <th>{% th_orden "precio" "Precio" orden direccion %}</th>
+                            <th>{% th_orden "producto" "Producto" orden direccion %}</th>
+                            <th class="d-none d-sm-table-cell">{% th_orden "precio" "Precio" orden direccion %}</th>
                             <th class="d-none d-md-table-cell">{% th_orden "stock" "Stock" orden direccion %}</th>
                             <th>Campaña activa</th>
+                            {% comment %}
+                            Esta cabecera se ocultaba en md y su celda en lg: entre
+                            768 y 992 px sobraba una cabecera sin columna debajo y
+                            todo lo de la derecha —incluido el botón de ver— quedaba
+                            corrido una posición. Ahora cabecera y celda usan el
+                            mismo punto de corte.
+                            {% endcomment %}
                             <th class="d-none d-lg-table-cell">Premios vigentes</th>
                             <th>Acciones</th>
                         </tr>
@@ -367,14 +368,16 @@ Importar y Nueva Campaña.
                     <tbody>
                     {% for p in productos %}
                         <tr data-tiene-campana="{% if p.tiene_campana_activa %}true{% else %}false{% endif %}">
-                            <td class="d-none d-sm-table-cell">
-<span class="img-producto-caja">
-                                    <i class="bi bi-image"></i>
-                                    {% if p.imagen %}<img src="{{ p.imagen.url }}" class="img-producto" alt="{{ p.nombre }}" onerror="this.remove()">{% endif %}
-                                </span>
-                                <strong>{{ p.nombre }}</strong>
+                            <td>
+                                <div class="celda-producto">
+                                    <span class="img-producto-caja">
+                                        <i class="bi bi-image"></i>
+                                        {% if p.imagen %}<img src="{{ p.imagen.url }}" class="img-producto" alt="{{ p.nombre }}" onerror="this.remove()">{% endif %}
+                                    </span>
+                                    <strong>{{ p.nombre }}</strong>
+                                </div>
                             </td>
-                            <td class="precio">
+                            <td class="precio d-none d-sm-table-cell">
                                 $ {{ p.precio }}
                             </td>
                             <td class="d-none d-md-table-cell">

@@ -190,46 +190,43 @@
         <section class="dash-panel flex-1">
             <div class="dash-panel-head">
                 <span class="dash-panel-title">Metas del mes</span>
-                <a class="dash-link-arrow" href="{% url 'panel_ventas' %}">
+                <a class="dash-link-arrow" href="{% url 'panel_metas' %}">
                     <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
 
+            {% comment %}
+            Metas reales del módulo, no cifras escritas a mano: antes acá
+            había 74% / $250,000 / 120 de 300 kg fijos en el HTML, que no
+            se movían pasara lo que pasara en el negocio.
+            {% endcomment %}
+            {% for item in metas_activas %}
             <div class="goal-row">
-                <div class="goal-ring" style="--pct:74; --ring-color:var(--green);"><span>74%</span></div>
+                <div class="goal-ring"
+                     style="--pct:{{ item.progreso }}; --ring-color:{% if item.progreso >= 100 %}var(--green){% elif item.progreso >= 50 %}var(--gold){% else %}var(--red){% endif %};">
+                    <span>{{ item.progreso }}%</span>
+                </div>
                 <div class="goal-info">
-                    <div class="goal-name">Meta de ventas</div>
-                    <div class="goal-deadline">Cierre: 31 Ago, 2026</div>
-                </div>
-                <div class="goal-amounts">
-                    <div class="label">Alcanzado / Meta</div>
-                    <div class="value">${{ ventas_mes|floatformat:0 }} / $250,000</div>
-                </div>
-            </div>
-
-            <div class="goal-row">
-                <div class="goal-ring" style="--pct:40; --ring-color:var(--gold);"><span>40%</span></div>
-                <div class="goal-info">
-                    <div class="goal-name">Producción semanal</div>
-                    <div class="goal-deadline">Cierre: 9 Ago, 2026</div>
-                </div>
-                <div class="goal-amounts">
-                    <div class="label">Producido / Meta</div>
-                    <div class="value">120 / 300 kg</div>
-                </div>
-            </div>
-
-            <div class="goal-row">
-                <div class="goal-ring" style="--pct:18; --ring-color:var(--red);"><span>18%</span></div>
-                <div class="goal-info">
-                    <div class="goal-name">Nuevos clientes</div>
-                    <div class="goal-deadline">Cierre: 31 Ago, 2026</div>
+                    <div class="goal-name">{{ item.meta.get_tipo_display }}</div>
+                    <div class="goal-deadline">Cierre: {{ item.meta.fecha_fin|date:"j M, Y" }}</div>
                 </div>
                 <div class="goal-amounts">
                     <div class="label">Logrado / Meta</div>
-                    <div class="value">18 / 100</div>
+                    <div class="value">
+                        {% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.logro|floatformat:0 }}
+                        / {% if item.meta.tipo == 'ventas' %}${% endif %}{{ item.meta.objetivo|floatformat:0 }}
+                    </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="metas-inicio-vacio">
+                <i class="bi bi-bullseye"></i>
+                <p>Todavía no tienes metas activas.</p>
+                <a href="{% url 'panel_metas' %}" class="dash-btn dash-btn-solid">
+                    Ver las que propone el sistema
+                </a>
+            </div>
+            {% endfor %}
 
             <div class="campana-lista">
                 <div class="dash-panel-title" style="font-size:11px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:6px;">Estado de campañas</div>

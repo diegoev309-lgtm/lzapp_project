@@ -1652,6 +1652,13 @@ a{ text-decoration:none; color:inherit; }
 .dash-panel:has(> .detalle-dia-wrap){ min-height: 340px; }
 
 @media (max-width: 575px){
-  .dash-stats-grid{ grid-template-columns: 1fr; }
-  .stat-card{ min-height: 0; }
+  /* Dos por fila, igual que Inicio (que usa col-6 de Bootstrap y es el
+     estándar). Con una sola columna, cinco tarjetas ocupaban cinco
+     pantallazos completos antes de llegar al contenido. */
+  .dash-stats-grid{ grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card{ min-height: 0; padding: 12px; }
+  .stat-card .stat-icon{ width: 36px; height: 36px; font-size: 15px; }
+  .stat-card .stat-value{ font-size: 17px; }
+  .stat-card .stat-label{ font-size: 10.5px; }
+  .stat-card .stat-trend{ font-size: 10px; }
 }

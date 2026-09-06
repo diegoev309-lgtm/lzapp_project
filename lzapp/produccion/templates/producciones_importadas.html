@@ -104,7 +104,7 @@
                     <tr>
                         <td class="nombre-producto">{{ p.producto.nombre }}</td>
                         <td><span class="badge-cantidad-imp">+ {{ p.cantidad_producida }}</span></td>
-                        <td>{{ p.fecha_produccion|date:"d/m/Y H:i" }}</td>
+                        <td class="celda-fecha">{{ p.fecha_produccion|date:"d/m/Y H:i" }}</td>
                         <td>
                             {% if p.observacion %}
                                 {{ p.observacion }}

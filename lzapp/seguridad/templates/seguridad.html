@@ -149,7 +149,7 @@
                             </td>
                             <td>{{ d.direccion_ip|default:"—" }}</td>
                             <td>{{ d.ultima_actividad|timesince }} atrás</td>
-                            <td>{{ d.fecha_inicio|date:"d/m/Y H:i" }}</td>
+                            <td class="celda-fecha">{{ d.fecha_inicio|date:"d/m/Y H:i" }}</td>
                             <td>
                                 {% if not d.es_actual %}
                                     <form method="post" action="{% url 'cerrar_sesion_remota' d.session_key %}">
@@ -194,7 +194,7 @@
                 <tbody>
                     {% for evento in registro_auditoria %}
                         <tr>
-                            <td>{{ evento.fecha|date:"d/m/Y H:i" }}</td>
+                            <td class="celda-fecha">{{ evento.fecha|date:"d/m/Y H:i" }}</td>
                             <td>{{ evento.actor.username|default:"Sistema" }}</td>
                             <td>{{ evento.accion }}</td>
                             <td>{{ evento.descripcion }}</td>

@@ -14,7 +14,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.utils.http import urlsafe_base64_decode
 from django.utils import timezone
 from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, Q
 from datetime import timedelta
 
 from dashboard.models import Venta, Perfil, PerfilEmple
@@ -42,6 +42,7 @@ from .forms import (
 
 from django.core.paginator import Paginator
 from dashboard.paginacion import leer_por_pagina
+from dashboard.ordenamiento import aplicar_orden
 from django.core.cache import cache
 from django.views.decorators.http import require_GET
 import requests
@@ -699,6 +700,57 @@ def Usuarios(request):
             perfilemple__isnull=True
         )
 
+    # Buscador y estado de la cuenta, con la misma forma que el resto de
+    # los módulos. Sin esto, con 234 usuarios encontrar uno concreto
+    # obligaba a pasar página por página.
+
+    query = request.GET.get(
+        'q', ''
+    ).strip()
+
+    if query:
+
+        usuarios_qs = usuarios_qs.filter(
+            Q(username__icontains=query)
+            | Q(email__icontains=query)
+            | Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(perfil__telefono__icontains=query)
+        )
+
+    estado = request.GET.get(
+        'estado', 'todos'
+    )
+
+    if estado == 'activos':
+
+        usuarios_qs = usuarios_qs.filter(
+            is_active=True
+        )
+
+    elif estado == 'inactivos':
+
+        usuarios_qs = usuarios_qs.filter(
+            is_active=False
+        )
+
+    # ---------- Orden ----------
+
+    # Lista blanca compartida con las cabeceras de la tabla: el selector y
+    # el clic en la cabecera escriben el mismo ?orden=/?dir=, así que los
+    # dos caminos no pueden desincronizarse.
+    usuarios_qs, orden, direccion = aplicar_orden(
+        usuarios_qs,
+        request,
+        {
+            'id': 'id',
+            'usuario': 'username',
+            'email': 'email',
+            'registro': 'date_joined',
+        },
+        'id',
+    )
+
     # ---------- Estadísticas ----------
 
     total_usuarios = User.objects.filter(
@@ -810,6 +862,14 @@ def Usuarios(request):
         'usuarios': usuarios_pagina,
 
         'filtro_rol': filtro_rol,
+
+        'query': query,
+
+        'estado': estado,
+
+        'orden': orden,
+
+        'direccion': direccion,
 
         'total_usuarios': total_usuarios,
 

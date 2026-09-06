@@ -6,12 +6,6 @@
 {% block page_title %}Panel de Ventas{% endblock %}
 {% block page_subtitle %}Ganancias, ventas y productos más vendidos{% endblock %}
 
-{% block header_actions %}
-<a href="#" class="dash-btn dash-btn-danger" title="Exportar PDF">
-    <i class="bi bi-file-earmark-pdf-fill"></i>
-    <span class="btn-importar-texto">PDF</span>
-</a>
-{% endblock %}
 
 {% block extra_css %}
 
@@ -149,7 +143,7 @@ media página estaba siempre escondida.
                     <tbody>
                     {% for d in resumen_diario_pagina %}
                         <tr onclick="mostrarDetalleDia('{{ d.fecha|date:'Y-m-d' }}')">
-                            <td style="font-weight:600;">{{ d.fecha|date:"d/m/Y" }}</td>
+                            <td class="celda-fecha" style="font-weight:600;">{{ d.fecha|date:"d/m/Y" }}</td>
                             <td>{{ d.ventas }}</td>
                             <td>{{ d.unidades }}</td>
                             <td class="amount" style="color:var(--green);">$ {{ d.ingresos|floatformat:2 }}</td>

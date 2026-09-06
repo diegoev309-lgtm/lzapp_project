@@ -11,4 +11,8 @@ urlpatterns = [
     path('api/distribucion-productos', views.api_distribucion_productos, name="api_distribucion_productos"),
     path('api/stock-flujo', views.api_stock_flujo, name="api_stock_flujo"),
     path('api/pedidos-tiempo-real', views.api_pedidos_tiempo_real, name="api_pedidos_tiempo_real"),
+    path('metas/', views.panel_metas, name='panel_metas'),
+    path('metas/<int:meta_id>/', views.resolver_meta, name='resolver_meta'),
+    path('reportes/', views.panel_reportes, name='panel_reportes'),
+    path('reportes/<str:clave>/', views.generar_reporte, name='generar_reporte'),
 ]
