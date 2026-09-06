@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from dashboard.ordenamiento import aplicar_orden
+from dashboard.paginacion import leer_por_pagina
 from django.db import transaction
 from django.utils import timezone
 from django.db.models import Sum, Count
@@ -193,13 +195,27 @@ def listar_producciones(request):
     if query:
         producciones_periodo = producciones_periodo.filter(producto__nombre__icontains=query)
 
-    paginator = Paginator(producciones_periodo, 6)
+    producciones_periodo, orden, direccion = aplicar_orden(
+        producciones_periodo, request,
+        columnas={
+            'id': 'id',
+            'producto': 'producto__nombre',
+            'cantidad': 'cantidad_producida',
+            'fecha': 'fecha_produccion',
+            'vencimiento': 'fecha_vencimiento',
+        },
+        defecto='fecha',
+    )
+
+    paginator = Paginator(producciones_periodo, leer_por_pagina(request))
     producciones = paginator.get_page(request.GET.get('page'))
     productos_criticos, productos_sin_produccion = _calcular_alertas()
     formulario = ImportarProduccionForm()
 
     contexto = {
         'producciones': producciones,
+        'orden': orden,
+        'direccion': direccion,
         'filtro': filtro,
         'desde': desde,
         'hasta': hasta,

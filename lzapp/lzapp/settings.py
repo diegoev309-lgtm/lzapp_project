@@ -16,6 +16,20 @@ USAR_DISTANCE_MATRIX = False   # cambiar a True cuando GOOGLE_MAPS_API_KEY esté
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
+# Endurecimiento de transporte/cookies -- atado a "not DEBUG" para no romper
+# las pruebas actuales por http en la red local (ver comentario de
+# runserver 0.0.0.0:8000 más abajo); se activa solo cuando el proyecto
+# corra en producción con DEBUG=False. Protege datos sensibles en tránsito
+# (ubicación del cliente, sesión) contra sniffing/robo de cookie.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
 ALLOWED_HOSTS = ['*']
 # para la misma red
 #Usar el comando python manage.py runserver 0.0.0.0:8000 para ejecutar lo en otra pc y http://192.168.1.51:8000/

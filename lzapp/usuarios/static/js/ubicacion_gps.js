@@ -96,11 +96,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function geocodificarInversa(lat, lng, prefijo) {
         try {
-            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es`;
+            // Pasa por nuestro propio servidor en vez de llamar directo a
+            // Nominatim: así el proveedor externo nunca ve la IP real del
+            // cliente, solo la del servidor.
+            const url = `/usuarios/api/geocodificar-inversa/?lat=${lat}&lng=${lng}`;
             const respuesta = await fetch(url);
             const resultado = await respuesta.json();
 
-            const direccion = resultado.display_name;
+            const direccion = resultado.direccion;
             if (direccion) {
                 const texto = prefijo ? `${prefijo} — ${direccion}` : direccion;
                 mostrarEstado(texto, 'text-success');

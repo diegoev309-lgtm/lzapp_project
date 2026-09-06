@@ -1,0 +1,69 @@
+{% comment %}
+Pie de tabla compartido: cuántos registros hay, selector de filas por
+página y los números acotados a una ventana alrededor de la actual.
+
+Se usa con {% load paginacion_tags %} y {% paginacion pagina "usuarios" %}.
+{% endcomment %}
+
+<div class="pg-pie">
+
+    <div class="pg-info">
+        {% if total_registros %}
+            Mostrando <b>{{ pagina.start_index }}–{{ pagina.end_index }}</b>
+            de <b>{{ total_registros }}</b> {{ etiqueta }}
+        {% else %}
+            Sin {{ etiqueta }} para mostrar
+        {% endif %}
+    </div>
+
+    <div class="pg-tamano">
+        <label for="pgTamano{{ param_pagina }}">Filas</label>
+        <select id="pgTamano{{ param_pagina }}"
+                onchange="window.location.search = '?{{ param_tam }}=' + this.value + '{{ qs_tam|escapejs }}'">
+            {% for opcion in opciones %}
+                <option value="{{ opcion }}" {% if opcion == por_pagina %}selected{% endif %}>{{ opcion }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if total_paginas > 1 %}
+    <nav class="pg-links" aria-label="Paginación">
+        {% if pagina.has_previous %}
+            <a class="pg-link" href="?{{ param_pagina }}=1{{ qs }}" title="Primera" aria-label="Primera página">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+            <a class="pg-link" href="?{{ param_pagina }}={{ pagina.previous_page_number }}{{ qs }}" aria-label="Anterior">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        {% endif %}
+
+        {% if primera %}
+            <a class="pg-link" href="?{{ param_pagina }}=1{{ qs }}">1</a>
+            <span class="pg-hueco">…</span>
+        {% endif %}
+
+        {% for numero in numeros %}
+            {% if numero == pagina.number %}
+                <span class="pg-link active" aria-current="page">{{ numero }}</span>
+            {% else %}
+                <a class="pg-link" href="?{{ param_pagina }}={{ numero }}{{ qs }}">{{ numero }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if ultima %}
+            <span class="pg-hueco">…</span>
+            <a class="pg-link" href="?{{ param_pagina }}={{ total_paginas }}{{ qs }}">{{ total_paginas }}</a>
+        {% endif %}
+
+        {% if pagina.has_next %}
+            <a class="pg-link" href="?{{ param_pagina }}={{ pagina.next_page_number }}{{ qs }}" aria-label="Siguiente">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            <a class="pg-link" href="?{{ param_pagina }}={{ total_paginas }}{{ qs }}" title="Última" aria-label="Última página">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+</div>

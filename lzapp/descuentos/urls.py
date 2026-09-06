@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.panel_descuentos, name='panel_descuentos'),
     path('campana/nueva/', views.crear_campana_descuento, name='crear_campana_descuento'),
+    path('campanas/importar/', views.importar_campanas, name='importar_campanas'),
     path('campana/<int:pk>/editar/', views.editar_campana_descuento, name='editar_campana_descuento'),
     path('campana/<int:pk>/eliminar/', views.eliminar_campana_descuento, name='eliminar_campana_descuento'),
     path('campana/<int:pk>/toggle/', views.toggle_campana_descuento, name='toggle_campana_descuento'),

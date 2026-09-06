@@ -1,0 +1,47 @@
+{% comment %}
+Panel de turno del repartidor, dentro de la consola del mapa.
+
+Solo lo que se toca durante la jornada: abrir/cerrar turno y ver cuánto
+llevas encima. La configuración del vehículo NO va acá — se registra una
+vez en su propio módulo del dashboard (pedido/mi-vehiculo), no a mitad de
+una entrega. Recibe `perfil_emple` del contexto.
+{% endcomment %}
+
+<div class="pv-bloque">
+
+    <div class="pv-estado">
+        <span class="pv-punto" id="puntoEstado"></span>
+        <span id="textoEstadoUbicacion">Fuera de turno</span>
+    </div>
+
+    <button type="button" class="pv-btn-turno" id="btnCompartirUbicacion">
+        <i class="bi bi-scooter"></i> Empezar a repartir las entregas
+    </button>
+
+    <p class="pv-nota">
+        Hasta que no abras el turno no te llega ninguna entrega, aunque tengas
+        el GPS encendido.
+    </p>
+
+    <div class="pv-carga" id="cargaBarra" hidden>
+        <div class="pv-carga-cabecera">
+            <span><i class="bi bi-box-seam"></i> Carga del vehículo</span>
+            <span id="cargaTexto">—</span>
+        </div>
+        <div class="pv-carga-riel"><div class="pv-carga-relleno" id="cargaRelleno"></div></div>
+    </div>
+
+    {% comment %}
+    Solo lectura: el vehículo se registra en su módulo del dashboard
+    (Mi vehículo), no desde el mapa a mitad de una entrega.
+    {% endcomment %}
+    <div class="pv-vehiculo">
+        <div class="pv-vehiculo-actual">
+            <i class="bi bi-truck" id="iconoVehiculo"></i>
+            <div>
+                <strong id="vehiculoActual">{{ perfil_emple.get_vehiculo_display }}</strong>
+                <small><span id="capacidadActual">{{ perfil_emple.capacidad_productos }}</span> unidades de capacidad</small>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,8 +19,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from pedido.views import service_worker_entregas
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Va en la raíz a propósito: un service worker solo puede controlar
+    # páginas que cuelguen de su propia ruta, así que desde /static/ no
+    # podría cachear el mapa de /pedido/mis-entregas.
+    path('sw-entregas.js', service_worker_entregas, name='sw_entregas'),
     path('',include("home.urls")),
     path('usuarios/',include("usuarios.urls")),
     path('carro/', include("carrito.urls")),

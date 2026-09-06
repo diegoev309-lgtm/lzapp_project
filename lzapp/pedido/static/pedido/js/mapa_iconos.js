@@ -3,15 +3,27 @@
  * ícono de fuente metido en una burbuja. Requiere Leaflet ya cargado y
  * mapa_iconos.css (que trae las animaciones de cada pieza del SVG). */
 
-function crearIconoDestino() {
+/* opciones (todas opcionales):
+ *   numero    -> dibuja el puesto de la parada dentro del pin
+ *   atenuado  -> pin en gris, para las paradas que todavía no tocan.
+ *                El repartidor tiene que ver TODOS sus destinos, pero
+ *                distinguiendo de un vistazo cuál es el siguiente. */
+function crearIconoDestino(opciones = {}) {
+    const { numero = null, atenuado = false } = opciones;
+
+    const centro = numero !== null
+        ? `<text class="mi-pin-numero" x="20" y="20.4" text-anchor="middle">${numero}</text>`
+        : `<path class="mi-pin-casa" d="M17 18.3v-3.1l3-2.3 3 2.3v3.1h-2v-1.8h-2v1.8h-2z"/>`;
+
     const svg = `
-        <svg class="mi-svg mi-svg-destino" viewBox="0 0 40 48" width="40" height="48" xmlns="http://www.w3.org/2000/svg">
+        <svg class="mi-svg mi-svg-destino${atenuado ? ' mi-destino-atenuado' : ''}"
+             viewBox="0 0 40 48" width="40" height="48" xmlns="http://www.w3.org/2000/svg">
             <ellipse class="mi-radar" cx="20" cy="41" rx="5" ry="2"/>
             <ellipse class="mi-radar mi-radar-2" cx="20" cy="41" rx="5" ry="2"/>
             <g class="mi-pin-grupo">
                 <path class="mi-pin-cuerpo" d="M20 2C11.72 2 5 8.6 5 16.7c0 11 15 24.5 15 24.5s15-13.5 15-24.5C35 8.6 28.28 2 20 2z"/>
                 <circle class="mi-pin-nucleo" cx="20" cy="16.5" r="6.2"/>
-                <path class="mi-pin-casa" d="M17 18.3v-3.1l3-2.3 3 2.3v3.1h-2v-1.8h-2v1.8h-2z"/>
+                ${centro}
             </g>
         </svg>`;
     return L.divIcon({

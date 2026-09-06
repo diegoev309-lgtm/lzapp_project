@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from django.urls import reverse
 from openpyxl import load_workbook
 from dashboard.models import Producto, Calificacion
+from dashboard.ordenamiento import aplicar_orden
+from dashboard.paginacion import leer_por_pagina
 from notificacion.utils import notificar
 from producto.forms import ProductoForm, ImportarProductosForm
 from seguridad.decorators import vista_dashboard
@@ -18,7 +20,8 @@ from seguridad.decorators import vista_dashboard
 def listar_productos(request):
     query = request.GET.get('q', '').strip()
     estado = request.GET.get('estado', 'todos').strip().lower()
-    if estado not in ('todos', 'disponible', 'no_disponible', 'incompleto'):
+    if estado not in ('todos', 'disponible', 'no_disponible', 'incompleto',
+                      'stock_bajo', 'agotado'):
         estado = 'todos'
 
     mi_calificacion_sub = None
@@ -55,12 +58,31 @@ def listar_productos(request):
         lista_producto = lista_producto.filter(disponibilidad=False)
     elif estado == 'incompleto':
         lista_producto = lista_producto.filter(incompleto=True)
+    elif estado == 'stock_bajo':
+        # Por debajo del mínimo configurado en cada producto, no de un
+        # número fijo: el mínimo de un queso fresco no es el de uno curado.
+        lista_producto = lista_producto.filter(stock_actual__lt=F('stock_minimo'))
+    elif estado == 'agotado':
+        lista_producto = lista_producto.filter(stock_actual=0)
 
     productos_bajo_stock = Producto.objects.filter(stock_actual__lt=F('stock_minimo'))
 
-    paginator = Paginator(lista_producto, 5)
-    page = request.GET.get("page")
-    productos = paginator.get_page(page)
+    # Orden por columna (?orden=&dir=), sobre la lista completa y no solo
+    # sobre la página visible.
+    lista_producto, orden, direccion = aplicar_orden(
+        lista_producto, request,
+        columnas={
+            'nombre': 'nombre',
+            'precio': 'precio',
+            'stock': 'stock_actual',
+            'minimo': 'stock_minimo',
+            'estado': 'disponibilidad',
+        },
+        defecto='nombre',
+    )
+
+    paginator = Paginator(lista_producto, leer_por_pagina(request))
+    productos = paginator.get_page(request.GET.get("page"))
 
     formulario = ImportarProductosForm()
 
@@ -69,6 +91,8 @@ def listar_productos(request):
         "productos_bajo_stock": productos_bajo_stock,
         "query": query,
         "estado": estado,
+        "orden": orden,
+        "direccion": direccion,
         "formulario": formulario,
     })
 

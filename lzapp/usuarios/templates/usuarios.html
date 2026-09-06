@@ -1,5 +1,5 @@
 {% extends 'masterpage_dashboard.html' %}
-{% load static %}
+{% load static paginacion_tags %}
 
 {% block title %}LzApp · Usuarios{% endblock %}
 {% block page_icon %}bi-people-fill{% endblock %}
@@ -219,28 +219,12 @@
         {% csrf_token %}
     </form>
 
-    <!-- ===== Paginación ===== -->
-    {% if usuarios.paginator.num_pages > 1 %}
-    <div class="pie-productos">
-        <div class="pie-ventas">
-            {% if usuarios.has_previous %}
-                <a class="pg-link" href="?page=1{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">Primera</a>
-                <a class="pg-link" href="?page={{ usuarios.previous_page_number }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">&laquo;</a>
-            {% endif %}
-            {% for pagina in usuarios.paginator.page_range %}
-                {% if pagina == usuarios.number %}
-                    <span class="pg-link active">{{ pagina }}</span>
-                {% else %}
-                    <a class="pg-link" href="?page={{ pagina }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">{{ pagina }}</a>
-                {% endif %}
-            {% endfor %}
-            {% if usuarios.has_next %}
-                <a class="pg-link" href="?page={{ usuarios.next_page_number }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">&raquo;</a>
-                <a class="pg-link" href="?page={{ usuarios.paginator.num_pages }}{% if filtro_rol %}&rol={{ filtro_rol }}{% endif %}">Última</a>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
+    {% comment %}
+    Pie compartido: contador, selector de filas y una ventana de páginas
+    alrededor de la actual. Antes se imprimía page_range completo, así que
+    con muchos usuarios salía una tira interminable de números.
+    {% endcomment %}
+    {% paginacion usuarios "usuarios" %}
 
 </div>
 

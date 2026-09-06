@@ -3,13 +3,17 @@
    visual de config.css (perfil-wrapper / perfil-header / perfil-card).
    ============================================================ */
 
+[hidden]{ display:none !important; }
+
 .avatar-circulo i{
     font-size: 1.8rem;
     color: var(--dorado-claro);
 }
 
+/* ============================================================
+   ESTADO VACÍO — cuando el cliente no tiene ningún pedido activo
+   ============================================================ */
 .mps-wrapper{ max-width: 720px; }
-
 .mps-card{ padding-top: 1.8rem; }
 
 .mps-vacio{
@@ -21,51 +25,248 @@
 .mps-vacio p{ margin: 0 0 4px; font-weight: 700; color: var(--azul-profundo); }
 .mps-vacio span{ font-size: 0.88rem; }
 
-/* ---- Timeline de estados ---- */
+/* ============================================================
+   VISTA DE SEGUIMIENTO: el mapa ocupa toda la pantalla y lo demás
+   flota en las esquinas, sin quitarle espacio — el mapa es lo único
+   que de verdad importa ver mientras el pedido está en camino.
+
+     · arriba al centro  → datos del pedido (tiempo, distancia)
+     · abajo al centro   → estado, compacto
+     · abajo a la izq.   → la fila de entrega
+   ============================================================ */
+html:has(.mps-body-mapa), body.mps-body-mapa{
+    height: 100%;
+    overflow: hidden;
+    background: var(--azul-profundo);
+}
+
+.mps-fullscreen{
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.mps-mapa-fullscreen{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.mps-mapa-vacio-full{
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--gris-claro, #f7f8fc);
+    text-align: center;
+    padding: 2rem;
+    color: var(--gris-texto);
+}
+.mps-mapa-vacio-full.visible{ display: flex; }
+.mps-mapa-vacio-full i{ font-size: 2.4rem; color: var(--azul-claro); }
+.mps-mapa-vacio-full p{ margin: 0; font-size: 0.9rem; max-width: 280px; }
+
+/* ---- Botón de salir: arriba a la izquierda ---- */
+.mps-btn-salir{
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 500;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--blanco);
+    color: var(--azul-profundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.3);
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    animation: mpsAparecerArriba 0.4s ease;
+}
+.mps-btn-salir:hover{ color: #e2402d; transform: scale(1.08); }
+
+/* ============================================================
+   DATOS DEL PEDIDO — arriba, centrado
+   ============================================================ */
+.mps-info-top{
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    max-width: calc(100vw - 130px);
+    animation: mpsAparecerArriba 0.4s ease;
+}
+.mps-info-chips{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.mps-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--blanco);
+    color: var(--azul-profundo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 50px;
+    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.25);
+    white-space: nowrap;
+    max-width: 100%;
+}
+.mps-chip i{ color: var(--dorado, #c9a84c); font-size: 0.9rem; flex-shrink: 0; }
+.mps-chip span{ overflow: hidden; text-overflow: ellipsis; }
+
+.mps-chip.destacado{
+    background: var(--azul-profundo);
+    color: var(--blanco);
+}
+.mps-chip.destacado i{ color: var(--dorado-claro, #f0d98a); }
+
+.mps-chip.repartidor{ font-size: 0.76rem; padding: 6px 12px; }
+
+.mps-chip.incidencia{
+    background: #fff8e6;
+    color: #8a6100;
+    font-size: 0.76rem;
+    padding: 6px 12px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.35;
+}
+.mps-chip.incidencia i{ color: #d99400; }
+
+/* ============================================================
+   FILA DE ENTREGA — abajo a la izquierda.
+   El repartidor puede llevar varias entregas en la misma salida;
+   acá el cliente ve cuántas van antes de la suya, que es lo que
+   explica su tiempo estimado.
+   ============================================================ */
+.mps-cola{
+    position: absolute;
+    left: 14px;
+    bottom: 16px;
+    z-index: 500;
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 8px 26px rgba(2, 44, 99, 0.28);
+    max-width: 44vw;
+    animation: mpsAparecerIzquierda 0.45s ease;
+}
+.mps-cola-titulo{
+    font-size: 0.66rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gris-texto, #5b6472);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+.mps-cola-titulo i{ color: var(--dorado, #c9a84c); }
+
+.mps-cola-lista{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.mps-cola-item{
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.74rem;
+    color: var(--gris-texto, #5b6472);
+    white-space: nowrap;
+}
+.mps-cola-punto{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--gris-claro, #f7f8fc);
+    color: #9aa0ab;
+    font-size: 0.62rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.mps-cola-item.tuyo{ color: var(--azul-profundo); font-weight: 800; }
+.mps-cola-item.tuyo .mps-cola-punto{
+    background: var(--dorado, #c9a84c);
+    color: var(--azul-profundo);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.22);
+}
+
+/* ============================================================
+   ESTADO — abajo, centrado y compacto. Ya no es un panel que se
+   come media pantalla: solo el timeline, el estado actual y (en
+   camino) el PIN de entrega.
+   ============================================================ */
+.mps-estado-card{
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    z-index: 501;
+    width: max-content;
+    max-width: min(420px, calc(100vw - 32px));
+    background: var(--blanco);
+    border-radius: 20px;
+    padding: 12px 20px 14px;
+    box-shadow: 0 10px 34px rgba(2, 44, 99, 0.3);
+    text-align: center;
+    animation: mpsAparecerAbajo 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Timeline compacto: solo los puntos ---- */
 .mps-timeline{
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0;
-    margin-bottom: 1.6rem;
-    flex-wrap: nowrap;
 }
-.mps-paso{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
+.mps-paso{ display: flex; flex-shrink: 0; }
 .mps-paso-punto{
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--gris-claro, #f7f8fc);
     color: #9aa0ab;
-    font-size: 1rem;
+    font-size: 0.82rem;
     border: 2px solid var(--gris-claro, #f7f8fc);
     transition: var(--transition, .3s ease);
 }
-.mps-paso-texto{
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: #9aa0ab;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-}
 .mps-linea{
-    flex: 1;
+    width: 26px;
     height: 3px;
     background: var(--gris-claro, #f7f8fc);
-    margin: 0 4px;
-    margin-bottom: 22px;
+    margin: 0 3px;
     border-radius: 2px;
-    min-width: 16px;
 }
 
 .mps-paso.completo .mps-paso-punto{
@@ -73,7 +274,6 @@
     border-color: var(--dorado);
     color: var(--azul-profundo);
 }
-.mps-paso.completo .mps-paso-texto{ color: var(--azul-profundo); }
 .mps-linea.completa{ background: var(--dorado); }
 
 .mps-paso.actual .mps-paso-punto{
@@ -82,36 +282,47 @@
     color: var(--dorado-claro);
     box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.18);
 }
-.mps-paso.actual .mps-paso-texto{ color: var(--azul-profundo); }
-
 .mps-paso.cancelado .mps-paso-punto{
     background: #fdecec;
     border-color: #e2402d;
     color: #e2402d;
 }
 
-/* ---- Fila de datos rápidos ---- */
-.mps-info-fila{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 1.2rem;
-}
-.mps-info-item{
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--gris-claro, #f7f8fc);
+.mps-estado-texto{
+    margin-top: 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
     color: var(--azul-profundo);
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 50px;
+    letter-spacing: 0.01em;
 }
-.mps-info-item i{ color: var(--azul-medio, #1a5fa8); }
 
-/* ---- Modal de tiempo de preparación ---- */
+/* ---- PIN de entrega, dentro de la misma tarjeta ---- */
+.mps-codigo{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--gris-claro, #e3e6ee);
+    animation: mpsAparecerCodigo 0.5s ease;
+}
+.mps-codigo span{
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gris-texto, #5b6472);
+    font-weight: 700;
+}
+.mps-codigo strong{
+    display: block;
+    margin-top: 3px;
+    font-size: 1.5rem;
+    letter-spacing: 0.28em;
+    color: var(--azul-profundo);
+    font-family: 'Montserrat', monospace;
+}
+
+/* ============================================================
+   MODAL DE TIEMPO DE PREPARACIÓN
+   ============================================================ */
 .mps-modal-fondo{
     display: none;
     position: fixed;
@@ -159,219 +370,71 @@
     margin-bottom: 1.2rem;
 }
 
-/* ---- Aviso de incidencia ---- */
-.mps-incidencia{
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: #fff8e6;
-    border-left: 4px solid var(--dorado);
-    color: #8a6100;
-    font-size: 0.85rem;
-    line-height: 1.4;
-    padding: 12px 14px;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    text-align: left;
-}
-.mps-incidencia i{ margin-top: 2px; flex-shrink: 0; }
-
 /* ============================================================
-   VISTA DE SEGUIMIENTO: mapa a pantalla completa. Todo lo demás
-   (salir, estado, timeline, PIN) flota encima, sin quitarle espacio
-   al mapa — es lo único que de verdad importa ver mientras el
-   pedido está en camino.
+   ANIMACIONES
    ============================================================ */
-html:has(.mps-body-mapa), body.mps-body-mapa{
-    height: 100%;
-    overflow: hidden;
-    background: var(--azul-profundo);
+@keyframes mpsAparecerAbajo{
+    from{ opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to{ opacity: 1; transform: translateX(-50%) translateY(0); }
 }
-
-.mps-fullscreen{
-    position: fixed;
-    inset: 0;
-    height: 100dvh;
-    width: 100vw;
-    overflow: hidden;
-}
-
-.mps-mapa-fullscreen{
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
-.mps-mapa-vacio-full{
-    display: none;
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--gris-claro, #f7f8fc);
-    text-align: center;
-    padding: 2rem;
-    color: var(--gris-texto);
-}
-.mps-mapa-vacio-full.visible{ display: flex; }
-.mps-mapa-vacio-full i{ font-size: 2.4rem; color: var(--azul-claro); }
-.mps-mapa-vacio-full p{ margin: 0; font-size: 0.9rem; max-width: 280px; }
-
-/* ---- Botón de salir, flotando arriba a la izquierda ---- */
-.mps-btn-salir{
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    z-index: 500;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--blanco);
-    color: var(--azul-profundo);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.3);
-    text-decoration: none;
-    transition: transform 0.2s ease;
-    animation: mpsAparecerSalir 0.4s ease;
-}
-.mps-btn-salir:hover{ color: #e2402d; transform: scale(1.08); }
-
-/* ---- Badge de estado flotando arriba, centrado ---- */
-.mps-badge-estado{
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--azul-profundo);
-    color: var(--blanco);
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 10px 18px;
-    border-radius: 50px;
-    box-shadow: 0 6px 20px rgba(2, 44, 99, 0.3);
-    animation: mpsAparecer 0.4s ease;
-    max-width: calc(100vw - 150px);
-}
-.mps-badge-estado i{ color: var(--dorado-claro); font-size: 1rem; flex-shrink: 0; }
-.mps-badge-estado span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ---- Panel inferior deslizable con toda la info ---- */
-.mps-panel-inferior{
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 400;
-    background: var(--blanco);
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -10px 40px rgba(2, 44, 99, 0.25);
-    padding: 10px 1.4rem 1.4rem;
-    max-height: 55vh;
-    overflow-y: auto;
-    animation: mpsSubirPanel 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.mps-panel-handle{
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--gris-claro, #e3e6ee);
-    margin: 0 auto 0.9rem;
-}
-
-@keyframes mpsSubirPanel{
-    from{ transform: translateY(100%); }
-    to{ transform: translateY(0); }
-}
-@keyframes mpsAparecer{
+@keyframes mpsAparecerArriba{
     from{ opacity: 0; transform: translateX(-50%) translateY(-10px); }
     to{ opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+@keyframes mpsAparecerIzquierda{
+    from{ opacity: 0; transform: translateX(-12px); }
+    to{ opacity: 1; transform: translateX(0); }
+}
+@keyframes mpsAparecerCodigo{
+    from{ opacity: 0; transform: scale(0.94); }
+    to{ opacity: 1; transform: scale(1); }
+}
+
+/* El botón de salir no está centrado: no puede heredar el
+   translateX(-50%) de la animación de arriba. */
+.mps-btn-salir{ animation-name: mpsAparecerSalir; }
 @keyframes mpsAparecerSalir{
     from{ opacity: 0; transform: translateY(-10px); }
     to{ opacity: 1; transform: translateY(0); }
 }
 
-/* En el panel flotante el timeline y la info van más compactos que en
-   la tarjeta del estado vacío. */
-.mps-panel-inferior .mps-timeline{ margin-bottom: 1rem; }
-.mps-panel-inferior .mps-info-fila{ margin-bottom: 0.8rem; }
-
-/* ---- Código de entrega ---- */
-.mps-codigo{
-    text-align: center;
-    background: linear-gradient(135deg, var(--azul-profundo), var(--azul-principal, #083b78));
-    border-radius: 16px;
-    padding: 1rem 1.2rem;
-    margin-top: 0.4rem;
-    animation: mpsAparecerCodigo 0.5s ease;
-}
-@keyframes mpsAparecerCodigo{
-    from{ opacity: 0; transform: scale(0.9); }
-    to{ opacity: 1; transform: scale(1); }
-}
-.mps-codigo span{
-    display: block;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--dorado-claro);
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-.mps-codigo strong{
-    display: block;
-    font-size: 1.9rem;
-    letter-spacing: 0.3em;
-    color: var(--blanco);
-    font-family: 'Montserrat', monospace;
-}
-.mps-codigo small{
-    display: block;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.7);
-    margin-top: 6px;
-}
-
-/* ============================================================
-   ÍCONOS ANIMADOS — el paso activo del timeline y del badge se
-   mueven, para que se note de un vistazo en qué va el pedido.
-   ============================================================ */
+/* ---- Íconos animados según el estado ---- */
 @keyframes mpsGirarLento{ from{ transform: rotate(0); } to{ transform: rotate(360deg); } }
 @keyframes mpsRebotar{ 0%, 100%{ transform: translateX(0); } 50%{ transform: translateX(4px); } }
-@keyframes mpsPulsar{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(1.18); } }
-@keyframes mpsSaltar{ 0%, 100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+@keyframes mpsPulsar{ 0%, 100%{ transform: scale(1); } 50%{ transform: scale(1.14); } }
 
-.mps-paso.actual[data-estado="preparando"] .mps-paso-punto i,
-.mps-badge-estado.preparando i{
+.mps-paso.actual[data-estado="preparando"] .mps-paso-punto i{
     animation: mpsGirarLento 2.2s linear infinite;
     display: inline-block;
 }
-.mps-paso.actual[data-estado="en_camino"] .mps-paso-punto i,
-.mps-badge-estado.en_camino i{
+.mps-paso.actual[data-estado="en_camino"] .mps-paso-punto i{
     animation: mpsRebotar 0.7s ease-in-out infinite;
     display: inline-block;
 }
-.mps-paso.actual[data-estado="entregado"] .mps-paso-punto,
-.mps-badge-estado.entregado{
+.mps-paso.actual[data-estado="entregado"] .mps-paso-punto{
     animation: mpsPulsar 1.3s ease-in-out infinite;
 }
-.mps-paso[data-estado="pendiente"].completo .mps-paso-punto i{
-    animation: mpsSaltar 0.5s ease;
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 576px){
+    .mps-estado-card{ padding: 10px 16px 12px; bottom: 12px; }
+    .mps-paso-punto{ width: 27px; height: 27px; font-size: 0.75rem; }
+    .mps-linea{ width: 18px; }
+    .mps-estado-texto{ font-size: 0.76rem; }
+    .mps-codigo strong{ font-size: 1.3rem; letter-spacing: 0.22em; }
+
+    .mps-cola{ left: 10px; bottom: 12px; padding: 10px 12px; max-width: 40vw; }
+    .mps-cola-item{ font-size: 0.68rem; }
+
+    .mps-info-top{ top: 12px; max-width: calc(100vw - 120px); }
+    .mps-chip{ font-size: 0.72rem; padding: 7px 12px; }
 }
 
-@media (max-width: 576px){
-    .mps-paso-texto{ font-size: 0.6rem; }
-    .mps-paso-punto{ width: 32px; height: 32px; font-size: 0.85rem; }
-    .mps-panel-inferior{ max-height: 60vh; }
-    .mps-codigo strong{ font-size: 1.6rem; letter-spacing: 0.25em; }
+/* En pantallas muy bajas (celular apaisado) la fila se esconde para
+   no chocar con la tarjeta de estado: el dato clave (el tiempo) ya
+   está arriba. */
+@media (max-height: 460px){
+    .mps-cola{ display: none; }
 }

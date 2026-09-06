@@ -91,3 +91,19 @@
     0%{ transform: scale(0.5); opacity: 0.8; }
     100%{ transform: scale(1.6); opacity: 0; }
 }
+
+/* ---- Paradas de la ruta del repartidor ---- */
+.mi-pin-numero{
+    fill: #fff;
+    font-size: 8.5px;
+    font-weight: 800;
+    font-family: 'Montserrat', system-ui, sans-serif;
+}
+
+/* Paradas que todavía no tocan: en gris y sin el radar animado, para que
+   la próxima (a color) se distinga de un vistazo sin esconder el resto. */
+.mi-svg-destino.mi-destino-atenuado{ opacity: .62; }
+.mi-svg-destino.mi-destino-atenuado .mi-pin-cuerpo{ fill: #8b93a1; }
+.mi-svg-destino.mi-destino-atenuado .mi-pin-nucleo{ fill: #5b6472; }
+.mi-svg-destino.mi-destino-atenuado .mi-radar{ display: none; }
+.mi-svg-destino.mi-destino-atenuado .mi-pin-grupo{ animation: none; }

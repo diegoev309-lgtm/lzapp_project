@@ -1,13 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     const CENTRO_DEFECTO = [6.2442, -75.5812]; // Medellín
-    const ORDEN_ESTADOS = ['pendiente', 'preparando', 'en_camino', 'entregado'];
+
+    // Orden real del ciclo: la producción arranca con el pago, y
+    // "pendiente" es la espera POSTERIOR (ya preparado, sin repartidor
+    // libre todavía), no el primer paso.
+    const ORDEN_ESTADOS = ['preparando', 'pendiente', 'en_camino', 'entregado'];
 
     const cajaMapa = document.getElementById('mapaSeguimiento');
     if (!cajaMapa) return;
 
-    // El botón "salir" vive arriba a la izquierda y el badge de estado
-    // arriba centrado — el control de zoom se pasa a la derecha para no
-    // chocar con ninguno de los dos.
+    // El botón "salir" vive arriba a la izquierda (mismo lugar que el
+    // botón de cerrar del mapa de "elegir ubicación de entrega"), la
+    // tarjeta de estado abajo al centro y la fila abajo a la izquierda,
+    // así que el zoom se queda arriba a la derecha -- la esquina libre.
     const mapa = L.map('mapaSeguimiento', { zoomControl: false }).setView(CENTRO_DEFECTO, 13);
     L.control.zoom({ position: 'topright' }).addTo(mapa);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -63,27 +68,65 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const TEXTO_BADGE = {
-        pendiente: 'Confirmado',
+    const TEXTO_ESTADO = {
         preparando: 'Preparando tu pedido',
+        pendiente: 'Listo — esperando repartidor',
         en_camino: 'En camino hacia ti',
         entregado: 'Entregado',
-        cancelado: 'Cancelado',
-    };
-    const ICONO_BADGE = {
-        pendiente: 'bi-check-lg',
-        preparando: 'bi-egg-fried',
-        en_camino: 'bi-scooter',
-        entregado: 'bi-house-check-fill',
-        cancelado: 'bi-x-circle-fill',
+        cancelado: 'Pedido cancelado',
     };
 
-    function actualizarBadge(estado) {
-        const badge = document.getElementById('mpsBadgeEstado');
-        if (!badge) return;
-        badge.className = 'mps-badge-estado ' + estado;
-        document.getElementById('mpsBadgeTexto').textContent = TEXTO_BADGE[estado] || estado;
-        document.getElementById('mpsBadgeIcono').className = 'bi ' + (ICONO_BADGE[estado] || 'bi-info-circle-fill');
+    function actualizarEstadoTexto(estado, pedidosAntes) {
+        const texto = document.getElementById('mpsEstadoTexto');
+        if (!texto) return;
+
+        let etiqueta = TEXTO_ESTADO[estado] || estado;
+        if (estado === 'en_camino' && pedidosAntes > 0) {
+            etiqueta += ` · ${pedidosAntes} antes de ti`;
+        }
+        texto.textContent = etiqueta;
+    }
+
+    // ---- Chips de arriba: tiempo, distancia, repartidor, incidencia ----
+    function mostrarChip(id, visible, texto) {
+        const chip = document.getElementById(id);
+        if (!chip) return;
+        chip.hidden = !visible;
+        if (visible && texto !== undefined) {
+            chip.querySelector('span').textContent = texto;
+        }
+    }
+
+    // ---- Fila de entrega (abajo a la izquierda) ----
+    // El cliente no ve datos de los pedidos ajenos (ni debe): solo cuántas
+    // paradas van antes de la suya y en qué puesto queda.
+    function actualizarCola(pedido) {
+        const cola = document.getElementById('mpsCola');
+        const lista = document.getElementById('mpsColaLista');
+        if (!cola || !lista) return;
+
+        const puesto = pedido.orden_en_ruta;
+        if (pedido.estado !== 'en_camino' || !puesto) {
+            cola.hidden = true;
+            return;
+        }
+
+        const items = [];
+        for (let i = 1; i < puesto; i++) {
+            items.push(`
+                <li class="mps-cola-item">
+                    <span class="mps-cola-punto">${i}</span>
+                    <span>Otra entrega</span>
+                </li>`);
+        }
+        items.push(`
+            <li class="mps-cola-item tuyo">
+                <span class="mps-cola-punto">${puesto}</span>
+                <span>Tu pedido</span>
+            </li>`);
+
+        lista.innerHTML = items.join('');
+        cola.hidden = false;
     }
 
     let huboDatosAlgunaVez = false;
@@ -115,61 +158,37 @@ document.addEventListener('DOMContentLoaded', function () {
             const datos = await respuesta.json();
             const pedido = (datos.pedidos || []).find(p => p.pedido_id === MPS_PEDIDO_ID);
 
-            if (!pedido) {
-                if (huboDatosAlgunaVez) {
-                    // El pedido salió de la lista de "activos" (lo entregaron o
-                    // lo cancelaron) — recargamos para mostrar el estado final.
-                    window.location.reload();
-                }
-                return;
-            }
+            // Si el pedido ya no viene, se conserva en pantalla lo último
+            // que sí se supo: nada de recargar la página encima del cliente.
+            if (!pedido) return;
             huboDatosAlgunaVez = true;
 
             actualizarTimeline(pedido.estado);
-            actualizarBadge(pedido.estado);
+            actualizarEstadoTexto(pedido.estado, pedido.pedidos_antes);
+            actualizarCola(pedido);
 
             if (pedido.estado === 'preparando') {
                 mostrarModalPreparacion(datos.minutos_preparacion);
             }
 
+            // ---- PIN de entrega (dentro de la tarjeta de estado) ----
             const bloqueCodigo = document.getElementById('mpsCodigo');
             if (bloqueCodigo) {
-                if (pedido.codigo_entrega && pedido.estado === 'en_camino') {
+                const mostrar = Boolean(pedido.codigo_entrega) && pedido.estado === 'en_camino';
+                if (mostrar) {
                     document.getElementById('mpsCodigoValor').textContent =
                         pedido.codigo_entrega.split('').join(' ');
-                    bloqueCodigo.style.display = 'block';
-                } else {
-                    bloqueCodigo.style.display = 'none';
                 }
+                bloqueCodigo.hidden = !mostrar;
             }
 
-            const infoRepartidor = document.getElementById('mpsInfoRepartidor');
-            const repartidorNombre = document.getElementById('mpsRepartidorNombre');
-            if (pedido.repartidor) {
-                repartidorNombre.textContent = pedido.repartidor;
-                infoRepartidor.style.display = 'flex';
-            } else {
-                infoRepartidor.style.display = 'none';
-            }
-
-            const infoDistancia = document.getElementById('mpsInfoDistancia');
-            const distanciaTexto = document.getElementById('mpsDistanciaTexto');
-            if (pedido.distancia_km) {
-                distanciaTexto.textContent = pedido.tiempo_estimado_min
-                    ? `${pedido.distancia_km} km · ${pedido.tiempo_estimado_min} min`
-                    : `${pedido.distancia_km} km`;
-                infoDistancia.style.display = 'flex';
-            } else {
-                infoDistancia.style.display = 'none';
-            }
-
-            const avisoIncidencia = document.getElementById('mpsIncidencia');
-            if (pedido.incidencia) {
-                document.getElementById('mpsIncidenciaTexto').textContent = pedido.incidencia;
-                avisoIncidencia.style.display = 'flex';
-            } else {
-                avisoIncidencia.style.display = 'none';
-            }
+            // ---- Chips de arriba: tiempo y distancia ya vienen calculados ----
+            mostrarChip('mpsChipTiempo', Boolean(pedido.tiempo_estimado_min),
+                        `${pedido.tiempo_estimado_min} min`);
+            mostrarChip('mpsChipDistancia', Boolean(pedido.distancia_km),
+                        `${pedido.distancia_km} km`);
+            mostrarChip('mpsInfoRepartidor', Boolean(pedido.repartidor), pedido.repartidor);
+            mostrarChip('mpsIncidencia', Boolean(pedido.incidencia), pedido.incidencia);
 
             const vacio = document.getElementById('mapaSeguimientoVacio');
             capaMarcadores.clearLayers();

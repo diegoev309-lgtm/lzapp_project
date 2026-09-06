@@ -59,8 +59,14 @@ class SeguridadSesionMiddleware:
                         messages.error(request, 'Tu sesión se cerró por inactividad.')
                         return redirect('login')
 
-        sesion.direccion_ip = obtener_ip_cliente(request)
-        sesion.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
-        sesion.ultima_actividad = timezone.now()
-        sesion.save(update_fields=['direccion_ip', 'user_agent', 'ultima_actividad'])
+        # .update() en vez de .save(update_fields=...): si la fila fue
+        # borrada entre el get_or_create de arriba y este punto (logout en
+        # otra pestaña, el comando limpiar_sesiones_inactivas, etc.), un
+        # save() explota con NotUpdated -- un update() sobre 0 filas
+        # simplemente no hace nada, que es lo correcto acá.
+        SesionActiva.objects.filter(pk=sesion.pk).update(
+            direccion_ip=obtener_ip_cliente(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+            ultima_actividad=timezone.now(),
+        )
         return None

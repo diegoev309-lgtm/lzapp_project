@@ -10,9 +10,9 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from dashboard.models import DetalleVenta, Venta
+from dashboard.paginacion import leer_por_pagina
 from seguridad.decorators import vista_dashboard
 
-POR_PAGINA_VENTAS = 3
 TOP_PRODUCTOS_CANTIDAD = 5
 
 
@@ -194,7 +194,10 @@ def construir_contexto_ganancias(request):
 def panel_ventas(request):
     contexto = construir_contexto_ganancias(request)
 
-    paginator = Paginator(contexto['resumen_diario'], POR_PAGINA_VENTAS)
+    # Lo elige el usuario desde el pie de la tabla (10 por defecto). Antes
+    # eran 3 días fijos por página, que con un mes de ventas obligaba a
+    # pasar diez páginas para ver el período completo.
+    paginator = Paginator(contexto['resumen_diario'], leer_por_pagina(request))
     contexto['resumen_diario_pagina'] = paginator.get_page(request.GET.get('page'))
 
     return render(request, 'panel_ventas.html', contexto)

@@ -78,6 +78,36 @@ def obtener_ruta_completa(lat1, lon1, lat2, lon2):
     return _ruta_completa_osrm(lat1, lon1, lat2, lon2)
 
 
+def obtener_direccion(lat, lng):
+    """Dirección legible de unas coordenadas (Nominatim / OpenStreetMap).
+
+    Se usa para rellenar el destino de un pedido que quedó solo con el pin:
+    si el cliente marcó su ubicación con el GPS y la geocodificación del
+    navegador no alcanzó a responder, el pedido llegaba sin texto y el
+    repartidor veía "Sin dirección registrada" aunque el punto estuviera
+    perfectamente puesto en el mapa.
+
+    Devuelve None si el servicio no responde: es un dato de apoyo, las
+    coordenadas siguen siendo la fuente real del destino.
+    """
+    try:
+        respuesta = requests.get(
+            'https://nominatim.openstreetmap.org/reverse',
+            params={'format': 'json', 'lat': str(lat), 'lon': str(lng),
+                    'accept-language': 'es'},
+            headers={'User-Agent': 'LacteosZulianos/1.0'},
+            # Timeout corto a propósito: esto corre dentro de la asignación,
+            # que a su vez cuelga de los endpoints en vivo. Si Nominatim
+            # está lento, vale más quedarse sin el texto de la dirección
+            # (las coordenadas ya alcanzan para entregar) que dejar
+            # esperando al repartidor mirando la pantalla.
+            timeout=3,
+        )
+        return respuesta.json().get('display_name')
+    except (requests.RequestException, ValueError):
+        return None
+
+
 def obtener_repartidor_mas_cercano(cliente_lat, cliente_lng, candidatos):
     """
     candidatos: queryset/lista de PerfilEmple con repartidor_latitud/longitud ya cargados.

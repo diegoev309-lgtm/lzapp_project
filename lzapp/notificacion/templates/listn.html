@@ -1,11 +1,48 @@
 {% extends "masterpage_dashboard.html" %}
-{% load static %}
+{% load static paginacion_tags %}
 
 {% block page_icon %}bi bi-bell-fill{% endblock %}
 {% block page_title %}Notificaciones{% endblock %}
 {% block page_subtitle %}Historial completo de avisos del sistema{% endblock %}
 
 {% block content %}
+
+{% comment %}
+Buscador y filtros: el historial crece rápido y sin nada para acotarlo,
+encontrar el aviso de un pedido puntual era imposible. El formulario va
+por GET para que el estado quede en la URL y se pueda compartir o
+recargar sin perder lo filtrado.
+{% endcomment %}
+<form method="get" class="notif-filtros" id="formFiltrosNotif">
+    <div class="notif-buscador">
+        <i class="bi bi-search"></i>
+        <input type="text" name="q" value="{{ query }}" autocomplete="off"
+               placeholder="Buscar en título o mensaje...">
+    </div>
+
+    <select name="tipo" onchange="this.form.submit()" aria-label="Filtrar por tipo">
+        <option value="todos" {% if tipo == 'todos' %}selected{% endif %}>Todos los tipos</option>
+        {% for valor, etiqueta in tipos %}
+            <option value="{{ valor }}" {% if tipo == valor %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="lectura" onchange="this.form.submit()" aria-label="Filtrar por lectura">
+        <option value="todas" {% if lectura == 'todas' %}selected{% endif %}>Leídas y no leídas</option>
+        <option value="no_leidas" {% if lectura == 'no_leidas' %}selected{% endif %}>
+            Sin leer{% if total_no_leidas %} ({{ total_no_leidas }}){% endif %}
+        </option>
+        <option value="leidas" {% if lectura == 'leidas' %}selected{% endif %}>Ya leídas</option>
+    </select>
+
+    <button type="submit" class="notif-btn-buscar"><i class="bi bi-funnel"></i> Filtrar</button>
+
+    {% if query or tipo != 'todos' or lectura != 'todas' %}
+        <a href="{% url 'Notificaciones' %}" class="notif-btn-limpiar">
+            <i class="bi bi-x-lg"></i> Limpiar
+        </a>
+    {% endif %}
+</form>
 
 <div class="dash-panel">
     <div class="notif-pagina-lista">
@@ -23,46 +60,19 @@
         {% empty %}
             <div class="dash-notif-vacio">
                 <i class="bi bi-bell-slash"></i>
-                <p>No hay notificaciones registradas todavía.</p>
+                {% if query or tipo != 'todos' or lectura != 'todas' %}
+                    <p>Ninguna notificación coincide con lo que buscas.</p>
+                    <a href="{% url 'Notificaciones' %}" class="notif-btn-limpiar">
+                        <i class="bi bi-arrow-counterclockwise"></i> Quitar filtros
+                    </a>
+                {% else %}
+                    <p>No hay notificaciones registradas todavía.</p>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
 
-    {% if notificaciones.paginator.num_pages > 1 %}
-        <div class="pie-productos">
-            <nav class="paginacion-inline" aria-label="Paginación de notificaciones">
-                <ul class="pagination pagination-sm mb-0">
-                    {% if notificaciones.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1">Primera</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ notificaciones.previous_page_number }}">&laquo;</a>
-                        </li>
-                    {% endif %}
-                    {% for pagina in notificaciones.paginator.page_range %}
-                        {% if pagina == notificaciones.number %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ pagina }}</span>
-                            </li>
-                        {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ pagina }}">{{ pagina }}</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                    {% if notificaciones.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ notificaciones.next_page_number }}">&raquo;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ notificaciones.paginator.num_pages }}">Última</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    {% endif %}
+    {% paginacion notificaciones "notificaciones" %}
 </div>
 
 {% endblock %}

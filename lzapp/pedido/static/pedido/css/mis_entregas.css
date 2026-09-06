@@ -1,0 +1,467 @@
+/* ============================================================
+   PANEL DEL REPARTIDOR
+
+   El mapa es el puesto de trabajo y ocupa toda el área; la consola
+   (entrega actual, cola, incidencias, turno) flota encima y se puede
+   plegar. Así el repartidor no tiene que salirse del mapa para nada,
+   ni siquiera a pantalla completa.
+   ============================================================ */
+
+[hidden]{ display:none !important; }
+
+.aviso-offline{
+    margin:0 15px 12px;
+    padding:11px 14px;
+    border-radius:12px;
+    background:rgba(228,200,112,.12);
+    border:1px solid rgba(228,200,112,.35);
+    color:var(--gold);
+    font-size:12.5px;
+    line-height:1.45;
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+}
+.aviso-offline i{ font-size:15px; flex-shrink:0; margin-top:1px; }
+
+/* ---- Contenedor del mapa ----
+   isolation + z-index bajo: Leaflet usa z-index de hasta 800 en sus
+   paneles y controles, y sin un contexto de apilamiento propio esos
+   valores le ganaban al menú de perfil y al de notificaciones de la
+   cabecera (z-index 70), que quedaban tapados por el mapa. */
+.mapa-entregas-wrap{
+    position:relative;
+    z-index:0;
+    isolation:isolate;
+    margin:15px;
+    height:calc(100vh - 190px);
+    min-height:430px;
+    border-radius:16px;
+    overflow:hidden;
+}
+.mapa-entregas-wrap.expandido{
+    position:fixed;
+    inset:0;
+    margin:0;
+    height:auto;
+    border-radius:0;
+    z-index:2000;
+}
+.mapa-entregas-box{ position:absolute; inset:0; }
+
+.mapa-entregas-vacio{
+    display:none;
+    position:absolute;
+    inset:0;
+    z-index:400;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:8px;
+    text-align:center;
+    color:var(--text-tertiary);
+    background:var(--bg-panel);
+    padding:2rem 1rem;
+}
+.mapa-entregas-vacio.visible{ display:flex; }
+.mapa-entregas-vacio i{ font-size:2rem; }
+.mapa-entregas-vacio p{ margin:0; font-size:13px; max-width:260px; }
+
+/* ---- Botones flotantes del mapa ---- */
+.mapa-acciones{
+    position:absolute;
+    top:12px;
+    right:12px;
+    z-index:1000;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.mapa-acciones button{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:none;
+    background:var(--bg-panel);
+    color:var(--text-primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    box-shadow:0 3px 14px rgba(0,0,0,.5);
+    cursor:pointer;
+    transition:.2s;
+}
+.mapa-acciones button:hover{ background:var(--gold); color:#1A1A2E; }
+
+/* ============================================================
+   CONSOLA
+   ============================================================ */
+.consola{
+    position:absolute;
+    left:12px;
+    bottom:12px;
+    z-index:1100;
+    width:min(400px, calc(100% - 24px));
+    max-height:min(70%, 560px);
+    display:flex;
+    flex-direction:column;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:18px;
+    box-shadow:0 12px 40px rgba(0,0,0,.55);
+    overflow:hidden;
+}
+/* Manija deslizable: se arrastra hacia abajo para plegar el panel.
+   touch-action:none es lo que impide que el navegador se quede con el
+   gesto vertical y lo convierta en scroll de la página. */
+.consola-agarre{
+    width:100%;
+    padding:10px 0 6px;
+    cursor:grab;
+    touch-action:none;
+    flex-shrink:0;
+}
+.consola-agarre:active{ cursor:grabbing; }
+.consola-agarre::before{
+    content:'';
+    display:block;
+    width:44px; height:5px;
+    margin:0 auto;
+    border-radius:3px;
+    background:var(--text-tertiary);
+    opacity:.5;
+    transition:opacity .15s, width .15s;
+}
+.consola-agarre:hover::before, .consola-agarre:active::before{
+    opacity:.9;
+    width:56px;
+}
+.consola-agarre:focus-visible{ outline:2px solid var(--gold); outline-offset:-2px; border-radius:10px; }
+
+.consola-tabs{
+    display:flex;
+    gap:4px;
+    padding:4px 8px 8px;
+    border-bottom:1px solid var(--border-subtle);
+}
+.consola-tab{
+    flex:1;
+    min-width:0;
+    border:none;
+    background:none;
+    border-radius:10px;
+    padding:8px 4px;
+    color:var(--text-tertiary);
+    font-size:10.5px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    position:relative;
+    transition:.15s;
+}
+.consola-tab i{ font-size:15px; }
+.consola-tab span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.consola-tab:hover{ color:var(--text-primary); }
+.consola-tab.activa{ background:rgba(228,200,112,.14); color:var(--gold); }
+.consola-contador{
+    position:absolute;
+    top:2px; right:6px;
+    min-width:16px; height:16px;
+    border-radius:8px;
+    background:var(--gold);
+    color:#1A1A2E;
+    font-size:9.5px;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+}
+.consola-contador:empty, .consola-contador[data-cero="1"]{ display:none; }
+
+.consola-cuerpo{ overflow-y:auto; padding:12px 14px 14px; }
+.consola-panel{ display:none; }
+.consola-panel.activo{ display:block; }
+.consola-vacio{
+    margin:0; padding:18px 4px; text-align:center;
+    color:var(--text-tertiary); font-size:12.5px;
+}
+.consola-nota{
+    margin:0 0 10px; font-size:11.5px; line-height:1.45; color:var(--text-tertiary);
+}
+
+.consola-abrir{
+    position:absolute;
+    left:12px; bottom:12px;
+    z-index:1100;
+    border:none;
+    border-radius:12px;
+    padding:10px 14px;
+    background:var(--bg-panel);
+    color:var(--text-primary);
+    font-size:12.5px;
+    font-weight:700;
+    display:flex; align-items:center; gap:7px;
+    box-shadow:0 6px 20px rgba(0,0,0,.5);
+    cursor:pointer;
+}
+
+/* ============================================================
+   ENTREGA ACTUAL
+   ============================================================ */
+.ea-cabecera{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.ea-puesto{
+    width:30px; height:30px; border-radius:50%;
+    background:var(--gold); color:#1A1A2E;
+    font-size:13px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.ea-titulo{ flex:1; min-width:0; }
+.ea-titulo strong{ display:block; font-size:14px; color:var(--text-primary); }
+.ea-titulo small{ display:block; font-size:11.5px; color:var(--text-tertiary); }
+
+/* Productos con foto: el repartidor confirma de un vistazo qué carga */
+.ea-productos{ display:flex; flex-direction:column; gap:7px; margin-bottom:10px; }
+.ea-producto{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.04);
+    border-radius:11px;
+    padding:7px 10px;
+}
+.ea-foto{
+    width:42px; height:42px; border-radius:9px;
+    object-fit:cover; flex-shrink:0;
+    background:rgba(255,255,255,.06);
+}
+.ea-foto-vacia{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-tertiary); font-size:16px;
+}
+.ea-producto-nombre{ flex:1; min-width:0; font-size:12.5px; color:var(--text-secondary); }
+.ea-producto-cant{
+    font-size:14px; font-weight:800; color:var(--gold); flex-shrink:0;
+}
+
+.ea-datos{
+    display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;
+}
+.ea-dato{
+    font-size:11.5px; color:var(--text-secondary);
+    background:rgba(255,255,255,.05);
+    border-radius:8px; padding:4px 9px;
+}
+.ea-dato.alerta{ background:rgba(228,200,112,.14); color:var(--gold); }
+
+.ea-pin-nota{
+    font-size:11px; color:var(--text-tertiary);
+    display:flex; align-items:center; gap:5px; margin-bottom:8px;
+}
+.ea-acciones{ display:flex; gap:7px; }
+.ea-pin{
+    width:78px; flex-shrink:0;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-subtle);
+    border-radius:10px; padding:9px 10px;
+    color:var(--text-primary); font-size:14px;
+    letter-spacing:2px; text-align:center;
+}
+.ea-pin:focus{ outline:none; border-color:var(--gold); }
+.ea-btn{
+    border:none; border-radius:10px; padding:9px 14px;
+    font-weight:700; font-size:12.5px; cursor:pointer; white-space:nowrap;
+}
+.ea-btn.entregar{ background:var(--green); color:#0F2E1C; flex:1; }
+.ea-btn.ir{ background:rgba(255,255,255,.07); color:var(--text-secondary); flex-shrink:0; }
+.ea-btn:disabled{ opacity:.6; cursor:not-allowed; }
+.ea-aviso{ font-size:11.5px; margin-top:8px; display:none; }
+.ea-aviso.visible{ display:block; }
+.ea-aviso.ok{ color:var(--green); }
+.ea-aviso.error{ color:var(--red); }
+
+/* ============================================================
+   COLA DE CLIENTES
+   ============================================================ */
+.cola-controles{ display:flex; flex-direction:column; gap:9px; margin-bottom:11px; }
+.cola-buscador{ position:relative; }
+.cola-buscador i{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-tertiary); font-size:13px;
+}
+.cola-buscador input{
+    width:100%;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-subtle);
+    border-radius:10px;
+    padding:9px 12px 9px 33px;
+    color:var(--text-primary);
+    font-size:12.5px;
+}
+.cola-buscador input:focus{ outline:none; border-color:var(--gold); }
+
+.cola-filtro{
+    display:flex; align-items:center; gap:8px; margin:0;
+    font-size:11.5px; color:var(--text-secondary); cursor:pointer;
+}
+.cola-filtro input[type="checkbox"]{ accent-color:var(--gold); width:15px; height:15px; }
+.cola-filtro input[type="range"]{ flex:1; min-width:60px; accent-color:var(--gold); }
+.cola-filtro b{ color:var(--text-tertiary); font-weight:600; min-width:40px; }
+
+.cola-lista{ display:flex; flex-direction:column; gap:8px; }
+.cola-item{
+    background:rgba(255,255,255,.04);
+    border-radius:12px;
+    padding:10px 12px;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:.15s;
+}
+.cola-item:hover{ border-color:var(--border-subtle); }
+.cola-item.proxima{ border-color:rgba(228,200,112,.45); background:rgba(228,200,112,.07); }
+.cola-item-cabecera{ display:flex; align-items:center; gap:8px; }
+.cola-puesto{
+    width:22px; height:22px; border-radius:50%;
+    background:rgba(255,255,255,.08); color:var(--text-tertiary);
+    font-size:10.5px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.cola-item.proxima .cola-puesto{ background:var(--gold); color:#1A1A2E; }
+.cola-cliente{ flex:1; min-width:0; font-size:12.5px; font-weight:700; color:var(--text-primary); }
+.cola-dir{ font-size:11px; color:var(--text-tertiary); margin-top:3px; padding-left:30px; }
+.cola-chips{ display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; padding-left:30px; }
+.cola-chip{
+    font-size:10.5px;
+    background:rgba(228,200,112,.12);
+    color:var(--gold);
+    border-radius:7px;
+    padding:3px 7px;
+}
+.cola-chip.gris{ background:rgba(255,255,255,.06); color:var(--text-tertiary); }
+
+/* ============================================================
+   INCIDENCIAS
+   ============================================================ */
+.incidencias-lista{ display:flex; flex-direction:column; gap:9px; }
+.incidencia-card{
+    background:rgba(255,255,255,.04);
+    border-radius:12px;
+    padding:11px 12px;
+}
+.incidencia-card-titulo{ font-weight:700; color:var(--text-primary); font-size:12.5px; }
+.incidencia-card-dir{ font-size:11px; color:var(--text-tertiary); margin:2px 0 8px; }
+.incidencia-actual{
+    font-size:11.5px; color:var(--gold); margin-bottom:8px;
+    display:flex; align-items:flex-start; gap:6px;
+}
+.incidencia-campos{ display:flex; flex-direction:column; gap:7px; }
+.incidencia-campos input{
+    width:100%;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-subtle);
+    border-radius:10px;
+    padding:8px 11px;
+    color:var(--text-primary);
+    font-size:12.5px;
+}
+.incidencia-campos input:focus{ outline:none; border-color:var(--gold); }
+.incidencia-fila{ display:flex; gap:7px; }
+.incidencia-fila input{ flex:1; min-width:0; }
+.incidencia-fila button{
+    border:none; border-radius:10px; padding:8px 14px;
+    background:var(--gold); color:#1A1A2E;
+    font-weight:700; font-size:12px; cursor:pointer; white-space:nowrap;
+}
+.incidencia-fila button:disabled{ opacity:.6; cursor:not-allowed; }
+.incidencia-aviso{ font-size:11px; margin-top:6px; display:none; }
+.incidencia-aviso.visible{ display:block; }
+.incidencia-aviso.ok{ color:var(--green); }
+.incidencia-aviso.error{ color:var(--red); }
+
+/* ============================================================
+   TURNO Y VEHÍCULO (pedido/_panel_vehiculo.html)
+   ============================================================ */
+.pv-bloque{ display:flex; flex-direction:column; gap:12px; }
+
+.pv-estado{
+    display:flex; align-items:center; gap:9px;
+    font-size:12.5px; color:var(--text-secondary);
+}
+.pv-punto{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--text-tertiary); flex-shrink:0;
+}
+.pv-punto.activo{
+    background:var(--green);
+    box-shadow:0 0 0 4px rgba(74,222,128,.18);
+}
+
+.pv-btn-turno{
+    width:100%;
+    padding:13px;
+    border-radius:13px;
+    border:none;
+    background:var(--gold);
+    color:#1A1A2E;
+    font-weight:800;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:.2s;
+}
+.pv-btn-turno.compartiendo{ background:var(--green); color:#0F2E1C; }
+.pv-btn-turno:disabled{ opacity:.6; cursor:not-allowed; }
+
+.pv-carga-cabecera{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11.5px; color:var(--text-secondary); margin-bottom:6px;
+}
+.pv-carga-cabecera i{ color:var(--gold); }
+.pv-carga-riel{ height:7px; border-radius:5px; background:rgba(255,255,255,.07); overflow:hidden; }
+.pv-carga-relleno{
+    height:100%; width:0; border-radius:5px;
+    background:var(--gold); transition:width .35s ease;
+}
+.pv-carga-relleno.lleno{ background:var(--red); }
+
+.pv-vehiculo{
+    border-top:1px solid var(--border-subtle);
+    padding-top:12px;
+    display:flex; flex-direction:column; gap:10px;
+}
+.pv-vehiculo-actual{ display:flex; align-items:center; gap:11px; }
+.pv-vehiculo-actual i{ font-size:22px; color:var(--gold); }
+.pv-vehiculo-actual strong{ display:block; font-size:13.5px; color:var(--text-primary); }
+.pv-vehiculo-actual small{ display:block; font-size:11.5px; color:var(--text-tertiary); }
+
+/* El vehículo se edita en su módulo del dashboard, no acá: desde la
+   consola solo se ve cuál está registrado y se salta a cambiarlo. */
+.pv-enlace-vehiculo{
+    display:inline-flex; align-items:center; gap:7px;
+    text-decoration:none;
+    border-radius:10px;
+    padding:9px 14px;
+    background:rgba(255,255,255,.06);
+    color:var(--text-secondary);
+    font-size:12px; font-weight:700;
+    transition:.2s;
+}
+.pv-enlace-vehiculo:hover{ background:var(--gold); color:#1A1A2E; }
+
+.pv-nota{ margin:0; font-size:11px; line-height:1.45; color:var(--text-tertiary); }
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 600px){
+    .mapa-entregas-wrap{ margin:10px; height:calc(100vh - 165px); border-radius:14px; }
+    .consola{
+        left:8px; right:8px; bottom:8px;
+        width:auto;
+        max-height:66%;
+    }
+    .consola-abrir{ left:8px; bottom:8px; }
+    .mapa-acciones{ top:8px; right:8px; }
+    .mapa-acciones button{ width:38px; height:38px; }
+    .consola-tab span{ display:none; }
+    .consola-tab i{ font-size:17px; }
+    .aviso-offline{ margin:0 10px 10px; }
+}

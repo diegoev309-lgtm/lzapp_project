@@ -13,7 +13,10 @@ from django.db.models import F
 from .logic import Carro
 from .utils import enviar_email_compra
 from .context_processor import totalizar_carro as _totalizar_carro
-from dashboard.models import Producto, DescuentoAsignado, Venta, DetalleVenta, Pedido, Perfil
+from dashboard.models import (
+    Producto, DescuentoAsignado, Venta, DetalleVenta, Pedido, Perfil, PerfilEmple,
+    Notificacion,
+)
 from django.conf import settings
 from django.shortcuts import redirect
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -28,6 +31,24 @@ sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
 def _es_peticion_ajax(request):
     return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+ERROR_CUENTA_DE_TRABAJO = 'Las cuentas del equipo no pueden hacer pedidos.'
+
+
+def _es_cuenta_de_trabajo(user):
+    """True si es una cuenta del negocio (admin o repartidor), no un cliente.
+
+    Un pedido hecho por un empleado rompe todo lo que viene después: el
+    motor podría asignarle su propia entrega, entra en las estadísticas de
+    ventas como si fuera un cliente real, y ensucia las sugerencias que el
+    sistema saca del historial. La tienda es para clientes.
+    """
+    if not user.is_authenticated:
+        return False
+    if user.is_staff or user.is_superuser:
+        return True
+    return PerfilEmple.objects.filter(empleado=user, rol='empleado').exists()
 
 
 def _resumen_carro(request, producto_id=None):
@@ -59,8 +80,26 @@ def _resumen_carro(request, producto_id=None):
 
 
 def agregar_producto(request, producto_id):
+    if _es_cuenta_de_trabajo(request.user):
+        if _es_peticion_ajax(request):
+            return JsonResponse({'ok': False, 'error': ERROR_CUENTA_DE_TRABAJO}, status=403)
+        messages.warning(request, ERROR_CUENTA_DE_TRABAJO)
+        return redirect("carro")
+
     carro = Carro(request)
-    identificador = Producto.objects.get(id=producto_id)
+    identificador = Producto.objects.filter(id=producto_id).first()
+
+    # El producto pudo salir del catálogo con la página del cliente ya
+    # abierta (o con el producto adentro del carrito). Antes eso era un
+    # DoesNotExist -> error 500; ahora se limpia el resto viejo y se
+    # avisa, que es lo único que se puede hacer.
+    if not identificador:
+        carro.eliminar_por_id(producto_id)
+        error = 'Ese producto ya no está disponible.'
+        if _es_peticion_ajax(request):
+            return JsonResponse({'ok': False, 'error': error, **_resumen_carro(request)}, status=404)
+        messages.warning(request, error)
+        return redirect("carro")
 
     premio = None
     codigo_premio = request.GET.get('premio')
@@ -87,10 +126,12 @@ def agregar_producto(request, producto_id):
     return redirect("carro")
 
 
-def eliminar_producto(request,producto_id):
-    carro=Carro(request)
-    identificador=Producto.objects.get(id=producto_id)
-    carro.eliminar(producto=identificador)
+# Quitar y restar van por id, sin tocar la base: si el producto ya no
+# existe en el catálogo, el cliente igual tiene que poder sacarlo de su
+# carrito (antes esto reventaba con DoesNotExist y la fila quedaba pegada).
+def eliminar_producto(request, producto_id):
+    carro = Carro(request)
+    carro.eliminar_por_id(producto_id)
 
     if _es_peticion_ajax(request):
         return JsonResponse({'ok': True, **_resumen_carro(request, producto_id)})
@@ -98,10 +139,9 @@ def eliminar_producto(request,producto_id):
     return redirect("carro")
 
 
-def restar_producto(request,producto_id):
-    carro=Carro(request)
-    identificador=Producto.objects.get(id=producto_id)
-    carro.restar(producto=identificador)
+def restar_producto(request, producto_id):
+    carro = Carro(request)
+    carro.restar_por_id(producto_id)
 
     if _es_peticion_ajax(request):
         return JsonResponse({'ok': True, **_resumen_carro(request, producto_id)})
@@ -209,6 +249,10 @@ def _construir_preference_data(request, lat=None, lng=None, direccion=None):
 
 def crear_preferencia(request):
     """Redirect clásico (por si quieres mantenerlo como fallback)."""
+    if _es_cuenta_de_trabajo(request.user):
+        messages.warning(request, ERROR_CUENTA_DE_TRABAJO)
+        return redirect("carro")
+
     carro = request.session.get("carro", {})
     if not carro:
         return HttpResponseBadRequest("El carrito está vacío")
@@ -231,6 +275,9 @@ def crear_preferencia(request):
 
 def crear_preferencia_ajax(request):
     """Devuelve el preference_id para renderizar el Wallet Brick en la página."""
+    if _es_cuenta_de_trabajo(request.user):
+        return JsonResponse({"error": ERROR_CUENTA_DE_TRABAJO}, status=403)
+
     carro = request.session.get("carro", {})
     if not carro:
         return JsonResponse({"error": "El carrito está vacío"}, status=400)
@@ -348,6 +395,8 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
         )
 
         total_venta = Decimal("0")
+        sobreventas = []
+        desaparecidos = []
 
         for item in items_comprados:
             try:
@@ -355,6 +404,11 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
                     pk=item["producto_id"]
                 )
             except Producto.DoesNotExist:
+                # El producto se borró del catálogo entre el checkout y el
+                # pago. La venta sigue adelante (hay plata cobrada), pero
+                # no puede quedar en silencio: si no, se genera una venta
+                # en cero y un pedido vacío que sale a ruta sin nada.
+                desaparecidos.append(str(item.get("producto_id")))
                 continue
 
             cantidad = int(item["cantidad"])
@@ -369,11 +423,31 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
                 subtotal=subtotal,
             )
 
-            # F() evita condición de carrera si llegan
-            # varias notificaciones casi al mismo tiempo.
-            Producto.objects.filter(pk=producto.pk).update(
-                stock_actual=F("stock_actual") - cantidad
-            )
+            # El stock se valida al crear la preferencia, pero entre ese
+            # momento y el pago aprobado pueden pasar minutos y otro
+            # cliente puede haberse llevado las últimas unidades.
+            #
+            # Restar a ciegas reventaba: stock_actual es PositiveInteger
+            # (UNSIGNED en MySQL) y "2 - 5" tira IntegrityError, que aborta
+            # toda la transacción. Resultado: el cliente pagaba y no
+            # quedaba ni venta, ni pedido, ni correo -- y como el webhook
+            # devolvía error, Mercado Pago reintentaba y volvía a fallar.
+            #
+            # La venta se respeta siempre (la plata ya se cobró): se
+            # descuenta hasta donde alcanza y el faltante se avisa al
+            # equipo para que resuelva con el cliente.
+            faltante = cantidad - producto.stock_actual
+            descontar = min(cantidad, producto.stock_actual)
+
+            if descontar:
+                # F() y no una asignación directa: aunque la fila ya está
+                # bloqueada, deja el descuento en manos de la base.
+                Producto.objects.filter(pk=producto.pk).update(
+                    stock_actual=F("stock_actual") - descontar
+                )
+
+            if faltante > 0:
+                sobreventas.append((producto, faltante))
 
             total_venta += subtotal
 
@@ -381,9 +455,11 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
         venta.save(update_fields=["total"])
 
         # El Pedido lo crea la señal post_save de Venta; aquí le dejamos
-        # la ubicación de entrega, que es lo que después usa
-        # asignar_repartidor_automatico() para elegir repartidor y ruta.
+        # la ubicación de entrega, que es lo que después usa el motor de
+        # asignación para elegir repartidor y trazar la ruta.
         _guardar_ubicacion_entrega(venta, lat, lng, direccion)
+
+        _avisar_sobreventa(venta, sobreventas, desaparecidos)
 
     # Marca cada premio usado como YA UTILIZADO
     if codigos_premio:
@@ -397,6 +473,35 @@ def registrar_pago_aprobado(payment_id, coords_respaldo=None):
     enviar_email_compra(venta.id)
 
     return venta
+
+
+def _avisar_sobreventa(venta, sobreventas, desaparecidos=None):
+    """Le avisa al equipo que una venta pagada no se puede cumplir entera.
+
+    Pasa cuando entre la creación de la preferencia y el pago aprobado
+    otro cliente se llevó las últimas unidades, o cuando el producto se
+    borró del catálogo. La venta no se toca (ya se cobró), pero alguien
+    tiene que enterarse para reponer, entregar parcial o devolver la
+    plata: si esto quedara mudo, el pedido saldría a ruta con menos
+    producto del que el cliente pagó — o directamente vacío.
+    """
+    partes = [f'{p.nombre} (faltan {n})' for p, n in (sobreventas or [])]
+    if desaparecidos:
+        partes.append(f'productos que ya no existen: {", ".join(desaparecidos)}')
+
+    if not partes:
+        return
+
+    detalle = ', '.join(partes)
+    for staff in User.objects.filter(is_staff=True, is_active=True):
+        Notificacion.objects.create(
+            usuario=staff,
+            titulo='Venta que no se puede cumplir',
+            mensaje=(f'La venta #{venta.id} de {venta.usuario.username} se pagó pero no '
+                     f'se puede completar: {detalle}.'),
+            tipo='warning',
+            url='/pedido/Pedidos',
+        )
 
 
 def _guardar_ubicacion_entrega(venta, lat, lng, direccion=None):

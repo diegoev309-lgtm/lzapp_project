@@ -6,13 +6,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root{
+  /* color-scheme le dice al navegador con qué paleta pintar lo que él
+     dibuja y nosotros no controlamos: el desplegable de un <select>, las
+     barras de scroll, los selectores de fecha. Sin esto, los menús de
+     "Todos los estados" u "Ordenar" salían blancos con texto negro sobre
+     el dashboard oscuro, porque el navegador asumía tema claro. */
+  color-scheme: dark;
+
+  /* Superficie de los controles (inputs, selects, textareas). Va como
+     variable y no como rgba(255,255,255,...) fijo: ese blanco funciona
+     sobre un panel oscuro, pero en modo claro es blanco sobre blanco y
+     el campo desaparece. */
+  --control-bg:       rgba(255,255,255,.05);
+  --control-bg-hover: rgba(255,255,255,.09);
+
   --bg-app:        #0F0F17;
   --bg-canvas:     #13131A;
   --bg-panel:      #1E1E2D;
   --bg-sidebar:    #16161F;
   --border-subtle: rgba(255,255,255,.06);
   --border-hair:   rgba(255,255,255,.08);
-  color-scheme: dark;
 
   --gold:          #E4C870;
   --gold-dim:      rgba(228,200,112,.14);
@@ -42,6 +55,9 @@
    ========================================================================== */
 [data-theme="light"]{
   color-scheme: light;
+
+  --control-bg:       rgba(15,15,23,.04);
+  --control-bg-hover: rgba(15,15,23,.07);
 
   --bg-app:        #EDEBF2;
   --bg-canvas:     #F3F1F6;
@@ -1075,7 +1091,7 @@ a{ text-decoration:none; color:inherit; }
 
 
 /*==========================================================
-   COMPONENTES COMPARTIDOS: carrusel de gráficos, filtro de
+   COMPONENTES COMPARTIDOS: paneles con gráfico, filtro de
    fechas, modal custom, mini-stats, badge numerado, spinner.
    Usado por: Panel de Ventas, y cualquier vista futura con
    gráficos, filtros de período o listas rankeadas.
@@ -1089,44 +1105,24 @@ a{ text-decoration:none; color:inherit; }
 }
 .contenedor-grafico{ position:relative; flex:1; min-height:0; }
 
-/* ---- Carrusel de gráficos ---- */
-.carrusel-graficos{ position:relative; }
-.carrusel-viewport{ overflow:hidden; border-radius: var(--radius-panel); }
-.carrusel-track{ display:flex; transition: transform .4s ease; }
-.carrusel-slide{ min-width:100%; box-sizing:border-box; }
-.carrusel-slide .dash-panel{
-    height:min(60vh, 430px);
-    min-height: 380px;
-    display:flex;
-    flex-direction:column;
+/* ---- Paneles con gráfico ----
+   El carrusel del Panel de Ventas se eliminó (todo quedó en una sola
+   vista). Era .carrusel-slide .dash-panel quien le daba la altura a esos
+   paneles, así que hay que dársela acá: .contenedor-grafico es flex:1 con
+   min-height:0 y, sin una altura arriba, colapsaría a cero y el gráfico
+   no se vería. */
+.dash-panel:has(> .contenedor-grafico){
+    height: min(60vh, 430px);
+    min-height: 340px;
 }
-.carrusel-flecha{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    width:36px; height:36px;
-    border-radius:50%;
-    border:1px solid var(--border-hair);
-    background: var(--bg-panel);
-    color: var(--text-primary);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 10px 24px rgba(0,0,0,.4);
-    cursor:pointer;
-    transition:.2s;
-}
-.carrusel-flecha:hover{ background: var(--gold); color:#1A1A2E; border-color: var(--gold); }
-.carrusel-flecha-izq{ left:-14px; }
-.carrusel-flecha-der{ right:-14px; }
-.carrusel-puntos{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
-.carrusel-puntos .punto{
-    width:8px; height:8px; border-radius:50%; border:none;
-    background: rgba(255,255,255,.15);
-    padding:0; cursor:pointer; transition:.2s;
-}
-.carrusel-puntos .punto.activo{ width:22px; border-radius:5px; background: var(--gold); }
-@media(max-width:576px){
-    .carrusel-flecha-izq{ left:4px; }
-    .carrusel-flecha-der{ right:4px; }
+
+/* Respaldo para navegadores sin :has() — la clase la puede poner la
+   plantilla directamente en el panel. */
+.dash-panel.con-grafico{
+    height: min(60vh, 430px);
+    min-height: 340px;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ---- Dropdown de filtro de período (custom, sin Bootstrap) ---- */
@@ -1168,7 +1164,9 @@ a{ text-decoration:none; color:inherit; }
     padding:7px 10px; font-size:12.5px;
     color: var(--text-primary);
     background: var(--bg-canvas);
-    color-scheme: dark;
+    /* Sin color-scheme fijo: lo hereda de :root, que ya cambia con el
+       tema. Forzado en 'dark', el calendario del navegador salía oscuro
+       sobre una página clara. */
 }
 .rango-personalizado input[type="date"]:focus{ outline:none; border-color: var(--gold); }
 .btn-aplicar-rango{
@@ -1612,4 +1610,48 @@ a{ text-decoration:none; color:inherit; }
 
 @media(max-width:576px){
     .grafico-panel .contenedor-grafico{ height:300px; }
+}
+/* ============================================================
+   UNIFORMIDAD DE TARJETAS Y PANELES
+
+   Antes: .dash-stats-grid era repeat(4, 1fr) fijo, así que en pantallas
+   medianas las cuatro tarjetas se comprimían en vez de reacomodarse, y
+   quedaban visiblemente más angostas que los paneles de abajo. Los
+   paneles, a su vez, no tenían altura propia: cada uno terminaba con la
+   altura de su contenido y la fila quedaba despareja.
+   ============================================================ */
+
+.dash-stats-grid{
+  /* Se reacomodan solas: nunca por debajo de 210px de ancho. */
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  align-items: stretch;
+}
+
+/* Misma altura en toda la fila, sin importar cuánto texto traiga cada una. */
+.stat-card{
+  height: 100%;
+  min-height: 92px;
+}
+
+/* Los paneles llenan su columna: dentro de .col-* .d-flex esto es lo que
+   iguala las alturas de una fila. */
+.dash-panel{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El cuerpo del panel se estira para empujar el pie hacia abajo, así los
+   paneles de una misma fila terminan alineados aunque tengan distinto
+   contenido. */
+.dash-panel > .dash-panel-head{ flex-shrink: 0; }
+
+/* Alturas mínimas por tipo de panel: sin esto, un panel con lista vacía
+   quedaba de la mitad del alto que el de al lado. */
+.dash-panel:has(> [id$="Chart"]),
+.dash-panel:has(> .detalle-dia-wrap){ min-height: 340px; }
+
+@media (max-width: 575px){
+  .dash-stats-grid{ grid-template-columns: 1fr; }
+  .stat-card{ min-height: 0; }
 }

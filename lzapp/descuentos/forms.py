@@ -67,3 +67,16 @@ class CampanaDescuentoForm(forms.ModelForm):
             raise forms.ValidationError('La fecha de fin no puede ser anterior a la fecha de inicio.')
 
         return cleaned_data
+
+class ImportarCampanasForm(forms.Form):
+    """Carga masiva de campañas desde un Excel.
+
+    Mismo patrón que la importación de productos: se sube el .xlsx y la
+    vista lo recorre fila por fila. El formulario solo valida que llegue
+    un archivo; el contenido se revisa después, porque una fila mala no
+    debe tumbar toda la importación.
+    """
+    archivo = forms.FileField(
+        label='Selecciona el archivo Excel (.xlsx)',
+        widget=forms.ClearableFileInput(attrs={'accept': '.xlsx,.xls'})
+    )

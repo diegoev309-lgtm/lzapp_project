@@ -1,0 +1,659 @@
+/* ============================================================
+   ANIMACIONES DEL DASHBOARD
+
+   Objetivo: que la carga se sienta viva sin volverse un circo. Tres
+   reglas que se respetan en todo el archivo:
+
+     1. Nada dura más de ~450 ms. Una animación que se nota como espera
+        deja de ser adorno y pasa a ser fricción.
+     2. Todo entra hacia arriba y con opacidad. Un solo lenguaje, no
+        cinco efectos distintos por página.
+     3. Todo se apaga con prefers-reduced-motion. Para quien marea el
+        movimiento, esto no es un lujo.
+
+   El escalonado lo aplica animaciones.js poniendo --i en cada elemento.
+   ============================================================ */
+
+/* ============================================================
+   ENTRADA DEL CONTENIDO
+   ============================================================ */
+@keyframes entrarArriba{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+@keyframes entrarSuave{
+    from{ opacity:0; }
+    to{ opacity:1; }
+}
+@keyframes entrarEscala{
+    from{ opacity:0; transform:scale(.96); }
+    to{ opacity:1; transform:scale(1); }
+}
+
+/* `.anim-entrada` la pone el JS sobre los bloques principales de cada
+   módulo. El retraso sale de --i, así las tarjetas caen en cascada en vez
+   de aparecer todas de golpe. */
+.anim-entrada{
+    opacity:0;
+    animation: entrarArriba .42s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay: calc(var(--i, 0) * 55ms);
+}
+.anim-entrada-suave{
+    opacity:0;
+    animation: entrarSuave .5s ease forwards;
+    animation-delay: calc(var(--i, 0) * 45ms);
+}
+.anim-entrada-escala{
+    opacity:0;
+    animation: entrarEscala .4s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+/* Filas de tabla: escalonado más corto, son muchas. */
+.anim-fila{
+    opacity:0;
+    animation: entrarArriba .32s ease forwards;
+    animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+/* ============================================================
+   TRANSICIONES DE CONTROLES
+   ============================================================ */
+.dash-nav-item,
+.btn, button:not(.consola-tab):not(.mv-vehiculo),
+.dash-user-menu-item,
+.tab-item{
+    transition: background-color .18s ease,
+                color .18s ease,
+                border-color .18s ease,
+                transform .14s ease,
+                box-shadow .2s ease;
+}
+
+/* El empujón hacia arriba confirma que el clic entró, sin esperar a que
+   el servidor responda. */
+.btn:hover, button:not(:disabled):not(.consola-tab):hover{ transform: translateY(-1px); }
+.btn:active, button:not(:disabled):active{ transform: translateY(0) scale(.98); }
+
+/* ---- Iconos del menú lateral ---- */
+.dash-nav-item{ position:relative; }
+.dash-nav-item:hover{ transform: translateY(-2px) scale(1.06); }
+.dash-nav-item:active{ transform: translateY(0) scale(.94); }
+
+/* Al escoger un módulo el icono se marca al instante, sin esperar al
+   servidor: el pulso confirma el clic y el halo indica que va en camino. */
+.dash-nav-item.eligiendo{
+    animation: navElegido .45s cubic-bezier(.22,1,.36,1);
+}
+@keyframes navElegido{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(.9); }
+    100%{ transform:scale(1); }
+}
+.dash-nav-item.eligiendo::before{
+    content:'';
+    position:absolute;
+    inset:-4px;
+    border-radius:inherit;
+    border:2px solid var(--gold, #e4c870);
+    opacity:0;
+    animation: navHalo .7s ease-out infinite;
+    pointer-events:none;
+}
+@keyframes navHalo{
+    0%{ transform:scale(.85); opacity:.75; }
+    100%{ transform:scale(1.25); opacity:0; }
+}
+
+/* El tooltip del nombre del módulo entra deslizándose en vez de aparecer
+   de golpe (el contenido ya lo pone main.css con data-tip). */
+.dash-nav-item[data-tip]::after{
+    opacity:0;
+    transform: translateX(-6px);
+    transition: opacity .16s ease, transform .16s ease;
+    pointer-events:none;
+}
+.dash-nav-item[data-tip]:hover::after{
+    opacity:1;
+    transform: translateX(0);
+}
+
+/* Tarjetas y paneles: se levantan apenas al pasar por encima. */
+.dash-card, .stat-card, .mv-panel, .cola-item{
+    transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease;
+}
+.dash-card:hover, .stat-card:hover, .mv-panel:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px rgba(0,0,0,.28);
+}
+
+/* Filas de tabla */
+.tabla-productos tbody tr{ transition: background-color .16s ease; }
+
+/* ============================================================
+   ESQUELETOS (lo que se ve mientras llegan los datos)
+   Un bloque que late en el lugar exacto donde va a aparecer el dato:
+   la pantalla no salta cuando por fin llega.
+   ============================================================ */
+.esqueleto{
+    position:relative;
+    overflow:hidden;
+    border-radius:10px;
+    background: rgba(255,255,255,.05);
+    color:transparent !important;
+    pointer-events:none;
+    user-select:none;
+}
+.esqueleto::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    transform:translateX(-100%);
+    background:linear-gradient(90deg,
+        transparent, rgba(255,255,255,.09), transparent);
+    animation: esqueletoBrillo 1.3s infinite;
+}
+@keyframes esqueletoBrillo{ to{ transform:translateX(100%); } }
+
+.esqueleto-linea{ height:12px; margin:7px 0; }
+.esqueleto-linea.corta{ width:45%; }
+.esqueleto-linea.media{ width:70%; }
+
+/* ============================================================
+   NÚMEROS Y GRÁFICOS
+   ============================================================ */
+/* Los contadores los anima el JS; acá solo se evita que el cambio de
+   cifra empuje el layout de un lado a otro. */
+.stat-value, .dash-card-valor, .stat-valor{
+    font-variant-numeric: tabular-nums;
+    transition: color .25s ease;
+}
+.valor-actualizado{ animation: destelloValor .6s ease; }
+@keyframes destelloValor{
+    0%{ transform:scale(1); }
+    35%{ transform:scale(1.12); }
+    100%{ transform:scale(1); }
+}
+
+/* Contenedores de gráficos: aparecen con escala para que el dibujo del
+   gráfico no salga de la nada. */
+.grafico-caja, .chart-container, [id^="grafico"]{
+    animation: entrarEscala .45s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* ============================================================
+   NAVEGACIÓN ENTRE MÓDULOS
+   Al hacer clic en otro módulo la página actual se desvanece un poco:
+   da señal inmediata de que el clic entró, mientras el servidor responde.
+   ============================================================ */
+body.saliendo .dash-main{
+    opacity:.45;
+    transform: translateY(-6px);
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+/* ============================================================
+   ACCESIBILIDAD
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+        animation-duration:.001ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+    }
+    .anim-entrada, .anim-entrada-suave, .anim-entrada-escala, .anim-fila{
+        opacity:1 !important;
+    }
+}
+
+/* ============================================================
+   PIE DE TABLA COMPARTIDO (dashboard/_paginacion.html)
+   ============================================================ */
+.pg-pie{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+    padding:14px 16px;
+    border-top:1px solid var(--border-subtle);
+    font-size:12.5px;
+    color:var(--text-tertiary);
+}
+.pg-info b{ color:var(--text-primary); font-weight:700; }
+
+.pg-tamano{ display:flex; align-items:center; gap:7px; }
+.pg-tamano label{ margin:0; font-size:12px; }
+.pg-tamano select{
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-subtle);
+    border-radius:9px;
+    padding:5px 9px;
+    color:var(--text-primary);
+    font-size:12.5px;
+    cursor:pointer;
+}
+.pg-tamano select:focus{ outline:none; border-color:var(--gold); }
+
+.pg-links{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.pg-link{
+    min-width:32px;
+    height:32px;
+    padding:0 8px;
+    border-radius:9px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:var(--text-secondary);
+    font-size:12.5px;
+    font-weight:600;
+    background:rgba(255,255,255,.04);
+    transition:background-color .16s ease, color .16s ease, transform .14s ease;
+}
+.pg-link:hover{ background:var(--gold); color:#1A1A2E; transform:translateY(-1px); }
+.pg-link.active{
+    background:var(--gold);
+    color:#1A1A2E;
+    cursor:default;
+}
+.pg-link.active:hover{ transform:none; }
+.pg-hueco{ padding:0 3px; color:var(--text-tertiary); }
+
+@media (max-width: 640px){
+    .pg-pie{ justify-content:center; text-align:center; }
+    .pg-links{ justify-content:center; width:100%; }
+}
+
+/* ============================================================
+   CABECERAS ORDENABLES ({% th_orden %})
+   ============================================================ */
+.th-orden{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    text-decoration:none;
+    color:inherit;
+    white-space:nowrap;
+    transition:color .16s ease;
+}
+.th-orden i{
+    font-size:11px;
+    opacity:.4;
+    transition:opacity .16s ease, color .16s ease;
+}
+.th-orden:hover{ color:var(--gold); }
+.th-orden:hover i{ opacity:.85; }
+
+/* La columna por la que se está ordenando ahora mismo */
+.th-orden.activa{ color:var(--gold); }
+.th-orden.activa i{ opacity:1; color:var(--gold); }
+
+/* ============================================================
+   BARRA DE FILTROS (Notificaciones y cualquier módulo que la reuse)
+   ============================================================ */
+.notif-filtros{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+.notif-buscador{ position:relative; flex:1 1 240px; min-width:0; }
+.notif-buscador i{
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--text-tertiary); font-size:13px; pointer-events:none;
+}
+.notif-buscador input{
+    width:100%;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:11px;
+    padding:10px 13px 10px 35px;
+    color:var(--text-primary);
+    font-size:13px;
+}
+.notif-filtros select{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:11px;
+    padding:10px 12px;
+    color:var(--text-primary);
+    font-size:13px;
+    cursor:pointer;
+}
+.notif-buscador input:focus, .notif-filtros select:focus{
+    outline:none; border-color:var(--gold);
+}
+.notif-btn-buscar{
+    border:none; border-radius:11px; padding:10px 17px;
+    background:var(--gold); color:#1A1A2E;
+    font-weight:700; font-size:13px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px;
+}
+.notif-btn-limpiar{
+    border-radius:11px; padding:10px 15px;
+    background:rgba(255,255,255,.06);
+    color:var(--text-secondary);
+    font-size:12.5px; font-weight:600;
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:.18s;
+}
+.notif-btn-limpiar:hover{ background:var(--red); color:#fff; }
+
+@media (max-width: 560px){
+    .notif-filtros{ gap:8px; }
+    .notif-filtros select, .notif-btn-buscar, .notif-btn-limpiar{ flex:1 1 auto; }
+}
+
+/* ============================================================
+   BARRA DE ACCIONES AGRUPADAS A LA DERECHA
+
+   El selector de vista, Importar y Nuevo Producto son acciones sobre el
+   módulo entero, así que van juntas y del mismo lado. Antes Importar
+   vivía dentro del panel, en la fila del buscador, donde parecía un
+   filtro más.
+   ============================================================ */
+.productos-toolbar-derecha{
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+/* La barra de filtros: buscador ancho y los selectores tras él.
+
+   El max-width:420px de .barra-busqueda tiene sentido cuando solo hay un
+   buscador, pero con filtros al lado obliga a cuatro controles a
+   repartirse 420 px: se parten en dos filas apretadas y queda medio panel
+   vacío a la derecha. Acá se libera el ancho y cada control toma lo suyo. */
+.busqueda-fila{ flex-wrap:wrap; }
+.busqueda-fila .barra-busqueda{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    flex:1;
+    max-width:none;
+    width:auto;
+}
+.busqueda-fila .campo-busqueda{ flex:1 1 240px; min-width:0; }
+
+/* Los selectores toman el ancho de su contenido, no un tercio del panel. */
+.busqueda-fila .select-estado-producto{
+    flex:0 0 auto;
+    width:auto;
+    min-width:150px;
+    max-width:220px;
+}
+
+@media (max-width: 780px){
+    .productos-toolbar-derecha{ justify-content:stretch; }
+    .productos-toolbar-derecha .tab-group{ flex:1 1 100%; }
+    .productos-toolbar-derecha .dash-btn{ flex:1 1 auto; justify-content:center; }
+    .busqueda-fila .barra-busqueda .select-estado-producto{ flex:1 1 140px; max-width:none; }
+}
+
+/* ============================================================
+   CONTROLES DE FORMULARIO — UN SOLO ESTILO PARA TODO EL PANEL
+
+   Antes cada módulo repetía su propio background:rgba(255,255,255,.05).
+   Ese blanco translúcido funciona sobre un panel oscuro, pero en modo
+   claro es blanco sobre blanco: el campo quedaba invisible y solo se
+   veía el borde. Acá se centraliza con las variables --control-bg, que
+   sí cambian con el tema.
+
+   Se limita a .dash-frame para no pisar los formularios de la tienda,
+   que tienen su propio diseño.
+   ============================================================ */
+.dash-frame input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.dash-frame select,
+.dash-frame textarea{
+    background: var(--control-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    border-radius: var(--radius-btn, 10px);
+    transition: border-color .16s ease, background-color .16s ease;
+}
+.dash-frame input:hover:not(:disabled),
+.dash-frame select:hover:not(:disabled),
+.dash-frame textarea:hover:not(:disabled){
+    background: var(--control-bg-hover);
+}
+.dash-frame input:focus,
+.dash-frame select:focus,
+.dash-frame textarea:focus{
+    outline: none;
+    border-color: var(--gold);
+    background: var(--control-bg-hover);
+}
+.dash-frame input::placeholder,
+.dash-frame textarea::placeholder{ color: var(--text-tertiary); }
+.dash-frame input:disabled,
+.dash-frame select:disabled,
+.dash-frame textarea:disabled{ opacity: .55; cursor: not-allowed; }
+
+/* Las opciones del desplegable las dibuja el sistema: se les da el color
+   del panel para que no salgan blancas sobre el tema oscuro en los
+   navegadores que no respetan color-scheme del todo. */
+.dash-frame select option{
+    background: var(--bg-panel);
+    color: var(--text-primary);
+}
+
+/* Superficies que estaban en blanco fijo y en modo claro desaparecían */
+.pg-link,
+.pg-tamano select,
+.cola-item,
+.incidencia-card,
+.ea-producto,
+.mv-dato,
+.mv-vehiculo{
+    background: var(--control-bg);
+}
+.notif-btn-limpiar,
+.ea-btn.ir{
+    background: var(--control-bg);
+    color: var(--text-secondary);
+}
+
+/* Casillas y rangos: que el acento siga al tema */
+.dash-frame input[type="checkbox"],
+.dash-frame input[type="radio"],
+.dash-frame input[type="range"]{ accent-color: var(--gold); }
+
+/* ============================================================
+   MODAL DE IMPORTAR — ayuda de columnas
+   ============================================================ */
+.modal-importar-ayuda{
+    margin:0 0 12px;
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--text-secondary);
+}
+.modal-importar-columnas{
+    margin:0 0 12px;
+    padding:0;
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.modal-importar-columnas li{
+    font-size:12px;
+    color:var(--text-secondary);
+    background:var(--control-bg);
+    border-radius:9px;
+    padding:7px 11px;
+    display:flex;
+    align-items:baseline;
+    gap:7px;
+    flex-wrap:wrap;
+}
+.modal-importar-columnas b{
+    color:var(--gold);
+    font-weight:800;
+    min-width:14px;
+}
+.modal-importar-columnas span{ color:var(--text-tertiary); font-size:11px; }
+.modal-importar-nota{
+    margin:0 0 14px;
+    font-size:11.5px;
+    line-height:1.5;
+    color:var(--text-tertiary);
+    border-left:3px solid var(--gold);
+    padding-left:10px;
+}
+
+/* ============================================================
+   AJUSTES DE TEMA CLARO
+
+   Superficies que estaban con blanco translúcido fijo. Sobre un panel
+   oscuro se ven como un realce sutil; sobre uno claro son blanco sobre
+   blanco y el elemento se pierde.
+   ============================================================ */
+[data-theme="light"] .producto-card-frecuencia,
+[data-theme="light"] .chip-producto,
+[data-theme="light"] .campo-peso-input input[type="number"],
+[data-theme="light"] .cola-chip.gris,
+[data-theme="light"] .ea-dato,
+[data-theme="light"] .mv-vehiculo{
+    background: var(--control-bg);
+}
+[data-theme="light"] .producto-card-stats{
+    background: rgba(15,15,23,.03);
+}
+[data-theme="light"] .switch-slider{
+    background: rgba(15,15,23,.18);
+}
+[data-theme="light"] .badge-estado-toggle.bg-secondary{
+    background-color: rgba(15,15,23,.07) !important;
+}
+[data-theme="light"] .badge-estado-toggle.bg-secondary:hover{
+    background-color: rgba(15,15,23,.14) !important;
+}
+/* Las sombras negras fuertes del tema oscuro son manchas grises en el
+   claro: se suavizan. */
+[data-theme="light"] .toast-mensaje,
+[data-theme="light"] .consola,
+[data-theme="light"] .mapa-acciones button,
+[data-theme="light"] .notif-stock{
+    box-shadow: 0 10px 30px rgba(15,15,23,.12);
+}
+[data-theme="light"] .esqueleto{ background: rgba(15,15,23,.06); }
+[data-theme="light"] .esqueleto::after{
+    background: linear-gradient(90deg, transparent, rgba(15,15,23,.06), transparent);
+}
+
+/* ============================================================
+   BARRA DE SCROLL — fina, dorada, y crece al pasar el cursor
+
+   Fina porque en reposo es solo una referencia visual: no hace falta que
+   ocupe 15 px de ancho. Crece al acercar el cursor porque una barra de
+   6 px es difícil de agarrar con el mouse; así se tiene lo delgado
+   mientras se lee y lo agarrable cuando se va a usar.
+
+   Se declara por partida doble a propósito: `scrollbar-width` y
+   `scrollbar-color` es el estándar (Firefox), y ::-webkit-scrollbar es
+   lo que entienden Chrome, Edge y Safari. Ninguno de los dos cubre todo
+   solo.
+   ============================================================ */
+:root{
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
+}
+
+::-webkit-scrollbar{
+    width: 7px;
+    height: 7px;
+}
+::-webkit-scrollbar-track{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb{
+    background: var(--gold);
+    border-radius: 20px;
+    /* El borde transparente deja el pulgar más delgado que el canal, así
+       no toca los bordes del contenido. */
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    transition: background-color .2s ease;
+}
+::-webkit-scrollbar-thumb:hover{
+    background: var(--gold-claro, #F0D98A);
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-corner{ background: transparent; }
+
+/* Al pasar el cursor por un área con scroll, la barra se ensancha lo
+   suficiente para poder agarrarla. El ancho de ::-webkit-scrollbar no
+   admite transición, así que el cambio es directo. */
+*:hover > ::-webkit-scrollbar,
+.dash-frame *:hover::-webkit-scrollbar{
+    width: 12px;
+    height: 12px;
+}
+
+/* Zonas con scroll propio dentro de los paneles (listas de pedidos,
+   leyendas de gráficos, el desplegable de la campana): mismo criterio. */
+.dash-notif-menu-lista::-webkit-scrollbar,
+.notif-pagina-lista::-webkit-scrollbar,
+.consola-cuerpo::-webkit-scrollbar,
+.mapa-overlay::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar,
+[style*="overflow-y"]::-webkit-scrollbar{
+    width: 7px;
+    height: 7px;
+}
+.dash-notif-menu-lista:hover::-webkit-scrollbar,
+.notif-pagina-lista:hover::-webkit-scrollbar,
+.consola-cuerpo:hover::-webkit-scrollbar,
+.mapa-overlay:hover::-webkit-scrollbar,
+.table-responsive:hover::-webkit-scrollbar,
+[style*="overflow-y"]:hover::-webkit-scrollbar{
+    width: 12px;
+    height: 12px;
+}
+
+/* ============================================================
+   IMÁGENES DE PRODUCTO SIN FOTO
+
+   El respaldo era static/img/no-image.png, que no existe en el proyecto
+   (daba 404), así que tanto los productos sin foto como aquellos cuyo
+   archivo se perdió mostraban el icono de imagen rota del navegador.
+
+   Ahora el hueco lo llena un icono dibujado por CSS: no depende de
+   ningún archivo, se adapta al tema y no puede volver a romperse. La
+   imagen real se pinta encima y, si falla al cargar, el onerror la quita
+   y queda el icono.
+   ============================================================ */
+.img-producto-caja,
+.producto-card-img-caja{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:var(--control-bg);
+    color:var(--text-tertiary);
+}
+.img-producto-caja{
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    font-size:17px;
+}
+.producto-card-img-caja{
+    width:100%;
+    height:100%;
+    font-size:32px;
+}
+.img-producto-caja img,
+.producto-card-img-caja img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.img-producto-caja img{ border-radius:10px; }

@@ -49,7 +49,7 @@
 .ubicacion-modal-cerrar{
     position: absolute;
     top: 16px;
-    right: 16px;
+    left: 16px;
     z-index: 3;
     width: 32px;
     height: 32px;
@@ -126,8 +126,8 @@
 
 .ubicacion-mapa-expandir{
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 16px;
+    right: 16px;
     z-index: 1000;
     width: 34px;
     height: 34px;
@@ -146,15 +146,11 @@
     background: var(--dorado-claro, #f0d98a);
 }
 
-/* Con el encabezado oculto, el botón de minimizar se pasa a la izquierda
-   para no encimarse con el botón de cerrar (X), que sigue arriba a la
-   derecha — y el control de zoom de Leaflet vive siempre abajo a la
-   izquierda, lejos de los dos. */
-#modalUbicacionEntrega.mapa-expandido .ubicacion-mapa-expandir{
-    top: 16px;
-    left: 16px;
-    right: auto;
-}
+/* Mismas esquinas en todo el sitio: cerrar (X) siempre arriba a la
+   izquierda -- igual que "salir" en el mapa de seguimiento del pedido --
+   minimizar/expandir siempre arriba a la derecha, y el control de zoom de
+   Leaflet abajo a la izquierda. Nada cambia de esquina solo por maximizar
+   el mapa. */
 #modalUbicacionEntrega.mapa-expandido .ubicacion-modal-cerrar{
     z-index: 1002;
 }

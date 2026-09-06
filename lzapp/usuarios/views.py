@@ -41,6 +41,51 @@ from .forms import (
 )
 
 from django.core.paginator import Paginator
+from dashboard.paginacion import leer_por_pagina
+from django.core.cache import cache
+from django.views.decorators.http import require_GET
+import requests
+
+
+# =========================================================
+# UBICACIÓN
+# =========================================================
+
+@login_required
+@require_GET
+def geocodificar_inversa(request):
+    #"""Proxy de geocodificación inversa contra Nominatim (OpenStreetMap).
+    #
+    #El navegador ya no llama directo a nominatim.openstreetmap.org: si lo
+    #hiciera, ese servicio externo vería la IP real del cliente en cada
+    #movimiento del mapa. Pasando la consulta por acá, Nominatim solo ve la
+    #IP de nuestro servidor, y de paso exigimos sesión iniciada y limitamos
+    #a 1 consulta/segundo por usuario -- lo mismo que ya pedía la política
+    #de uso del servicio gratuito, pero ahora reforzado del lado servidor
+    #en vez de confiar en que el JS del navegador respete el límite.
+    #"""
+    lat = _coordenada(request.GET.get('lat'))
+    lng = _coordenada(request.GET.get('lng'))
+    if lat is None or lng is None:
+        return JsonResponse({'error': 'Coordenadas inválidas'}, status=400)
+
+    clave_limite = f'geocodificacion_inversa:{request.user.id}'
+    if cache.get(clave_limite):
+        return JsonResponse({'error': 'Espera un momento antes de volver a intentarlo.'}, status=429)
+    cache.set(clave_limite, True, timeout=1)
+
+    try:
+        respuesta = requests.get(
+            'https://nominatim.openstreetmap.org/reverse',
+            params={'format': 'json', 'lat': str(lat), 'lon': str(lng), 'accept-language': 'es'},
+            headers={'User-Agent': 'LacteosZulianos/1.0'},
+            timeout=6,
+        )
+        direccion = respuesta.json().get('display_name')
+    except (requests.RequestException, ValueError):
+        direccion = None
+
+    return JsonResponse({'direccion': direccion})
 
 
 # =========================================================
@@ -727,17 +772,16 @@ def Usuarios(request):
 
     # ---------- Paginación ----------
 
+    # El tamaño lo elige el usuario desde el pie de la tabla (10 por
+    # defecto); leer_por_pagina lo acota a la lista de opciones para que
+    # un ?por_pagina= inventado en la URL no traiga la tabla entera.
     paginator = Paginator(
         usuarios_qs,
-        8
-    )
-
-    pagina = request.GET.get(
-        'page'
+        leer_por_pagina(request),
     )
 
     usuarios_pagina = paginator.get_page(
-        pagina
+        request.GET.get('page')
     )
 
     # ---------- Tendencia ----------

@@ -7,6 +7,7 @@ from django.utils import timezone
 from .models import Venta, DetalleVenta, Producto, Produccion, Pedido, CampanaDescuento
 from seguridad.decorators import vista_dashboard
 from seguridad.validators import leer_entero_acotado
+from pedido.views import _serializar_pedidos_tiempo_real
 
 import calendar
 
@@ -220,28 +221,20 @@ def api_stock_flujo(request):
 
 @vista_dashboard
 def api_pedidos_tiempo_real(request):
-    """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega."""
+    """Estado en vivo de los últimos pedidos: repartidor asignado y avance de la entrega.
+
+    Reutiliza el mismo serializador que ya usan el panel de Pedidos y el
+    seguimiento del cliente/repartidor (pedido/views.py) -- antes esta
+    vista tenía su propia copia recortada (sin coordenadas, ruta ni
+    tiempo estimado), duplicada y desactualizada cada vez que se agregaba
+    un campo nuevo al seguimiento en vivo.
+    """
     pedidos = (Pedido.objects
-               .select_related('venta', 'venta__usuario', 'repartidor')
-               .prefetch_related('venta__detalles')
+               .select_related('venta', 'venta__usuario', 'venta__usuario__perfil', 'repartidor', 'repartidor__perfilemple')
+               .prefetch_related('venta__detalles__producto')
                .order_by('-fecha_creacion')[:20])
 
-    lista = []
-    for ped in pedidos:
-        venta = ped.venta
-        n_items = sum(d.cantidad for d in venta.detalles.all())
-        lista.append({
-            'id': venta.id,
-            'pedido_id': ped.id,
-            'cliente': venta.usuario.get_full_name() or venta.usuario.username,
-            'fecha': timezone.localtime(venta.fecha).strftime('%d/%m %H:%M'),
-            'total': float(venta.total),
-            'estado': ped.estado,
-            'estado_display': ped.get_estado_display(),
-            'repartidor': (ped.repartidor.get_full_name() or ped.repartidor.username) if ped.repartidor else None,
-            'items': n_items,
-            'incidencia': ped.incidencia,
-        })
+    lista = _serializar_pedidos_tiempo_real(pedidos)
 
     resumen = {
         'pendientes': sum(1 for p in lista if p['estado'] in ('pendiente', 'preparando')),

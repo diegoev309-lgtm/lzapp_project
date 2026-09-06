@@ -1,5 +1,5 @@
 {% extends "masterpage_dashboard.html" %}
-{% load static %}
+{% load static paginacion_tags orden_tags %}
 
 {% block page_icon %}bi-box-seam-fill{% endblock %}
 {% block page_title %}Historial de Producción{% endblock %}
@@ -18,7 +18,19 @@
 {% block content %}
 
 <div class="contenedor-produccion">
-    <div class="productos-toolbar" style="justify-content:flex-start;">
+    {% comment %}
+    Acciones agrupadas a la derecha, igual que Productos y Descuentos.
+    Antes "Nueva Producción" quedaba suelta a la izquierda e "Importar"
+    estaba metido dentro del panel, junto al buscador, donde parecía un
+    filtro y no una acción del módulo.
+    {% endcomment %}
+    <div class="productos-toolbar productos-toolbar-derecha">
+        <button type="button" class="dash-btn btn-importar-header"
+                onclick="abrirModalImportarProduccion()">
+            <i class="bi bi-file-earmark-excel"></i>
+            <span class="btn-importar-texto">Importar</span>
+        </button>
+
         <a href="{% url 'crear_produccion' %}" class="dash-btn dash-btn-solid">
             <i class="bi bi-plus-circle-fill"></i>
             Nueva Producción
@@ -29,7 +41,7 @@
          TABLA DE PRODUCCIONES
     ====================================================== -->
     <div class="bloque-productos">
-        <div class="busqueda-fila" style="justify-content:space-between;">
+        <div class="busqueda-fila">
             <form method="get" class="barra-busqueda" id="formBuscarProduccion">
                 <div class="campo-busqueda">
                     <i class="bi bi-search"></i>
@@ -37,13 +49,6 @@
                            placeholder="Buscar producto..." value="{{ query }}" autocomplete="off">
                 </div>
             </form>
-
-            <button type="button"
-                    class="dash-btn"
-                    onclick="abrirModalImportarProduccion()">
-                <i class="bi bi-file-earmark-excel"></i>
-                Importar
-            </button>
         </div>
         
         <div id="contenedorTablaProducciones">
@@ -53,11 +58,11 @@
 
                     <thead>
                         <tr>
-                            <th class="d-none d-md-table-cell">ID</th>
-                            <th>Producto</th>
-                            <th>Cantidad Producida</th>
-                            <th class="d-none d-sm-table-cell">Fecha</th>
-                            <th class="d-none d-md-table-cell">Vencimiento</th>
+                            <th class="d-none d-md-table-cell">{% th_orden "id" "ID" orden direccion %}</th>
+                            <th>{% th_orden "producto" "Producto" orden direccion %}</th>
+                            <th>{% th_orden "cantidad" "Cantidad Producida" orden direccion %}</th>
+                            <th class="d-none d-sm-table-cell">{% th_orden "fecha" "Fecha" orden direccion %}</th>
+                            <th class="d-none d-md-table-cell">{% th_orden "vencimiento" "Vencimiento" orden direccion %}</th>
                             <th class="d-none d-lg-table-cell">Observación</th>
                         </tr>
                     </thead>
@@ -102,49 +107,7 @@
             <!-- =================================================
                  PAGINACIÓN
             ================================================== -->
-            <div class="pie-productos">
-                <nav class="paginacion-inline"
-                     aria-label="Paginación de producciones">
-                    <ul class="pagination pagination-sm mb-0">
-
-                        {% if producciones.has_previous %}
-                            <li class="page-item"><a class="page-link"href="?page=1">Primera</a></li>
-                            <li class="page-item">
-                                <a class="page-link"href="?page={{ producciones.previous_page_number }}">&laquo;</a>
-                            </li>
-
-                        {% endif %}
-
-                        {% for pagina in producciones.paginator.page_range %}
-                            {% if pagina == producciones.number %}
-                                <li class="page-item active">
-                                    <span class="page-link">
-                                        {{ pagina }}
-                                    </span>
-                                </li>
-
-                            {% else %}
-                                <li class="page-item">
-                                    <a class="page-link"href="?page={{ pagina }}">
-                                        {{ pagina }}
-                                    </a>
-                                </li>
-                            {% endif %}
-
-                        {% endfor %}
-
-                        {% if producciones.has_next %}
-                            <li class="page-item">
-                                <a class="page-link"href="?page={{ producciones.next_page_number }}">&raquo;</a>
-                            </li>
-
-                            <li class="page-item">
-                                <a class="page-link"href="?page={{ producciones.paginator.num_pages }}">Última</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
+            {% paginacion producciones "producciones" %}
         </div>
     </div>
 
@@ -672,8 +635,10 @@ document.addEventListener('DOMContentLoaded', function(){
         buscar(input.value.trim());
     });
 
+    // Paginación y cabeceras ordenables, sin recargar la página. El
+    // selector apunta al marcado nuevo del pie compartido.
     contenedor.addEventListener('click', (e) => {
-        const link = e.target.closest('.pagination a.page-link');
+        const link = e.target.closest('.pg-links a.pg-link, a.th-orden');
         if (!link) return;
         e.preventDefault();
         const url = new URL(link.href);

@@ -1,5 +1,5 @@
 {% extends "masterpage_dashboard.html" %}
-{% load static %}
+{% load static paginacion_tags %}
 
 {% block title %}LzApp · Panel de Ventas{% endblock %}
 {% block page_icon %}bi-graph-up-arrow{% endblock %}
@@ -28,113 +28,86 @@
 
 {% block content %}
 
-<!-- ============ BARRA: SELECTOR DE VISTA + FILTRO DE PERÍODO ============ -->
-<div class="productos-toolbar">
-    <div class="tab-group" role="group" aria-label="Selector de vista">
-        <div class="tab-item active" id="btnVistaResumen" onclick="cambiarVistaVentas('resumen')">
-            <i class="bi bi-speedometer2"></i> Resumen
-        </div>
-        <div class="tab-item" id="btnVistaHistorial" onclick="cambiarVistaVentas('historial')">
-            <i class="bi bi-table"></i> Historial de ventas
+{% comment %}
+Una sola vista, con el mismo ritmo que Inicio (que es el estándar):
+KPIs arriba, después gráficos en la rejilla de Bootstrap, y al final las
+tablas. Antes esto estaba partido en dos pestañas — "Resumen" con un
+carrusel de gráficos e "Historial" con las tarjetas y tablas — así que
+para cruzar un número del gráfico con su fila había que ir y volver, y
+media página estaba siempre escondida.
+{% endcomment %}
+
+<!-- ============ 1. INDICADORES DEL PERÍODO ============ -->
+<div class="dash-stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-cash-coin"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">$ {{ total_ingresos|floatformat:2 }}</div>
+            <div class="stat-label">Ingresos del período</div>
         </div>
     </div>
-
-</div>
-
-<!-- ============ VISTA RESUMEN: SOLO GRÁFICOS (CARRUSEL) ============ -->
-<div id="vistaResumen">
-    <div class="carrusel-graficos">
-        <div class="carrusel-viewport">
-            <div class="carrusel-track" id="carruselTrack">
-
-                <div class="carrusel-slide">
-                    <div class="dash-panel">
-                        <div class="dash-panel-head">
-                            <span class="dash-panel-title"><i class="bi bi-graph-up" style="color:var(--gold)"></i> Ingresos por día</span>
-                            <span class="panel-subtitulo">Clic en un punto para ver el detalle</span>
-                        </div>
-                        <div class="contenedor-grafico" id="chartIngresos"></div>
-                    </div>
-                </div>
-
-                <div class="carrusel-slide">
-                    <div class="dash-panel">
-                        <div class="dash-panel-head">
-                            <span class="dash-panel-title"><i class="bi bi-bar-chart-line-fill" style="color:var(--gold)"></i> Ventas por día</span>
-                        </div>
-                        <div class="contenedor-grafico" id="chartVentas"></div>
-                    </div>
-                </div>
-
-                <div class="carrusel-slide">
-                    <div class="dash-panel">
-                        <div class="dash-panel-head">
-                            <span class="dash-panel-title"><i class="bi bi-pie-chart-fill" style="color:var(--gold)"></i> Participación por producto</span>
-                        </div>
-                        <div class="contenedor-grafico" id="chartDona"></div>
-                    </div>
-                </div>
-
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ cantidad_ventas }}</div>
+            <div class="stat-label">Ventas realizadas</div>
         </div>
-
-        <button type="button" class="carrusel-flecha carrusel-flecha-izq" onclick="moverCarrusel(-1)" aria-label="Gráfico anterior">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-        <button type="button" class="carrusel-flecha carrusel-flecha-der" onclick="moverCarrusel(1)" aria-label="Gráfico siguiente">
-            <i class="bi bi-chevron-right"></i>
-        </button>
-
-        <div class="carrusel-puntos" id="carruselPuntos">
-            <button type="button" class="punto activo" onclick="irASlide(0)" aria-label="Ver ingresos por día"></button>
-            <button type="button" class="punto" onclick="irASlide(1)" aria-label="Ver ventas por día"></button>
-            <button type="button" class="punto" onclick="irASlide(2)" aria-label="Ver participación por producto"></button>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon gold"><i class="bi bi-box-seam"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">{{ unidades_vendidas }}</div>
+            <div class="stat-label">Unidades vendidas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-graph-up"></i></div>
+        <div class="stat-info">
+            <div class="stat-value">$ {{ ticket_promedio|floatformat:2 }}</div>
+            <div class="stat-label">Ticket promedio</div>
         </div>
     </div>
 </div>
 
-<!-- ============ VISTA HISTORIAL: KPIs + TOP PRODUCTOS + RESUMEN DIARIO ============ -->
-<div id="vistaHistorial" style="display:none;">
-
-    <div class="dash-stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon green"><i class="bi bi-cash-coin"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">$ {{ total_ingresos|floatformat:2 }}</div>
-                <div class="stat-label">Ingresos del período</div>
+<!-- ============ 2. GRÁFICOS ============ -->
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-8 d-flex">
+        <section class="dash-panel flex-1 con-grafico">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title"><i class="bi bi-graph-up" style="color:var(--gold)"></i> Ingresos por día</span>
+                <span class="panel-subtitulo">Clic en un punto para ver el detalle</span>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon blue"><i class="bi bi-receipt"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ cantidad_ventas }}</div>
-                <div class="stat-label">Ventas realizadas</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon gold"><i class="bi bi-box-seam"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ unidades_vendidas }}</div>
-                <div class="stat-label">Unidades vendidas</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple"><i class="bi bi-graph-up"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">$ {{ ticket_promedio|floatformat:2 }}</div>
-                <div class="stat-label">Ticket promedio</div>
-            </div>
-        </div>
+            <div class="contenedor-grafico" id="chartIngresos"></div>
+        </section>
     </div>
 
-    <div class="historial-grid">
+    <div class="col-12 col-lg-4 d-flex">
+        <section class="dash-panel flex-1 con-grafico">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title"><i class="bi bi-pie-chart-fill" style="color:var(--gold)"></i> Participación por producto</span>
+            </div>
+            <div class="contenedor-grafico" id="chartDona"></div>
+        </section>
+    </div>
+</div>
 
-        <section class="dash-panel">
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-8 d-flex">
+        <section class="dash-panel flex-1 con-grafico">
+            <div class="dash-panel-head">
+                <span class="dash-panel-title"><i class="bi bi-bar-chart-line-fill" style="color:var(--gold)"></i> Ventas por día</span>
+            </div>
+            <div class="contenedor-grafico" id="chartVentas"></div>
+        </section>
+    </div>
+
+    <div class="col-12 col-lg-4 d-flex">
+        <section class="dash-panel flex-1">
             <div class="dash-panel-head">
                 <span class="dash-panel-title"><i class="bi bi-trophy-fill" style="color:var(--gold)"></i> Top productos más vendidos</span>
             </div>
             {% if top_productos %}
-                {% for item in top_productos|slice:":4" %}
+                {% for item in top_productos|slice:":5" %}
                     <div class="tx-row">
                         <div class="rank-badge">{{ forloop.counter }}</div>
                         <div class="tx-info">
@@ -151,7 +124,12 @@
                 </div>
             {% endif %}
         </section>
+    </div>
+</div>
 
+<!-- ============ 3. RESUMEN DIARIO ============ -->
+<div class="row g-3">
+    <div class="col-12">
         <section class="dash-panel">
             <div class="dash-panel-head">
                 <span class="dash-panel-title"><i class="bi bi-calendar3" style="color:var(--gold)"></i> Resumen diario</span>
@@ -189,28 +167,9 @@
                 </table>
             </div>
 
-            <!-- ============ PAGINACIÓN ============ -->
-            <div class="pie-ventas">
-                {% if resumen_diario_pagina.has_previous %}
-                    <a class="pg-link" href="?page=1&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Primera</a>
-                    <a class="pg-link" href="?page={{ resumen_diario_pagina.previous_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&laquo;</a>
-                {% endif %}
-                {% for pagina in resumen_diario_pagina.paginator.page_range %}
-                    {% if pagina == resumen_diario_pagina.number %}
-                        <span class="pg-link active">{{ pagina }}</span>
-                    {% else %}
-                        <a class="pg-link" href="?page={{ pagina }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">{{ pagina }}</a>
-                    {% endif %}
-                {% endfor %}
-                {% if resumen_diario_pagina.has_next %}
-                    <a class="pg-link" href="?page={{ resumen_diario_pagina.next_page_number }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">&raquo;</a>
-                    <a class="pg-link" href="?page={{ resumen_diario_pagina.paginator.num_pages }}&filtro={{ filtro }}&desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">Última</a>
-                {% endif %}
-            </div>
+            {% paginacion resumen_diario_pagina "días" %}
         </section>
-
     </div>
-
 </div>
 
 <!-- ============ MODAL: DETALLE DE UN DÍA (custom, sin Bootstrap) ============ -->
@@ -333,68 +292,18 @@ const chartDona = new ApexCharts(document.querySelector('#chartDona'), {
 });
 chartDona.render();
 
-// Recálculo de seguridad: los paneles 2 y 3 del carrusel están fuera del
-// área visible al cargar y a veces ApexCharts no toma su tamaño real a
-// tiempo. Forzamos un resize apenas termina de pintar.
+// Recálculo de seguridad: los gráficos se pintan mientras el velo de
+// carga todavía está puesto, y ApexCharts a veces no toma bien el ancho
+// del contenedor en ese momento. Un resize apenas termina lo reacomoda.
 setTimeout(function(){
     window.dispatchEvent(new Event('resize'));
 }, 50);
 
-/* ---- Carrusel de gráficos (Resumen) ---- */
-let carruselIndice = 0;
-const carruselTotalSlides = 3;
-
-function actualizarCarrusel(){
-    const track = document.getElementById('carruselTrack');
-    if(!track) return;
-    track.style.transform = `translateX(-${carruselIndice * 100}%)`;
-    document.querySelectorAll('#carruselPuntos .punto').forEach((punto, i) => {
-        punto.classList.toggle('activo', i === carruselIndice);
-    });
-    [chartIngresos, chartVentas, chartDona].forEach(function(chart){
-        chart.updateOptions({}, false, true);
-    });
-}
-
-function moverCarrusel(delta){
-    carruselIndice = (carruselIndice + delta + carruselTotalSlides) % carruselTotalSlides;
-    actualizarCarrusel();
-}
-
-function irASlide(indice){
-    carruselIndice = indice;
-    actualizarCarrusel();
-}
-
-/* ---- Selector de vista: Resumen / Historial de ventas ---- */
-function cambiarVistaVentas(vista){
-    const vResumen = document.getElementById('vistaResumen');
-    const vHistorial = document.getElementById('vistaHistorial');
-    const bResumen = document.getElementById('btnVistaResumen');
-    const bHistorial = document.getElementById('btnVistaHistorial');
-    if(!vResumen || !vHistorial || !bResumen || !bHistorial) return;
-
-    if(vista === 'historial'){
-        vResumen.style.display = 'none';
-        vHistorial.style.display = 'block';
-        bHistorial.classList.add('active');
-        bResumen.classList.remove('active');
-    } else {
-        vHistorial.style.display = 'none';
-        vResumen.style.display = 'block';
-        bResumen.classList.add('active');
-        bHistorial.classList.remove('active');
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
-    }
-    localStorage.setItem('vistaVentas', vista);
-}
-
-document.addEventListener('DOMContentLoaded', function(){
-    const guardada = localStorage.getItem('vistaVentas');
-    if(guardada === 'historial'){
-        cambiarVistaVentas('historial');
-    }
-});
+// El carrusel y el selector Resumen/Historial se eliminaron: ahora todo
+// vive en una sola vista, así que no hay nada que mostrar u ocultar.
+// Se limpia la preferencia guardada de la versión anterior para no dejar
+// basura en el navegador de quien ya la tenía.
+try { localStorage.removeItem('vistaVentas'); } catch (e) { /* storage bloqueado */ }
 
 /* ---- Dropdown de período (custom) ---- */
 function toggleFiltroMenu(){

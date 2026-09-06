@@ -66,20 +66,33 @@ class Carro:
         self.session["carro"]=self.carro
         self.session.modified=True
     
-    def eliminar(self,producto):
-        producto_id=str(producto.id)
+    # eliminar/restar trabajan con el id y no con el objeto Producto: si el
+    # producto se borró del catálogo mientras estaba en el carrito de
+    # alguien, esa persona tiene que poder sacarlo igual. Buscándolo en la
+    # base primero, la fila quedaba pegada y sin forma de quitarla.
+    def eliminar_por_id(self, producto_id):
+        producto_id = str(producto_id)
         if producto_id in self.carro:
             del self.carro[producto_id]
             self.guardar_carro()
 
-    def restar(self,producto):
-        for key,value in self.carro.items():
-            if key==str(producto.id):
-                value["cantidad"]=value["cantidad"]-1
-                if value["cantidad"]<1:
-                    self.eliminar(producto)
-                break
+    def restar_por_id(self, producto_id):
+        producto_id = str(producto_id)
+        item = self.carro.get(producto_id)
+        if not item:
+            return
+
+        item["cantidad"] -= 1
+        if item["cantidad"] < 1:
+            self.eliminar_por_id(producto_id)
+            return
         self.guardar_carro()
+
+    def eliminar(self, producto):
+        self.eliminar_por_id(producto.id)
+
+    def restar(self, producto):
+        self.restar_por_id(producto.id)
 
     def limpiar_carro(self):
         self.session["carro"]={}

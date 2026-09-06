@@ -1,0 +1,326 @@
+{% extends "masterpage_dashboard.html" %}
+{% load static %}
+
+{% block page_icon %}bi bi-truck{% endblock %}
+{% block page_title %}Mi vehículo{% endblock %}
+{% block page_subtitle %}Con qué repartes y cuánto puedes cargar en una salida{% endblock %}
+
+{% block content %}
+<style>
+    .mv-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+        gap:15px;
+        padding:15px;
+        align-items:start;
+    }
+    .mv-panel{
+        background:var(--bg-panel);
+        border:1px solid var(--border-subtle);
+        border-radius:16px;
+        padding:20px;
+    }
+    .mv-panel h3{
+        margin:0 0 4px;
+        font-size:15px;
+        color:var(--text-primary);
+        display:flex; align-items:center; gap:8px;
+    }
+    .mv-panel h3 i{ color:var(--gold); }
+    .mv-panel > p{
+        margin:0 0 18px;
+        font-size:12.5px;
+        line-height:1.5;
+        color:var(--text-tertiary);
+    }
+
+    /* ---- Selector de vehículo en tarjetas ---- */
+    .mv-vehiculos{
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));
+        gap:10px;
+        margin-bottom:18px;
+    }
+    .mv-vehiculo{
+        border:1.5px solid var(--border-subtle);
+        background:rgba(255,255,255,.03);
+        border-radius:14px;
+        padding:16px 10px;
+        cursor:pointer;
+        text-align:center;
+        transition:.18s;
+    }
+    .mv-vehiculo:hover{ border-color:var(--text-tertiary); }
+    .mv-vehiculo.activo{
+        border-color:var(--gold);
+        background:rgba(228,200,112,.10);
+    }
+    .mv-vehiculo i{ font-size:26px; color:var(--text-tertiary); display:block; margin-bottom:7px; }
+    .mv-vehiculo.activo i{ color:var(--gold); }
+    .mv-vehiculo span{ font-size:12.5px; font-weight:700; color:var(--text-secondary); }
+    .mv-vehiculo.activo span{ color:var(--text-primary); }
+    .mv-vehiculo input{ display:none; }
+
+    /* ---- Capacidad ---- */
+    .mv-campo{ display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
+    .mv-campo label{ font-size:12.5px; font-weight:700; color:var(--text-primary); }
+    .mv-campo small{ font-size:11.5px; color:var(--text-tertiary); line-height:1.45; }
+    .mv-campo input[type="number"]{
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--border-subtle);
+        border-radius:11px;
+        padding:11px 13px;
+        color:var(--text-primary);
+        font-size:15px;
+        font-weight:700;
+        max-width:160px;
+    }
+    .mv-campo input[type="number"]:focus{ outline:none; border-color:var(--gold); }
+
+    .mv-guardar{
+        border:none;
+        border-radius:12px;
+        padding:12px 22px;
+        background:var(--gold);
+        color:#1A1A2E;
+        font-weight:800;
+        font-size:13.5px;
+        cursor:pointer;
+    }
+    .mv-guardar:disabled{ opacity:.6; cursor:not-allowed; }
+    .mv-aviso{ font-size:12.5px; margin-top:12px; display:none; }
+    .mv-aviso.visible{ display:block; }
+    .mv-aviso.ok{ color:var(--green); }
+    .mv-aviso.error{ color:var(--red); }
+
+    /* ---- Estado actual ---- */
+    .mv-resumen{ display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+    .mv-resumen-icono{
+        width:56px; height:56px; border-radius:15px;
+        background:rgba(228,200,112,.12);
+        color:var(--gold);
+        display:flex; align-items:center; justify-content:center;
+        font-size:26px; flex-shrink:0;
+    }
+    .mv-resumen strong{ display:block; font-size:17px; color:var(--text-primary); }
+    .mv-resumen small{ display:block; font-size:12px; color:var(--text-tertiary); margin-top:2px; }
+
+    .mv-carga-cabecera{
+        display:flex; justify-content:space-between; align-items:center;
+        font-size:12.5px; color:var(--text-secondary); margin-bottom:7px;
+    }
+    .mv-carga-riel{
+        height:9px; border-radius:6px;
+        background:rgba(255,255,255,.07);
+        overflow:hidden;
+    }
+    .mv-carga-relleno{
+        height:100%; border-radius:6px;
+        background:var(--gold);
+        transition:width .4s ease;
+    }
+    .mv-carga-relleno.lleno{ background:var(--red); }
+    .mv-carga-nota{ margin:9px 0 0; font-size:11.5px; color:var(--text-tertiary); line-height:1.45; }
+
+    .mv-datos{ margin-top:18px; display:flex; flex-direction:column; gap:9px; }
+    .mv-dato{
+        display:flex; justify-content:space-between; align-items:center;
+        font-size:12.5px;
+        padding:10px 12px;
+        background:rgba(255,255,255,.04);
+        border-radius:11px;
+    }
+    .mv-dato span{ color:var(--text-tertiary); }
+    .mv-dato b{ color:var(--text-primary); }
+
+    .mv-ir-mapa{
+        display:inline-flex; align-items:center; gap:7px;
+        margin-top:18px;
+        text-decoration:none;
+        border-radius:12px;
+        padding:11px 18px;
+        background:rgba(255,255,255,.06);
+        color:var(--text-primary);
+        font-size:13px; font-weight:700;
+        transition:.2s;
+    }
+    .mv-ir-mapa:hover{ background:var(--gold); color:#1A1A2E; }
+</style>
+
+<div class="mv-grid">
+
+    <!-- ============ Registro del vehículo ============ -->
+    <div class="mv-panel">
+        <h3><i class="bi bi-truck"></i> Registra tu vehículo</h3>
+        <p>
+            De esto depende cuántas entregas te puede asignar el sistema. Si dices que
+            cargas más de lo que realmente te cabe, te van a llegar pedidos que no vas
+            a poder llevar.
+        </p>
+
+        <div class="mv-vehiculos" id="mvVehiculos">
+            {% for valor, etiqueta in vehiculos %}
+            <label class="mv-vehiculo {% if perfil_emple.vehiculo == valor %}activo{% endif %}"
+                   data-vehiculo="{{ valor }}">
+                <input type="radio" name="vehiculo" value="{{ valor }}"
+                       {% if perfil_emple.vehiculo == valor %}checked{% endif %}>
+                <i class="bi
+                    {% if valor == 'moto' %}bi-scooter
+                    {% elif valor == 'bicicleta' %}bi-bicycle
+                    {% elif valor == 'carro' %}bi-car-front-fill
+                    {% else %}bi-person-walking{% endif %}"></i>
+                <span>{{ etiqueta }}</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div class="mv-campo">
+            <label for="mvCapacidad">Cuántas unidades de producto te caben</label>
+            <small>
+                Es el total de productos que puedes llevar de una salida, sumando
+                todos los pedidos. Ej: si en la moto te caben 20 quesos, escribe 20.
+            </small>
+            <input type="number" id="mvCapacidad" min="1" max="500" step="1"
+                   value="{{ perfil_emple.capacidad_productos }}">
+        </div>
+
+        <button type="button" class="mv-guardar" id="mvGuardar">
+            <i class="bi bi-check-lg"></i> Guardar mi vehículo
+        </button>
+        <div class="mv-aviso" id="mvAviso"></div>
+    </div>
+
+    <!-- ============ Estado actual ============ -->
+    <div class="mv-panel">
+        <h3><i class="bi bi-speedometer2"></i> Cómo vas ahora</h3>
+        <p>Lo que llevas encima en este momento y cuánto te queda libre.</p>
+
+        <div class="mv-resumen">
+            <div class="mv-resumen-icono">
+                <i class="bi
+                    {% if perfil_emple.vehiculo == 'moto' %}bi-scooter
+                    {% elif perfil_emple.vehiculo == 'bicicleta' %}bi-bicycle
+                    {% elif perfil_emple.vehiculo == 'carro' %}bi-car-front-fill
+                    {% else %}bi-person-walking{% endif %}" id="mvIconoActual"></i>
+            </div>
+            <div>
+                <strong id="mvNombreActual">{{ perfil_emple.get_vehiculo_display }}</strong>
+                <small><span id="mvCapacidadActual">{{ perfil_emple.capacidad_productos }}</span> unidades de capacidad</small>
+            </div>
+        </div>
+
+        <div class="mv-carga-cabecera">
+            <span><i class="bi bi-box-seam"></i> Carga actual</span>
+            <span><b>{{ carga_actual }}</b> / {{ perfil_emple.capacidad_productos }} unidades</span>
+        </div>
+        <div class="mv-carga-riel">
+            {% widthratio carga_actual perfil_emple.capacidad_productos 100 as porcentaje %}
+            <div class="mv-carga-relleno {% if porcentaje >= 100 %}lleno{% endif %}"
+                 style="width: {% if porcentaje > 100 %}100{% else %}{{ porcentaje }}{% endif %}%;"></div>
+        </div>
+        <p class="mv-carga-nota">
+            El sistema no te asigna pedidos que no te quepan: si vas lleno, el pedido
+            espera al siguiente repartidor en vez de quedarse sin llevar.
+        </p>
+
+        <div class="mv-datos">
+            <div class="mv-dato">
+                <span>Entregas en curso</span>
+                <b>{{ entregas_activas }}</b>
+            </div>
+            <div class="mv-dato">
+                <span>Turno</span>
+                <b>{% if perfil_emple.disponible %}Abierto — recibiendo entregas{% else %}Cerrado{% endif %}</b>
+            </div>
+        </div>
+
+        <a href="{% url 'mis_entregas' %}" class="mv-ir-mapa">
+            <i class="bi bi-geo-alt-fill"></i> Ir a mi ruta
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const URL_VEHICULO = "{% url 'actualizar_vehiculo' %}";
+
+function getCookie(nombre) {
+    let valor = null;
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach((cookie) => {
+            cookie = cookie.trim();
+            if (cookie.substring(0, nombre.length + 1) === (nombre + '=')) {
+                valor = decodeURIComponent(cookie.substring(nombre.length + 1));
+            }
+        });
+    }
+    return valor;
+}
+
+const ICONO_VEHICULO = {
+    moto: 'bi-scooter',
+    bicicleta: 'bi-bicycle',
+    carro: 'bi-car-front-fill',
+    a_pie: 'bi-person-walking',
+};
+
+// Selección visual de la tarjeta (el radio de adentro es el que manda).
+document.querySelectorAll('.mv-vehiculo').forEach((tarjeta) => {
+    tarjeta.addEventListener('click', () => {
+        document.querySelectorAll('.mv-vehiculo').forEach((t) => t.classList.remove('activo'));
+        tarjeta.classList.add('activo');
+        tarjeta.querySelector('input').checked = true;
+    });
+});
+
+document.getElementById('mvGuardar').addEventListener('click', async () => {
+    const boton = document.getElementById('mvGuardar');
+    const aviso = document.getElementById('mvAviso');
+    const elegido = document.querySelector('.mv-vehiculo input:checked');
+
+    aviso.className = 'mv-aviso';
+    if (!elegido) {
+        aviso.textContent = 'Elige con qué repartes.';
+        aviso.className = 'mv-aviso error visible';
+        return;
+    }
+
+    boton.disabled = true;
+    try {
+        const respuesta = await fetch(URL_VEHICULO, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                vehiculo: elegido.value,
+                capacidad_productos: document.getElementById('mvCapacidad').value,
+            }).toString(),
+        });
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+            aviso.textContent = datos.error || 'No se pudo guardar.';
+            aviso.className = 'mv-aviso error visible';
+            return;
+        }
+
+        document.getElementById('mvNombreActual').textContent = datos.vehiculo_display;
+        document.getElementById('mvCapacidadActual').textContent = datos.capacidad_productos;
+        document.getElementById('mvIconoActual').className =
+            'bi ' + (ICONO_VEHICULO[datos.vehiculo] || 'bi-truck');
+
+        aviso.textContent = 'Guardado. El sistema ya usa esta capacidad para asignarte entregas.';
+        aviso.className = 'mv-aviso ok visible';
+    } catch (error) {
+        aviso.textContent = 'No se pudo guardar. Revisa tu conexión.';
+        aviso.className = 'mv-aviso error visible';
+    } finally {
+        boton.disabled = false;
+    }
+});
+</script>
+{% endblock %}

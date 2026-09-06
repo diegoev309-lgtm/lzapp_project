@@ -1,6 +1,6 @@
 {% extends "masterpage_dashboard.html" %}
 {% load static %}
-{% load producto_extras %}
+{% load producto_extras paginacion_tags orden_tags %}
 {% block page_icon %}bi bi-basket-fill{% endblock %}
 {% block page_title %}Productos{% endblock %}
 {% block page_subtitle %}Administra todos los productos registrados del sistema{% endblock %}
@@ -207,7 +207,13 @@
 </div>
 {% endif %}
 
-<div class="productos-toolbar">
+{% comment %}
+Acciones agrupadas a la derecha: selector de vista, Importar y Nuevo
+Producto. Importar estaba metido dentro del panel, en la fila del
+buscador, así que parecía un filtro más cuando en realidad es una acción
+sobre todo el módulo — igual que Nuevo Producto.
+{% endcomment %}
+<div class="productos-toolbar productos-toolbar-derecha">
     <div class="tab-group" role="group" aria-label="Selector de vista">
         <div class="tab-item active" id="btnVistaTabla" onclick="cambiarVista('tabla')">
             <i class="bi bi-table"></i> Tabla
@@ -216,6 +222,11 @@
             <i class="bi bi-grid-3x3-gap-fill"></i> Tarjetas
         </div>
     </div>
+
+    <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
+        <i class="bi bi-file-earmark-excel"></i>
+        <span class="btn-importar-texto">Importar</span>
+    </button>
 
     <a href="{% url 'crear_producto' %}" class="dash-btn dash-btn-solid">
         <i class="bi bi-plus-circle-fill"></i> Nuevo Producto
@@ -237,13 +248,29 @@
                 <option value="disponible" {% if estado == 'disponible' %}selected{% endif %}>Disponibles</option>
                 <option value="no_disponible" {% if estado == 'no_disponible' %}selected{% endif %}>No disponibles</option>
                 <option value="incompleto" {% if estado == 'incompleto' %}selected{% endif %}>Incompletos</option>
+                <option value="stock_bajo" {% if estado == 'stock_bajo' %}selected{% endif %}>Stock bajo</option>
+                <option value="agotado" {% if estado == 'agotado' %}selected{% endif %}>Agotados</option>
+            </select>
+
+            {% comment %}
+            El orden también acá y no solo en las cabeceras de la tabla:
+            la vista de tarjetas no tiene cabeceras, así que sin esto era
+            imposible ordenar los productos cuando se miraban como tarjetas.
+            {% endcomment %}
+            <select name="orden" id="selectOrdenProducto" class="input-busqueda select-estado-producto"
+                    aria-label="Ordenar por">
+                <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Ordenar: Nombre</option>
+                <option value="precio" {% if orden == 'precio' %}selected{% endif %}>Ordenar: Precio</option>
+                <option value="stock" {% if orden == 'stock' %}selected{% endif %}>Ordenar: Stock</option>
+                <option value="estado" {% if orden == 'estado' %}selected{% endif %}>Ordenar: Estado</option>
+            </select>
+
+            <select name="dir" id="selectDirProducto" class="input-busqueda select-estado-producto"
+                    aria-label="Dirección del orden">
+                <option value="asc" {% if direccion == 'asc' %}selected{% endif %}>Ascendente</option>
+                <option value="desc" {% if direccion == 'desc' %}selected{% endif %}>Descendente</option>
             </select>
         </form>
-
-        <button type="button" class="dash-btn btn-importar-header" onclick="abrirModalImportar()">
-            <i class="bi bi-file-earmark-excel"></i>
-            <span class="btn-importar-texto">Importar</span>
-        </button>
     </div>
 
         <div id="contenedorListaProductos">
@@ -252,13 +279,20 @@
             <div id="vistaTabla" class="table-responsive">
                 <table class="table table-hover tabla-productos align-middle">
                     <thead>
+                        {% comment %}
+                        Las cabeceras con {% th_orden %} ordenan la lista
+                        completa en la base, no solo la página visible.
+                        Calificación no es ordenable: se calcula con un
+                        Subquery por fila y ordenar por ella obligaría a
+                        recalcularla para toda la tabla.
+                        {% endcomment %}
                         <tr>
                             <th class="d-none d-sm-table-cell">Imagen</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th class="d-none d-md-table-cell">Stock</th>
+                            <th>{% th_orden "nombre" "Nombre" orden direccion %}</th>
+                            <th>{% th_orden "precio" "Precio" orden direccion %}</th>
+                            <th class="d-none d-md-table-cell">{% th_orden "stock" "Stock" orden direccion %}</th>
                             <th>Calificacion</th>
-                            <th>Estado</th>
+                            <th>{% th_orden "estado" "Estado" orden direccion %}</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -266,11 +300,10 @@
                     {% for i in productos %}
                         <tr>
                             <td class="d-none d-sm-table-cell">
-                                {% if i.imagen %}
-                                    <img src="{{ i.imagen.url }}" class="img-producto">
-                                {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" class="img-producto">
-                                {% endif %}
+<span class="img-producto-caja">
+                                    <i class="bi bi-image"></i>
+                                    {% if i.imagen %}<img src="{{ i.imagen.url }}" class="img-producto" alt="{{ i.nombre }}" onerror="this.remove()">{% endif %}
+                                </span>
                             </td>
                             <td>
                                 <strong>{{ i.nombre }}</strong>
@@ -344,11 +377,10 @@
                 {% for i in productos %}
                     <div class="producto-card">
                         <div class="producto-card-img-wrapper">
-                            {% if i.imagen %}
-                                <img src="{{ i.imagen.url }}" class="producto-card-imagen">
-                            {% else %}
-                                <img src="{% static 'img/no-image.png' %}" class="producto-card-imagen">
-                            {% endif %}
+                            <span class="producto-card-img-caja">
+                                <i class="bi bi-image"></i>
+                                {% if i.imagen %}<img src="{{ i.imagen.url }}" class="producto-card-imagen" alt="{{ i.nombre }}" onerror="this.remove()">{% endif %}
+                            </span>
                             <div class="producto-card-estado">
                                 {% if i.disponibilidad %}
                                     <span class="badge bg-success">
@@ -408,42 +440,11 @@
                 {% endfor %}
             </div>
 
-            <!-- ============ PIE: VISTA + PAGINACIÓN EN UNA SOLA LÍNEA ============ -->
-            <div class="pie-productos">
-
-                <nav class="paginacion-inline" aria-label="Paginación de productos">
-                    <ul class="pagination pagination-sm mb-0">
-                        {% if productos.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">Primera</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">&laquo;</a>
-                            </li>
-                        {% endif %}
-                        {% for pagina in productos.paginator.page_range %}
-                            {% if pagina == productos.number %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ pagina }}</span>
-                                </li>
-                            {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ pagina }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">{{ pagina }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                        {% if productos.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">&raquo;</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ productos.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if estado and estado != 'todos' %}&estado={{ estado }}{% endif %}">Última</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-
-            </div>
+            {% comment %}
+            Pie compartido: contador, selector de filas y ventana de
+            páginas. Antes se imprimía page_range entero.
+            {% endcomment %}
+            {% paginacion productos "productos" %}
 
         </div>
 
@@ -587,6 +588,14 @@
             const estado = selectEstado ? selectEstado.value : 'todos';
             if (estado && estado !== 'todos') params.set('estado', estado);
 
+            // El orden también viaja: sin esto, escribir en el buscador
+            // devolvía la lista al orden por defecto y se perdía lo que el
+            // usuario acababa de elegir.
+            const selOrden = document.getElementById('selectOrdenProducto');
+            const selDir = document.getElementById('selectDirProducto');
+            if (selOrden && selOrden.value) params.set('orden', selOrden.value);
+            if (selDir && selDir.value) params.set('dir', selDir.value);
+
             const cadena = params.toString();
             const url = cadena
                 ? `${window.location.pathname}?${cadena}`
@@ -606,16 +615,22 @@
             buscar(input.value.trim());
         });
 
-        if (selectEstado) {
-            selectEstado.addEventListener('change', () => {
-                buscar(input.value.trim());
-            });
-        }
+        // Estado, orden y dirección van por el mismo camino que el
+        // buscador: sin recargar y conservando lo que ya estaba puesto.
+        ['selectEstadoProducto', 'selectOrdenProducto', 'selectDirProducto'].forEach((id) => {
+            const select = document.getElementById(id);
+            if (select) {
+                select.addEventListener('change', () => buscar(input.value.trim()));
+            }
+        });
 
-        // La paginación (Primera, «, números, », Última) también pasa
-        // por el mismo camino de fetch(), sin recargar la página.
+        // La paginación y las cabeceras ordenables pasan por el mismo
+        // camino de fetch(), sin recargar la página. El selector apunta al
+        // marcado nuevo (.pg-link y .th-orden): con el viejo
+        // (.paginacion-inline a.page-link) esto había quedado sin efecto y
+        // cada clic recargaba la página entera.
         contenedor.addEventListener('click', (e) => {
-            const link = e.target.closest('.paginacion-inline a.page-link');
+            const link = e.target.closest('.pg-links a.pg-link, a.th-orden');
             if (!link) return;
             e.preventDefault();
             const url = new URL(link.href);

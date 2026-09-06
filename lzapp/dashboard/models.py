@@ -1,11 +1,9 @@
-from pedido.services import obtener_repartidor_mas_cercano
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from datetime import timedelta
 from decimal import Decimal
 from django.utils import timezone
-from django.db.models import Avg, Count, Q
 
 import random
 import string
@@ -44,10 +42,37 @@ class PerfilEmple(models.Model):
         ],
         default='cliente'
     )
+    class Vehiculo(models.TextChoices):
+        MOTO      = 'moto',      'Moto'
+        BICICLETA = 'bicicleta', 'Bicicleta'
+        CARRO     = 'carro',     'Carro'
+        A_PIE     = 'a_pie',     'A pie'
+
     repartidor_latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     repartidor_longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    disponible = models.BooleanField(default=True, help_text='Si puede recibir nuevas entregas asignadas')
+
+    # Arranca apagado a propósito: un repartidor está disponible solo
+    # cuando ÉL le da a "Empezar a repartir". Con default=True el sistema
+    # le asignaba entregas a gente que ni había salido de su casa.
+    disponible = models.BooleanField(
+        default=False,
+        help_text='Lo enciende el propio repartidor al empezar su turno. '
+                  'Solo los disponibles reciben entregas.'
+    )
+    vehiculo = models.CharField(
+        max_length=15, choices=Vehiculo.choices, default=Vehiculo.MOTO,
+        help_text='En qué reparte. Define cuánto puede cargar de una salida.'
+    )
+    capacidad_productos = models.PositiveIntegerField(
+        default=20,
+        validators=[MinValueValidator(1), MaxValueValidator(500)],
+        help_text='Cuántas unidades de producto le caben en el vehículo. '
+                  'El sistema no le asigna entregas que no le quepan.'
+    )
     ubicacion_actualizada = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.empleado.username} ({self.get_vehiculo_display()}, {self.capacidad_productos} u.)'
 
 # =========================================================
 # #Tabla de producto
@@ -272,6 +297,12 @@ class Pedido(models.Model):
         help_text='PIN de 4 dígitos que el cliente muestra y el repartidor '
                    'escribe para confirmar que entregó el pedido correcto.'
     )
+    orden_en_ruta = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='Puesto de este pedido dentro de la ruta del repartidor '
+                  '(1 = la próxima parada). Es lo que le permite al cliente '
+                  'ver cuántas entregas van antes de la suya.'
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -289,6 +320,12 @@ from django.dispatch import receiver
 def crear_pedido_automatico(sender, instance, created, **kwargs):
     """Cada Venta nueva obtiene automáticamente su Pedido de seguimiento.
 
+    Nace directamente en PREPARANDO: apenas el pago queda aprobado la
+    producción arranca, sin esperar a que nadie apruebe nada a mano. El
+    estado PENDIENTE es la cola *posterior* a la preparación (pedido ya
+    listo esperando repartidor), no un paso previo — si fuera previo, la
+    cocina se quedaría frenada esperando un clic del admin.
+
     El pedido nace con la ubicación que el cliente tiene registrada en su
     perfil: así ningún pedido queda sin destino aunque el checkout no haya
     alcanzado a mandar el pin (y sin destino no se puede asignar
@@ -299,96 +336,24 @@ def crear_pedido_automatico(sender, instance, created, **kwargs):
         return
 
     perfil = Perfil.objects.filter(usuario=instance.usuario).first()
-    valores = {}
+    valores = {'estado': Pedido.Estado.PREPARANDO}
     if perfil and perfil.latitud and perfil.longitud:
-        valores = {
+        valores.update({
             'cliente_latitud': perfil.latitud,
             'cliente_longitud': perfil.longitud,
             'direccion_entrega': perfil.direccion,
-        }
+        })
 
     Pedido.objects.get_or_create(venta=instance, defaults=valores)
 
 
 from datetime import timedelta
-from pedido.services import obtener_repartidor_mas_cercano, obtener_ruta_completa
 
-
-def _repartidor_menos_cargado():
-    """Repartidor disponible con menos entregas activas encima.
-
-    Es el plan B de la asignación: se usa cuando nadie tiene GPS reciente.
-    Antes, sin este respaldo, un pedido no se le asignaba a nadie hasta que
-    algún repartidor abriera la app y empezara a compartir ubicación — es
-    decir, el pedido se quedaba trabado esperando algo que el repartidor no
-    tenía por qué haber hecho todavía.
-    """
-    activos = Count(
-        'empleado__entregas_asignadas',
-        filter=Q(empleado__entregas_asignadas__estado__in=[
-            Pedido.Estado.PREPARANDO, Pedido.Estado.EN_CAMINO,
-        ]),
-    )
-    return (PerfilEmple.objects
-            .filter(rol='empleado', disponible=True)
-            .select_related('empleado')
-            .annotate(entregas_activas=activos)
-            .order_by('entregas_activas', 'id')
-            .first())
-
-
-@receiver(post_save, sender=Pedido)
-def asignar_repartidor_automatico(sender, instance, created, **kwargs):
-    """Cuando el pedido pasa a 'preparando' y aún no tiene repartidor,
-    busca automáticamente al disponible más cercano al cliente. Si ninguno
-    tiene ubicación reciente, igual se lo asigna al menos cargado: la ruta
-    y el tiempo se calculan después, apenas ese repartidor comparta su GPS."""
-    if instance.estado != Pedido.Estado.PREPARANDO or instance.repartidor_id:
-        return
-
-    mejor = distancia_km = tiempo_min = None
-    tiene_destino = bool(instance.cliente_latitud and instance.cliente_longitud)
-
-    if tiene_destino:
-        limite = timezone.now() - timedelta(minutes=15)
-        candidatos = PerfilEmple.objects.filter(
-            rol='empleado',
-            disponible=True,
-            ubicacion_actualizada__gte=limite,
-            repartidor_latitud__isnull=False,
-            repartidor_longitud__isnull=False,
-        ).select_related('empleado')
-
-        mejor, distancia_km, tiempo_min = obtener_repartidor_mas_cercano(
-            instance.cliente_latitud, instance.cliente_longitud, candidatos
-        )
-
-    if not mejor:
-        mejor = _repartidor_menos_cargado()
-        distancia_km = tiempo_min = None
-
-    if not mejor:
-        return
-
-    instance.repartidor = mejor.empleado
-
-    # Pedimos la geometría de la ruta solo para el repartidor ya elegido
-    # (una petición extra a OSRM, pero ocurre una sola vez por asignación,
-    # no en cada ping de GPS). Esa misma respuesta trae distancia y tiempo,
-    # así que los tomamos de ahí en vez de descartarlos.
-    if tiene_destino and mejor.repartidor_latitud and mejor.repartidor_longitud:
-        distancia_ruta, tiempo_ruta, polyline = obtener_ruta_completa(
-            instance.cliente_latitud, instance.cliente_longitud,
-            mejor.repartidor_latitud, mejor.repartidor_longitud,
-        )
-        instance.ruta_polyline = polyline
-        distancia_km = distancia_ruta if distancia_ruta is not None else distancia_km
-        tiempo_min = tiempo_ruta if tiempo_ruta is not None else tiempo_min
-
-    instance.distancia_km = round(distancia_km, 2) if distancia_km else None
-    instance.tiempo_estimado_min = tiempo_min
-
-    instance.save(update_fields=['repartidor', 'distancia_km', 'tiempo_estimado_min', 'ruta_polyline'])
+# La asignación de repartidor y el avance de estados viven en
+# pedido/asignacion.py (el motor), no en una señal: un pedido recién
+# creado siempre está PREPARANDO y no se despacha hasta que termina su
+# preparación, así que no hay nada que hacer en el post_save. El motor lo
+# empujan los endpoints en vivo que los tres paneles ya consultan.
 
 # =========================================================
 # #Tabla de pedidos con un hostorial
@@ -411,7 +376,12 @@ class HistorialEstadoPedido(models.Model):
 def registrar_historial_estado(sender, instance, created, **kwargs):
     """Cada vez que el pedido se crea o cambia de estado, queda una fila
     en el historial — es lo que alimenta el timeline de seguimiento."""
-    ultimo = instance.historial.order_by('-fecha').first()
+    # -id además de -fecha: dos filas creadas en el mismo save() en
+    # cascada (esta señal dispara otro save() más abajo para el PIN de
+    # entrega) pueden quedar con el mismo timestamp si la resolución del
+    # reloj del sistema es baja -- sin el desempate, "-fecha" solo podía
+    # devolver cualquiera de las dos indistintamente.
+    ultimo = instance.historial.order_by('-fecha', '-id').first()
     if created or not ultimo or ultimo.estado != instance.estado:
         HistorialEstadoPedido.objects.create(pedido=instance, estado=instance.estado)
 
@@ -424,6 +394,7 @@ def registrar_historial_estado(sender, instance, created, **kwargs):
 
 MENSAJES_ESTADO_CLIENTE = {
     Pedido.Estado.PREPARANDO: ('Tu pedido está en preparación 👨‍🍳', 'info'),
+    Pedido.Estado.PENDIENTE:  ('Tu pedido ya está listo y espera repartidor 📦', 'info'),
     Pedido.Estado.EN_CAMINO:  ('¡Tu pedido salió para entrega! 🚚', 'info'),
     Pedido.Estado.ENTREGADO:  ('Tu pedido fue entregado ✅', 'success'),
     Pedido.Estado.CANCELADO:  ('Tu pedido fue cancelado', 'warning'),
@@ -443,41 +414,49 @@ def notificar_cambio_estado(sender, instance, created, **kwargs):
         return
 
     mensaje, tipo = datos
-    minutos = obtener_configuracion_entrega().minutos_preparacion
+    config = obtener_configuracion_entrega()
+    minutos = config.minutos_preparacion
 
     # --- Cliente ---
-    detalle_tiempo = ''
+    detalle = ''
     if instance.estado == Pedido.Estado.PREPARANDO:
-        detalle_tiempo = f' Tiempo estimado de preparación: {minutos} min.'
+        detalle = f' Tiempo estimado de preparación: {minutos} min.'
+    elif instance.estado == Pedido.Estado.EN_CAMINO and pedido.orden_en_ruta:
+        # El repartidor puede llevar varias entregas en la misma salida: el
+        # cliente ve cuántas van antes de la suya para que el tiempo tenga
+        # sentido en vez de parecer que se atrasó sin explicación.
+        antes = pedido.orden_en_ruta - 1
+        if antes > 0:
+            plural = 's' if antes > 1 else ''
+            detalle = f' Hay {antes} entrega{plural} antes de la tuya.'
 
     Notificacion.objects.create(
         usuario=pedido.venta.usuario,
         titulo='Actualización de tu pedido',
-        mensaje=f'{mensaje} — Pedido #{pedido.id}.{detalle_tiempo}',
+        mensaje=f'{mensaje} — Pedido #{pedido.id}.{detalle}',
         tipo=tipo,
         url='/pedido/mi-pedido',
     )
 
-    if instance.estado != Pedido.Estado.PREPARANDO:
+    # --- Admin: entró un pedido nuevo a producción ---
+    if instance.estado == Pedido.Estado.PREPARANDO:
+        for staff in User.objects.filter(is_staff=True, is_active=True):
+            Notificacion.objects.create(
+                usuario=staff,
+                titulo='Pedido para preparar',
+                mensaje=f'El pedido #{pedido.id} entró en preparación ({minutos} min estimados).',
+                tipo='warning',
+                url='/pedido/Pedidos',
+            )
         return
 
-    # --- Admin: le toca prepararlo ---
-    for staff in User.objects.filter(is_staff=True, is_active=True):
-        Notificacion.objects.create(
-            usuario=staff,
-            titulo='Pedido para preparar',
-            mensaje=f'El pedido #{pedido.id} entró en preparación ({minutos} min estimados).',
-            tipo='warning',
-            url='/pedido/Pedidos',
-        )
-
-    # --- Repartidor asignado: que sepa que ya se está preparando lo suyo ---
-    if pedido.repartidor_id:
+    # --- Repartidor: recién acá se le asignó la entrega ---
+    if instance.estado == Pedido.Estado.EN_CAMINO and pedido.repartidor_id:
+        puesto = f' Es tu parada #{pedido.orden_en_ruta}.' if pedido.orden_en_ruta else ''
         Notificacion.objects.create(
             usuario_id=pedido.repartidor_id,
             titulo='Entrega asignada',
-            mensaje=(f'El pedido #{pedido.id} se está preparando '
-                     f'({minutos} min estimados). Prepárate para salir.'),
+            mensaje=f'Te asignaron el pedido #{pedido.id}.{puesto}',
             tipo='info',
             url='/pedido/mis-entregas',
         )
@@ -814,6 +793,19 @@ class ConfiguracionEntrega(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(600)],
         help_text='Minutos que tarda la preparación de un pedido antes de salir a ruta.'
     )
+    max_pedidos_por_repartidor = models.PositiveIntegerField(
+        default=3,
+        validators=[MinValueValidator(1), MaxValueValidator(20)],
+        help_text='Cuántas entregas puede llevar encima un repartidor a la vez. '
+                  'Los pedidos que no entran esperan en la cola (estado pendiente).'
+    )
+    minutos_por_parada = models.PositiveIntegerField(
+        default=8,
+        validators=[MinValueValidator(1), MaxValueValidator(120)],
+        help_text='Lo que tarda el repartidor en cada entrega (estacionar, entregar, '
+                  'cobrar). Se suma al tiempo estimado por cada pedido que va antes '
+                  'en la ruta.'
+    )
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -829,6 +821,52 @@ def obtener_configuracion_entrega():
         pk=1, defaults={'minutos_preparacion': 20},
     )
     return config
+
+
+class SugerenciaSistema(models.Model):
+    #"""
+    #Ajuste que el sistema propone al admin después de mirar cómo vinieron
+    #saliendo los pedidos anteriores.
+    #
+    #El admin ya no cambia estados a mano (eso lo maneja el motor), pero sí
+    #sigue siendo el que decide la configuración del negocio. Cuando los
+    #números muestran un patrón — pedidos esperando demasiado en la cola,
+    #entregas que siempre tardan más de lo estimado — el sistema deja acá
+    #una sugerencia con el valor concreto que recomienda, y el admin la
+    #aplica o la descarta de un clic.
+    #"""
+
+    class Tipo(models.TextChoices):
+        TIEMPO_PREPARACION  = 'tiempo_preparacion',  'Tiempo de preparación'
+        MINUTOS_PARADA      = 'minutos_parada',      'Minutos por parada'
+        FALTAN_REPARTIDORES = 'faltan_repartidores', 'Faltan repartidores'
+
+    class Estado(models.TextChoices):
+        PENDIENTE  = 'pendiente',  'Pendiente'
+        APLICADA   = 'aplicada',   'Aplicada'
+        DESCARTADA = 'descartada', 'Descartada'
+
+    tipo = models.CharField(max_length=30, choices=Tipo.choices)
+    estado = models.CharField(max_length=15, choices=Estado.choices, default=Estado.PENDIENTE)
+    mensaje = models.CharField(max_length=255)
+    valor_actual = models.PositiveIntegerField(null=True, blank=True)
+    valor_sugerido = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text='Valor que el sistema recomienda. Nulo en sugerencias que no '
+                  'se aplican con un número (ej. "faltan repartidores").'
+    )
+    muestras = models.PositiveIntegerField(
+        default=0, help_text='Cuántos pedidos anteriores se miraron para sacar esta conclusión.'
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'sugerencia_sistema'
+        ordering = ['-fecha_actualizacion']
+
+    def __str__(self):
+        return f'{self.get_tipo_display()}: {self.mensaje}'
 
 
 class ConfiguracionSeguridad(models.Model):

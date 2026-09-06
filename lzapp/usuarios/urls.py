@@ -16,6 +16,7 @@ urlpatterns = [
     path('usuarios/eliminar-multiple/', views.eliminar_usuarios_multiple, name='eliminar_usuarios_multiple'),
     path('usuarios/editar/<int:id>/', views.editar_usuario, name='editar_usuario'),
     path('api/estadisticas-usuarios/', views.api_estadisticas_usuarios, name='api_estadisticas_usuarios'),
+    path('api/geocodificar-inversa/', views.geocodificar_inversa, name='geocodificar_inversa'),
 
     
 ]
